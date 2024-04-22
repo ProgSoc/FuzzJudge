@@ -4,6 +4,12 @@ Randomised input judging server, designed for ProgComp.
 
 Compiling code on the server machine is tricky, and we can't support everyone's favourite niche languages - so let's make it about transforming the input into the correct output like Advent of Code.
 
+## Debugging the Project
+
+```sh
+$ deno run --watch -A src/main.ts sample/
+```
+
 ## Competition Format
 
 - `/comp` Competition Folder
