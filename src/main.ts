@@ -97,7 +97,7 @@ if (import.meta.main) {
       case "/auth/logout": {
         return new Response("Logged out.\n", {
           status: 401,
-          headers: { "WWW-Authenticate": `Basic realm="comp", charset="utf-8"` },
+          headers: { "WWW-Authenticate": `Basic charset="utf-8"` },
         });
       }
       case "/comp/": return new Response(undent(`
@@ -142,6 +142,7 @@ if (import.meta.main) {
         `), { headers: { "Content-Type": "text/html" } });
       }
       default: {
+        const authDetails = auth.protect(req);
         const pattern = new URLPattern({ pathname: "/comp/prob/{:id/}:fn?" }).exec(url)?.pathname.groups;
         if (pattern !== undefined) {
           const problem = problems[pattern.id!];
@@ -175,7 +176,6 @@ if (import.meta.main) {
               </html>
             `), { headers: { "Content-Type": "text/html" } });
           }
-          const authDetails = auth.protect(req);
           switch (pattern.fn) {
             case "icon": {
               return new Response(problem.doc().icon);
