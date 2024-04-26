@@ -33,10 +33,10 @@ export class FuzzJudgeProblem {
     this.#doc = doc;
     this.#configPath = configPath;
     this.#slug = basename(dirname(configPath));
-    this.#cmdFuzz = Object(doc.config).fuzz?.[0] ?? pathJoin(configPath, "../fuzz");
-    this.#cmdSolve = Object(doc.config).solve?.[0] ?? pathJoin(configPath, "../solve");
-    this.#argsFuzz = Array.from(Object(doc.config).fuzz ?? []).map(String).slice(1);
-    this.#argsSolve = Array.from(Object(doc.config).solve ?? []).map(String).slice(1);
+    this.#cmdFuzz = Object(doc.config).exec?.fuzz?.[0] ?? pathJoin(configPath, "../fuzz");
+    this.#cmdSolve = Object(doc.config).exec?.solve?.[0] ?? pathJoin(configPath, "../solve");
+    this.#argsFuzz = Array.from(Object(doc.config).exec?.fuzz ?? []).map(String).slice(1);
+    this.#argsSolve = Array.from(Object(doc.config).exec?.solve ?? []).map(String).slice(1);
   }
 
   slug(): string {

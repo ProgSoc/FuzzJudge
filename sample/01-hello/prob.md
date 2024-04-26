@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+[exec]
 fuzz = ["deno", "run", "fuzz.ts"]
 solve = ["deno", "run", "solve.ts"]
 ```
