@@ -142,9 +142,9 @@ if (import.meta.main) {
         `), { headers: { "Content-Type": "text/html" } });
       }
       default: {
-        const authDetails = auth.protect(req);
         const pattern = new URLPattern({ pathname: "/comp/prob/{:id/}:fn?" }).exec(url)?.pathname.groups;
         if (pattern !== undefined) {
+          const authDetails = auth.protect(req);
           const problem = problems[pattern.id!];
           if (!pattern.fn) {
             return new Response(undent(`
