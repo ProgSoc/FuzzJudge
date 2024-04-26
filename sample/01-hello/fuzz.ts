@@ -16,7 +16,6 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod.ts";
 import { makeSeededGenerators } from "https://deno.land/x/vegas@v1.3.0/mod.ts";
 
 const names = [
@@ -32,23 +31,8 @@ const names = [
 ];
 
 if (import.meta.main) {
-  if (Deno.args[0] == "fuzz") {
-    const rand = makeSeededGenerators(Deno.args[1] || "");
-    for (const sample of rand.randomSample(names, 5)) {
-      console.log(sample);
-    }
+  const rand = makeSeededGenerators(Deno.args[0] ?? "");
+  for (const sample of rand.randomSample(names, 5)) {
+    console.log(sample);
   }
-  else if (Deno.args[0] == "solve") {
-    for await (
-      const line of Deno.stdin.readable
-        .pipeThrough(new TextDecoderStream())
-        .pipeThrough(new TextLineStream())
-    ) {
-      console.log(solve(line));
-    }
-  }
-}
-
-function solve(line: string): string {
-  return `Hello, ${line}!`;
 }

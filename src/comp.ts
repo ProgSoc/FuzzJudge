@@ -19,19 +19,24 @@
 import { basename, dirname, pathJoin } from "./deps.ts";
 import { FuzzJudgeDocument } from "./util.ts";
 
+
 export class FuzzJudgeProblem {
   #doc: FuzzJudgeDocument;
   #configPath: string;
   #slug: string;
-  #cmd: string;
-  #args: string[];
+  #cmdFuzz: string;
+  #cmdSolve: string;
+  #argsFuzz: string[];
+  #argsSolve: string[];
 
   constructor(configPath: string, doc: FuzzJudgeDocument) {
     this.#doc = doc;
     this.#configPath = configPath;
     this.#slug = basename(dirname(configPath));
-    this.#cmd = Object(doc.config).exec?.[0] ?? pathJoin(configPath, "./code");
-    this.#args = Array.from(Object(doc.config).exec ?? []).map(String).slice(1);
+    this.#cmdFuzz = Object(doc.config).fuzz?.[0];
+    this.#cmdSolve = Object(doc.config).solve?.[0];
+    this.#argsFuzz = Array.from(Object(doc.config).fuzz ?? []).map(String).slice(1);
+    this.#argsSolve = Array.from(Object(doc.config).solve ?? []).map(String).slice(1);
   }
 
   slug(): string {
@@ -43,8 +48,8 @@ export class FuzzJudgeProblem {
   }
 
   async fuzz(seed: string): Promise<string> {
-    const proc = new Deno.Command(this.#cmd, {
-      args: [...this.#args, "fuzz", seed],
+    const proc = new Deno.Command(this.#cmdFuzz, {
+      args: [...this.#argsFuzz, seed],
       cwd: pathJoin(this.#configPath, ".."),
       stdin: "piped",
       stdout: "piped",
@@ -56,8 +61,8 @@ export class FuzzJudgeProblem {
   }
 
   async solve(input: string): Promise<string> {
-    const proc = new Deno.Command(this.#cmd, {
-      args: [...this.#args, "solve"],
+    const proc = new Deno.Command(this.#cmdSolve, {
+      args: this.#argsSolve,
       cwd: pathJoin(this.#configPath, ".."),
       stdin: "piped",
       stdout: "piped",
