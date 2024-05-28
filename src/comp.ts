@@ -25,18 +25,18 @@ export class FuzzJudgeProblem {
   #configPath: string;
   #slug: string;
   #cmdFuzz: string;
-  #cmdSolve: string;
+  #cmdJudge: string;
   #argsFuzz: string[];
-  #argsSolve: string[];
+  #argsJudge: string[];
 
   constructor(configPath: string, doc: FuzzJudgeDocument) {
     this.#doc = doc;
     this.#configPath = configPath;
     this.#slug = basename(dirname(configPath));
-    this.#cmdFuzz = Object(doc.config).exec?.fuzz?.[0] ?? pathJoin(configPath, "../fuzz");
-    this.#cmdSolve = Object(doc.config).exec?.solve?.[0] ?? pathJoin(configPath, "../solve");
-    this.#argsFuzz = Array.from(Object(doc.config).exec?.fuzz ?? []).map(String).slice(1);
-    this.#argsSolve = Array.from(Object(doc.config).exec?.solve ?? []).map(String).slice(1);
+    this.#cmdFuzz = Object(doc.config).fuzz?.exec?.[0] ?? pathJoin(configPath, "../fuzz");
+    this.#cmdJudge = Object(doc.config).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
+    this.#argsFuzz = Array.from(Object(doc.config).fuzz?.exec ?? []).map(String).slice(1);
+    this.#argsJudge = Array.from(Object(doc.config).judge?.exec ?? []).map(String).slice(1);
   }
 
   slug(): string {
@@ -60,9 +60,9 @@ export class FuzzJudgeProblem {
     return new TextDecoder().decode(out.stdout);
   }
 
-  async solve(input: string): Promise<string> {
-    const proc = new Deno.Command(this.#cmdSolve, {
-      args: this.#argsSolve,
+  async judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
+    const proc = new Deno.Command(this.#cmdJudge, {
+      args: [...this.#argsJudge, seed],
       cwd: pathJoin(this.#configPath, ".."),
       stdin: "piped",
       stdout: "piped",
@@ -70,7 +70,9 @@ export class FuzzJudgeProblem {
     }).spawn();
     await new Response(input).body?.pipeTo(proc.stdin);
     const out = await proc.output();
-    if (!out.success) console.error(new TextDecoder().decode(out.stderr));
-    return new TextDecoder().decode(out.stdout);
+    const err = new TextDecoder().decode(out.stderr);
+    
+    if (out.success) return { correct: true };
+    else return { correct: false, errors: err };
   }
 }

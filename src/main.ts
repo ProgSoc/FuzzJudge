@@ -165,7 +165,7 @@ if (import.meta.main) {
                   <form method="post" action="/comp/prob/${pattern.id}/judge" enctype="text/plain">
                   <fieldset>
                     <legend><a href="/comp/prob/${pattern.id}/judge">Judge</a></legend>
-                    <p><textarea name="solve"></textarea></p>
+                    <p><textarea name="judge"></textarea></p>
                     <button type="submit">Submit</button>
                   </fieldset>
                   </form>
@@ -199,10 +199,15 @@ if (import.meta.main) {
               if (req.method !== "POST") {
                 return new Response("Resource must be POSTed\n", { status: 405, headers: { "Allow": "POST" } });
               }
-              const [correct, upload] = await Promise.all([problem.fuzz(authDetails.username).then(body => problem.solve(body)), req.text().then(body => new URLSearchParams(body).get("solve")?.replaceAll(/\r/g, ""))]);
-              if (correct === upload) return new Response("Success\n", { status: 200 });
-              else return new Response("Invalid solution!\n", { status: 400 });
+              let solution = await req.text().then(body => new URLSearchParams(body).get("judge"));
+              const { correct, errors } = await problem.judge(authDetails.username, solution);
+              if (correct) return new Response("Success\n", { status: 200 });
+              else return new Response(`Invalid solution! ${errors}\n`, { status: 400 });
             }
+          }
+
+          if (problem.doc().publicAssets?.includes(pattern.fn)) {
+            return new Response(await Deno.readFile(pathJoin(root, problem.slug(), pattern.fn)));
           }
         }
         break;
