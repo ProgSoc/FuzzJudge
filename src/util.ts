@@ -55,7 +55,7 @@ export function loadMarkdown(fileText: string): FuzzJudgeDocument {
 export function undent(text: string): string {
   const trimmed = text.replace(/^\s*\n(?=\s*[^\s])/, "").replace(/(?<=\n)\s*$/, "");
   const indent = trimmed.match(/^\s*/)?.[0].replaceAll("\t", "\\t") ?? "";
-  return trimmed.replaceAll(new RegExp("^"+indent, "gm"), "");
+  return trimmed.replaceAll(new RegExp("^" + indent, "gm"), "");
 }
 
 export function indent(pre: string, text: string): string {

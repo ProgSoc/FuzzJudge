@@ -57,8 +57,12 @@ if (import.meta.main) {
     match: [/prob\.md/],
     maxDepth: 2,
   })) {
-    const problem = new FuzzJudgeProblem(ent.path, loadMarkdown(await Deno.readTextFile(ent.path)));
-    problems[problem.slug()] = problem;
+    try {
+      const problem = new FuzzJudgeProblem(ent.path, loadMarkdown(await Deno.readTextFile(ent.path)));
+      problems[problem.slug()] = problem;
+    } catch (e) {
+      console.error(`Could not load "${ent.path}": ${e}`);
+    }
   }
 
   const auth = new Auth({
