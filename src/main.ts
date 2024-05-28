@@ -179,7 +179,7 @@ if (import.meta.main) {
                 <li><a href="/comp/prob/${pattern.id}/instructions">Instructions</a></li>
                 <li><a href="/comp/prob/${pattern.id}/points">Points</a></li>
                 <li><a href="/comp/prob/${pattern.id}/difficulty">Difficulty</a></li>
-                <li><a href="/comp/prob/${pattern.id}/points">Fuzz</a></li>
+                <li><a href="/comp/prob/${pattern.id}/fuzz">Fuzz</a></li>
                 <li><a href="/comp/prob/${pattern.id}/solved">Solved</a></li>
                 <li>
                   <form method="post" action="/comp/prob/${pattern.id}/judge" enctype="text/plain">
