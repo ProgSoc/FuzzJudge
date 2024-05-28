@@ -50,3 +50,8 @@ export function appendAnswer(username: string, slug: string) {
 
   db.query("REPLACE INTO scores (username, answered) VALUES (?, ?)", [username, JSON.stringify(answered)]);
 }
+
+export function initialiseUserScore(username: string) {
+  if (db.query("SELECT * FROM scores WHERE username == ?", [username]).length > 0) return;
+  db.query("INSERT INTO scores (username, answered) VALUES (?, ?)", [username, "[]"]);
+}
