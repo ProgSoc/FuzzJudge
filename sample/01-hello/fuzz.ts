@@ -30,9 +30,13 @@ const names = [
   "Justine",
 ];
 
+export function fuzz(seed: string): string[] {
+  const rand = makeSeededGenerators(seed);
+  return rand.randomSample(names, 5);
+}
+
 if (import.meta.main) {
-  const rand = makeSeededGenerators(Deno.args[0] ?? "");
-  for (const sample of rand.randomSample(names, 5)) {
+  for (const sample of fuzz(Deno.args[0] ?? "")) {
     console.log(sample);
   }
 }
