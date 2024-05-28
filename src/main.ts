@@ -43,7 +43,7 @@ import { undent, indent, loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
 import { pathJoin, walk } from "./deps.ts";
 import { Auth } from "./auth.ts";
-import { appendAnswer, getScoreboard, getAnswered } from "./score.ts";
+import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore } from "./score.ts";
 
 if (import.meta.main) {
 
@@ -97,6 +97,7 @@ if (import.meta.main) {
       `), { headers: { "Content-Type": "text/html" } });
       case "/auth/login": {
         const details = auth.protect(req);
+        initialiseUserScore(details.username);
         return new Response(`Authorized: ${Deno.inspect(details)}\n`);
       }
       case "/auth/logout": {
