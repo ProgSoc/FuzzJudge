@@ -28,6 +28,7 @@ export class FuzzJudgeProblem {
   #cmdJudge: string;
   #argsFuzz: string[];
   #argsJudge: string[];
+  #envFuzz: Record<string, string>;
 
   constructor(configPath: string, doc: FuzzJudgeDocument) {
     this.#doc = doc;
@@ -37,6 +38,8 @@ export class FuzzJudgeProblem {
     this.#cmdJudge = Object(doc.config).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
     this.#argsFuzz = Array.from(Object(doc.config).fuzz?.exec ?? []).map(String).slice(1);
     this.#argsJudge = Array.from(Object(doc.config).judge?.exec ?? []).map(String).slice(1);
+    this.#envFuzz = Object(doc.config).fuzz?.env ?? {};
+    for (const key in this.#envFuzz) this.#envFuzz[key] = String(this.#envFuzz[key]);
   }
 
   slug(): string {
@@ -54,6 +57,7 @@ export class FuzzJudgeProblem {
       stdin: "piped",
       stdout: "piped",
       stderr: "piped",
+      env: this.#envFuzz,
     }).spawn();
     const out = await proc.output();
     if (!out.success) console.error(new TextDecoder().decode(out.stderr));
