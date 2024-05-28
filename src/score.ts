@@ -27,7 +27,7 @@ export type UserScore = {
 }
 
 export function calculatePoints(problems: Record<string, FuzzJudgeProblem>, answers: Answer[]) {
-  return answers.reduce((acc, answer) => problems[answer.slug].doc().config?.problem?.points ?? 0 + acc, 0);
+  return answers.reduce((acc, answer) => problems[answer.slug]?.doc().config?.problem?.points ?? 0 + acc, 0);
 }
 
 export function getScoreboard(problems: Record<string, FuzzJudgeProblem>): UserScore[] {
