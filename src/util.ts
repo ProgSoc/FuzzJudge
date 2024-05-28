@@ -23,6 +23,7 @@ export interface FuzzJudgeDocument {
   title?: string,
   summary?: string,
   icon?: string,
+  publicAssets?: string[],
   body: string,
 }
 
@@ -46,8 +47,9 @@ export function loadMarkdown(fileText: string): FuzzJudgeDocument {
   const icon = titleRaw?.match(/\p{RGI_Emoji}/v)?.[0];
   const title = (icon !== undefined ? titleRaw?.replace(icon!, "") : titleRaw)?.trim();
   const summary = html.match(/<p.*>(.*?)<\/p>/)?.[1].replaceAll(/<.*>/g, "");
+  const publicAssets = markdown.match(/!\[.*\]\((.*?)\)/g)?.map((s) => s.match(/\((.*?)\)/)?.[1]).filter((s) => s !== undefined);
   return {
-    config, title, summary, icon,
+    config, title, summary, icon, publicAssets,
     body: title === undefined ? html : html.replace(/<h1.*>(.*?)<\/h1>/, ""),
   };
 }
@@ -55,7 +57,7 @@ export function loadMarkdown(fileText: string): FuzzJudgeDocument {
 export function undent(text: string): string {
   const trimmed = text.replace(/^\s*\n(?=\s*[^\s])/, "").replace(/(?<=\n)\s*$/, "");
   const indent = trimmed.match(/^\s*/)?.[0].replaceAll("\t", "\\t") ?? "";
-  return trimmed.replaceAll(new RegExp("^"+indent, "gm"), "");
+  return trimmed.replaceAll(new RegExp("^" + indent, "gm"), "");
 }
 
 export function indent(pre: string, text: string): string {
