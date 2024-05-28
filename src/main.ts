@@ -43,6 +43,7 @@ import { undent, indent, loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
 import { pathJoin, walk } from "./deps.ts";
 import { Auth } from "./auth.ts";
+import { appendAnswer, getScoreboard, getAnswered } from "./score.ts";
 
 if (import.meta.main) {
 
@@ -118,6 +119,7 @@ if (import.meta.main) {
             <li><a href="/comp/brief">Brief</a></li>
             <li><a href="/comp/instructions">Instructions</a></li>
             <li><a href="/comp/prob/">Problems</a></li>
+            <li><a href="/comp/scoreboard">Scoreboard</a></li>
           </ul>
         </main>
         </body>
@@ -128,6 +130,16 @@ if (import.meta.main) {
       case "/comp/brief": return new Response(compfile.summary);
       case "/comp/instructions": return new Response(
         compfile.body,
+        { headers: { "Content-Type": "text/html" } },
+      );
+      case "/comp/scoreboard": return new Response(undent(`
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"/></head>
+          <body>
+          ${getScoreboard(problems).map(user => `<h2>${user.username} - ${user.points}</h2><ul>${user.answers.map(({ slug, time }) => `<li><b>${slug}</b> at ${time}</li>`).join("\n")}</ul>`).join("\n")}
+          </body>
+          </html>`),
         { headers: { "Content-Type": "text/html" } },
       );
       case "/comp/prob/": {
@@ -165,7 +177,10 @@ if (import.meta.main) {
                 <li><a href="/comp/prob/${pattern.id}/name">Name</a></li>
                 <li><a href="/comp/prob/${pattern.id}/brief">Brief</a></li>
                 <li><a href="/comp/prob/${pattern.id}/instructions">Instructions</a></li>
-                <li><a href="/comp/prob/${pattern.id}/fuzz">Fuzz</a></li>
+                <li><a href="/comp/prob/${pattern.id}/points">Points</a></li>
+                <li><a href="/comp/prob/${pattern.id}/difficulty">Difficulty</a></li>
+                <li><a href="/comp/prob/${pattern.id}/points">Fuzz</a></li>
+                <li><a href="/comp/prob/${pattern.id}/solved">Solved</a></li>
                 <li>
                   <form method="post" action="/comp/prob/${pattern.id}/judge" enctype="text/plain">
                   <fieldset>
@@ -206,8 +221,23 @@ if (import.meta.main) {
               }
               let solution = await req.text().then(body => new URLSearchParams(body).get("judge"));
               const { correct, errors } = await problem.judge(authDetails.username, solution);
-              if (correct) return new Response("Success\n", { status: 200 });
-              else return new Response(`Invalid solution! ${errors}\n`, { status: 400 });
+
+              if (correct) {
+                appendAnswer(authDetails.username, problem.slug());
+                return new Response("Success\n", { status: 200 });
+              }
+
+              return new Response(`Invalid solution! ${errors}\n`, { status: 400 });
+            }
+            case "difficulty": {
+              return new Response(problem.doc().config?.problem?.difficulty ?? "unknown");
+            }
+            case "points": {
+              return new Response(problem.doc().config?.problem?.points ?? "unknown");
+            }
+            case "solved": {
+              const solved = getAnswered(authDetails.username).some(({ slug }) => slug === problem.slug());
+              return new Response(solved ? "true" : "false");
             }
           }
 
