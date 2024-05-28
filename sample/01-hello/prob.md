@@ -21,6 +21,10 @@ env = {}
 
 [judge]
 exec = ["deno", "run", "judge.ts"]
+
+[problem]
+points = 20
+difficulty = 3
 ```
 
 # 👋 Hello Programmers!
