@@ -29,6 +29,8 @@ export class FuzzJudgeProblem {
   #argsFuzz: string[];
   #argsJudge: string[];
   #envFuzz: Record<string, string>;
+  #previousSubmissionTimes: Record<string, number> = {};
+  #submissionCounts: Record<string, number> = {};
 
   constructor(configPath: string, doc: FuzzJudgeDocument) {
     this.#doc = doc;
@@ -65,6 +67,9 @@ export class FuzzJudgeProblem {
   }
 
   async judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
+    const { limited, message } = this.#handleRateLimiting(seed);
+    if (limited) return { correct: false, errors: message };
+
     const proc = new Deno.Command(this.#cmdJudge, {
       args: [...this.#argsJudge, seed],
       cwd: pathJoin(this.#configPath, ".."),
@@ -75,8 +80,35 @@ export class FuzzJudgeProblem {
     await new Response(input).body?.pipeTo(proc.stdin);
     const out = await proc.output();
     const err = new TextDecoder().decode(out.stderr);
-    
+
     if (out.success) return { correct: true };
     else return { correct: false, errors: err };
+  }
+
+  #handleRateLimiting(seed: string): { limited: boolean; message?: string } {
+    // Increase the interval by 5 seconds for each submission
+    const interval = 5 * 1000 * (this.#submissionCounts[seed] ?? 0); // ms
+
+    if (this.#previousSubmissionTimes[seed] !== undefined) {
+      const now = Date.now();
+      const timeSinceLastSubmission = now - this.#previousSubmissionTimes[seed];
+
+      if (timeSinceLastSubmission < interval) {
+        const secondsToWait = (interval - timeSinceLastSubmission) / 1000;
+        const formattedTime = secondsToWait > 59
+          ? `${Math.floor(secondsToWait / 60)} minutes`
+          : `${Math.ceil(secondsToWait)} seconds`;
+
+        return {
+          limited: true,
+          message: `Please wait ${formattedTime} before submitting again.`,
+        };
+      }
+    }
+
+    this.#previousSubmissionTimes[seed] = Date.now();
+    this.#submissionCounts[seed] = (this.#submissionCounts[seed] ?? 0) + 1;
+
+    return { limited: false };
   }
 }
