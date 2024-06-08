@@ -90,8 +90,7 @@ export class FuzzJudgeProblem {
     const interval = 5 * 1000 * (this.#submissionCounts[seed] ?? 0); // ms
 
     if (this.#previousSubmissionTimes[seed] !== undefined) {
-      const now = Date.now();
-      const timeSinceLastSubmission = now - this.#previousSubmissionTimes[seed];
+      const timeSinceLastSubmission = Date.now() - this.#previousSubmissionTimes[seed];
 
       if (timeSinceLastSubmission < interval) {
         const secondsToWait = (interval - timeSinceLastSubmission) / 1000;
