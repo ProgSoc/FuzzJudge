@@ -1,0 +1,10 @@
+services:
+  server:
+    build: .
+    volumes:
+      - ./sample:/competition
+      - type: bind
+        source: ./db.sqlite3
+        target: /app/scores.db
+    ports:
+      - "8000:8000"
