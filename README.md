@@ -16,12 +16,51 @@ $ deno run --watch -A src/main.ts sample/
     - `/comp/comp.md` Competition description and config (code block front matter)
     - `/comp/style.css` Frontend competition page stylesheet
     - `/comp/<prob>/` Problem Folders
-      - `/comp/<prob>/prob.md` Problem description and config (code block front matter)
+      - `/comp/<prob>/prob.md` Problem description and config (code block front matter). [See below](#problem-format).
 
 ## Backend API Listing
 
 - `/comp/`
 - `/auth/`
+
+## Problem Format
+A problem directory should contain a markdown document `prob.md` and any other required files. For an full examples see [the sample questions](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
+
+### Fuzz
+The `[fuzz]` section in the code block front matter is used to generate a user's unique problem input based on that user's unique seed.
+```
+[fuzz]
+exec = ["deno", "run", "fuzz.ts"]
+env = { KEY = 123 }
+```
+* `cmd` is the command to be run to generate the problem input.
+* `env` is any any environment variables to set for the command.
+
+The command is executed in the path of the problem directory with the seed appended to the end of the specified arguments list (so for example the command above would be executed as `deno run fuzz.ts someseed123`). The seed can be any string. The resulting problem input for that seed should then be sent to `stdout`.
+
+### Judge
+The `[judge]` section in the code block front matter takes the user's solution to the problem and determines whether or not it is correct.
+```
+[judge]
+exec = ["deno", "run", "judge.ts"]
+```
+The command is executed with the seed the same way it is in the (fuzz method)[#fuzz] with the same seed for that user. As it is the same seed, it can be used to determine if the submission is valid for that user's puzzle input. The user's puzzle input is piped to the command though `stdin`. If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the question is incorrect, `stderr` will be sent to the client. This is useful for displaying errors regarding incorrect formatting in submissions.
+
+### Problem Metadata
+* **Title**: The first large header (e.g. `# FuzzJudge Problem`) in the document specifies the problem title.
+* **Icon**: Any emoji (unicode RGI emoji) in the first large header specifies the problem's icon (e.g. `# 😄 FuzzJudge Problem`). This will be excluded from the problem title.
+* **Brief**: The first paragraph in the document specifies a brief for the question.
+* **Instructions**: The remainder of the document (including the brief) is the instructions for the problem. Any images included in the problem directory can be used in the document with the regular image syntax `![Some image](image.png)` and they will automatically be made public.
+
+
+The `[problem]` section in the code block front matter is used to specify the difficulty and points.
+```
+[problem]
+points = 20
+difficulty = 3
+```
+* `points` is the number of points awarded for submitting a passing solution.
+* `difficult` is a difficulty rating where 1 is easy, 2 is medium and 3 is hard.
 
 ## Background
 
