@@ -44,7 +44,7 @@ The `[judge]` section in the code block front matter takes the user's solution t
 [judge]
 exec = ["deno", "run", "judge.ts"]
 ```
-The command is executed with the seed the same way it is in the (fuzz method)[#fuzz] with the same seed for that user. As it is the same seed, it can be used to determine if the submission is valid for that user's puzzle input. The user's puzzle input is piped to the command though `stdin`. If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the question is incorrect, `stderr` will be sent to the client. This is useful for displaying errors regarding incorrect formatting in submissions.
+The command is executed with the seed the same way it is in the [fuzz method](#fuzz) with the same seed for that user. As it is the same seed, it can be used to determine if the submission is valid for that user's puzzle input. The user's puzzle input is piped to the command though `stdin`. If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the question is incorrect, `stderr` will be sent to the client. This is useful for displaying errors regarding incorrect formatting in submissions.
 
 ### Problem Metadata
 * **Title**: The first large header (e.g. `# FuzzJudge Problem`) in the document specifies the problem title.
@@ -60,7 +60,7 @@ points = 20
 difficulty = 3
 ```
 * `points` is the number of points awarded for submitting a passing solution.
-* `difficult` is a difficulty rating where 1 is easy, 2 is medium and 3 is hard.
+* `difficulty` is a difficulty rating where 1 is easy, 2 is medium and 3 is hard.
 
 ## Background
 
