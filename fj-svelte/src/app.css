@@ -1,0 +1,56 @@
+html {
+  font-family: arial;
+  background-color: var(--bg-prim);
+  color: var(--text-prim);
+}
+
+button {
+  background-color: var(--accent);
+  color: var(--text-sec);
+  border: none;
+  cursor: pointer;
+  border-radius: 1px;
+  size: 17px;
+  padding: 4px;
+}
+
+:root {
+  --text-prim: #f8f8f8;
+  --text-sec: #d7d7d7;
+  --accent: #282a30;
+  --accent-text: #83a4f4;
+  --bg-prim: #27292f;
+  --bg-sec: #141519;
+}
+
+html {
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-sec);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-sec);
+  opacity: 0.5;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-sec);
+}
+
+.octicon {
+  visibility: hidden;
+  width: 0px;
+}
+
+a {
+  color: var(--accent-text);
+}
