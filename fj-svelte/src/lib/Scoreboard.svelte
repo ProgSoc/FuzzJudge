@@ -106,16 +106,17 @@
   .solved {
     background-color: #41df56;
     color: #000000;
+    text-align: center;
   }
 
   th {
     padding: 0.8rem 0.3rem;
-    border: solid 1px var(--bg-sec);
+    border: solid 1px var(--text-prim);
   }
 
   td {
     padding: 0.3rem;
-    border: solid 1px var(--bg-sec);
+    border: solid 1px var(--text-sec);
   }
 
   .result {

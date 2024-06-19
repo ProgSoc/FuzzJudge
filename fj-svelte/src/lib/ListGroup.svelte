@@ -19,6 +19,8 @@
     margin-left: 0.3rem;
     color: var(--text-sec);
     cursor: pointer;
-    padding: 0.3rem;
+    padding: 1rem;
+    background-color: var(--bg-sec);
+    max-width: fit-content;
   }
 </style>

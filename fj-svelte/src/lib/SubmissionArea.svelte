@@ -43,13 +43,17 @@
 
 <div class="question-submission">
   <div class="section">
-    <button class="get-input" on:click={open_fuzz}> Get input </button>
-  </div>
-  <div class="section">
+    <div class="text-area-buttons">
+      <span class="get-input" > To begin, <span class="input-span" on:click={open_fuzz}>grab your question input! </span></span>
+      </div>
     <textarea bind:value={submission_value} />
+    <div class="text-area-buttons">
+ 
     <button on:click={() => submit($selected_question)}>
       {waiting_on_server ? "Processing..." : "Submit"}
     </button>
+    </div>
+
   </div>
   <div class="sec error-message-area">
     {#if $error_message !== undefined}
@@ -61,13 +65,12 @@
 </div>
 
 <style>
-  .get-input {
-    padding: 1.7rem;
-  }
+
 
   .section {
     flex-direction: column;
     display: flex;
+
   }
 
   .error-message-area {
@@ -78,8 +81,33 @@
     color: var(--text-sec);
     background-color: var(--bg-sec);
     margin: 0.25rem;
+    flex: 1; /* Make each button take up equal space */
+    width: 50%; /* Ensure each button takes up half the container's width */
+    box-sizing: border-box;
+    &:hover {
+      background-color: #121212;
+    } /* Include padding and border in the element's total width and height */
   }
 
+  .get-input{
+    margin-bottom: 1rem;
+    margin-left: 0.25rem;
+  }
+
+  .input-span{
+    color: green;
+    &:hover{
+      color:lightgreen;
+      cursor:pointer;
+    }
+  }
+
+  .text-area-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Ensure the container spans the full width */
+  }
   textarea {
     height: 8rem;
     width: 15rem;
@@ -94,9 +122,9 @@
     grid-area: question-submission;
     padding: 0.7rem;
     display: flex;
-    justify-content: center;
+    justify-content: start;
     flex-direction: column;
-    align-content: center;
+    align-content: start;
     flex-wrap: wrap;
     align-items: center;
   }

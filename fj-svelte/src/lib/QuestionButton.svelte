@@ -37,8 +37,6 @@
     color: var(--text-sec);
     cursor: pointer;
     padding: 0.3rem;
-    border-bottom: solid 2px var(--accent);
-
     display: grid;
     grid-auto-columns: 1fr;
     grid-auto-rows: 1fr;
@@ -46,8 +44,11 @@
     grid-template-rows: 1fr;
     gap: 0px 0px;
     grid-template-areas: "icon name status";
+    background-color: var(--bg-sec);
+    border: solid 2px transparent;
+    border-bottom: solid 2px var(--accent);
   }
-
+  
   .icon {
     grid-area: icon;
     font-size: 1rem;
@@ -64,6 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    color: lightgreen;
   }
 
   .subtext {
@@ -72,6 +74,6 @@
   }
 
   .selected {
-    background-color: var(--accent);
+    border: solid 2px white;
   }
 </style>
