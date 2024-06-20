@@ -45,6 +45,7 @@ import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore } from "./score.ts";
 import { Router } from "./http.ts";
+import { HEADER } from "./version.ts";
 
 if (import.meta.main) {
 
@@ -76,6 +77,7 @@ if (import.meta.main) {
 
   //
   const router = new Router({
+    "GET": _ => HEADER,
     "BREW": _ => new Response("418 I'm a Teapot", { status: 418 }),
     "/auth": {
       "/login": async req => {
