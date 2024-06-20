@@ -1,0 +1,8 @@
+Valid:
+Hello Bob!
+Hello Hello, World!!
+
+Invalid:
+HelloJoe!
+Hi!
+Hey mate
