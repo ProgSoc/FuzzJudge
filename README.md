@@ -12,16 +12,30 @@ $ deno run --watch -A src/main.ts sample/
 
 ## Competition Format
 
-- `/comp` Competition Folder
-    - `/comp/comp.md` Competition description and config (code block front matter)
-    - `/comp/style.css` Frontend competition page stylesheet
-    - `/comp/<prob>/` Problem Folders
-      - `/comp/<prob>/prob.md` Problem description and config (code block front matter). [See below](#problem-format).
+- Competition Folder (Demo in `sample/`)
+    - `comp.md` Competition description and config (code block front matter)
+    - `<prob>/` Problem Folders
+        - `prob.md` Problem description and config (code block front matter). [See below](#problem-format).
 
-## Backend API Listing
+## Backend API
 
-- `/comp/`
-- `/auth/`
+- `/auth`
+    - `login`
+    - `logout`
+- `/comp`
+    - `name`
+    - `brief`
+    - `instructions`
+    - `scoreboard`
+    - `prob/:id`
+        - `icon`
+        - `name`
+        - `brief`
+        - `difficulty`
+        - `points`
+        - `fuzz`
+        - `judge`
+        - `assets/**`
 
 ## Problem Format
 A problem directory should contain a markdown document `prob.md` and any other required files. For an full examples see [the sample questions](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
