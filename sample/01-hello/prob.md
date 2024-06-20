@@ -37,6 +37,8 @@ For example, `Linus` will be converted to `Hello Linus!`.
 
 Make sure you have a look at the "scaffolds" page, to see how get familiar with how the questions will do I/O.
 
+See the [examples.txt](examples.txt) file for some valid and invalid solutions.
+
 ## Input format
 
 The first line contains a string `S` which is the name to be greeted.
