@@ -128,11 +128,12 @@ if (import.meta.main) {
               if (req.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
                 return new Response("415 Unsupported Media Type (Expected application/x-www-form-urlencoded)", { status: 415 });
               }
-              const submissionOutput = await req.text().then(body => new URLSearchParams(body).get("output"));
+              const body = await req.text();
+              const submissionOutput = new URLSearchParams(body).get("output");
               if (submissionOutput === null) {
                 return new Response("400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n", { status: 400 });
               }
-              const submissionCode = await req.text().then(body => new URLSearchParams(body).get("source"));
+              const submissionCode = new URLSearchParams(body).get("source");
               if (submissionCode === null) {
                 return new Response("400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n", { status: 400 });
               }
