@@ -41,9 +41,10 @@ Backend
 
 import { undent, indent, loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk } from "./deps.ts";
+import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore } from "./score.ts";
+import { Router } from "./http.ts";
 
 if (import.meta.main) {
 
@@ -67,72 +68,28 @@ if (import.meta.main) {
   }
 
   const auth = new Auth({
-    basic: ({ username }) => {
-      return { username };
+    basic: async ({ username, password }) => {
+      // crypto.subtle.digest()
+      return { username, id: username };
     },
   });
 
-  Deno.serve({
-    onError: (e) => {
-      if (e instanceof Response) return e;
-      else return new Response(String(e), { status: 500 });
-    }
-  }, async req => {
-    const url = new URL(req.url);
-    switch (url.pathname) {
-      case "/auth/": return new Response(undent(`
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"/></head>
-        <body>
-        <header><h1>Authentication</h1></header>
-        <main>
-          <ul>
-            <li><a href="/auth/login">Login</a></li>
-            <li><a href="/auth/logout">Logout</a></li>
-          </ul>
-        </main>
-        </body>
-        </html>
-      `), { headers: { "Content-Type": "text/html" } });
-      case "/auth/login": {
-        const details = auth.protect(req);
-        initialiseUserScore(details.username);
-        return new Response(`Authorized: ${Deno.inspect(details)}\n`);
-      }
-      case "/auth/logout": {
-        return new Response("Logged out.\n", {
-          status: 401,
-          headers: { "WWW-Authenticate": `Basic charset="utf-8"` },
-        });
-      }
-      case "/comp/": return new Response(undent(`
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"/></head>
-        <body>
-        <header><h1>Competition</h1></header>
-        <main>
-          <ul>
-            <li><a href="/comp/icon">Icon</a></li>
-            <li><a href="/comp/name">Name</a></li>
-            <li><a href="/comp/brief">Brief</a></li>
-            <li><a href="/comp/instructions">Instructions</a></li>
-            <li><a href="/comp/prob/">Problems</a></li>
-            <li><a href="/comp/scoreboard">Scoreboard</a></li>
-          </ul>
-        </main>
-        </body>
-        </html>
-      `), { headers: { "Content-Type": "text/html" } });
-      // case "/icon": return new Response();
-      case "/comp/name": return new Response(compfile.title ?? "FuzzJudge Competition");
-      case "/comp/brief": return new Response(compfile.summary);
-      case "/comp/instructions": return new Response(
-        compfile.body,
-        { headers: { "Content-Type": "text/html" } },
-      );
-      case "/comp/scoreboard": return new Response(undent(`
+  //
+  const router = new Router({
+    "BREW": _ => new Response("418 I'm a Teapot", { status: 418 }),
+    "/auth": {
+      "/login": async req => {
+        const user = await auth.protect(req);
+        initialiseUserScore(user.id);
+        return new Response(`Authorized: ${Deno.inspect(user)}\n`);
+      },
+      "/logout": req => auth.requestAuth(req),
+    },
+    "/comp": {
+      "/name": () => compfile.title ?? "FuzzJudge Competition",
+      "/brief": () => compfile.summary ?? "",
+      "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
+      "/scoreboard": () => new Response(undent(`
           <!DOCTYPE html>
           <html>
           <head><meta charset="utf-8"/></head>
@@ -141,113 +98,69 @@ if (import.meta.main) {
           </body>
           </html>`),
         { headers: { "Content-Type": "text/html" } },
-      );
-      case "/comp/prob/": {
-        return new Response(undent(`
-          <!DOCTYPE html>
-          <html>
-          <head><meta charset="utf-8"/></head>
-          <body>
-          <header><h1>Problems</h1></header>
-          <main>
-            <ul>
-            ${indent("  ", Object.entries(problems).map(([slug, prob]) => `<li><a href="/comp/prob/${encodeURIComponent(slug)}/">${prob.doc().title ?? slug}</a></li>\n`).join(""))}
-            </ul>
-          </main>
-          </body>
-          </html>
-        `), { headers: { "Content-Type": "text/html" } });
-      }
-      default: {
-        const pattern = new URLPattern({ pathname: "/comp/prob/{:id/}:fn?" }).exec(url)?.pathname.groups;
-        if (pattern !== undefined) {
-          const authDetails = auth.protect(req);
-          const problem = problems[pattern.id!];
-          if (!pattern.fn) {
-            return new Response(undent(`
-              <!DOCTYPE html>
-              <html>
-              <head><meta charset="utf-8"/></head>
-              <body>
-              <header><h1>${problem.doc().title ?? problem.slug()}</h1></header>
-              <hr/>
-              <main>
-                <ul>
-                <li><a href="/comp/prob/${pattern.id}/icon">Icon</a></li>
-                <li><a href="/comp/prob/${pattern.id}/name">Name</a></li>
-                <li><a href="/comp/prob/${pattern.id}/brief">Brief</a></li>
-                <li><a href="/comp/prob/${pattern.id}/instructions">Instructions</a></li>
-                <li><a href="/comp/prob/${pattern.id}/points">Points</a></li>
-                <li><a href="/comp/prob/${pattern.id}/difficulty">Difficulty</a></li>
-                <li><a href="/comp/prob/${pattern.id}/fuzz">Fuzz</a></li>
-                <li><a href="/comp/prob/${pattern.id}/solved">Solved</a></li>
-                <li>
-                  <form method="post" action="/comp/prob/${pattern.id}/judge" enctype="text/plain">
-                  <fieldset>
-                    <legend><a href="/comp/prob/${pattern.id}/judge">Judge</a></legend>
-                    <p><textarea name="judge"></textarea></p>
-                    <button type="submit">Submit</button>
-                  </fieldset>
-                  </form>
-                </li>
-                </ul>
-              </main>
-              </body>
-              </html>
-            `), { headers: { "Content-Type": "text/html" } });
-          }
-          switch (pattern.fn) {
-            case "icon": {
-              return new Response(problem.doc().icon);
-            }
-            case "name": {
-              return new Response(problem.doc().title ?? problem.slug());
-            }
-            case "brief": {
-              return new Response(problem.doc().summary);
-            }
-            case "instructions": {
-              return new Response(
-                problem.doc().body,
-                { headers: { "Content-Type": "text/html" } },
-              )
-            }
-            case "fuzz": {
-              return new Response(await problem.fuzz(authDetails.username));
-            }
-            case "judge": {
-              if (req.method !== "POST") {
-                return new Response("Resource must be POSTed\n", { status: 405, headers: { "Allow": "POST" } });
+      ),
+      "/prob": {
+        "/:id": {
+          "/icon": (_req, { id }) => problems[id!].doc().icon,
+          "/name": (_req, { id }) => problems[id!].doc().title,
+          "/brief": (_req, { id }) => problems[id!].doc().summary,
+          "/difficulty": (_req, { id }) => (problems[id!].doc().config as any)?.problem?.difficulty,
+          "/points": (_req, { id }) => (problems[id!].doc().config as any)?.problem?.points,
+          "/solution": _ => new Response("451 Unavailable For Legal Reasons", { status: 451 }),
+          // Gated (by time and auth) utils ...
+          "/instructions": async (req, { id }) => {
+            await auth.protect(req);
+            return problems[id!].doc().body;
+          },
+          "/fuzz": async (req, { id }) => {
+            const user = await auth.protect(req);
+            return await problems[id!].fuzz(user.id);
+          },
+          "/judge": {
+            "GET": async (req, { id: problemId }) => {
+              const user = await auth.protect(req);
+              return getAnswered(user.id).some(({ slug }) => slug === problemId) ? "OK" : "Not Solved";
+            },
+            "POST": async (req, { id: problemId }) => {
+              const user = await auth.protect(req);
+              if (req.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
+                return new Response("415 Unsupported Media Type (Expected application/x-www-form-urlencoded)", { status: 415 });
               }
-              let solution = await req.text().then(body => new URLSearchParams(body).get("judge"));
-              const { correct, errors } = await problem.judge(authDetails.username, solution);
+              const submissionOutput = await req.text().then(body => new URLSearchParams(body).get("output"));
+              if (submissionOutput === null) {
+                return new Response("400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n", { status: 400 });
+              }
+              const submissionCode = await req.text().then(body => new URLSearchParams(body).get("source"));
+              if (submissionCode === null) {
+                return new Response("400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n", { status: 400 });
+              }
+              const { correct, errors } = await problems[problemId!].judge(user.id, submissionOutput);
 
               if (correct) {
-                appendAnswer(authDetails.username, problem.slug());
-                return new Response("Success\n", { status: 200 });
+                appendAnswer(user.id, problemId!);
+                return "Approved! ✅\n";
+              } else {
+                return new Response(`422 Unprocessable Content\n\nSolution rejected.\n\n${errors}\n`, { status: 422 });
               }
+            },
+          },
+          "/assets/*": async (req, { id: problemId, 0: assetPath }) => {
+            await auth.protect(req);
+            return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
+          },
+        },
+      },
+      "/team": {},
+    },
+  });
 
-              return new Response(`Invalid solution! ${errors}\n`, { status: 400 });
-            }
-            case "difficulty": {
-              return new Response(problem.doc().config?.problem?.difficulty ?? "unknown");
-            }
-            case "points": {
-              return new Response(problem.doc().config?.problem?.points ?? "unknown");
-            }
-            case "solved": {
-              const solved = getAnswered(authDetails.username).some(({ slug }) => slug === problem.slug());
-              return new Response(solved ? "true" : "false");
-            }
-          }
-
-          if (problem.doc().publicAssets?.includes(pattern.fn)) {
-            return new Response(await Deno.readFile(pathJoin(root, problem.slug(), pattern.fn)));
-          }
-        }
-        break;
-      }
-    }
-    return new Response("Not Found", { status: 404 });
+  Deno.serve({
+    port: 1989,
+    handler: req => router.route(req),
+    onError: (e) => {
+      if (e instanceof Response) return e;
+      else if (e instanceof Error) return new Response(`Internal Server Error\n\n${e.stack ?? e.message}`, { status: 500 });
+      else return new Response(String(e), { status: 500 });
+    },
   });
 }

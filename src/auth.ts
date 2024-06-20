@@ -24,32 +24,42 @@ export function basicAuth(req: Request): { username: string, password: string } 
   return { username, password };
 }
 
-export interface AuthSchemes<T> {
+export interface AuthSchemes<UserDetails> {
   basic: (options: {
     username: string,
     password: string,
-  }) => T | null,
+  }) => UserDetails | null,
 }
 
-export class Auth<T> {
-  #schemes: AuthSchemes<T>;
+export class Auth<UserDetails> {
+  #schemes: AuthSchemes<UserDetails>;
 
-  constructor(schemes: AuthSchemes<T>) {
+  constructor(schemes: AuthSchemes<UserDetails>) {
     this.#schemes = schemes;
   }
 
-  protect(req: Request): T {
-    const header = req.headers.get("Authorization");
+  protect(ctx: Request): UserDetails {
+    const header = ctx.headers.get("Authorization");
     if (header) {
       if (header.startsWith("Basic ")) {
-        const [ username, password ] = atob(header.slice(6)).split(/:(.*)/);
-        const details = this.#schemes.basic({ username, password });
-        if (details !== null) return details;
+        try {
+          const [ username, password ] = atob(header.slice(6)).split(/:(.*)/);
+          const details = this.#schemes.basic({ username, password });
+          if (details !== null) return details;
+        } catch (e) {
+          if (e instanceof DOMException && e.message === "InvalidCharacterError") {
+            throw new Response("400 Bad Request ('Basic' Header not base64)\n", { status: 400 });
+          }
+        }
       }
     }
-    throw new Response("Unauthorized.\n", {
+    throw this.requestAuth(ctx);
+  }
+
+  requestAuth(_: Request): Response {
+    return new Response("401 Unauthorized\n", {
       status: 401,
-      headers: { "WWW-Authenticate": `Basic charset="utf-8"` },
+      headers: { "WWW-Authenticate": `Basic realm="/comp" charset="utf-8"` },
     });
   }
 }

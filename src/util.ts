@@ -47,7 +47,7 @@ export function loadMarkdown(fileText: string): FuzzJudgeDocument {
   const icon = titleRaw?.match(/\p{RGI_Emoji}/v)?.[0];
   const title = (icon !== undefined ? titleRaw?.replace(icon!, "") : titleRaw)?.trim();
   const summary = html.match(/<p.*>(.*?)<\/p>/)?.[1].replaceAll(/<.*>/g, "");
-  const publicAssets = markdown.match(/!\[.*\]\((.*?)\)/g)?.map((s) => s.match(/\((.*?)\)/)?.[1]).filter((s) => s !== undefined);
+  const publicAssets = markdown.match(/!\[.*\]\((.*?)\)/g)?.map((s) => s.match(/\((.*?)\)/)?.[1]).filter((s) => s !== undefined) as string[];
   return {
     config, title, summary, icon, publicAssets,
     body: title === undefined ? html : html.replace(/<h1.*>(.*?)<\/h1>/, ""),
