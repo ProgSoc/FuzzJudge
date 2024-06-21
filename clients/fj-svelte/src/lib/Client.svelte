@@ -3,11 +3,10 @@
   import Popout from "./Popout.svelte";
   import Sidebar from "./Sidebar.svelte";
   import Scoreboard from "./Scoreboard.svelte";
-  import Question from "./Question.svelte";
+  import QuestionContents from "./QuestionContents.svelte";
   import {
     type QuestionMeta,
     selected_question,
-    difficulty_name,
   } from "../utils";
 
   import { get_username } from "../api";
@@ -60,7 +59,7 @@
     </div>
   </div>
   <Sidebar {questions} />
-  <Question question_data={questions[$selected_question]} {set_solved} />
+  <QuestionContents question_data={questions[$selected_question]} {set_solved} />
 </div>
 
 <Popout

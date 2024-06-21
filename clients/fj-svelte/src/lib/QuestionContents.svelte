@@ -16,7 +16,7 @@
     if (slug === undefined) return;
 
     if (question_instructions !== undefined) {
-      question_instructions.scrollTop = 0; // huh?
+      question_instructions.scrollTop = 0;
     }
   });
 </script>
