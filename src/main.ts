@@ -41,9 +41,9 @@ Backend
 
 import { undent, indent, loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
+import { pathJoin, walk, serveFile, normalize, WebSocketServer, WebSocketClient } from "./deps.ts";
 import { Auth } from "./auth.ts";
-import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore } from "./score.ts";
+import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore, subscribeToScoreboard, createScoreboardCSV } from "./score.ts";
 import { Router } from "./http.ts";
 import { HEADER } from "./version.ts";
 
@@ -75,6 +75,15 @@ if (import.meta.main) {
     },
   });
 
+  const wss = new WebSocketServer(8080);
+  subscribeToScoreboard(() => {
+    const scoreboard = getScoreboard(problems);
+    const csv = createScoreboardCSV(scoreboard);
+    for (const client of wss.clients) {
+      client.send(csv);
+    }
+  });
+
   //
   const router = new Router({
     "GET": _ => HEADER,
@@ -87,21 +96,25 @@ if (import.meta.main) {
       },
       "/logout": req => auth.requestAuth(req),
     },
+    "/client/*": (req, { 0: path }) => {
+      if (!path || path === "") {
+        path = "index.html";
+      } else if (path.endsWith("/")) {
+        path += "index.html";
+      }
+      return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
+    },
     "/comp": {
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
-      "/scoreboard": () => new Response(undent(`
-          <!DOCTYPE html>
-          <html>
-          <head><meta charset="utf-8"/></head>
-          <body>
-          ${getScoreboard(problems).map(user => `<h2>${user.username} - ${user.points}</h2><ul>${user.answers.map(({ slug, time }) => `<li><b>${slug}</b> at ${time}</li>`).join("\n")}</ul>`).join("\n")}
-          </body>
-          </html>`),
-        { headers: { "Content-Type": "text/html" } },
-      ),
+      "/scoreboard": () => {
+        const scoreboard = getScoreboard(problems);
+        const csv = createScoreboardCSV(scoreboard);
+        return new Response(csv, { headers: { "Content-Type": "text/csv" } });
+      },
       "/prob": {
+        "GET": () => Object.keys(problems).join("\n"),
         "/:id": {
           "/icon": (_req, { id }) => problems[id!].doc().icon,
           "/name": (_req, { id }) => problems[id!].doc().title,

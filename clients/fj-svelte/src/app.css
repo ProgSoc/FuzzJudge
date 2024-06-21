@@ -1,0 +1,96 @@
+html {
+    font-family: arial;
+    background-color: var(--bg-prim);
+    color: var(--text-prim);
+}
+
+button {
+    background-color: var(--accent);
+    color: var(--text-sec);
+    border: none;
+    cursor: pointer;
+    border-radius: 1px;
+    size: 17px;
+    padding: 4px;
+    margin: 10px 0px 10px 0px;
+}
+
+:root {
+    --text-prim: #f8f8f8;
+    --text-sec: #d7d7d7;
+    --accent: #282a30;
+    --accent-text: #83a4f4;
+    --bg-prim: #27292f;
+    --bg-sec: #141519;
+}
+
+html {
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-sec);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-sec);
+    opacity: 0.5;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--bg-sec);
+}
+
+.octicon {
+    visibility: hidden;
+    width: 0px;
+}
+
+a {
+    color: var(--accent-text);
+}
+
+#instructions-md > p {
+    line-height: 1.75;
+    margin: 1rem;
+}
+
+#instructions-md > pre {
+    background-color: #0D131C;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 0 2px #ffffff1a;
+    padding: 1rem;
+    max-width: max-content;
+    overflow: scroll;
+    margin-left: 1rem;
+}
+
+#instructions-md > p > code {
+  background-color: #0D131C;
+  box-shadow: inset 0 0 0 2px #ffffff1a;
+  width: 100%;
+  padding: 0.25rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+    #instructions-md > pre {
+        overflow: hidden;
+    }
+}
+
+#instructions-md > ul li {
+    margin-bottom: 8px;
+}
+
+/* For images in markdown */
+img {
+    max-height: 25rem;
+    max-width: 90%;
+}
