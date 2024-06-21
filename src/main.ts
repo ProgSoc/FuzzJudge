@@ -79,7 +79,6 @@ if (import.meta.main) {
   subscribeToScoreboard(() => {
     const scoreboard = getScoreboard(problems);
     const csv = createScoreboardCSV(scoreboard);
-
     for (const client of wss.clients) {
       client.send(csv);
     }
@@ -113,6 +112,7 @@ if (import.meta.main) {
         return new Response(csv, { headers: { "Content-Type": "text/csv" } });
       },
       "/prob": {
+        "GET": () => Object.keys(problems).join("\n"),
         "/:id": {
           "/icon": (_req, { id }) => problems[id!].doc().icon,
           "/name": (_req, { id }) => problems[id!].doc().title,

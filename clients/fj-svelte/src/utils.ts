@@ -16,7 +16,7 @@ export interface QuestionMeta {
   brief: string;
 }
 
-const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
+export const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
   if (a.difficulty !== b.difficulty) {
     return a.difficulty - b.difficulty;
   }
