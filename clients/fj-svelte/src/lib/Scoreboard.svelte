@@ -42,6 +42,7 @@
     });
 
   $: users = users.sort((a, b) => b.points - a.points);
+  $: sorted_questions = Object.values(questions).sort((a, b) => a.num - b.num);
 
   onMount(() => {
     return () => {
@@ -58,7 +59,7 @@
     <th> Position </th>
     <th> Team </th>
     <th> Points </th>
-    {#each Object.values(questions) as question}
+    {#each sorted_questions as question}
       <th class="question-num">{question.num}</th>
     {/each}
   </tr>
@@ -73,7 +74,7 @@
       <td class="points">
         {user.points}
       </td>
-      {#each Object.values(questions) as question}
+      {#each sorted_questions as question}
         <td
           class={`result ${user.solved.includes(question.slug) ? "solved" : ""}`}
         >
