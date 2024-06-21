@@ -16,19 +16,11 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-export function basicAuth(req: Request): { username: string, password: string } | null {
-  const header = req.headers.get("Authorization");
-  if (!header) return null;
-  if (!header.startsWith("Basic ")) return null;
-  const [ username, password ] = atob(header.slice(6)).split(/:(.*)/);
-  return { username, password };
-}
-
 export interface AuthSchemes<UserDetails> {
   basic: (options: {
     username: string,
     password: string,
-  }) => UserDetails | null,
+  }) => UserDetails | null | Promise<UserDetails | null>,
 }
 
 export class Auth<UserDetails> {
@@ -38,13 +30,13 @@ export class Auth<UserDetails> {
     this.#schemes = schemes;
   }
 
-  protect(ctx: Request): UserDetails {
+  async protect(ctx: Request): Promise<UserDetails> {
     const header = ctx.headers.get("Authorization");
     if (header) {
       if (header.startsWith("Basic ")) {
         try {
           const [ username, password ] = atob(header.slice(6)).split(/:(.*)/);
-          const details = this.#schemes.basic({ username, password });
+          const details = await this.#schemes.basic({ username, password });
           if (details !== null) return details;
         } catch (e) {
           if (e instanceof DOMException && e.message === "InvalidCharacterError") {
@@ -53,7 +45,10 @@ export class Auth<UserDetails> {
         }
       }
     }
-    throw this.requestAuth(ctx);
+    throw new Response("401 Unauthorized\n", {
+      status: 401,
+      headers: { "WWW-Authenticate": `Basic realm="/comp" charset="utf-8"` },
+    });
   }
 
   requestAuth(_: Request): Response {
