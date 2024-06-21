@@ -3,7 +3,7 @@
   import Popout from "./Popout.svelte";
   import Sidebar from "./Sidebar.svelte";
   import Scoreboard from "./Scoreboard.svelte";
-  import SubmissionArea from "./SubmissionArea.svelte";
+  import Question from "./Question.svelte";
   import {
     type QuestionMeta,
     selected_question,
@@ -60,45 +60,7 @@
     </div>
   </div>
   <Sidebar {questions} />
-  <div
-    id="question-instructions"
-    class="question-instructions"
-    bind:this={question_instructions}
-  >
-    {#if $selected_question !== undefined}
-      {#if questions[$selected_question] !== undefined}
-        <h1 style="margin-top: 0px;">
-          <span
-            style={questions[$selected_question].solved
-              ? "text-decoration: line-through;"
-              : ""}
-          >
-            {questions[$selected_question].name}
-          </span>
-
-          {#if questions[$selected_question].solved}
-            <span style="font-size: 1.3rem;">✓</span>
-          {/if}
-        </h1>
-
-        <div style="margin-left: 1rem;">
-          <span style="margin-right: 1rem; opacity:0.7;"
-            ><b>Difficulty:</b>
-            {difficulty_name(questions[$selected_question].difficulty)}</span
-          >
-          <span style="opacity:0.7;"
-            ><b>Points:</b> {questions[$selected_question].points}</span
-          >
-        </div>
-
-        <div id="instructions-md">
-          {@html questions[$selected_question].instructions}
-        </div>
-      {/if}
-
-      <SubmissionArea {set_solved} />
-    {/if}
-  </div>
+  <Question question_data={questions[$selected_question]} {set_solved} />
 </div>
 
 <Popout
@@ -141,13 +103,5 @@
     padding: 0.25rem;
     color: var(--text-sec);
     background-color: var(--bg-sec);
-  }
-
-  .question-instructions {
-    color: var(--text-prim);
-    grid-area: question-instructions;
-    overflow-y: scroll;
-    padding: 1rem;
-    text-wrap: pretty;
   }
 </style>
