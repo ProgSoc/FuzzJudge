@@ -16,7 +16,7 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { TOML, YAML, renderMarkdown } from "./deps.ts";
+import { KATEX_CSS, TOML, YAML, renderMarkdown } from "./deps.ts";
 
 export interface FuzzJudgeDocument {
   config?: unknown,
@@ -42,7 +42,12 @@ export function frontMatter(
 
 export function loadMarkdown(fileText: string): FuzzJudgeDocument {
   const [config, markdown] = frontMatter(fileText);
-  const html = renderMarkdown(markdown);
+  let html = renderMarkdown(markdown, {
+    allowMath: true,
+  });
+  if (html.includes("katex")) {
+    html = `<style>\n${indent("    ", KATEX_CSS)}\n</style>\n${html}`;
+  }
   const titleRaw = html.match(/<h1.*>(.*?)<\/h1>/)?.[1].replaceAll(/<.*>/g, "");
   const icon = titleRaw?.match(/\p{RGI_Emoji}/v)?.[0];
   const title = (icon !== undefined ? titleRaw?.replace(icon!, "") : titleRaw)?.trim();
