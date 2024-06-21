@@ -25,10 +25,19 @@
 
     questions[slug].solved = true;
   };
+
+  try {
+    const socket = new WebSocket(`ws://localhost:9999`);
+
+    socket.addEventListener("message", (event) => {
+      window.location.reload();
+    });
+  } catch (e) {
+  }
 </script>
 
 {#if questions !== undefined}
-    <Client {questions} {set_solved} />
+  <Client {questions} {set_solved} />
 {:else if loading_error !== undefined}
   <div class="loading">Error loading questions: {loading_error}</div>
 {:else}
