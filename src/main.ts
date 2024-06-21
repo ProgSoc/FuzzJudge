@@ -94,9 +94,7 @@ if (import.meta.main) {
         initialiseUserScore(user.id);
         return new Response(`Authorized: ${Deno.inspect(user)}\n`);
       },
-      "/logout": () => new Response("401 Unauthorized\n", {
-        status: 401,
-      }),
+      "/logout": req => auth.requestAuth(req),
     },
     "/client/*": (req, { 0: path }) => {
       if (!path || path === "") {
