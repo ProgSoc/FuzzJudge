@@ -27,12 +27,13 @@
   };
 
   try {
-    const socket = new WebSocket(`ws://localhost:9999`);
+    const socket = new WebSocket(`ws://localhost:25566`);
 
     socket.addEventListener("message", (event) => {
       window.location.reload();
     });
   } catch (e) {
+    console.error("Failed to connect to socket: ", e);
   }
 </script>
 

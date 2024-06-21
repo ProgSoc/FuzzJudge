@@ -11,7 +11,7 @@ Output will be in `./dist`
 ## Starting dev server
 ```sh
 npm install
-npm run fuzzjudge-build <PATH TO COMP>
+npm run dev <PATH TO COMP>
 ```
 Requires deno. Note that ports 9999, 1989 and 8080 must be free and currently there is no good error handling for this.
 
