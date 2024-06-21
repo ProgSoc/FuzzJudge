@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Client from "./lib/Client.svelte";
   import Loading from "./lib/Loading.svelte";
+  import Scoreboard from "./lib/Scoreboard.svelte";
   import { type QuestionMeta } from "./utils";
 
   import { get_questions, get_comp_info } from "./api";
@@ -19,16 +19,10 @@
     .catch((err) => {
       loading_error = err;
     });
-
-  const set_solved = (slug: string) => {
-    if (questions === undefined) return;
-
-    questions[slug].solved = true;
-  };
 </script>
 
 {#if questions !== undefined}
-    <Client {questions} {set_solved} />
+  <Scoreboard {questions} />
 {:else if loading_error !== undefined}
   <div class="loading">Error loading questions: {loading_error}</div>
 {:else}

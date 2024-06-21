@@ -99,6 +99,8 @@ if (import.meta.main) {
     "/client/*": (req, { 0: path }) => {
       if (!path || path === "") {
         path = "index.html";
+      } else if (path.endsWith("/")) {
+        path += "index.html";
       }
       return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
     },
