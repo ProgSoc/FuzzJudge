@@ -31,16 +31,6 @@
   }
 
   let showing_popout: ShowingPopout = ShowingPopout.None;
-
-  let question_instructions: any;
-
-  selected_question.subscribe((slug) => {
-    if (slug === undefined) return;
-
-    if (question_instructions !== undefined) {
-      question_instructions.scrollTop = 0;
-    }
-  });
 </script>
 
 <div class="layout">
