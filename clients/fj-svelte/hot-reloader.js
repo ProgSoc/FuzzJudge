@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { cpSync } from "fs";
 import path from "path";
 import watch from "watch";
@@ -31,7 +31,12 @@ const build = () => {
     return;
   }
 
-  running = exec("npm run build", (err, stdout, stderr) => {
+  running = spawn("npm", ["run", "build"], {
+    stdio: "inherit",
+    stderr: "inherit",
+  });
+
+  running.on("close", () => {
     cpSync(path.resolve("dist"), path.join(comp_dir, "client"), { recursive: true });
     console.log("Done!");
     running = undefined;
@@ -44,9 +49,11 @@ watch.watchTree(path.resolve("src"), function(f, curr, prev) {
   build();
 })
 
-const deno_proc = exec(`deno run --watch -A ../../src/main.ts ${comp_dir}`, (err, stdout, stderr) => {
-  console.log(err);
-  console.log(stderr);
+const deno_proc = spawn("deno", ["run", "--watch", "-A", path.resolve("../../src/main.ts"), path.resolve(comp_dir)], {
+  stdio: "inherit",
+  stderr: "inherit",
 });
-console.log("Started at http://localhost:1989/client/");
 
+console.log("Staring client at http://localhost:1989/client/ ...");
+
+build();
