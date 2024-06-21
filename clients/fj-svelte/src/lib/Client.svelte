@@ -42,6 +42,12 @@
       question_instructions.scrollTop = 0;
     }
   });
+
+  const logout = () => {
+    fetch("/auth/logout").then(() => {
+      window.location.reload();
+    });
+  };
 </script>
 
 <div class="layout">
@@ -56,7 +62,7 @@
     </div>
     <div>
       Logged in as <b>{username}</b>
-      <a href="/auth/logout">Logout</a>
+      <button on:click={logout}>Logout</button>
     </div>
   </div>
   <Sidebar {questions} />
