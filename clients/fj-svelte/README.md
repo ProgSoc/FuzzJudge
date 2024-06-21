@@ -1,8 +1,15 @@
 # fj-svelte
 Single page FuzzJudge frontend with live scoreboard.
 
-## Starting dev server
+## Building
+```sh
+npm install
+npm run build
 ```
+Output will be in `./dist`
+
+## Starting dev server
+```sh
 npm install
 npm run fuzzjudge-build <PATH TO COMP>
 ```
