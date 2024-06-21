@@ -142,6 +142,7 @@
     color: var(--text-sec);
     background-color: var(--bg-sec);
   }
+
   .question-instructions {
     color: var(--text-prim);
     grid-area: question-instructions;

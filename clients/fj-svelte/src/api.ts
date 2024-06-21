@@ -92,7 +92,7 @@ const get_question_data = async (slug: string) => {
   data.instructions = data.instructions.replace(
     /(<img\s+[^>]*src=")(?!https:\/\/)([^"]+)"/g,
     (match, p1, p2) => {
-      return `${p1}${BACKEND_SERVER}/comp/prob/${slug}/${p2}"`;
+      return `${p1}${BACKEND_SERVER}/comp/prob/${slug}/assets/${p2}"`;
     },
   );
 

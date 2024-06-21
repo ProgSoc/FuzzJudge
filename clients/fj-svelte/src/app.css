@@ -88,3 +88,9 @@ a {
 #instructions-md > ul li {
     margin-bottom: 8px;
 }
+
+/* For images in markdown */
+img {
+    max-height: 25rem;
+    max-width: 90%;
+}
