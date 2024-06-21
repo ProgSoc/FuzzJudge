@@ -46,7 +46,7 @@ export type UserScore = {
 
 const subscriptions: (() => void)[] = [];
 
-export function subscribeToScoreboard(fn: (csv: string) => void) {
+export function subscribeToScoreboard(fn: () => void) {
   subscriptions.push(fn);
 }
 
@@ -89,13 +89,10 @@ export function createScoreboardCSV(scoreboard: UserScore[]): string {
   let csv = "username, points, solved\n";
   for (const user of scoreboard) {
     csv += `${user.username}, ${user.points}`;
-
     if (user.answers.length > 0) {
       csv += `, ${user.answers.map(({ slug }) => slug).join(", ")}`;
     }
-
     csv += "\n";
   }
-
   return csv;
 }

@@ -101,7 +101,6 @@ if (import.meta.main) {
       if (!path || path === "") {
         path = "index.html";
       }
-
       return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
     },
     "/comp": {
@@ -110,9 +109,7 @@ if (import.meta.main) {
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
       "/scoreboard": () => {
         const scoreboard = getScoreboard(problems);
-
         const csv = createScoreboardCSV(scoreboard);
-
         return new Response(csv, { headers: { "Content-Type": "text/csv" } });
       },
       "/prob": {
