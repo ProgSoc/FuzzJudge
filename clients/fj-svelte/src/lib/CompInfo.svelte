@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { BACKEND_SERVER, get_comp_info } from "../utils";
-    import Loading from "./Loading.svelte";
+  import { get_comp_info } from "../api";
+  import Loading from "./Loading.svelte";
 
   let title: string | undefined = undefined;
   let instructions = "";

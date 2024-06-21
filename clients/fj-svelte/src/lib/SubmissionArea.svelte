@@ -2,6 +2,8 @@
   import { writable } from "svelte/store";
   import { selected_question, BACKEND_SERVER } from "../utils";
 
+  export let set_solved: (slug: string) => void;
+
   const open_fuzz = () => {
     window.open(
       `${BACKEND_SERVER}/comp/prob/${$selected_question}/fuzz`,
@@ -22,9 +24,15 @@
 
     waiting_on_server = true;
 
-    fetch(`${BACKEND_SERVER}comp/prob/${slug}/judge`, {
+    fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
       method: "POST",
-      body: `judge=${submission_value}`,
+      body: new URLSearchParams({
+        output: submission_value,
+        source: "hi",
+      }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     }).then((res) => {
       waiting_on_server = false;
 
@@ -34,8 +42,8 @@
         error_message.set(body);
       });
 
-      if (res.ok) {
-        // global.get_question_data(slug).then(q => q.solved?.set(() => true));
+      if (res.ok && set_solved !== undefined) {
+        set_solved(slug);
       }
     });
   };

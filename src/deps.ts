@@ -6,3 +6,4 @@ export { render as renderMarkdown } from "https://deno.land/x/gfm@0.6.0/mod.ts";
 export { DB } from "https://deno.land/x/sqlite/mod.ts";
 export { serveFile } from "https://jsr.io/@std/http/0.224.5/mod.ts"
 export { normalize } from "https://jsr.io/@std/path/0.225.2/mod.ts"
+export { WebSocketServer } from "https://deno.land/x/websocket@v0.1.4/mod.ts";

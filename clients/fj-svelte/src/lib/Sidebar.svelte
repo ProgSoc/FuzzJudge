@@ -2,7 +2,7 @@
     import ListGroup from "./ListGroup.svelte";
     import { type QuestionMeta } from "../utils";
 
-    export let sorted_questions: Record<string, QuestionMeta[]> = {};
+    export let questions: Record<string, QuestionMeta> = {};
     let open: boolean = true;
 
     function toggleOpen() {
@@ -26,10 +26,10 @@
             </button>
         </div>
 
-        <ListGroup name="Easy" list={sorted_questions["1"] ?? []} />
-        <ListGroup name="Medium" list={sorted_questions["2"] ?? []} />
-        <ListGroup name="Hard" list={sorted_questions["3"] ?? []} />
-        <ListGroup name="Other" list={sorted_questions["other"] ?? []} />
+        <ListGroup name="Easy" {questions} includes={1} />
+        <ListGroup name="Medium" {questions} includes={2} />
+        <ListGroup name="Hard" {questions} includes={3} />
+        <ListGroup name="Other" {questions} includes={(d) => d < 1 || d > 3} />
     </div>
 {:else}
     <div class="closed-question-list">
@@ -73,7 +73,7 @@
     @media (width >= 1250px) {
         .question-list {
             min-width: max-content;
-            overflow: hidden;
+            overflow: scroll;
         }
     }
 

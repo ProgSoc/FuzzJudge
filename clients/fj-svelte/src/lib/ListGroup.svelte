@@ -3,18 +3,29 @@
   import QuestionButton from "./QuestionButton.svelte";
 
   export let name: string = "";
-  export let list: QuestionMeta[] = [];
+  export let questions: Record<string, QuestionMeta> = {};
+  export let includes: number | ((difficulty: number) => boolean) = 0;
+
+  $: list = Object.values(questions)
+    .filter((q) => {
+      if (typeof includes === "function") {
+        return includes(q.difficulty);
+      }
+
+      return q.difficulty === includes;
+    })
+    .sort((a, b) => a.num - b.num);
 </script>
 
 {#if list.length > 0}
-  <div class="diff-divider">{name}</div>
+  <div class="difficulty-divider">{name}</div>
 {/if}
 {#each list as q}
   <QuestionButton question={q} />
 {/each}
 
 <style>
-  .diff-divider {
+  .difficulty-divider {
     font-size: 1.2rem;
     margin-left: 0.3rem;
     color: var(--text-sec);

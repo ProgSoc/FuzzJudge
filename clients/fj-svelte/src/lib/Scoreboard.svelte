@@ -3,11 +3,14 @@
   import {
     type QuestionMeta,
     truncate_username,
+    type ScoreboardUser,
+  } from "../utils";
+
+  import {
     get_scoreboard,
     subscribe_to_scoreboard,
-    type ScoreboardUser,
     type ScoreboardEvent,
-  } from "../utils";
+  } from "../api";
 
   export let questions: Record<string, QuestionMeta> = {};
 
@@ -25,7 +28,11 @@
 
   let unsubscribe: (() => void) | null = null;
 
-  subscribe_to_scoreboard((event: ScoreboardEvent) => {})
+  subscribe_to_scoreboard((event: ScoreboardEvent) => {
+    if (event.new_scoreboard !== undefined) {
+      users = event.new_scoreboard;
+    }
+  })
     .then((unsub) => {
       unsubscribe = unsub;
     })

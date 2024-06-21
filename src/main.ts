@@ -41,9 +41,9 @@ Backend
 
 import { undent, indent, loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
+import { pathJoin, walk, serveFile, normalize, WebSocketServer, WebSocketClient } from "./deps.ts";
 import { Auth } from "./auth.ts";
-import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore } from "./score.ts";
+import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore, subscribeToScoreboard, createScoreboardCSV } from "./score.ts";
 import { Router } from "./http.ts";
 import { HEADER } from "./version.ts";
 
@@ -75,6 +75,16 @@ if (import.meta.main) {
     },
   });
 
+  const wss = new WebSocketServer(8080);
+  subscribeToScoreboard(() => {
+    const scoreboard = getScoreboard(problems);
+    const csv = createScoreboardCSV(scoreboard);
+
+    for (const client of wss.clients) {
+      client.send(csv);
+    }
+  });
+
   //
   const router = new Router({
     "GET": _ => HEADER,
@@ -87,20 +97,24 @@ if (import.meta.main) {
       },
       "/logout": req => auth.requestAuth(req),
     },
+    "/client/*": (req, { 0: path }) => {
+      if (!path || path === "") {
+        path = "index.html";
+      }
+
+      return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
+    },
     "/comp": {
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
-      "/scoreboard": () => new Response(undent(`
-          <!DOCTYPE html>
-          <html>
-          <head><meta charset="utf-8"/></head>
-          <body>
-          ${getScoreboard(problems).map(user => `<h2>${user.username} - ${user.points}</h2><ul>${user.answers.map(({ slug, time }) => `<li><b>${slug}</b> at ${time}</li>`).join("\n")}</ul>`).join("\n")}
-          </body>
-          </html>`),
-        { headers: { "Content-Type": "text/html" } },
-      ),
+      "/scoreboard": () => {
+        const scoreboard = getScoreboard(problems);
+
+        const csv = createScoreboardCSV(scoreboard);
+
+        return new Response(csv, { headers: { "Content-Type": "text/csv" } });
+      },
       "/prob": {
         "/:id": {
           "/icon": (_req, { id }) => problems[id!].doc().icon,
@@ -128,11 +142,12 @@ if (import.meta.main) {
               if (req.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
                 return new Response("415 Unsupported Media Type (Expected application/x-www-form-urlencoded)", { status: 415 });
               }
-              const submissionOutput = await req.text().then(body => new URLSearchParams(body).get("output"));
+              const body = await req.text();
+              const submissionOutput = new URLSearchParams(body).get("output");
               if (submissionOutput === null) {
                 return new Response("400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n", { status: 400 });
               }
-              const submissionCode = await req.text().then(body => new URLSearchParams(body).get("source"));
+              const submissionCode = new URLSearchParams(body).get("source");
               if (submissionCode === null) {
                 return new Response("400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n", { status: 400 });
               }

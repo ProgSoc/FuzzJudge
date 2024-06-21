@@ -1,7 +1,7 @@
 <script lang="ts">
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
-  import Sidebar from "./Sidebar.svelte"
+  import Sidebar from "./Sidebar.svelte";
   import Scoreboard from "./Scoreboard.svelte";
   import SubmissionArea from "./SubmissionArea.svelte";
   import {
@@ -10,10 +10,20 @@
     difficulty_name,
   } from "../utils";
 
-  let username = "user";
+  import { get_username } from "../api";
+
+  let username = "Loading...";
+
+  get_username().then((name) => {
+    username = name;
+  });
 
   export let questions: Record<string, QuestionMeta> = {};
-  export let sorted_questions: Record<string, QuestionMeta[]> = {};
+  export let set_solved: (slug: string) => void;
+
+  selected_question.set(
+    Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
+  );
 
   enum ShowingPopout {
     None,
@@ -37,16 +47,24 @@
 <div class="layout">
   <div class="top-bar">
     <div>
-      <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}>Comp Info</button>
-      <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}>Scoreboard</button>
+      <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}
+        >Comp Info</button
+      >
+      <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}
+        >Scoreboard</button
+      >
     </div>
     <div>
       Logged in as <b>{username}</b>
-      <a href="auth/logout">Logout</a>
+      <a href="/auth/logout">Logout</a>
     </div>
   </div>
-  <Sidebar {sorted_questions}/>
-  <div id="question-instructions" class="question-instructions" bind:this={question_instructions}>
+  <Sidebar {questions} />
+  <div
+    id="question-instructions"
+    class="question-instructions"
+    bind:this={question_instructions}
+  >
     {#if $selected_question !== undefined}
       {#if questions[$selected_question] !== undefined}
         <h1 style="margin-top: 0px;">
@@ -68,7 +86,9 @@
             ><b>Difficulty:</b>
             {difficulty_name(questions[$selected_question].difficulty)}</span
           >
-          <span style="opacity:0.7;"><b>Points:</b> {questions[$selected_question].points}</span>
+          <span style="opacity:0.7;"
+            ><b>Points:</b> {questions[$selected_question].points}</span
+          >
         </div>
 
         <div id="instructions-md">
@@ -76,16 +96,22 @@
         </div>
       {/if}
 
-      <SubmissionArea />
+      <SubmissionArea {set_solved} />
     {/if}
   </div>
 </div>
 
-<Popout shown={showing_popout === ShowingPopout.Scoreboard} close={() => (showing_popout = ShowingPopout.None)}>
+<Popout
+  shown={showing_popout === ShowingPopout.Scoreboard}
+  close={() => (showing_popout = ShowingPopout.None)}
+>
   <Scoreboard {questions} />
 </Popout>
 
-<Popout shown={showing_popout === ShowingPopout.CompInfo} close={() => (showing_popout = ShowingPopout.None)}>
+<Popout
+  shown={showing_popout === ShowingPopout.CompInfo}
+  close={() => (showing_popout = ShowingPopout.None)}
+>
   <CompInfo />
 </Popout>
 
