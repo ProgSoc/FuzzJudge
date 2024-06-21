@@ -4,8 +4,18 @@ export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
 
   try {
-    const res = await (await fetch(`${BACKEND_SERVER}/comp/prob`)).text();
-    let arr = res.split("\n").filter(x => x !== "");
+    const res = await fetch(`${BACKEND_SERVER}/comp/prob`);
+
+    if (!res.ok) {
+      throw "Failed to fetch questions";
+    }
+
+    const text = await res.text();
+    let arr = text.split("\n").filter(x => x !== "");
+
+    if (arr.length === 0) {
+      throw "No questions found";
+    }
 
     for (const slug of arr) {
       questions[slug] = await get_question_data(slug);
