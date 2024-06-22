@@ -73,7 +73,7 @@ export class Clock {
     const comp_state = this.current_comp_state();
     if (comp_state == undefined || !allowed_in.includes(comp_state)) {
       throw new Response("503 Unavailable\n\nToo early or too late\n", {
-        status: 401,
+        status: 503,
       });
     }
   }
