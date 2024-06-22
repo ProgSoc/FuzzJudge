@@ -104,6 +104,7 @@ if (import.meta.main) {
     "BREW": _ => new Response("418 I'm a Teapot", { status: 418 }),
     "/auth": {
       "/login": async req => {
+        console.log("authing")
         const user = await auth.protect(req);
         return new Response(`Authorized: ${Deno.inspect(user)}\n`);
       },
@@ -122,7 +123,7 @@ if (import.meta.main) {
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
       "/scoreboard": req => {
-        clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
+        // clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
         if (req.headers.get("Upgrade") == "websocket") {
           // TODO: websocket upgrades and new live scoreboard format
         }
@@ -149,23 +150,23 @@ if (import.meta.main) {
           "/solution": _ => new Response("451 Unavailable For Legal Reasons", { status: 451 }),
           // Gated (by time and auth) utils ...
           "/instructions": async (req, { id }) => {
-            clock.protect();
+            // clock.protect();
             await auth.protect(req);
             return problems[id!].doc().body;
           },
           "/fuzz": async (req, { id }) => {
-            clock.protect();
+            // clock.protect();
             const user = await auth.protect(req);
             return await problems[id!].fuzz(db.userTeam(user.team).seed);
           },
           "/judge": {
             "GET": async (req, { id: problemId }) => {
-              clock.protect();
+              // clock.protect();
               const user = await auth.protect(req);
               return db.solved({ team: user.team, prob: problemId! }) ? "OK" : "Not Solved";
             },
             "POST": async (req, { id: problemId }) => {
-              clock.protect();
+              // clock.protect();
               const user = await auth.protect(req);
               if (db.solved({ team: user.team, prob: problemId! })) {
                 return new Response("409 Conflict\n\nProblem already solved.\n");
@@ -207,7 +208,7 @@ if (import.meta.main) {
           },
           "/assets/*": async (req, { id: problemId, 0: assetPath }) => {
             await auth.protect(req);
-            clock.protect();
+            // clock.protect();
             return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
           },
         },

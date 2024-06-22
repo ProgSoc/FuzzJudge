@@ -51,9 +51,9 @@ export class Clock {
       // will use a query like SELECT start_time, freeze_time, stop_time FROM CompetitionConfig WHERE name = ?;
       this.#timing_config_retrieved = new Date();
       this.#timing_config = {
-        start: new Date(Date.now() + 5000),
-        freeze: new Date(Date.now() + 20000),
-        stop: new Date(Date.now() + 30000),
+        start: new Date(Date.now() + 30_000),
+        freeze: new Date(Date.now() + 60_000),
+        stop: new Date(Date.now() + 120_000),
       };
     }
   }
@@ -72,9 +72,8 @@ export class Clock {
   protect(allowed_in: CompState[] = [CompState.LIVE_WITHOUT_SCORES, CompState.LIVE_WITH_SCORES]) {
     const comp_state = this.current_comp_state();
     if (comp_state == undefined || !allowed_in.includes(comp_state)) {
-      throw new Response("401 Unauthorized\n", {
+      throw new Response("401 Unauthorized\n\nToo early or too late", {
         status: 401,
-        headers: { "WWW-Authenticate": `Basic realm="/comp" charset="utf-8"` },
       });
     }
   }
