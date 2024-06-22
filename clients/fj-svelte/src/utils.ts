@@ -112,7 +112,11 @@ export interface CompTimes {
 }
 
 export const parse_times = (data: string): CompTimes => {
-  return { start: new Date(Date.now() + 5000), freeze: new Date(Date.now() + 20000), stop: new Date(Date.now() + 30000)};
+  let obj = JSON.parse(data);
+  obj.start = new Date(obj.start);
+  obj.freeze = new Date(obj.freeze);
+  obj.stop = new Date(obj.stop);
+  return obj;
 }
 
 export enum CompState {

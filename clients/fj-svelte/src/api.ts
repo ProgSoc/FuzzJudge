@@ -127,9 +127,6 @@ const get_question_data = async (slug: string) => {
 };
 
 export const get_comp_times = async (): Promise<CompTimes | undefined> => {
-  return undefined;
-
-  // return new Promise((resolve, _) => {
-  //   resolve(parse_times("dummy data to get from request"));
-  // });
+  const times_string = await (await fetch(`${BACKEND_SERVER}/comp/clock`)).text();
+  return parse_times(times_string);
 }
