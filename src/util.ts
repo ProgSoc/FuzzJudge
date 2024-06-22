@@ -16,14 +16,14 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { KATEX_CSS, TOML, YAML, renderMarkdown } from "./deps.ts";
+import { KATEX_CSS, TOML, YAML, normalize, renderMarkdown } from "./deps.ts";
 
 export interface FuzzJudgeDocument {
   config?: unknown,
   title?: string,
   summary?: string,
   icon?: string,
-  publicAssets?: string[],
+  publicAssets: Set<string>,
   body: string,
 }
 
@@ -52,7 +52,10 @@ export function loadMarkdown(fileText: string): FuzzJudgeDocument {
   const icon = titleRaw?.match(/\p{RGI_Emoji}/v)?.[0];
   const title = (icon !== undefined ? titleRaw?.replace(icon!, "") : titleRaw)?.trim();
   const summary = html.match(/<p.*>(.*?)<\/p>/)?.[1].replaceAll(/<.*>/g, "");
-  const publicAssets = markdown.match(/!\[.*\]\((.*?)\)/g)?.map((s) => s.match(/\((.*?)\)/)?.[1]).filter((s) => s !== undefined) as string[];
+  const publicAssets = new Set<string>();
+  for (const [_, link] of markdown.matchAll(/!?\[.*?\]\(([^:]+?)\)/g)) {
+    publicAssets.add(normalize("/" + link));
+  }
   return {
     config, title, summary, icon, publicAssets,
     body: title === undefined ? html : html.replace(/<h1.*>(.*?)<\/h1>/, ""),
