@@ -175,21 +175,21 @@ export class CompetitionDB {
 
   attempts(params: { team: number, prob: string }): number {
     return this.#db.query<[number]>(
-      "SELECT COUNT(*) FROM subm WHERE subm_team = :team AND subm_prob = :prob",
+      "SELECT COUNT(*) FROM subm WHERE team = :team AND prob = :prob",
       params,
     )[0][0];
   }
 
   solved(params: { team: number, prob: string }): boolean {
     return this.#db.query<[number]>(
-      "SELECT COUNT(*) FROM subm WHERE subm_ok = TRUE AND subm_team = :team AND subm_prob = :prob",
+      "SELECT COUNT(*) FROM subm WHERE ok = TRUE AND team = :team AND prob = :prob",
       params,
     )[0][0] > 0;
   }
 
   solvedSet(params: { team: number }): Set<string> {
     return new Set(this.#db.query<[string]>(
-      "SELECT DISTINCT subm_prob FROM subm WHERE subm_ok = TRUE AND subm_team = :team",
+      "SELECT DISTINCT prob FROM subm WHERE ok = TRUE AND team = :team",
       params,
     ).flat());
   }
