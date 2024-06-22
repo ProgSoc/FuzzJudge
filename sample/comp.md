@@ -1,9 +1,3 @@
-```toml
-start = "2024-06-22T00:33:49.625Z"
-freeze = "2024-06-23T00:33:49.625Z"
-stop = "2024-06-23T00:33:49.625Z"
-```
-
 # ProgComp 2023
 
 ProgSoc @ TechFest

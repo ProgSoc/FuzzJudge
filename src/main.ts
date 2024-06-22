@@ -54,7 +54,7 @@ if (import.meta.main) {
   const root = await Deno.realPath(Deno.args[0] ?? ".");
 
   const compfile = loadMarkdown(await Deno.readTextFile(pathJoin(root, "./comp.md")));
-  const clock = new Clock(compfile.config);
+  const clock = new Clock(compfile.title ?? "progcomp1");
 
   const problems: Record<string, FuzzJudgeProblem> = {};
   for await (const ent of walk(root, {
@@ -120,12 +120,21 @@ if (import.meta.main) {
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
-      "/clock": () => new Response(clock.times_json(), { headers: { "Content-Type": "text/json" }}),
       "/scoreboard": req => {
         if (req.headers.get("Upgrade") == "websocket") {
           // TODO: websocket upgrades and new live scoreboard format
         }
         return new Response(db.oldScoreboard(), { headers: { "Content-Type": "text/csv" } });
+      },
+      "/clock": {
+        "GET": () => new Response(clock.times_json(), { headers: { "Content-Type": "text/json" }}),
+        "POST": async (_req) => {
+          const user = await auth.protect(_req);
+          // if user is not admin return 401
+          const body = await _req.text()
+          clock.set_times(body);
+          return new Response("Success");
+        }
       },
       "/prob": {
         "GET": () => Object.keys(problems).join("\n"),
