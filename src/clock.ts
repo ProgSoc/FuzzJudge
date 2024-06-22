@@ -69,7 +69,7 @@ export class Clock {
     // UPDATE Games SET start_time = ... WHERE name = ?;
   }
 
-  protected(_ctx: Request, allowed_in: CompState[]) {
+  protect(allowed_in: CompState[] = [CompState.LIVE_WITHOUT_SCORES, CompState.LIVE_WITH_SCORES]) {
     const comp_state = this.current_comp_state();
     if (comp_state == undefined || !allowed_in.includes(comp_state)) {
       throw new Response("401 Unauthorized\n", {
