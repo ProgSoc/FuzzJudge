@@ -10,7 +10,6 @@ ProgSoc @ TechFest
 - 3:00 - Scoreboard freeze
 - 4:00 - Competition end, scoreboard unfreeze, announcing winners
 
-
 ## Solving questions
 
 Each question requires processing your generated problem input. Just as an example, here's a simple python program that reads a line from standard input and then prints it out again:
@@ -24,7 +23,6 @@ We've prepared scaffolds for Python, Java and C++. You should be able to write c
 
 To upload a file, make sure you're logged in, then you should have a submit button in the top right. Click, then select your file and the question you're submitting for, and it should judge it from there.
 
-
 ## Scoring
 
 There are 2 points systems:
@@ -37,4 +35,4 @@ There are 2 points systems:
 
 ## Prizes
 
-1st place: $1500 2nd place: $900 3rd place: $600
+1st place: \$1500 2nd place: \$900 3rd place: \$600
