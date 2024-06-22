@@ -73,11 +73,12 @@ export class Router {
       const result = pattern.exec(req.url)?.pathname;
       if (result !== undefined) {
         const responseOrBodyInit = await (methods?.[req.method.toUpperCase() as Uppercase<string>] ?? handler)?.(req, result.groups);
+        const foundMethod = methods?.[req.method.toUpperCase() as Uppercase<string>] !== undefined;
         if (responseOrBodyInit instanceof Response) {
           return responseOrBodyInit;
         }
         else if (responseOrBodyInit === undefined) {
-          if (Object.keys(methods ?? {}).length > 0) {
+          if (Object.keys(methods ?? {}).length > 0 && !foundMethod) {
             return new Response("405 Method Not Allowed (No method handler)", { status: 405 })
           } else {
             return new Response("404 Not Found (No resource)", { status: 404 });

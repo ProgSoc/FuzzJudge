@@ -255,7 +255,12 @@ if (import.meta.main) {
           "/assets/*": async (req, { id: problemId, 0: assetPath }) => {
             await auth.protect(req);
             // clock.protect();
-            return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
+            const normalisedAssetPath = normalize("/" + assetPath);
+            if (problems[problemId!].doc().publicAssets.has(normalisedAssetPath)) {
+              return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
+            } else {
+              return undefined;
+            }
           },
         },
       },
