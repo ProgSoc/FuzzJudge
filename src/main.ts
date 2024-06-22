@@ -72,7 +72,7 @@ if (import.meta.main) {
   }
 
   const db = new CompetitionDB(pathJoin(root, "comp.db"), problems);
-  db.resetUser({ logn: "admin", role: "admin" });
+  db.resetUser({ logn: "admin", role: "admin" }, false);
 
   const auth = new Auth({
     basic: async ({ username, password }) => {
