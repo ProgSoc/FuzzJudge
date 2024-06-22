@@ -121,10 +121,10 @@ export class CompetitionDB {
     return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
   }
 
-  resetUser(params: { logn: string, role: UserRoles }, upsert = true): User {
+  resetUser(params: { logn: string, role: UserRoles }, resetPassword = true): User {
     return this.#db.queryEntries<User>(`
         INSERT INTO user VALUES (NULL, NULL, :logn, :salt, NULL, :logn, :role)
-        ${upsert ? "ON CONFLICT DO UPDATE SET hash = NULL, role = :role" : ""}
+        ON CONFLICT DO UPDATE SET role = :role${resetPassword ? ", hash = NULL" : ""}
         RETURNING *
       `,
       {
