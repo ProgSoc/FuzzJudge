@@ -67,8 +67,13 @@ export class FuzzJudgeProblem {
   }
 
   async judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
-    const { limited, message } = this.#handleRateLimiting(seed);
-    if (limited) return { correct: false, errors: message };
+    const { limited, retry } = this.#handleRateLimiting(seed);
+    if (limited) {
+      throw new Response(
+        `429 Too Many Requests\n\nRetry after ${retry}s\n`,
+        { status: 429, headers: [["Retry-After", retry.toFixed(0)]] },
+      );
+    }
 
     const proc = new Deno.Command(this.#cmdJudge, {
       args: [...this.#argsJudge, seed],
@@ -85,7 +90,7 @@ export class FuzzJudgeProblem {
     else return { correct: false, errors: err };
   }
 
-  #handleRateLimiting(seed: string): { limited: boolean; message?: string } {
+  #handleRateLimiting(seed: string): { limited: boolean; retry: number } {
     // Increase the interval by 5 seconds for each submission
     const interval = 5 * 1000 * (this.#submissionCounts[seed] ?? 0); // ms
 
@@ -94,13 +99,9 @@ export class FuzzJudgeProblem {
 
       if (timeSinceLastSubmission < interval) {
         const secondsToWait = (interval - timeSinceLastSubmission) / 1000;
-        const formattedTime = secondsToWait > 59
-          ? `${Math.floor(secondsToWait / 60)} minutes`
-          : `${Math.ceil(secondsToWait)} seconds`;
-
         return {
           limited: true,
-          message: `Please wait ${formattedTime} before submitting again.`,
+          retry: secondsToWait,
         };
       }
     }
@@ -108,6 +109,6 @@ export class FuzzJudgeProblem {
     this.#previousSubmissionTimes[seed] = Date.now();
     this.#submissionCounts[seed] = (this.#submissionCounts[seed] ?? 0) + 1;
 
-    return { limited: false };
+    return { limited: false, retry: 0 };
   }
 }
