@@ -13,7 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
   import SubmissionArea from "./SubmissionArea.svelte";
   import {
@@ -21,6 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     selected_question,
     difficulty_name,
   } from "../utils";
+    import { onDestroy } from "svelte";
 
   export let question_data: QuestionMeta | undefined = undefined;
   export let set_solved: (slug: string) => void;
@@ -28,28 +28,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let question_instructions: any;
 
   // Reset scroll to top when a new question is selected
-  selected_question.subscribe((slug) => {
+  const unsub_scroll_up = selected_question.subscribe((slug) => {
     if (slug === undefined) return;
 
     if (question_instructions !== undefined) {
       question_instructions.scrollTop = 0;
     }
   });
+
+  onDestroy(() => {
+    unsub_scroll_up();
+  });
 </script>
 
-<div class="question">
-  <div
-    id="question-instructions"
-    class="question-instructions"
-    bind:this={question_instructions}
-  >
+<div class="question" bind:this={question_instructions}>
+  <div id="question-instructions" class="question-instructions">
     {#if $selected_question !== undefined}
       {#if question_data !== undefined}
         <h1 style="margin-top: 0px;">
           <span
-            style={question_data.solved
-              ? "text-decoration: line-through;"
-              : ""}
+            style={question_data.solved ? "text-decoration: line-through;" : ""}
           >
             {question_data.name}
           </span>
@@ -64,8 +62,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
             ><b>Difficulty:</b>
             {difficulty_name(question_data.difficulty)}</span
           >
-          <span style="opacity:0.7;"
-            ><b>Points:</b> {question_data.points}</span
+          <span style="opacity:0.7;"><b>Points:</b> {question_data.points}</span
           >
         </div>
 

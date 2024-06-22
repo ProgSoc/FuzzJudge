@@ -13,7 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script>
   export let shown = false;
   export let close = () => {};
@@ -54,7 +53,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     margin-top: 10px;
   }
 
-  .close{
+  .close {
     text-decoration: double;
     font-weight: bold;
     position: absolute;

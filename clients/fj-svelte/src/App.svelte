@@ -20,7 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     CompState,
     get_current_comp_state,
     get_time_till_next_state,
-    needs_questions,
+    showing_questions,
     type CompTimes,
     type QuestionMeta,
   } from "./utils";
@@ -29,7 +29,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let comp_times: CompTimes | undefined = undefined;
   let questions: Record<string, QuestionMeta> | undefined = undefined;
-  let loading_error: string | undefined = undefined;
+  let loading_errors: string[] = [];
 
   get_comp_info().then((data) => {
     window.document.title = data.title;
@@ -41,7 +41,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         questions = q;
       })
       .catch((err) => {
-        loading_error = err;
+        loading_errors.push(err);
+        loading_errors = loading_errors;
       });
   };
 
@@ -53,7 +54,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   const set_timer_for_next_state = () => {
     if (comp_times == undefined) return;
     current_state = get_current_comp_state(comp_times);
-    if (needs_questions(comp_times)) {
+    if (showing_questions(comp_times)) {
       load_questions();
     }
     console.log(`changed current state to ${current_state}`);
@@ -65,6 +66,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       get_time_till_next_state(comp_times, current_state),
     );
   };
+
   onDestroy(() => clearTimeout(timer_ref));
 
   get_comp_times()
@@ -76,13 +78,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
       console.log("got times");
       comp_times = t;
-      if (needs_questions(t)) {
+      if (showing_questions(t)) {
         load_questions();
       }
       set_timer_for_next_state();
     })
     .catch((err) => {
-      loading_error = err;
+      loading_errors.push(err);
+      loading_errors = loading_errors;
     });
 
   const set_solved = (slug: string) => {
@@ -103,10 +106,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 </script>
 
-{#if (comp_times !== undefined && !needs_questions(comp_times)) || questions !== undefined}
+{#if questions !== undefined || (comp_times !== undefined && !showing_questions(comp_times))}
   <Client {questions} {set_solved} {comp_times} {current_state} />
-{:else if loading_error !== undefined}
-  <div class="loading">Error loading questions: {loading_error}</div>
+{:else if loading_errors.length > 0}
+  <div class="loading">
+    Error loading questions:<br />
+    {#each loading_errors as error}
+      <code>{error}</code>
+    {/each}
+  </div>
 {:else}
   <Loading />
 {/if}

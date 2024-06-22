@@ -13,7 +13,9 @@
 * with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { BACKEND_SERVER, parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
+import { parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
+
+export const BACKEND_SERVER: string = "";
 
 export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
@@ -144,3 +146,11 @@ export const submit_solution = async (slug: string, output: string, source: stri
     message: await res.text(),
   };
 }
+
+export const open_fuzz = (slug: string) => {
+  window.open(
+    `${BACKEND_SERVER}/comp/prob/${slug}/fuzz`,
+    "_blank",
+  );
+};
+

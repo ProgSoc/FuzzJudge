@@ -13,9 +13,8 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     type QuestionMeta,
     truncate_username,
@@ -60,12 +59,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   $: users = users.sort((a, b) => b.points - a.points);
   $: sorted_questions = Object.values(questions).sort((a, b) => a.num - b.num);
 
-  onMount(() => {
-    return () => {
-      if (unsubscribe !== null) {
-        unsubscribe();
-      }
-    };
+  onDestroy(() => {
+    if (unsubscribe !== null) {
+      unsubscribe();
+    }
   });
 </script>
 

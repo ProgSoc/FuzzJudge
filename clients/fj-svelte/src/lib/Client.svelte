@@ -13,7 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
@@ -82,7 +81,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Sidebar {questions} />
 
   <!-- main content -->
-  {#if comp_times === undefined || (current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES)}
+  {#if comp_times === undefined || current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES}
     <QuestionContents
       question_data={questions[$selected_question]}
       {set_solved}
@@ -93,7 +92,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
   {:else}
     <div class="locked-message">
-      <h1>Finished</h1>
+      <div class="finished-message">
+        <h1>Competition Finished</h1>
+        <p>You can no longer submit solutions.</p>
+      </div>
     </div>
   {/if}
 </div>
@@ -148,5 +150,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     width: 100%;
     font-size: 1.5rem;
     color: var(--text-sec);
+  }
+
+  .finished-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>

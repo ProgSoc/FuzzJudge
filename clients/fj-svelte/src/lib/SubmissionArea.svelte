@@ -15,17 +15,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { writable } from "svelte/store";
-  import { selected_question, BACKEND_SERVER } from "../utils";
-  import { submit_solution } from "../api";
+  import { selected_question } from "../utils";
+  import { submit_solution, open_fuzz } from "../api";
 
   export let set_solved: (slug: string) => void;
-
-  const open_fuzz = () => {
-    window.open(
-      `${BACKEND_SERVER}/comp/prob/${$selected_question}/fuzz`,
-      "_blank",
-    );
-  };
 
   let waiting_on_server = false;
 
@@ -33,6 +26,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let submission_value = "";
   let source_value = "";
+
+  selected_question.subscribe((_) => {
+      submission_value = "";
+      source_value = "";
+  });
 
   const submit = (slug: string) => {
     if (waiting_on_server === true) return;
@@ -61,12 +59,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="section">
     <div class="text-area-buttons">
       <span class="get-input">
-        To begin, <span class="input-span" on:click={open_fuzz}
+        To begin, <span
+          class="input-span"
+          on:click={() => open_fuzz($selected_question)}
           >grab your question input!
         </span></span
       >
     </div>
-    <textarea bind:value={submission_value} />
+    <div class="section submission-areas">
+      <div class="solution-submission">
+        <h2>Question Solution</h2>
+        <textarea bind:value={submission_value} />
+      </div>
+      <div class="source-submission">
+        <h2>Solution source</h2>
+        <p>
+          Please include any of the source code used to solve the problem. This
+          may be manually reviewed later.
+        </p>
+        <textarea bind:value={source_value} />
+      </div>
+    </div>
     <div class="text-area-buttons">
       <button on:click={() => submit($selected_question)}>
         {waiting_on_server ? "Processing..." : "Submit"}
