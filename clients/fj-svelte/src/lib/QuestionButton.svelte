@@ -13,8 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
-
 <script lang="ts">
   import { type QuestionMeta, selected_question } from "../utils";
 
@@ -65,7 +63,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     border: solid 2px transparent;
     border-bottom: solid 2px var(--accent);
   }
-  
+
   .icon {
     grid-area: icon;
     font-size: 1rem;

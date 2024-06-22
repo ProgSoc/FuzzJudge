@@ -18,8 +18,6 @@ import { writable, type Writable } from "svelte/store";
 
 export const selected_question: Writable<string> = writable("");
 
-export const BACKEND_SERVER: string = "";
-
 export interface QuestionMeta {
   slug: string;
   num: number;
@@ -46,7 +44,7 @@ export const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
     if (a.slug.charCodeAt(i) !== b.slug.charCodeAt(i)) {
       return a.slug.charCodeAt(i) - b.slug.charCodeAt(i);
     }
-  }
+ }
 
   return 1;
 };
@@ -157,7 +155,7 @@ export const get_time_till_next_state = (times: CompTimes | undefined, current: 
   return get_state_start_time(times, current + 1).getTime() - new Date().getTime();
 }
 
-export const needs_questions = (times: CompTimes): boolean => {
+export const showing_questions_at_current_time  = (times: CompTimes): boolean => {
   const state = get_current_comp_state(times)
   return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES
 }

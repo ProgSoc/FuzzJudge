@@ -13,7 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
     import ListGroup from "./ListGroup.svelte";
     import { type QuestionMeta } from "../utils";
