@@ -1,52 +1,52 @@
 /*
-* FuzzJudge - Randomised input judging server, designed for ProgComp.
-* Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU Affero General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
+ * FuzzJudge - Randomised input judging server, designed for ProgComp.
+ * Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { FuzzJudgeProblem } from "./comp.ts";
-import { DB, compressZstd, decompressZstd } from "./deps.ts"
+import { DB, compressZstd, decompressZstd } from "./deps.ts";
 
 export type Team = {
-  id: number,
-  seed: string,
-  name: string,
+  id: number;
+  seed: string;
+  name: string;
 };
 
 export type UserRoles = "admin" | "competitor";
 
 export type User = {
-  id: number,
-  team: number,
-  logn: string,
-  salt: Uint8Array,
-  hash: Uint8Array,
-  name: string,
-  role: UserRoles,
+  id: number;
+  team: number;
+  logn: string;
+  salt: Uint8Array;
+  hash: Uint8Array;
+  name: string;
+  role: UserRoles;
 };
 
 export type Submission = {
-  id: number,
-  team: number,
-  prob: string,
-  time: Date,
-  out: string,
-  code: string,
-  ok: boolean,
-  vler: string,
-  vlms: number,
+  id: number;
+  team: number;
+  prob: string;
+  time: Date;
+  out: string;
+  code: string;
+  ok: boolean;
+  vler: string;
+  vlms: number;
 };
 
 export type DBSubscriptionHandler = (db: CompetitionDB) => void | Promise<void>;
@@ -121,8 +121,9 @@ export class CompetitionDB {
     return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
   }
 
-  resetUser(params: { logn: string, role: UserRoles }): User {
-    return this.#db.queryEntries<User>(`
+  resetUser(params: { logn: string; role: UserRoles }): User {
+    return this.#db.queryEntries<User>(
+      `
         INSERT INTO user VALUES (NULL, NULL, :logn, :salt, NULL, :logn, :role)
         ON CONFLICT DO UPDATE SET hash = NULL, role = :role
         RETURNING *
@@ -135,10 +136,13 @@ export class CompetitionDB {
   }
 
   updateUser(targetLogn: string, params: Record<string, string | number>): User {
-    return this.#db.queryEntries<User>(`
+    return this.#db.queryEntries<User>(
+      `
       UPDATE user
       SET (${Object.keys(params).join(",")})
-      = (${Object.keys(params).map(_=>"?").join(",")})
+      = (${Object.keys(params)
+        .map((_) => "?")
+        .join(",")})
       WHERE id = ?
       RETURNING *
       `,
@@ -150,7 +154,7 @@ export class CompetitionDB {
     this.#db.query("DELETE FROM user WHERE logn = :logn", params);
   }
 
-  async basicAuth({ logn, pass }: { logn: string, pass: Uint8Array }): Promise<User | null> {
+  async basicAuth({ logn, pass }: { logn: string; pass: Uint8Array }): Promise<User | null> {
     const user = this.#db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn", { logn })[0] ?? null;
     if (user === null) return null;
     const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array([...pass, ...user.salt])));
@@ -173,25 +177,23 @@ export class CompetitionDB {
     return this.#db.queryEntries<Team>("SELECT * FROM team");
   }
 
-  attempts(params: { team: number, prob: string }): number {
-    return this.#db.query<[number]>(
-      "SELECT COUNT(*) FROM subm WHERE team = :team AND prob = :prob",
-      params,
-    )[0][0];
+  attempts(params: { team: number; prob: string }): number {
+    return this.#db.query<[number]>("SELECT COUNT(*) FROM subm WHERE team = :team AND prob = :prob", params)[0][0];
   }
 
-  solved(params: { team: number, prob: string }): boolean {
-    return this.#db.query<[number]>(
-      "SELECT COUNT(*) FROM subm WHERE ok = TRUE AND team = :team AND prob = :prob",
-      params,
-    )[0][0] > 0;
+  solved(params: { team: number; prob: string }): boolean {
+    return (
+      this.#db.query<[number]>(
+        "SELECT COUNT(*) FROM subm WHERE ok = TRUE AND team = :team AND prob = :prob",
+        params,
+      )[0][0] > 0
+    );
   }
 
   solvedSet(params: { team: number }): Set<string> {
-    return new Set(this.#db.query<[string]>(
-      "SELECT DISTINCT prob FROM subm WHERE ok = TRUE AND team = :team",
-      params,
-    ).flat());
+    return new Set(
+      this.#db.query<[string]>("SELECT DISTINCT prob FROM subm WHERE ok = TRUE AND team = :team", params).flat(),
+    );
   }
 
   score(params: { team: number }): number {
@@ -221,7 +223,7 @@ export class CompetitionDB {
     let out = "username, points, solved\n";
     for (const { id: team, name } of this.teams()) {
       const solved = [...this.solvedSet({ team })].join(", ");
-      out += `${name}, ${this.score({ team })}${solved ? ", " + solved : ""}\n`
+      out += `${name}, ${this.score({ team })}${solved ? ", " + solved : ""}\n`;
     }
     return out;
   }
