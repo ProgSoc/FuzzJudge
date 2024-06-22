@@ -1,24 +1,23 @@
 /*
-* FuzzJudge - Randomised input judging server, designed for ProgComp.
-* Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU Affero General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
+ * FuzzJudge - Randomised input judging server, designed for ProgComp.
+ * Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { basename, dirname, pathJoin } from "./deps.ts";
 import { FuzzJudgeDocument } from "./util.ts";
-
 
 export class FuzzJudgeProblem {
   #doc: FuzzJudgeDocument;
@@ -38,8 +37,12 @@ export class FuzzJudgeProblem {
     this.#slug = basename(dirname(configPath));
     this.#cmdFuzz = Object(doc.config).fuzz?.exec?.[0] ?? pathJoin(configPath, "../fuzz");
     this.#cmdJudge = Object(doc.config).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
-    this.#argsFuzz = Array.from(Object(doc.config).fuzz?.exec ?? []).map(String).slice(1);
-    this.#argsJudge = Array.from(Object(doc.config).judge?.exec ?? []).map(String).slice(1);
+    this.#argsFuzz = Array.from(Object(doc.config).fuzz?.exec ?? [])
+      .map(String)
+      .slice(1);
+    this.#argsJudge = Array.from(Object(doc.config).judge?.exec ?? [])
+      .map(String)
+      .slice(1);
     this.#envFuzz = Object(doc.config).fuzz?.env ?? {};
     for (const key in this.#envFuzz) this.#envFuzz[key] = String(this.#envFuzz[key]);
   }
@@ -69,10 +72,10 @@ export class FuzzJudgeProblem {
   async judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
     const { limited, retry } = this.#handleRateLimiting(seed);
     if (limited) {
-      throw new Response(
-        `429 Too Many Requests\n\nRetry after ${retry}s\n`,
-        { status: 429, headers: [["Retry-After", retry.toFixed(0)]] },
-      );
+      throw new Response(`429 Too Many Requests\n\nRetry after ${retry}s\n`, {
+        status: 429,
+        headers: [["Retry-After", retry.toFixed(0)]],
+      });
     }
 
     const proc = new Deno.Command(this.#cmdJudge, {
