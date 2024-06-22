@@ -125,7 +125,7 @@ export class CompetitionDB {
     return this.#db.queryEntries<User>(
       `
         INSERT INTO user VALUES (NULL, NULL, :logn, :salt, NULL, :logn, :role)
-        ON CONFLICT DO UPDATE SET hash = NULL, role = :role
+        ${upsert ? "ON CONFLICT DO UPDATE SET hash = NULL, role = :role" : ""}
         RETURNING *
       `,
       {
