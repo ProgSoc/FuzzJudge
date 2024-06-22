@@ -1,19 +1,26 @@
 /*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU Lesser General Public License as published by the
-* Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-* for more details.
-*
-* You should have received a copy of the GNU Lesser General Public License along
-* with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along
+ * with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import { parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
+import {
+  parse_scoreboard,
+  parse_times,
+  question_order,
+  type CompTimes,
+  type QuestionMeta,
+  type ScoreboardUser,
+} from "./utils";
 
 export const BACKEND_SERVER: string = "";
 
@@ -28,7 +35,7 @@ export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
     }
 
     const text = await res.text();
-    let arr = text.split("\n").filter(x => x !== "");
+    let arr = text.split("\n").filter((x) => x !== "");
 
     if (arr.length === 0) {
       throw "No questions found";
@@ -43,23 +50,22 @@ export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
     for (let i = 0; i < sorted.length; i++) {
       sorted[i].num = i + 1;
     }
-
   } catch (e: any) {
     throw e.toString();
   }
 
   return questions;
-}
+};
 
 export interface ScoreboardEvent {
   new_scoreboard: ScoreboardUser[];
 }
 
-export const subscribe_to_scoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<(() => void)> => {
+export const subscribe_to_scoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<() => void> => {
   const server = window.location.hostname;
   const port = 8080;
 
-  const socket = new WebSocket(`ws://${server}:${port}`)
+  const socket = new WebSocket(`ws://${server}:${port}`);
 
   socket.addEventListener("message", (event) => {
     callback({ new_scoreboard: parse_scoreboard(event.data) });
@@ -70,7 +76,7 @@ export const subscribe_to_scoreboard = async (callback: (data: ScoreboardEvent) 
   };
 };
 
-export const get_comp_info = async (): Promise<{ title: string, instructions: string }> => {
+export const get_comp_info = async (): Promise<{ title: string; instructions: string }> => {
   const title = await (await fetch(`${BACKEND_SERVER}/comp/name`)).text();
   const instructions = await (await fetch(`${BACKEND_SERVER}/comp/instructions`)).text();
   return { title, instructions };
@@ -81,45 +87,25 @@ export const get_scoreboard = async (): Promise<ScoreboardUser[]> => {
 };
 
 export const get_username = async (): Promise<string> => {
-  return await fetch(`${BACKEND_SERVER}/auth`).then(r => r.text());
+  return await fetch(`${BACKEND_SERVER}/auth`).then((r) => r.text());
 };
 
 const get_question_data = async (slug: string) => {
   const data: QuestionMeta = {
     slug,
     num: -1,
-    name: await (
-      await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/name`)
-    ).text(),
-    icon: await (
-      await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/icon`)
-    ).text(),
-    instructions: await (
-      await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/instructions`)
-    ).text(),
-    solved:
-      (await (
-        await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`)
-      ).text()) === "OK",
-    points: parseInt(
-      await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/points`)).text(),
-    ),
-    difficulty: parseInt(
-      await (
-        await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/difficulty`)
-      ).text(),
-    ),
-    brief: await (
-      await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/brief`)
-    ).text(),
+    name: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/name`)).text(),
+    icon: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/icon`)).text(),
+    instructions: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/instructions`)).text(),
+    solved: (await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`)).text()) === "OK",
+    points: parseInt(await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/points`)).text()),
+    difficulty: parseInt(await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/difficulty`)).text()),
+    brief: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/brief`)).text(),
   };
 
-  data.instructions = data.instructions.replace(
-    /(<img\s+[^>]*src=")(?!https:\/\/)([^"]+)"/g,
-    (match, p1, p2) => {
-      return `${p1}${BACKEND_SERVER}/comp/prob/${slug}/assets/${p2}"`;
-    },
-  );
+  data.instructions = data.instructions.replace(/(<img\s+[^>]*src=")(?!https:\/\/)([^"]+)"/g, (match, p1, p2) => {
+    return `${p1}${BACKEND_SERVER}/comp/prob/${slug}/assets/${p2}"`;
+  });
 
   return data;
 };
@@ -127,9 +113,13 @@ const get_question_data = async (slug: string) => {
 export const get_comp_times = async (): Promise<CompTimes | undefined> => {
   const times_string = await (await fetch(`${BACKEND_SERVER}/comp/clock`)).text();
   return parse_times(times_string);
-}
+};
 
-export const submit_solution = async (slug: string, output: string, source: string): Promise<{ correct: boolean, message: string }> => {
+export const submit_solution = async (
+  slug: string,
+  output: string,
+  source: string,
+): Promise<{ correct: boolean; message: string }> => {
   const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
     method: "POST",
     body: new URLSearchParams({
@@ -145,12 +135,8 @@ export const submit_solution = async (slug: string, output: string, source: stri
     correct: res.ok,
     message: await res.text(),
   };
-}
-
-export const open_fuzz = (slug: string) => {
-  window.open(
-    `${BACKEND_SERVER}/comp/prob/${slug}/fuzz`,
-    "_blank",
-  );
 };
 
+export const open_fuzz = (slug: string) => {
+  window.open(`${BACKEND_SERVER}/comp/prob/${slug}/fuzz`, "_blank");
+};
