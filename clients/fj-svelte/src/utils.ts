@@ -129,8 +129,8 @@ export const get_state_start_time = (times: CompTimes, state: CompState): Date =
 }
 
 // Returns the number of milliseconds until the next state
-export const get_time_till_next_state = (times: CompTimes, current: CompState): number => {
-  if(current === CompState.FINISHED) {
+export const get_time_till_next_state = (times: CompTimes | undefined, current: CompState | undefined): number => {
+  if(current === CompState.FINISHED || times == undefined || current == undefined) {
     return 1e10;
   }
 

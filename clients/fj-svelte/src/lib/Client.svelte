@@ -8,15 +8,11 @@
     type QuestionMeta,
     selected_question,
     type CompTimes,
-    needs_questions,
     CompState,
-    get_current_comp_state,
-    get_time_till_next_state,
   } from "../utils";
 
   import { get_username } from "../api";
-    import Countdown from "./Countdown.svelte";
-    import { onDestroy } from "svelte";
+  import Countdown from "./Countdown.svelte";
 
   let username = "Loading...";
 
@@ -25,21 +21,9 @@
   });
 
   export let comp_times: CompTimes;
+  export let current_state: CompState; // can be infered from comp_times but is passed in to make it reactive
   export let questions: Record<string, QuestionMeta> = {};
   export let set_solved: (slug: string) => void;
-
-  let current_state = get_current_comp_state(comp_times);
-  let timer_ref = -1;
-  // Sets a timer to trigger a rerender to update the main content
-  const set_timer_for_next_state = () => {
-    timer_ref = setTimeout(() => {
-      current_state = get_current_comp_state(comp_times);
-      console.log(`changed current state to ${current_state}`);
-      set_timer_for_next_state();
-    }, get_time_till_next_state(comp_times, current_state));
-  };
-  set_timer_for_next_state();
-  onDestroy(() => clearTimeout(timer_ref))
 
   selected_question.set(
     Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
@@ -63,12 +47,16 @@
       <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}
         >Scoreboard</button
       >
+      {#if current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES }
+        <span>Remaining: <Countdown {comp_times} until_state={CompState.FINISHED} show_binary={false}/></span>
+      {/if}
     </div>
     <div>
       Logged in as <b>{username}</b>
       <a href="/auth/logout">Logout</a>
     </div>
   </div>
+
   <Sidebar {questions} />
 
   <!-- main content -->

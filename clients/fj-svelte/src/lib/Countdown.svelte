@@ -4,6 +4,8 @@
 
   export let comp_times: CompTimes;
   export let until_state: CompState;
+  export let show_binary: boolean = true;
+  export let show_decimal: boolean = true;
 
   const start_time = get_state_start_time(comp_times, until_state)
 
@@ -29,10 +31,14 @@
 
 </script>
 
-<div>
-  {time_left_bin}
-  {time_left_dec}
-</div>
+<span>
+  {#if show_binary}
+    {time_left_bin}
+  {/if}
+  {#if show_decimal}
+    {time_left_dec}
+  {/if}
+</span>
 
 <style>
 </style>
