@@ -64,10 +64,13 @@
 </div>
 
 <style>
+  .question {
+    overflow: scroll;
+  }
+
   .question-instructions {
     color: var(--text-prim);
     grid-area: question-instructions;
-    overflow-y: scroll;
     padding: 1rem;
     text-wrap: pretty;
   }
