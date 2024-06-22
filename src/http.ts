@@ -91,3 +91,23 @@ export class Router {
     return new Response("404 Not Found (No route)", { status: 404 });
   }
 }
+
+export function expectMime(ctx: Request, type: string) {
+  if (ctx.headers.get("Content-Type") !== type) {
+    throw new Response(`415 Unsupported Media Type\n\nExpected '${type}'`, { status: 415 });
+  }
+}
+
+export async function expectForm<
+  T extends Record<string, null | ((value: string) => unknown)>
+>(ctx: Request, fields: T)
+  : Promise<{ [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string }>
+{
+  expectMime(ctx, "application/x-www-form-urlencoded");
+  const params = new URLSearchParams(await ctx.text());
+  return Object.fromEntries(Object.entries(fields).map(([field, map]) => {
+    const value = params.get(field);
+    if (value === null) throw new Response(`400 Bad Request\n\nMissing form field '${field}'\n`, { status: 400 });
+    return [field, map?.(value) ?? value];
+  })) as { [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string };
+}
