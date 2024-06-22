@@ -47,8 +47,14 @@
       <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}
         >Scoreboard</button
       >
-      {#if current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES }
-        <span>Remaining: <Countdown {comp_times} until_state={CompState.FINISHED} show_binary={false}/></span>
+      {#if current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES}
+        <span
+          >Remaining: <Countdown
+            {comp_times}
+            until_state={CompState.FINISHED}
+            show_binary={false}
+          /></span
+        >
       {/if}
     </div>
     <div>
@@ -61,13 +67,19 @@
 
   <!-- main content -->
   {#if current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES}
-    <QuestionContents question_data={questions[$selected_question]} {set_solved} />
+    <QuestionContents
+      question_data={questions[$selected_question]}
+      {set_solved}
+    />
   {:else if current_state == CompState.BEFORE}
-    <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
+    <div class="locked-message">
+      <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
+    </div>
   {:else}
-    <h1>Finished</h1>
+    <div class="locked-message">
+      <h1>Finished</h1>
+    </div>
   {/if}
-
 </div>
 
 <Popout
@@ -110,5 +122,15 @@
     padding: 0.25rem;
     color: var(--text-sec);
     background-color: var(--bg-sec);
+  }
+
+  .locked-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    font-size: 1.5rem;
+    color: var(--text-sec);
   }
 </style>
