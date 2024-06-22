@@ -47,12 +47,14 @@ import { Router } from "./http.ts";
 import { HEADER } from "./version.ts";
 import { CompetitionDB } from "./db.ts";
 import { DBSubscriptionHandler } from "./db.ts";
+import { Clock } from "./clock.ts";
 
 if (import.meta.main) {
 
   const root = await Deno.realPath(Deno.args[0] ?? ".");
 
   const compfile = loadMarkdown(await Deno.readTextFile(pathJoin(root, "./comp.md")));
+  const clock = new Clock(compfile.config);
 
   const problems: Record<string, FuzzJudgeProblem> = {};
   for await (const ent of walk(root, {
@@ -118,6 +120,7 @@ if (import.meta.main) {
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
+      "/clock": () => new Response(clock.times_json(), { headers: { "Content-Type": "text/json" }}),
       "/scoreboard": req => {
         if (req.headers.get("Upgrade") == "websocket") {
           // TODO: websocket upgrades and new live scoreboard format
