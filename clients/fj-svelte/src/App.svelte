@@ -13,7 +13,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
   import Client from "./lib/Client.svelte";
   import Loading from "./lib/Loading.svelte";
@@ -47,7 +46,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 
   let current_state: CompState | undefined = undefined;
+
   let timer_ref = -1;
+
   // Sets a timer to trigger a rerender to update the main content
   const set_timer_for_next_state = () => {
     if (comp_times == undefined) return;
@@ -90,6 +91,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     questions[slug].solved = true;
   };
 
+  // For hot reloading
   try {
     const socket = new WebSocket(`ws://localhost:25566`);
 
@@ -97,11 +99,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       window.location.reload();
     });
   } catch (e) {
-    console.error("Failed to connect to socket: ", e);
+    console.error("Failed to connect to hot-reloading socket: ", e);
   }
 </script>
 
-{#if ((comp_times !== undefined && !needs_questions(comp_times)) || questions !== undefined)}
+{#if (comp_times !== undefined && !needs_questions(comp_times)) || questions !== undefined}
   <Client {questions} {set_solved} {comp_times} {current_state} />
 {:else if loading_error !== undefined}
   <div class="loading">Error loading questions: {loading_error}</div>

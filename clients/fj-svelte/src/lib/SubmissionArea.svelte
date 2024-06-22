@@ -13,10 +13,10 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-
 <script lang="ts">
   import { writable } from "svelte/store";
   import { selected_question, BACKEND_SERVER } from "../utils";
+  import { submit_solution } from "../api";
 
   export let set_solved: (slug: string) => void;
 
@@ -32,6 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let error_message = writable("");
 
   let submission_value = "";
+  let source_value = "";
 
   const submit = (slug: string) => {
     if (waiting_on_server === true) return;
@@ -40,44 +41,37 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
     waiting_on_server = true;
 
-    fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
-      method: "POST",
-      body: new URLSearchParams({
-        output: submission_value,
-        source: "hi",
-      }),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+    submit_solution(slug, submission_value, source_value).then(
+      ({ correct, message }) => {
+        waiting_on_server = false;
+
+        if (slug === $selected_question) {
+          error_message.set(message);
+        }
+
+        if (correct && set_solved !== undefined) {
+          set_solved(slug);
+        }
       },
-    }).then((res) => {
-      waiting_on_server = false;
-
-      res.text().then((body) => {
-        if (slug !== $selected_question) return;
-
-        error_message.set(body);
-      });
-
-      if (res.ok && set_solved !== undefined) {
-        set_solved(slug);
-      }
-    });
+    );
   };
 </script>
 
 <div class="question-submission">
   <div class="section">
     <div class="text-area-buttons">
-      <span class="get-input" > To begin, <span class="input-span" on:click={open_fuzz}>grab your question input! </span></span>
-      </div>
+      <span class="get-input">
+        To begin, <span class="input-span" on:click={open_fuzz}
+          >grab your question input!
+        </span></span
+      >
+    </div>
     <textarea bind:value={submission_value} />
     <div class="text-area-buttons">
- 
-    <button on:click={() => submit($selected_question)}>
-      {waiting_on_server ? "Processing..." : "Submit"}
-    </button>
+      <button on:click={() => submit($selected_question)}>
+        {waiting_on_server ? "Processing..." : "Submit"}
+      </button>
     </div>
-
   </div>
   <div class="sec error-message-area">
     {#if $error_message !== undefined}
@@ -89,12 +83,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </div>
 
 <style>
-
-
   .section {
     flex-direction: column;
     display: flex;
-
   }
 
   .error-message-area {
@@ -113,16 +104,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     } /* Include padding and border in the element's total width and height */
   }
 
-  .get-input{
+  .get-input {
     margin-bottom: 1rem;
     margin-left: 0.25rem;
   }
 
-  .input-span{
+  .input-span {
     color: green;
-    &:hover{
-      color:lightgreen;
-      cursor:pointer;
+    &:hover {
+      color: lightgreen;
+      cursor: pointer;
     }
   }
 
@@ -132,6 +123,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     justify-content: space-between;
     width: 100%; /* Ensure the container spans the full width */
   }
+
   textarea {
     height: 8rem;
     width: 15rem;

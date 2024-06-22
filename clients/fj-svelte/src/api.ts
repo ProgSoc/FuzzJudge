@@ -13,9 +13,7 @@
 * with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-
-
-import { BACKEND_SERVER, parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser} from "./utils";
+import { BACKEND_SERVER, parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
 
 export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
@@ -127,4 +125,22 @@ const get_question_data = async (slug: string) => {
 export const get_comp_times = async (): Promise<CompTimes | undefined> => {
   const times_string = await (await fetch(`${BACKEND_SERVER}/comp/clock`)).text();
   return parse_times(times_string);
+}
+
+export const submit_solution = async (slug: string, output: string, source: string): Promise<{ correct: boolean, message: string }> => {
+  const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
+    method: "POST",
+    body: new URLSearchParams({
+      output,
+      source,
+    }),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  return {
+    correct: res.ok,
+    message: await res.text(),
+  };
 }
