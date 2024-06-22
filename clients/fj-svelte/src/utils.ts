@@ -1,18 +1,17 @@
 /*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU Lesser General Public License as published by the
-* Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful, but 
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
-* for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public License along
-* with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
-
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along
+ * with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { writable, type Writable } from "svelte/store";
 
@@ -44,7 +43,7 @@ export const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
     if (a.slug.charCodeAt(i) !== b.slug.charCodeAt(i)) {
       return a.slug.charCodeAt(i) - b.slug.charCodeAt(i);
     }
- }
+  }
 
   return 1;
 };
@@ -102,11 +101,10 @@ export const parse_scoreboard = (data: string): ScoreboardUser[] => {
   return users;
 };
 
-
 export interface CompTimes {
-  start: Date,
-  freeze: Date,
-  stop: Date,
+  start: Date;
+  freeze: Date;
+  stop: Date;
 }
 
 export const parse_times = (data: string): CompTimes => {
@@ -115,15 +113,18 @@ export const parse_times = (data: string): CompTimes => {
   obj.freeze = new Date(obj.freeze);
   obj.stop = new Date(obj.stop);
   return obj;
-}
+};
 
 export enum CompState {
-  BEFORE, LIVE_WITH_SCORES, LIVE_WITHOUT_SCORES, FINISHED
+  BEFORE,
+  LIVE_WITH_SCORES,
+  LIVE_WITHOUT_SCORES,
+  FINISHED,
 }
 
 export const get_current_comp_state = (times: CompTimes) => {
   const now = new Date(Date.now());
-  if(now < times.start) {
+  if (now < times.start) {
     return CompState.BEFORE;
   } else if (now < times.freeze) {
     return CompState.LIVE_WITH_SCORES;
@@ -132,7 +133,7 @@ export const get_current_comp_state = (times: CompTimes) => {
   } else {
     return CompState.FINISHED;
   }
-}
+};
 
 export const get_state_start_time = (times: CompTimes, state: CompState): Date => {
   switch (state) {
@@ -144,18 +145,18 @@ export const get_state_start_time = (times: CompTimes, state: CompState): Date =
     case CompState.FINISHED:
       return times.stop;
   }
-}
+};
 
 // Returns the number of milliseconds until the next state
 export const get_time_till_next_state = (times: CompTimes | undefined, current: CompState | undefined): number => {
-  if(current === CompState.FINISHED || times == undefined || current == undefined) {
+  if (current === CompState.FINISHED || times == undefined || current == undefined) {
     return 1e10;
   }
 
   return get_state_start_time(times, current + 1).getTime() - new Date().getTime();
-}
+};
 
-export const showing_questions_at_current_time  = (times: CompTimes): boolean => {
-  const state = get_current_comp_state(times)
-  return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES
-}
+export const showing_questions_at_current_time = (times: CompTimes): boolean => {
+  const state = get_current_comp_state(times);
+  return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES;
+};

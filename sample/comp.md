@@ -10,7 +10,6 @@ ProgSoc @ TechFest
 - 3:00 - Scoreboard freeze
 - 4:00 - Competition end, scoreboard unfreeze, announcing winners
 
-
 ## Solving questions
 
 Each question requires processing your generated problem input. Just as an example, here's a simple python program that reads a line from standard input and then prints it out again:
@@ -23,7 +22,6 @@ However, we've created a scaffold for each question that does that for you to ma
 We've prepared scaffolds for Python, Java and C++. You should be able to write code locally, test it with the sample inputs/outputs, then upload it to the competition server when you're done to mark it.
 
 To upload a file, make sure you're logged in, then you should have a submit button in the top right. Click, then select your file and the question you're submitting for, and it should judge it from there.
-
 
 ## Scoring
 
