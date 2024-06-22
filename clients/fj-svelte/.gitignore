@@ -24,6 +24,3 @@ dist-ssr
 *.sw?
 
 public/*.json
-
-# Remove this later when we get a better grasp on how deno is managed
-deno.lock
