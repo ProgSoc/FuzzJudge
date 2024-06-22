@@ -109,8 +109,10 @@ const get_question_data = async (slug: string) => {
   return data;
 };
 
-export const get_comp_times = async (): Promise<CompTimes> => {
-  return new Promise((resolve, _) => {
-    resolve(parse_times("dummy data to get from request"));
-  });
+export const get_comp_times = async (): Promise<CompTimes | undefined> => {
+  return undefined;
+
+  // return new Promise((resolve, _) => {
+  //   resolve(parse_times("dummy data to get from request"));
+  // });
 }
