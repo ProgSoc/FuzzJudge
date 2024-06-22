@@ -39,9 +39,9 @@ Backend
 
 */
 
-import { undent, indent, loadMarkdown } from "./util.ts";
+import { loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk, serveFile, normalize, WebSocketServer, WebSocketClient } from "./deps.ts";
+import { pathJoin, walk, serveFile, normalize, WebSocketServer } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore, subscribeToScoreboard, createScoreboardCSV } from "./score.ts";
 import { Router } from "./http.ts";
