@@ -25,12 +25,16 @@ export type Team = {
   name: string,
 };
 
+export type UserRoles = "admin" | "competitor";
+
 export type User = {
   id: number,
   team: number,
   logn: string,
-  pass: Uint8Array,
+  salt: Uint8Array,
+  hash: Uint8Array,
   name: string,
+  role: UserRoles,
 };
 
 export type Submission = {
@@ -67,8 +71,9 @@ export class CompetitionDB {
         team INTEGER  REFERENCES team,
         logn TEXT     UNIQUE,
         salt BLOB,
-        pass BLOB,
-        name TEXT
+        hash BLOB,
+        name TEXT,
+        role TEXT
       );
       CREATE TABLE IF NOT EXISTS subm (
         id   INTEGER  PRIMARY KEY AUTOINCREMENT,
@@ -116,8 +121,52 @@ export class CompetitionDB {
     return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
   }
 
-  auth(params: { logn: string, pass: Uint8Array }): User | null {
-    return this.#db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn AND pass = :pass", params)[0] ?? null;
+  resetUser(params: { logn: string, role: UserRoles }): User {
+    return this.#db.queryEntries<User>(`
+        INSERT INTO user VALUES (NULL, NULL, :logn, :salt, NULL, :logn, :role)
+        ON CONFLICT DO UPDATE SET hash = NULL, role = :role
+        RETURNING *
+      `,
+      {
+        ...params,
+        salt: crypto.getRandomValues(new Uint8Array(32)),
+      },
+    )[0];
+  }
+
+  updateUser(targetLogn: string, params: Record<string, string | number>): User {
+    return this.#db.queryEntries<User>(`
+      UPDATE user
+      SET (${Object.keys(params).join(",")})
+      = (${Object.keys(params).map(_=>"?").join(",")})
+      WHERE id = ?
+      RETURNING *
+      `,
+      [...Object.values(params), targetLogn],
+    )[0];
+  }
+
+  deleteUser(params: { logn: string }) {
+    this.#db.query("DELETE FROM user WHERE logn = :logn", params);
+  }
+
+  async basicAuth({ logn, pass }: { logn: string, pass: Uint8Array }): Promise<User | null> {
+    const user = this.#db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn", { logn })[0] ?? null;
+    if (user === null) return null;
+    const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array([...pass, ...user.salt])));
+    // Password reset mode, overwrite with new password.
+    if (user.hash === null) {
+      this.#db.query("UPDATE user SET hash = :hash WHERE id = :id", { hash, id: user.id });
+      user.hash = hash;
+    }
+    // normal authentication flow
+    else {
+      let matches = true;
+      // SECURITY: scan full list to avoid any potential side-channel
+      for (let i = 0; i < hash.length; ++i) if (hash[i] !== user.hash[i]) matches = false;
+      if (!matches) return null;
+    }
+    return user;
   }
 
   teams(): Team[] {

@@ -36,25 +36,25 @@ export class Auth<UserDetails> {
       if (header.startsWith("Basic ")) {
         try {
           const [ username, password ] = atob(header.slice(6)).split(/:(.*)/);
+          if (username == "") this.reject();
           const details = await this.#schemes.basic({ username, password });
           if (details !== null) return details;
         } catch (e) {
           if (e instanceof DOMException && e.message === "InvalidCharacterError") {
             throw new Response("400 Bad Request ('Basic' Header not base64)\n", { status: 400 });
+          } else {
+            throw e;
           }
         }
       }
     }
-    throw new Response("401 Unauthorized\n", {
-      status: 401,
-      headers: { "WWW-Authenticate": `Basic realm="/comp" charset="utf-8"` },
-    });
+    this.reject();
   }
 
-  requestAuth(_: Request): Response {
-    return new Response("401 Unauthorized\n", {
+  reject(): never {
+    throw new Response("401 Unauthorized\n", {
       status: 401,
-      headers: { "WWW-Authenticate": `Basic realm="/comp" charset="utf-8"` },
+      headers: { "WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"` },
     });
   }
 }
