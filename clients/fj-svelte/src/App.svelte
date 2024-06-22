@@ -2,9 +2,8 @@
   import Client from "./lib/Client.svelte";
   import Loading from "./lib/Loading.svelte";
   import { CompState, get_current_comp_state, get_time_till_next_state, needs_questions, type CompTimes, type QuestionMeta } from "./utils";
-
   import { get_questions, get_comp_info, get_comp_times } from "./api";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   let comp_times: CompTimes | undefined = undefined;
   let questions: Record<string, QuestionMeta> | undefined = undefined;

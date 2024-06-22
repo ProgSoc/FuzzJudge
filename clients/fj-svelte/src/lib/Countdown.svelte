@@ -26,8 +26,8 @@
   })();
 
   onDestroy(() => {
-		cancelAnimationFrame(anim_frame_ref);
-	});
+    cancelAnimationFrame(anim_frame_ref);
+  });
 
 </script>
 
