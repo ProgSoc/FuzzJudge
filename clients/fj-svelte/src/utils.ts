@@ -88,3 +88,47 @@ export const parse_scoreboard = (data: string): ScoreboardUser[] => {
   return users;
 };
 
+
+export interface CompTimes {
+  start: Date,
+  freeze: Date,
+  stop: Date,
+}
+
+export const parse_times = (data: string): CompTimes => {
+  return { start: new Date(Date.now() + 10000), freeze: new Date(Date.now() + 20000), stop: new Date(Date.now() + 30000)};
+}
+
+export enum CompState {
+  BEFORE, LIVE_WITH_SCORES, LIVE_WITHOUT_SCORES, FINISHED
+}
+
+export const get_current_comp_state = (times: CompTimes) => {
+  const now = new Date(Date.now());
+  if(now < times.start) {
+    return CompState.BEFORE;
+  } else if (now < times.freeze) {
+    return CompState.LIVE_WITH_SCORES;
+  } else if (now < times.stop) {
+    return CompState.LIVE_WITHOUT_SCORES;
+  } else {
+    return CompState.FINISHED;
+  }
+}
+
+export const get_state_start_time = (times: CompTimes, state: CompState): Date => {
+  switch (state) {
+    case CompState.LIVE_WITH_SCORES:
+    case CompState.BEFORE: // theres not really a start time for before so it is just the start time of live
+      return times.start;
+    case CompState.LIVE_WITHOUT_SCORES:
+      return times.freeze;
+    case CompState.FINISHED:
+      return times.stop;
+  }
+}
+
+export const needs_questions = (times: CompTimes): boolean => {
+  const state = get_current_comp_state(times)
+  return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES
+}

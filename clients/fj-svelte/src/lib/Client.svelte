@@ -7,9 +7,14 @@
   import {
     type QuestionMeta,
     selected_question,
+    type CompTimes,
+    needs_questions,
+    CompState,
+    get_current_comp_state,
   } from "../utils";
 
   import { get_username } from "../api";
+    import Countdown from "./Countdown.svelte";
 
   let username = "Loading...";
 
@@ -17,6 +22,7 @@
     username = name;
   });
 
+  export let comp_times: CompTimes;
   export let questions: Record<string, QuestionMeta> = {};
   export let set_solved: (slug: string) => void;
 
@@ -49,7 +55,16 @@
     </div>
   </div>
   <Sidebar {questions} />
-  <QuestionContents question_data={questions[$selected_question]} {set_solved} />
+
+  <!-- main content -->
+  {#if needs_questions(comp_times)}
+    <QuestionContents question_data={questions[$selected_question]} {set_solved} />
+  {:else if get_current_comp_state(comp_times) == CompState.BEFORE}
+    <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
+  {:else}
+    <h1>Finished</h1>
+  {/if}
+
 </div>
 
 <Popout
