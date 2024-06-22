@@ -23,7 +23,10 @@ interface TimeConfig {
 }
 
 export enum CompState {
-  BEFORE, LIVE_WITH_SCORES, LIVE_WITHOUT_SCORES, FINISHED
+  BEFORE,
+  LIVE_WITH_SCORES,
+  LIVE_WITHOUT_SCORES,
+  FINISHED,
 }
 
 const CONFIG_CACHE_REFRESH_MS = 1000;
@@ -42,12 +45,8 @@ export class Clock {
   }
 
   #load_times() {
-    const time_since_retrieved =
-      new Date().getTime() - this.#timing_config_retrieved.getTime();
-    if (
-      this.#timing_config == undefined ||
-      time_since_retrieved > CONFIG_CACHE_REFRESH_MS
-    ) {
+    const time_since_retrieved = new Date().getTime() - this.#timing_config_retrieved.getTime();
+    if (this.#timing_config == undefined || time_since_retrieved > CONFIG_CACHE_REFRESH_MS) {
       // will use a query like SELECT start_time, freeze_time, stop_time FROM CompetitionConfig WHERE name = ?;
       this.#timing_config_retrieved = new Date();
       this.#timing_config = {
@@ -80,9 +79,9 @@ export class Clock {
 
   current_comp_state(): CompState | undefined {
     const now = new Date();
-    if(this.#timing_config == undefined){
+    if (this.#timing_config == undefined) {
       return undefined;
-    } else if(now < this.#timing_config.start) {
+    } else if (now < this.#timing_config.start) {
       return CompState.BEFORE;
     } else if (now < this.#timing_config.freeze) {
       return CompState.LIVE_WITH_SCORES;
