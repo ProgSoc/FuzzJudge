@@ -72,7 +72,7 @@ export class Clock {
   protect(allowed_in: CompState[] = [CompState.LIVE_WITHOUT_SCORES, CompState.LIVE_WITH_SCORES]) {
     const comp_state = this.current_comp_state();
     if (comp_state == undefined || !allowed_in.includes(comp_state)) {
-      throw new Response("401 Unauthorized\n\nToo early or too late", {
+      throw new Response("503 Unavailable\n\nToo early or too late\n", {
         status: 401,
       });
     }

@@ -48,7 +48,6 @@ import { HEADER } from "./version.ts";
 import { CompetitionDB } from "./db.ts";
 import { DBSubscriptionHandler } from "./db.ts";
 import { Clock } from "./clock.ts";
-import { CompState } from "./clock.ts";
 
 if (import.meta.main) {
 
@@ -131,10 +130,10 @@ if (import.meta.main) {
       },
       "/clock": {
         "GET": () => new Response(clock.times_json(), { headers: { "Content-Type": "text/json" }}),
-        "POST": async (_req) => {
-          const user = await auth.protect(_req);
+        "POST": async (req) => {
+          const user = await auth.protect(req);
           // if user is not admin return 401
-          const body = await _req.text()
+          const body = await req.text()
           clock.set_times(body);
           return new Response("Success");
         }
