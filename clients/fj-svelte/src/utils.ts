@@ -96,7 +96,7 @@ export interface CompTimes {
 }
 
 export const parse_times = (data: string): CompTimes => {
-  return { start: new Date(Date.now() + 10000), freeze: new Date(Date.now() + 20000), stop: new Date(Date.now() + 30000)};
+  return { start: new Date(Date.now() + 5000), freeze: new Date(Date.now() + 20000), stop: new Date(Date.now() + 30000)};
 }
 
 export enum CompState {
@@ -126,6 +126,15 @@ export const get_state_start_time = (times: CompTimes, state: CompState): Date =
     case CompState.FINISHED:
       return times.stop;
   }
+}
+
+// Returns the number of milliseconds until the next state
+export const get_time_till_next_state = (times: CompTimes, current: CompState): number => {
+  if(current === CompState.FINISHED) {
+    return 1e10;
+  }
+
+  return get_state_start_time(times, current + 1).getTime() - new Date().getTime();
 }
 
 export const needs_questions = (times: CompTimes): boolean => {

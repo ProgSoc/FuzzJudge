@@ -11,10 +11,12 @@
     needs_questions,
     CompState,
     get_current_comp_state,
+    get_time_till_next_state,
   } from "../utils";
 
   import { get_username } from "../api";
     import Countdown from "./Countdown.svelte";
+    import { onDestroy } from "svelte";
 
   let username = "Loading...";
 
@@ -25,6 +27,19 @@
   export let comp_times: CompTimes;
   export let questions: Record<string, QuestionMeta> = {};
   export let set_solved: (slug: string) => void;
+
+  let current_state = get_current_comp_state(comp_times);
+  let timer_ref = -1;
+  // Sets a timer to trigger a rerender to update the main content
+  const set_timer_for_next_state = () => {
+    timer_ref = setTimeout(() => {
+      current_state = get_current_comp_state(comp_times);
+      console.log(`changed current state to ${current_state}`);
+      set_timer_for_next_state();
+    }, get_time_till_next_state(comp_times, current_state));
+  };
+  set_timer_for_next_state();
+  onDestroy(() => clearTimeout(timer_ref))
 
   selected_question.set(
     Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
@@ -57,9 +72,9 @@
   <Sidebar {questions} />
 
   <!-- main content -->
-  {#if needs_questions(comp_times)}
+  {#if current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES}
     <QuestionContents question_data={questions[$selected_question]} {set_solved} />
-  {:else if get_current_comp_state(comp_times) == CompState.BEFORE}
+  {:else if current_state == CompState.BEFORE}
     <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
   {:else}
     <h1>Finished</h1>
