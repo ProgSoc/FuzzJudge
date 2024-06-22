@@ -41,11 +41,12 @@ Backend
 
 import { loadMarkdown } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk, serveFile, normalize, WebSocketServer } from "./deps.ts";
+import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
-import { appendAnswer, getScoreboard, getAnswered, initialiseUserScore, subscribeToScoreboard, createScoreboardCSV } from "./score.ts";
 import { Router } from "./http.ts";
 import { HEADER } from "./version.ts";
+import { CompetitionDB } from "./db.ts";
+import { DBSubscriptionHandler } from "./db.ts";
 
 if (import.meta.main) {
 
@@ -68,20 +69,30 @@ if (import.meta.main) {
     }
   }
 
+  const db = new CompetitionDB(pathJoin(root, "comp.db"), problems);
+
   const auth = new Auth({
     basic: async ({ username, password }) => {
-      // crypto.subtle.digest()
-      return { username, id: username };
+      return db.auth({
+        logn: username,
+        pass: new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password))),
+      });
     },
   });
 
-  const wss = new WebSocketServer(8080);
-  subscribeToScoreboard(() => {
-    const scoreboard = getScoreboard(problems);
-    const csv = createScoreboardCSV(scoreboard);
-    for (const client of wss.clients) {
-      client.send(csv);
+  // Migrate into scoreboard endpoint
+  Deno.serve({ port: 8080 }, req => {
+    if (req.headers.get("Upgrade") != "websocket") {
+      return new Response(null, { status: 501 });
     }
+
+    const { socket, response } = Deno.upgradeWebSocket(req);
+    const handler: DBSubscriptionHandler = db => socket.send(db.oldScoreboard());
+
+    socket.addEventListener("open", () => db.subscribe(handler));
+    socket.addEventListener("close", () => db.unsubscribe(handler));
+
+    return response;
   });
 
   //
@@ -91,7 +102,6 @@ if (import.meta.main) {
     "/auth": {
       "/login": async req => {
         const user = await auth.protect(req);
-        initialiseUserScore(user.id);
         return new Response(`Authorized: ${Deno.inspect(user)}\n`);
       },
       "/logout": req => auth.requestAuth(req),
@@ -108,10 +118,11 @@ if (import.meta.main) {
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
-      "/scoreboard": () => {
-        const scoreboard = getScoreboard(problems);
-        const csv = createScoreboardCSV(scoreboard);
-        return new Response(csv, { headers: { "Content-Type": "text/csv" } });
+      "/scoreboard": req => {
+        if (req.headers.get("Upgrade") == "websocket") {
+          // TODO: websocket upgrades and new live scoreboard format
+        }
+        return new Response(db.oldScoreboard(), { headers: { "Content-Type": "text/csv" } });
       },
       "/prob": {
         "GET": () => Object.keys(problems).join("\n"),
@@ -129,15 +140,18 @@ if (import.meta.main) {
           },
           "/fuzz": async (req, { id }) => {
             const user = await auth.protect(req);
-            return await problems[id!].fuzz(user.id);
+            return await problems[id!].fuzz(db.userTeam(user.team).seed);
           },
           "/judge": {
             "GET": async (req, { id: problemId }) => {
               const user = await auth.protect(req);
-              return getAnswered(user.id).some(({ slug }) => slug === problemId) ? "OK" : "Not Solved";
+              return db.solved({ team: user.team, prob: problemId! }) ? "OK" : "Not Solved";
             },
             "POST": async (req, { id: problemId }) => {
               const user = await auth.protect(req);
+              if (db.solved({ team: user.team, prob: problemId! })) {
+                return new Response("409 Conflict\n\nProblem already solved.\n");
+              }
               if (req.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
                 return new Response("415 Unsupported Media Type (Expected application/x-www-form-urlencoded)", { status: 415 });
               }
@@ -150,10 +164,23 @@ if (import.meta.main) {
               if (submissionCode === null) {
                 return new Response("400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n", { status: 400 });
               }
-              const { correct, errors } = await problems[problemId!].judge(user.id, submissionOutput);
+              const time = new Date();
+              const t0 = performance.now();
+              const { correct, errors } = await problems[problemId!].judge(db.userTeam(user.team).seed, submissionOutput);
+              const t1 = performance.now();
+
+              db.postSubmission({
+                team: user.team,
+                prob: problemId!,
+                time,
+                out: submissionOutput,
+                code: submissionCode,
+                ok: correct,
+                vler: errors || "",
+                vlms: t1 - t0,
+              });
 
               if (correct) {
-                appendAnswer(user.id, problemId!);
                 return "Approved! ✅\n";
               } else {
                 return new Response(`422 Unprocessable Content\n\nSolution rejected.\n\n${errors}\n`, { status: 422 });
@@ -170,7 +197,7 @@ if (import.meta.main) {
     },
   });
 
-  Deno.serve({
+  await Deno.serve({
     port: 1989,
     handler: req => router.route(req),
     onError: (e) => {
@@ -178,5 +205,5 @@ if (import.meta.main) {
       else if (e instanceof Error) return new Response(`Internal Server Error\n\n${e.stack ?? e.message}`, { status: 500 });
       else return new Response(String(e), { status: 500 });
     },
-  });
+  }).finished;
 }
