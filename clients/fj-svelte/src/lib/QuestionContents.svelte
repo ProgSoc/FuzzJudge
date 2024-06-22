@@ -22,7 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   } from "../utils";
     import { onDestroy } from "svelte";
 
-  export let question_data: QuestionMeta | undefined = undefined;
+  export let question_data: QuestionMeta;
   export let set_solved: (slug: string) => void;
 
   let question_instructions: any;

@@ -115,9 +115,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 
   // FIXME
-  $: !(questions !== undefined) || selected_question.set(
-    Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
-  );
+  $: !(questions !== undefined) ||
+    selected_question.set(
+      Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
+    );
 
   enum ShowingPopout {
     None,
@@ -156,11 +157,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Sidebar {questions} />
 
   <!-- main content -->
-  {#if comp_times !== undefined && (showing_questions_at_current_time(comp_times))}
-    <QuestionContents
-      question_data={questions[$selected_question]}
-      {set_solved}
-    />
+  {#if comp_times === undefined || showing_questions_at_current_time(comp_times)}
+    {#if questions !== undefined}
+      <QuestionContents
+        question_data={questions[$selected_question]}
+        {set_solved}
+      />
+    {:else if loading_errors.length > 0}
+      <div class="loading">
+        Error loading questions:<br />
+        {#each loading_errors as error}
+          <code>{error}</code>
+        {/each}
+      </div>
+    {:else}
+      <Loading />
+    {/if}
   {:else if current_state == CompState.BEFORE}
     <div class="locked-message">
       <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
@@ -172,15 +184,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <p>You can no longer submit solutions.</p>
       </div>
     </div>
-  {:else if loading_errors.length > 0}
-    <div class="loading">
-      Error loading questions:<br />
-      {#each loading_errors as error}
-        <code>{error}</code>
-      {/each}
-    </div>
-  {:else}
-    <Loading />
   {/if}
 </div>
 
