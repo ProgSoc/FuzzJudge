@@ -1,4 +1,4 @@
-import { BACKEND_SERVER, parse_scoreboard, question_order, type QuestionMeta, type ScoreboardUser} from "./utils";
+import { BACKEND_SERVER, parse_scoreboard, parse_times, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser} from "./utils";
 
 export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
@@ -109,3 +109,10 @@ const get_question_data = async (slug: string) => {
   return data;
 };
 
+export const get_comp_times = async (): Promise<CompTimes | undefined> => {
+  return undefined;
+
+  // return new Promise((resolve, _) => {
+  //   resolve(parse_times("dummy data to get from request"));
+  // });
+}
