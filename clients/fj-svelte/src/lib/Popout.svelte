@@ -64,6 +64,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    min-width: 50vw;
   }
 
   .popout-fullscreen {
