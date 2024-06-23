@@ -251,7 +251,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
 
   getSubmissionSkeletons(teamId: number, problemId: string): Omit<Submission, "out" | "code" | "vler" | "vlms">[] {
     return this.#db.queryEntries<Submission>(
-      "SELECT id, team, prob, time, ok FROM subm WHERE team = ?, prob = ?",
+      "SELECT id, team, prob, time, ok FROM subm WHERE team = ? AND prob = ?",
       [teamId, problemId],
     );
   }
