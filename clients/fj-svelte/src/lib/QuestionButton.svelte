@@ -14,33 +14,35 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import { type QuestionMeta, selected_question } from "../utils";
 
-  export let question: QuestionMeta | undefined = undefined;
+  export let question: FuzzJudgeProblemMessage;
+  export let solved: boolean;
 
   const select = () => {
     selected_question.set(question?.slug ?? "");
   };
 </script>
 
-{#if question !== undefined}
-  <div class={`option ${$selected_question === question?.slug ? "selected" : ""}`} on:click={select}>
-    <div class="icon">
-      {question?.icon}
-    </div>
-    <div class="name">
-      <span style={question?.solved ? "text-decoration: line-through;" : ""}>{question.num}. {question.name}</span>
-      <br />
-      <!-- <span class="subtext">{$q_.brief}</span> -->
-      <span class="subtext">{question?.points} points</span>
-    </div>
-    <div class="status">
-      {#if question?.solved}
-        ✓
-      {/if}
-    </div>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class={`option ${$selected_question === question?.slug ? "selected" : ""}`} on:click={select}>
+  <div class="icon">
+    {question.doc.icon}
   </div>
-{/if}
+  <div class="name">
+    <span style={solved ? "text-decoration: line-through;" : ""}>{question.doc.title}</span>
+    <br />
+    <!-- <span class="subtext">{$q_.brief}</span> -->
+    <span class="subtext">{question.points} points</span>
+  </div>
+  <div class="status">
+    {#if solved}
+      ✓
+    {/if}
+  </div>
+</div>
 
 <style>
   .option {

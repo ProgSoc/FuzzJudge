@@ -37,6 +37,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import { initLiveState } from "../apiLive";
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { CompetitionScoreboardMessage } from "../../../../src/score";
 
   let username = "Loading...";
 
@@ -45,25 +47,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   let compTimes: CompTimes | undefined = undefined;
-  let questions: Record<string, QuestionMeta> | undefined = undefined;
+  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
+  let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
+  let solvedQuestions = new Set<string>();
 
   const competitionStartDeduper = makeCallDeduper();
 
   let liveState = initLiveState();
   liveState.listenClock((clock) => {
     compTimes = clock;
-
-    const msUntilStart = Math.floor(Math.max(0, clock.start.getTime() - Date.now()));
-
-    // If the time was moved forwards, reset the question visibility to null
-    if (msUntilStart > 0 && questions != null) {
-      questions = undefined;
-    }
-
-    // Queue question visibility to show once the competition is started
-    competitionStartDeduper.tryRun(msUntilStart, async () => {
-      questions = await get_questions();
-    });
+  });
+  liveState.listenQuestions((qs) => {
+    questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
+  });
+  liveState.listenScoreboard((sb) => {
+    scoreboard = sb;
   });
 
   get_comp_info().then((data) => {
@@ -77,9 +75,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     }
   });
 
-  const set_solved = (slug: string) => {
-    if (questions === undefined) return;
-    questions[slug].solved = true;
+  const setSolved = (slug: string) => {
+    solvedQuestions.add(slug);
   };
 
   enum ShowingPopout {
@@ -106,7 +103,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
   </div>
 
-  <Sidebar {questions} />
+  <Sidebar {solvedQuestions} {questions} />
 
   <!-- main content -->
   {#if timeStateData === undefined}
@@ -115,7 +112,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     {#if questions === undefined}
       <Loading />
     {:else}
-      <QuestionContents question_data={questions[$selected_question]} {set_solved} />
+      <QuestionContents
+        question_data={questions[$selected_question]}
+        solved={solvedQuestions.has($selected_question)}
+        {setSolved}
+      />
     {/if}
   {:else if timeStateData.phase !== CompState.FINISHED}
     <div class="locked-message">
@@ -132,7 +133,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </div>
 
 <Popout shown={showing_popout === ShowingPopout.Scoreboard} close={() => (showing_popout = ShowingPopout.None)}>
-  <Scoreboard {questions} />
+  {#if questions === undefined || scoreboard === undefined}
+    <Loading />
+  {:else}
+    <Scoreboard {questions} {scoreboard} />
+  {/if}
 </Popout>
 
 <Popout shown={showing_popout === ShowingPopout.CompInfo} close={() => (showing_popout = ShowingPopout.None)}>

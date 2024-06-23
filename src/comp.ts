@@ -20,15 +20,15 @@ import { basename, dirname, pathJoin, walkSync } from "./deps.ts";
 import { MarkdownDocument, Subscribable, loadMarkdown } from "./util.ts";
 
 export type FuzzJudgeProblemMessage = {
-  slug: string,
+  slug: string;
   doc: {
-    title: string,
-    icon?: string,
-    summary?: string,
-    body: string,
-  },
-  points: number,
-  difficulty: number,
+    title: string;
+    icon?: string;
+    summary?: string;
+    body: string;
+  };
+  points: number;
+  difficulty: number;
 };
 
 export type FuzzJudgeProblemSetMessage = FuzzJudgeProblemMessage[];
@@ -169,7 +169,11 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]>
     })) {
       try {
         const slug = FuzzJudgeProblem.getSlug(ent.path);
-        const problem = new FuzzJudgeProblem(slug, ent.path, loadMarkdown(Deno.readTextFileSync(ent.path), ent.path));
+        const problem = new FuzzJudgeProblem(
+          slug,
+          ent.path,
+          loadMarkdown(Deno.readTextFileSync(ent.path), `/comp/prob/${slug}/assets`),
+        );
         this.#problems.set(slug, problem);
       } catch (e) {
         console.error(`Could not load "${ent.path}": ${e}`);
@@ -193,6 +197,6 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]>
   }
 
   get(slug: string): FuzzJudgeProblem | undefined {
-    return this.#problems.get(slug)
+    return this.#problems.get(slug);
   }
 }

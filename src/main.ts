@@ -39,15 +39,22 @@ Backend
 
 */
 
-import { loadMarkdown, SubscriptionGroup } from "./util.ts";
-import { FuzzJudgeProblemSet } from "./comp.ts";
+import { loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
+import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
 import { accepts, pathJoin, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
 import { CompetitionDB, UserRoles } from "./db.ts";
-import { CompetitionClock } from "./clock.ts";
-import { CompetitionScoreboard } from "./score.ts";
+import { CompetitionClock, CompetitionClockMessage } from "./clock.ts";
+import { CompetitionScoreboard, CompetitionScoreboardMessage } from "./score.ts";
+
+// Temporary
+export type SocketMessage = SubscriptionGroupMessage<{
+  clock: CompetitionClockMessage;
+  scoreboard: CompetitionScoreboardMessage;
+  problems: FuzzJudgeProblemMessage[];
+}>;
 
 if (import.meta.main) {
   const root = await Deno.realPath(Deno.args[0] ?? ".");
@@ -66,6 +73,8 @@ if (import.meta.main) {
   });
 
   const scoreboard = new CompetitionScoreboard({ db, clock, problems });
+
+  clock.adjustStart(new Date(), { keepDuration: true });
 
   const live = new SubscriptionGroup({
     clock,
@@ -86,7 +95,7 @@ if (import.meta.main) {
     GET: (req) => {
       catchWebsocket(req, (socket) => {
         socket.addEventListener("open", () => {
-          const handler = live.subscribe(msg => socket.send(JSON.stringify(msg)));
+          const handler = live.subscribe((msg) => socket.send(JSON.stringify(msg)));
           socket.addEventListener("close", () => live.unsubscribe(handler));
         });
       });
@@ -172,7 +181,7 @@ if (import.meta.main) {
       "/clock": {
         GET: (req) => {
           catchWebsocket(req, (socket) => {
-            const handler = clock.subscribe(msg => socket.send(JSON.stringify(msg)));
+            const handler = clock.subscribe((msg) => socket.send(JSON.stringify(msg)));
             socket.addEventListener("close", () => clock.unsubscribe(handler));
           });
           return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
@@ -232,10 +241,9 @@ if (import.meta.main) {
               }
               const time = new Date();
               const t0 = performance.now();
-              const { correct, errors } = await problems.get(problemId!)!.judge(
-                db.userTeam(user.team).seed,
-                submissionOutput,
-              );
+              const { correct, errors } = await problems
+                .get(problemId!)!
+                .judge(db.userTeam(user.team).seed, submissionOutput);
               const t1 = performance.now();
 
               db.postSubmission({

@@ -18,7 +18,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { selected_question } from "../utils";
   import { submit_solution, open_fuzz } from "../api";
 
-  export let set_solved: (slug: string) => void;
+  export let setSolved: (slug: string) => void;
 
   let waiting_on_server = false;
 
@@ -46,8 +46,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         error_message.set(message);
       }
 
-      if (correct && set_solved !== undefined) {
-        set_solved(slug);
+      if (correct && setSolved !== undefined) {
+        setSolved(slug);
       }
     });
   };
