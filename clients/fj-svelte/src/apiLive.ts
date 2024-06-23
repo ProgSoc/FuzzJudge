@@ -38,7 +38,7 @@ export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
 
 export function initLiveState() {
   const clockSubscribable = makeSvelteSubscribable<MessageValue<"clock">>();
-  const questionsSubscribable = makeSvelteSubscribable<MessageValue<"questions">>();
+  // const questionsSubscribable = makeSvelteSubscribable<MessageValue<"questions">>();
   const scoreboardSubscribable = makeSvelteSubscribable<MessageValue<"scoreboard">>();
 
   listenOnWebsocket((data) => {
@@ -53,9 +53,9 @@ export function initLiveState() {
           start: new Date(value.start),
         });
         break;
-      case "questions":
-        questionsSubscribable.notify(data.value);
-        break;
+      // case "questions":
+      //   questionsSubscribable.notify(data.value);
+      //   break;
       case "scoreboard":
         scoreboardSubscribable.notify(data.value);
         break;
@@ -66,7 +66,7 @@ export function initLiveState() {
 
   return {
     listenClock: clockSubscribable.subscribe,
-    listenQuestions: questionsSubscribable.subscribe,
+    // listenQuestions: questionsSubscribable.subscribe,
     listenScoreboard: scoreboardSubscribable.subscribe,
   };
 }
