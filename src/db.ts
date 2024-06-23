@@ -133,6 +133,14 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
   }
 
+  allUsers(): User[] {
+    return this.#db.queryEntries<User>("SELECT * FROM user");
+  }
+
+  // createTeam(params: Omit<Team, "id">): number {
+  //   return this.#db.query()
+  // }
+
   resetUser(params: { logn: string; role: UserRoles }, resetPassword = true): User {
     return this.#db.queryEntries<User>(
       `
@@ -185,7 +193,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return user;
   }
 
-  teams(): Team[] {
+  allTeams(): Team[] {
     return this.#db.queryEntries<Team>("SELECT * FROM team");
   }
 
@@ -240,7 +248,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   /** @deprecated */
   oldScoreboard(): string {
     let out = "username, points, solved\n";
-    for (const { id: team, name } of this.teams()) {
+    for (const { id: team, name } of this.allTeams()) {
       const solved = [...this.solvedSet({ team })].join(", ");
       out += `${name}, ${this.score({ team })}${solved ? ", " + solved : ""}\n`;
     }
