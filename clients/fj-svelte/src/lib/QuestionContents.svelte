@@ -17,9 +17,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import SubmissionArea from "./SubmissionArea.svelte";
   import { type QuestionMeta, selected_question, difficulty_name } from "../utils";
   import { onDestroy } from "svelte";
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import SvelteMarkdown from "svelte-markdown";
 
-  export let question_data: QuestionMeta;
-  export let set_solved: (slug: string) => void;
+  export let question_data: FuzzJudgeProblemMessage;
+  export let solved: boolean;
+  export let setSolved: (slug: string) => void;
 
   let question_instructions: any;
 
@@ -42,11 +45,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     {#if $selected_question !== undefined}
       {#if question_data !== undefined}
         <h1 style="margin-top: 0px;">
-          <span style={question_data.solved ? "text-decoration: line-through;" : ""}>
-            {question_data.name}
+          <span style={solved ? "text-decoration: line-through;" : ""}>
+            {question_data.doc.title}
           </span>
 
-          {#if question_data.solved}
+          {#if solved}
             <span style="font-size: 1.3rem;">✓</span>
           {/if}
         </h1>
@@ -60,11 +63,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         </div>
 
         <div id="instructions-md">
-          {@html question_data.instructions}
+          <SvelteMarkdown source={question_data.doc.body} />
         </div>
       {/if}
 
-      <SubmissionArea {set_solved} />
+      <SubmissionArea {setSolved} />
     {/if}
   </div>
 </div>

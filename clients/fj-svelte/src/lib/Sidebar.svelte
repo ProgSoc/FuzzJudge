@@ -16,8 +16,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import ListGroup from "./ListGroup.svelte";
   import { type QuestionMeta } from "../utils";
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
 
-  export let questions: Record<string, QuestionMeta> = {};
+  export let questions: Record<string, FuzzJudgeProblemMessage> = {};
+  export let solvedQuestions: Set<string>;
   let open: boolean = true;
 
   function toggleOpen() {
@@ -41,10 +43,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       </button>
     </div>
 
-    <ListGroup name="Easy" {questions} includes={1} />
-    <ListGroup name="Medium" {questions} includes={2} />
-    <ListGroup name="Hard" {questions} includes={3} />
-    <ListGroup name="Other" {questions} includes={(d) => d < 1 || d > 3} />
+    <ListGroup name="Easy" {questions} {solvedQuestions} includes={1} />
+    <ListGroup name="Medium" {questions} {solvedQuestions} includes={2} />
+    <ListGroup name="Hard" {questions} {solvedQuestions} includes={3} />
+    <ListGroup name="Other" {questions} {solvedQuestions} includes={(d) => d < 1 || d > 3} />
   </div>
 {:else}
   <div class="closed-question-list">

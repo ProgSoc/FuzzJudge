@@ -18,44 +18,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { type QuestionMeta, truncate_username, type ScoreboardUser } from "../utils";
 
   import { get_scoreboard, subscribe_to_scoreboard, type ScoreboardEvent } from "../api";
+  import type { CompetitionScoreboardMessage } from "../../../../src/score";
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
 
-  export let questions: Record<string, QuestionMeta> = {};
+  export let questions: Record<string, FuzzJudgeProblemMessage>;
+  export let scoreboard: CompetitionScoreboardMessage;
 
-  let users: ScoreboardUser[] = [];
   let errors: string[] = [];
 
-  get_scoreboard()
-    .then((res) => {
-      users = res;
-    })
-    .catch((err) => {
-      errors.push(err.toString());
-      errors = errors;
-    });
-
-  let unsubscribe: (() => void) | null = null;
-
-  subscribe_to_scoreboard((event: ScoreboardEvent) => {
-    if (event.new_scoreboard !== undefined) {
-      users = event.new_scoreboard;
-    }
-  })
-    .then((unsub) => {
-      unsubscribe = unsub;
-    })
-    .catch((err) => {
-      errors.push(err.toString());
-      errors = errors;
-    });
-
-  $: users = users.sort((a, b) => b.points - a.points);
-  $: sorted_questions = Object.values(questions).sort((a, b) => a.num - b.num);
-
-  onDestroy(() => {
-    if (unsubscribe !== null) {
-      unsubscribe();
-    }
-  });
+  $: teams = scoreboard.sort((a, b) => b.rank - a.rank);
+  $: sorted_questions = Object.values(questions).sort((a, b) => a.slug.localeCompare(b.slug));
 </script>
 
 <h1>Scoreboard</h1>
@@ -65,23 +37,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <th> Team </th>
     <th> Points </th>
     {#each sorted_questions as question}
-      <th class="question-num">{question.num}</th>
+      <th class="question-num">{question.slug}</th>
     {/each}
   </tr>
-  {#each users as user, i}
+  {#each teams as team, i}
     <tr>
       <td class="position">
         {i + 1}
       </td>
       <td class="team-name">
-        {truncate_username(user.name)}
+        {truncate_username(team.name)}
       </td>
       <td class="points">
-        {user.points}
+        {team.rank}
       </td>
       {#each sorted_questions as question}
-        <td class={`result ${user.solved.includes(question.slug) ? "solved" : ""}`}>
-          {#if user.solved.includes(question.slug)}
+        <td class={`result`} class:solved={team.score.problems[question.slug].solved}>
+          {#if team.score.problems[question.slug].solved}
             ✓
           {/if}
         </td>

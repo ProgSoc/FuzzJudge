@@ -14,11 +14,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
+  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import type { QuestionMeta } from "../utils";
   import QuestionButton from "./QuestionButton.svelte";
 
   export let name: string = "";
-  export let questions: Record<string, QuestionMeta> = {};
+  export let questions: Record<string, FuzzJudgeProblemMessage>;
+  export let solvedQuestions: Set<string>;
   export let includes: number | ((difficulty: number) => boolean) = 0;
 
   $: list = Object.values(questions)
@@ -29,14 +31,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
       return q.difficulty === includes;
     })
-    .sort((a, b) => a.num - b.num);
+    .sort((a, b) => a.slug.localeCompare(b.slug));
 </script>
 
 {#if list.length > 0}
   <div class="difficulty-divider">{name}</div>
 {/if}
 {#each list as q}
-  <QuestionButton question={q} />
+  <QuestionButton question={q} solved={solvedQuestions.has(q.slug)} />
 {/each}
 
 <style>

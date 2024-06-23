@@ -1,6 +1,9 @@
-import type { MessageValue, SocketMessage } from "../../../src/live/socketData.ts";
 import { onDestroy } from "svelte";
 import { unreachable } from "./utils";
+import type { SocketMessage } from "../../../src/main.ts";
+import type { CompetitionClockMessage } from "../../../src/clock";
+import type { CompetitionScoreboardMessage } from "../../../src/score";
+import type { FuzzJudgeProblemMessage } from "../../../src/comp";
 
 function makeSvelteSubscribable<T>() {
   const subscribers = new Set<(value: T) => void>();
@@ -37,9 +40,9 @@ export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
 }
 
 export function initLiveState() {
-  const clockSubscribable = makeSvelteSubscribable<MessageValue<"clock">>();
-  const questionsSubscribable = makeSvelteSubscribable<MessageValue<"questions">>();
-  const scoreboardSubscribable = makeSvelteSubscribable<MessageValue<"scoreboard">>();
+  const clockSubscribable = makeSvelteSubscribable<CompetitionClockMessage>();
+  const questionsSubscribable = makeSvelteSubscribable<FuzzJudgeProblemMessage[]>();
+  const scoreboardSubscribable = makeSvelteSubscribable<CompetitionScoreboardMessage>();
 
   listenOnWebsocket((data) => {
     switch (data.kind) {
@@ -53,7 +56,7 @@ export function initLiveState() {
           start: new Date(value.start),
         });
         break;
-      case "questions":
+      case "problems":
         questionsSubscribable.notify(data.value);
         break;
       case "scoreboard":
