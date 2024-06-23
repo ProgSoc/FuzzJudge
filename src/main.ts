@@ -106,7 +106,46 @@ if (import.meta.main) {
       const user = await auth.protect(req);
       return new Response(user.logn);
     },
+    "/void": (_req) => {
+      return auth.reject();
+    },
+    "/admin": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        // console.log([...Deno.readDirSync(import.meta.resolve("/"))]);
+        return new Response(
+          await Deno.readFile(new URL(import.meta.resolve("./admin.html"))),
+          { headers: { "Content-Type": "text/html" } },
+        );
+      },
+    },
+    "/team": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        return new Response(JSON.stringify(db.allTeams()));
+      },
+      PUT: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        db.createTeam(await req.text());
+        return new Response("201 Created\n", { status: 201 });
+      },
+      PATCH: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        const [user, team] = (await req.text()).split(",").map(Number);
+        db.assignUserTeam(user, team);
+        return new Response(null, { status: 204 });
+      },
+    },
     "/user": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        return new Response(JSON.stringify(db.allUsers()));
+      },
       PUT: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();
@@ -188,7 +227,7 @@ if (import.meta.main) {
         },
       },
       "/prob": {
-        GET: () => Object.keys(problems).join("\n"),
+        GET: () => [...new Map(problems[Symbol.iterator]()).keys()].join("\n"),
         "/:id": {
           "/icon": (_req, { id }) => problems.get(id!)!.doc().icon,
           "/name": (_req, { id }) => problems.get(id!)!.doc().title,

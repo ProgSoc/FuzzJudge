@@ -129,8 +129,30 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return this.#db.queryEntries<User>("SELECT * FROM user WHERE id = ?", [id])[0];
   }
 
-  userTeam(id: number): Team {
-    return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
+  userTeam(id: number): Team | undefined {
+    const user: User | undefined = this.#db.queryEntries<User>("SELECT * FROM user WHERE id = ?", [id])[0];
+    if (!user) return undefined;
+    const team: Team | undefined = this.#db.queryEntries<Team>("SELECT * FROM team WHERE id = ?", [user.team])[0];
+    return team;
+  }
+
+  allUsers(): User[] {
+    return this.#db.queryEntries<User>("SELECT * FROM user");
+  }
+
+  createTeam(name: string): Team {
+    const seed = [...crypto.getRandomValues(new Uint8Array(8))].map(v => v.toString(16).padStart(2, "0")).join("");
+    return this.#db.queryEntries<Team>(
+      `
+        INSERT INTO team VALUES (NULL, :seed, :name)
+        RETURNING id
+      `,
+      { seed, name },
+    )[0];
+  }
+
+  assignUserTeam(user: number, team: number) {
+    this.#db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
   }
 
   resetUser(params: { logn: string; role: UserRoles }, resetPassword = true): User {
@@ -185,7 +207,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return user;
   }
 
-  teams(): Team[] {
+  allTeams(): Team[] {
     return this.#db.queryEntries<Team>("SELECT * FROM team");
   }
 
@@ -232,7 +254,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
 
   getSubmissionSkeletons(teamId: number, problemId: string): Omit<Submission, "out" | "code" | "vler" | "vlms">[] {
     return this.#db.queryEntries<Submission>(
-      "SELECT id, team, prob, time, ok FROM subm WHERE team = ?, prob = ?",
+      "SELECT id, team, prob, time, ok FROM subm WHERE team = ? AND prob = ?",
       [teamId, problemId],
     );
   }
@@ -240,7 +262,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   /** @deprecated */
   oldScoreboard(): string {
     let out = "username, points, solved\n";
-    for (const { id: team, name } of this.teams()) {
+    for (const { id: team, name } of this.allTeams()) {
       const solved = [...this.solvedSet({ team })].join(", ");
       out += `${name}, ${this.score({ team })}${solved ? ", " + solved : ""}\n`;
     }
