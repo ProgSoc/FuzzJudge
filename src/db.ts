@@ -230,6 +230,13 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return id;
   }
 
+  getSubmissionSkeletons(teamId: number, problemId: string): Omit<Submission, "out" | "code" | "vler" | "vlms">[] {
+    return this.#db.queryEntries<Submission>(
+      "SELECT id, team, prob, time, ok FROM subm WHERE team = ?, prob = ?",
+      [teamId, problemId],
+    );
+  }
+
   /** @deprecated */
   oldScoreboard(): string {
     let out = "username, points, solved\n";

@@ -55,6 +55,10 @@ export class FuzzJudgeProblem {
     return this.#doc;
   }
 
+  points(): number {
+    return Number(Object(this.#doc.config)?.points) || 0; // catch NaN
+  }
+
   async fuzz(seed: string): Promise<string> {
     const proc = new Deno.Command(this.#cmdFuzz, {
       args: [...this.#argsFuzz, seed],
