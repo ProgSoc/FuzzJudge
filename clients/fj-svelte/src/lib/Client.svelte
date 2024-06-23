@@ -16,15 +16,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import {
     CompState,
-    get_current_comp_state,
-    get_time_till_next_state,
-    showing_questions_at_current_time,
     type CompTimes,
     type QuestionMeta,
     selected_question,
+    getStateEndTime,
+    type TimeStateData,
+    getCurrentTimeStateData,
+    runRepeatedly,
   } from "../utils";
   import { get_questions, get_comp_info, get_comp_times } from "../api";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
   import Sidebar from "./Sidebar.svelte";
@@ -33,7 +34,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Loading from "./Loading.svelte";
 
   import { get_username } from "../api";
-  import Countdown from "./Countdown.svelte";
+  import InlineCountdown from "./counters/InlineCountdown.svelte";
+  import PageCountdown from "./counters/PageCountdown.svelte";
+
+  // There's no cleaner way of doing this, right?
+  let destroyed = false;
+  onDestroy(() => {
+    destroyed = true;
+  });
 
   let username = "Loading...";
 
@@ -41,72 +49,45 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     username = name;
   });
 
-  let comp_times: CompTimes | undefined = undefined;
+  let compTimes: CompTimes | undefined = undefined;
   let questions: Record<string, QuestionMeta> | undefined = undefined;
-  let loading_errors: string[] = [];
+
+  let loadingErrors: string[] = [];
+  function pushError(err: string) {
+    loadingErrors.push(err);
+    loadingErrors = loadingErrors;
+  }
 
   get_comp_info().then((data) => {
     window.document.title = data.title;
   });
 
-  const load_questions = () => {
-    get_questions()
-      .then((q) => {
-        questions = q;
-      })
-      .catch((err) => {
-        loading_errors.push(err);
-        loading_errors = loading_errors;
-      });
-  };
-
-  let current_state: CompState | undefined = undefined;
-
-  let timer_ref = -1;
-
-  // Sets a timer to trigger a rerender to update the main content
-  const set_timer_for_next_state = () => {
-    if (comp_times == undefined) return;
-
-    current_state = get_current_comp_state(comp_times);
-
-    if (showing_questions_at_current_time(comp_times)) {
-      load_questions();
+  let timeStateData: TimeStateData | undefined = undefined;
+  runRepeatedly(() => {
+    if (compTimes !== undefined) {
+      timeStateData = getCurrentTimeStateData(compTimes);
     }
+  });
 
-    console.log(`changed current state to ${current_state}`);
-
-    timer_ref = setTimeout(
-      () => {
-        set_timer_for_next_state();
-      },
-      get_time_till_next_state(comp_times, current_state),
-    );
-  };
-
-  onDestroy(() => clearTimeout(timer_ref));
-
-  get_comp_times()
-    .then((t) => {
-      if (t === undefined) {
-        load_questions();
+  onMount(async () => {
+    try {
+      compTimes = await get_comp_times();
+      if (destroyed) return;
+      if (compTimes === undefined) {
+        pushError("Could not load competition times");
         return;
       }
 
-      console.log("got times");
+      // Wait until questions can be loaded
+      const millisecondsUntilQuestions = Math.max(0, compTimes.start.getTime() - Date.now()) + 500;
+      await new Promise((resolve) => setTimeout(resolve, millisecondsUntilQuestions));
+      if (destroyed) return;
 
-      comp_times = t;
-
-      if (showing_questions_at_current_time(t)) {
-        load_questions();
-      }
-
-      set_timer_for_next_state();
-    })
-    .catch((err) => {
-      loading_errors.push(err);
-      loading_errors = loading_errors;
-    });
+      questions = await get_questions();
+    } catch (err: any) {
+      pushError(err.message ?? err.toString());
+    }
+  });
 
   const set_solved = (slug: string) => {
     if (questions === undefined) return;
@@ -131,8 +112,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div>
       <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}>Comp Info</button>
       <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}>Scoreboard</button>
-      {#if comp_times !== undefined && (current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES)}
-        <span>Remaining: <Countdown {comp_times} until_state={CompState.FINISHED} show_binary={false} /></span>
+      {#if timeStateData !== undefined}
+        <InlineCountdown {timeStateData} />
       {/if}
     </div>
     <div>
@@ -144,24 +125,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Sidebar {questions} />
 
   <!-- main content -->
-  {#if comp_times === undefined || showing_questions_at_current_time(comp_times)}
-    {#if questions !== undefined}
-      <QuestionContents question_data={questions[$selected_question]} {set_solved} />
-    {:else if loading_errors.length > 0}
-      <div class="loading">
-        Error loading questions:<br />
-        {#each loading_errors as error}
-          <code>{error}</code>
-        {/each}
-      </div>
-    {:else}
-      <Loading />
-    {/if}
-  {:else if current_state == CompState.BEFORE}
-    <div class="locked-message">
-      <Countdown {comp_times} until_state={CompState.LIVE_WITH_SCORES} />
+  {#if loadingErrors.length > 0}
+    <div class="loading">
+      Error loading questions:<br />
+      {#each loadingErrors as error}
+        <code>{error}</code>
+      {/each}
     </div>
-  {:else if current_state == CompState.FINISHED}
+  {:else if timeStateData === undefined}
+    <Loading />
+  {:else if timeStateData.questionsVisible}
+    {#if questions === undefined}
+      <Loading />
+    {:else}
+      <QuestionContents question_data={questions[$selected_question]} {set_solved} />
+    {/if}
+  {:else if timeStateData.phase !== CompState.FINISHED}
+    <div class="locked-message">
+      <PageCountdown {timeStateData} />
+    </div>
+  {:else}
     <div class="locked-message">
       <div class="finished-message">
         <h1>Competition Finished</h1>
