@@ -47,6 +47,8 @@ import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
 import { CompetitionDB, UserRoles } from "./db.ts";
 import { CompetitionClock } from "./clock.ts";
+import { makeListenerGroup } from "./live/notificationService.ts";
+import { makeSocketService, SocketMessage } from "./live/socketData.ts";
 
 if (import.meta.main) {
   const root = await Deno.realPath(Deno.args[0] ?? ".");
@@ -75,6 +77,10 @@ if (import.meta.main) {
     db,
     plannedStart: new Date(Object(compfile.config)?.times?.start || new Date().toJSON()),
     plannedFinish: new Date(Object(compfile.config)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
+  });
+
+  const socketService = makeSocketService({
+    clock,
   });
 
   const auth = new Auth({
@@ -182,18 +188,15 @@ if (import.meta.main) {
         return new Response(db.oldScoreboard(), { headers: { "Content-Type": "text/csv" } });
       },
       "/clock": {
-        GET: req => {
-          catchWebsocket(req, socket => {
+        GET: (req) => {
+          catchWebsocket(req, (socket) => {
             const handler: SubscriptionHandler<CompetitionClock> = (clock) => {
               socket.send(JSON.stringify(clock.now()));
             };
             socket.addEventListener("open", () => clock.subscribe(handler));
             socket.addEventListener("close", () => clock.unsubscribe(handler));
           });
-          return new Response(
-            JSON.stringify(clock.now()),
-            { headers: { "Content-Type": "text/json" } },
-          );
+          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
         },
       },
       "/prob": {
@@ -284,6 +287,20 @@ if (import.meta.main) {
               return undefined;
             }
           },
+        },
+      },
+      "/socket": {
+        GET: (req) => {
+          catchWebsocket(req, (socket) => {
+            socket.addEventListener("open", () => {
+              const unsubscribe = socketService.subscribe((msg) => {
+                socket.send(JSON.stringify(msg));
+              });
+
+              socket.addEventListener("close", unsubscribe);
+            });
+          });
+          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
         },
       },
     },
