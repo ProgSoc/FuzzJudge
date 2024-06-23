@@ -93,22 +93,6 @@ if (import.meta.main) {
     },
   });
 
-  // Migrate into scoreboard endpoint
-  Deno.serve({ port: 8080 }, (req) => {
-    if (req.headers.get("Upgrade") != "websocket") {
-      return new Response(null, { status: 501 });
-    }
-
-    const { socket, response } = Deno.upgradeWebSocket(req);
-    const handler: SubscriptionHandler<CompetitionDB> = (db) => socket.send(db.oldScoreboard());
-
-    socket.addEventListener("open", () => db.subscribe(handler));
-    socket.addEventListener("close", () => db.unsubscribe(handler));
-
-    return response;
-  });
-
-  //
   const router = new Router({
     GET: (req) => {
       catchWebsocket(req, (socket) => {
