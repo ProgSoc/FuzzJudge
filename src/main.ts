@@ -39,21 +39,21 @@ Backend
 
 */
 
-import { loadMarkdown } from "./util.ts";
+import { loadMarkdown, SubscriptionHandler } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
-import { pathJoin, walk, serveFile, normalize } from "./deps.ts";
+import { accepts, pathJoin, walk, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
-import { Router, expectForm, expectMime } from "./http.ts";
+import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
 import { CompetitionDB, UserRoles } from "./db.ts";
-import { DBSubscriptionHandler } from "./db.ts";
-import { Clock } from "./clock.ts";
+import { CompetitionClock } from "./clock.ts";
+import { makeListenerGroup } from "./live/notificationService.ts";
+import { makeSocketService, SocketMessage } from "./live/socketData.ts";
 
 if (import.meta.main) {
   const root = await Deno.realPath(Deno.args[0] ?? ".");
 
   const compfile = loadMarkdown(await Deno.readTextFile(pathJoin(root, "./comp.md")));
-  const clock = new Clock(compfile.title ?? "progcomp1");
 
   const problems: Record<string, FuzzJudgeProblem> = {};
   for await (const ent of walk(root, {
@@ -73,6 +73,16 @@ if (import.meta.main) {
   const db = new CompetitionDB(pathJoin(root, "comp.db"), problems);
   db.resetUser({ logn: "admin", role: "admin" }, false);
 
+  const clock = new CompetitionClock({
+    db,
+    plannedStart: new Date(Object(compfile.config)?.times?.start || new Date().toJSON()),
+    plannedFinish: new Date(Object(compfile.config)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
+  });
+
+  const socketService = makeSocketService({
+    clock,
+  });
+
   const auth = new Auth({
     basic: async ({ username, password }) => {
       return await db.basicAuth({
@@ -89,7 +99,7 @@ if (import.meta.main) {
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req);
-    const handler: DBSubscriptionHandler = (db) => socket.send(db.oldScoreboard());
+    const handler: SubscriptionHandler<CompetitionDB> = (db) => socket.send(db.oldScoreboard());
 
     socket.addEventListener("open", () => db.subscribe(handler));
     socket.addEventListener("close", () => db.unsubscribe(handler));
@@ -178,13 +188,15 @@ if (import.meta.main) {
         return new Response(db.oldScoreboard(), { headers: { "Content-Type": "text/csv" } });
       },
       "/clock": {
-        GET: () => new Response(clock.times_json(), { headers: { "Content-Type": "text/json" } }),
-        POST: async (req) => {
-          const user = await auth.protect(req);
-          // if user is not admin return 401
-          const body = await req.text();
-          clock.set_times(body);
-          return new Response("Success");
+        GET: (req) => {
+          catchWebsocket(req, (socket) => {
+            const handler: SubscriptionHandler<CompetitionClock> = (clock) => {
+              socket.send(JSON.stringify(clock.now()));
+            };
+            socket.addEventListener("open", () => clock.subscribe(handler));
+            socket.addEventListener("close", () => clock.unsubscribe(handler));
+          });
+          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
         },
       },
       "/prob": {
@@ -275,6 +287,20 @@ if (import.meta.main) {
               return undefined;
             }
           },
+        },
+      },
+      "/socket": {
+        GET: (req) => {
+          catchWebsocket(req, (socket) => {
+            socket.addEventListener("open", () => {
+              const unsubscribe = socketService.subscribe((msg) => {
+                socket.send(JSON.stringify(msg));
+              });
+
+              socket.addEventListener("close", unsubscribe);
+            });
+          });
+          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
         },
       },
     },

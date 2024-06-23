@@ -16,79 +16,80 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface TimeConfig {
-  start: Date;
-  freeze: Date;
-  stop: Date;
-}
+import { CompetitionDB } from "./db.ts";
+import { Subscribable } from "./util.ts";
 
-export enum CompState {
-  BEFORE,
-  LIVE_WITH_SCORES,
-  LIVE_WITHOUT_SCORES,
-  FINISHED,
-}
+export type ClockState =
+  | "live"
+  | "hold"
+  | "stop"
+;
 
-const CONFIG_CACHE_REFRESH_MS = 1000;
+export class CompetitionClock extends Subscribable<CompetitionClock> {
+  #db: CompetitionDB;
+  #state: ClockState = "hold";
+  #start: Date;
+  #finish: Date;
+  #hold: Date | null;
 
-export class Clock {
-  // Cache the timing config in memory to prevent excessive database hits,
-  // particularly when the comp starts and every connected client hits the questions endpoint at the same time
-  #timing_config: TimeConfig | undefined = undefined;
-  #timing_config_retrieved: Date = new Date();
-  #game_name: string;
-
-  constructor(game_name: string) {
-    // TODO: ensure game exists in database
-    this.#game_name = game_name;
-    this.#load_times();
+  constructor(opts: { db: CompetitionDB, plannedStart: Date, plannedFinish: Date }) {
+    super();
+    this.#db = opts.db;
+    this.#start = new Date(this.#db.getOrSetDefaultMeta("clock_start", opts.plannedStart.toJSON()));
+    this.#finish = new Date(this.#db.getOrSetDefaultMeta("clock_finish", opts.plannedFinish.toJSON()));
+    this.#hold = null;
   }
 
-  #load_times() {
-    const time_since_retrieved = new Date().getTime() - this.#timing_config_retrieved.getTime();
-    if (this.#timing_config == undefined || time_since_retrieved > CONFIG_CACHE_REFRESH_MS) {
-      // will use a query like SELECT start_time, freeze_time, stop_time FROM CompetitionConfig WHERE name = ?;
-      this.#timing_config_retrieved = new Date();
-      this.#timing_config = {
-        start: new Date(Date.now() + 30_000),
-        freeze: new Date(Date.now() + 60_000),
-        stop: new Date(Date.now() + 120_000),
-      };
+  protect(allowWhen: Iterable<ClockState>): void | never {
+    const allowedStates = new Set(allowWhen);
+    if (!allowedStates.has(this.#state)) {
+      let message = "";
+      switch (this.#state) {
+        case "hold": message = "Clock on hold.\n"; break;
+        case "live": message = "Clock is live.\n"; break;
+        case "stop": message = "Clock is stopped.\n"; break;
+      }
+      throw new Response(`503 Unavailable\n\n${message}`, { status: 503 })
     }
   }
 
-  times_json(): string {
-    this.#load_times();
-    return JSON.stringify(this.#timing_config);
+  now() {
+    return {
+      start: this.#start,
+      finish: this.#finish,
+      hold: this.#hold,
+    };
   }
 
-  set_times(content: string) {
-    // TODO: parse times and call db
-    console.log(`times ${content}`);
-    // UPDATE Games SET start_time = ... WHERE name = ?;
+  adjustStart(time: Date, { keepDuration = false }) {
+    const delta = this.#start.getTime() - time.getTime();
+    this.#start = time;
+    if (keepDuration) this.#finish = new Date(this.#finish.getTime() - delta);
+    this.notify(this);
   }
 
-  protect(allowed_in: CompState[] = [CompState.LIVE_WITHOUT_SCORES, CompState.LIVE_WITH_SCORES]) {
-    const comp_state = this.current_comp_state();
-    if (comp_state == undefined || !allowed_in.includes(comp_state)) {
-      throw new Response("503 Unavailable\n\nToo early or too late\n", {
-        status: 503,
-      });
-    }
-  }
-
-  current_comp_state(): CompState | undefined {
-    const now = new Date();
-    if (this.#timing_config == undefined) {
-      return undefined;
-    } else if (now < this.#timing_config.start) {
-      return CompState.BEFORE;
-    } else if (now < this.#timing_config.freeze) {
-      return CompState.LIVE_WITH_SCORES;
-    } else if (now < this.#timing_config.stop) {
-      return CompState.LIVE_WITHOUT_SCORES;
+  adjustFinish(timeOrMinutesDuration: Date | number) {
+    let newFinish: Date;
+    if (typeof timeOrMinutesDuration === "number") {
+      const duration = timeOrMinutesDuration;
+      newFinish = new Date(this.#start.getTime() + duration * 60_000);
     } else {
-      return CompState.FINISHED;
+      newFinish = timeOrMinutesDuration;
     }
+    if (newFinish < this.#start) throw new RangeError("Finish time must be after start.");
+    this.notify(this);
+  }
+
+  hold() {
+    this.#hold = new Date();
+    this.notify(this);
+  }
+
+  release({ extendDuration = false }) {
+    if (this.#hold === null) return;
+    const delta = this.#hold.getTime() - Date.now();
+    if (extendDuration) this.#finish = new Date(this.#finish.getTime() - delta);
+    this.#hold = null;
+    this.notify(this);
   }
 }
