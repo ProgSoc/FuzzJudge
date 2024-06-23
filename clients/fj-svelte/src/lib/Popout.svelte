@@ -17,6 +17,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   export let shown = false;
   export let close = () => {};
 
+  let maximized = false;
+  let onMaximiseToggle = () => {
+    maximized = !maximized;
+  };
+
   document.addEventListener("keydown", (e) => {
     if (!shown || e.key !== "Escape") return;
 
@@ -25,8 +30,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </script>
 
 {#if shown}
-  <div class="popout">
+  <div class="content-centered" class:popout={!maximized} class:popout-fullscreen={maximized}>
     <button class="close" on:click={close}>X</button>
+    <button class="maximise" on:click={onMaximiseToggle}>
+      {#if maximized}
+        &gt;-&lt;
+      {:else}
+        &lt;-&gt;
+      {/if}
+    </button>
     <div class="contents">
       <slot />
     </div>
@@ -34,9 +46,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 {/if}
 
 <style>
+  .content-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .popout {
     position: absolute;
-    overflow: scroll;
+    overflow: auto;
     width: calc(100% - 60px);
     height: calc(100% - 60px);
     background-color: var(--bg-prim);
@@ -46,6 +64,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  .popout-fullscreen {
+    position: fixed;
+    overflow: auto;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-prim);
+    color: var(--text-prim);
+    box-shadow: 0 0 50px 15px #000;
+    inset: 0px;
   }
 
   .contents {
@@ -59,5 +88,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     position: absolute;
     top: 0px;
     right: 10px;
+  }
+
+  .maximise {
+    text-decoration: double;
+    font-weight: bold;
+    position: absolute;
+    top: 0px;
+    right: 30px;
   }
 </style>
