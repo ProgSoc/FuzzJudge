@@ -35,8 +35,8 @@ export class CompetitionClock extends Subscribable<CompetitionClock> {
   constructor(opts: { db: CompetitionDB, plannedStart: Date, plannedFinish: Date }) {
     super();
     this.#db = opts.db;
-    this.#start = new Date(this.#db.getOrSetDefaultMeta("clock_start", opts.plannedStart.toJSON()));
-    this.#finish = new Date(this.#db.getOrSetDefaultMeta("clock_finish", opts.plannedFinish.toJSON()));
+    this.#start = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/start", opts.plannedStart.toJSON()));
+    this.#finish = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/finish", opts.plannedFinish.toJSON()));
     this.#hold = null;
   }
 
