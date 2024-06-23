@@ -137,9 +137,20 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return this.#db.queryEntries<User>("SELECT * FROM user");
   }
 
-  // createTeam(params: Omit<Team, "id">): number {
-  //   return this.#db.query()
-  // }
+  createTeam(name: string): Team {
+    const seed = [...crypto.getRandomValues(new Uint8Array(8))].map(v => v.toString(16).padStart(2, "0")).join("");
+    return this.#db.queryEntries<Team>(
+      `
+        INSERT INTO team VALUES (NULL, :seed, :name)
+        RETURNING id
+      `,
+      { seed, name },
+    )[0];
+  }
+
+  assignUserTeam(user: number, team: number) {
+    this.#db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
+  }
 
   resetUser(params: { logn: string; role: UserRoles }, resetPassword = true): User {
     return this.#db.queryEntries<User>(

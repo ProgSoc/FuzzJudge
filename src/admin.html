@@ -10,24 +10,55 @@
   <h2>Teams</h2>
   <pre><output id="teams"></output></pre>
   <hr/>
-  <form action="javascript:void(0)">
-    <button onclick=""></button>
+  <form id="team" action="javascript:void(0)">
+    <fieldset>
+      <legend>Create Team</legend>
+      <input type="text" name="name"/>
+      <button onclick="createTeam()">Create Team</button>
+    </fieldset>
+  </form>
+  <form id="assign" action="javascript:void(0)">
+    <fieldset>
+      <legend>Assign Team</legend>
+      <label>Team ID: <input type="text" name="team"/></label>
+      <label>User ID: <input type="text" name="user"/></label>
+      <button onclick="assignTeam()">Assign Team</button>
+    </fieldset>
   </form>
   <script>
-    window.addEventListener("DOMContentLoaded", async () => {
+    async function updateUsers() {
+      users.innerText = "";
       for (const user of (await fetch("/user").then(r => r.json()))) {
         users.insertAdjacentText(
           "beforeend",
-          JSON.stringify({ logn: user.logn, name: user.name, team: user.team, role: user.role }),
+          JSON.stringify({ id: user.id, logn: user.logn, name: user.name, team: user.team, role: user.role }) + "\n",
         );
       }
+    }
+    async function updateTeams() {
+      teams.innerText = "";
       for (const team of (await fetch("/team").then(r => r.json()))) {
         teams.insertAdjacentText(
           "beforeend",
-          JSON.stringify({ name: team.name, seed: team.seed }),
+          JSON.stringify({ id: team.id, name: team.name, seed: team.seed }) + "\n",
         );
       }
+    }
+    async function createTeam() {
+      await fetch("/team", { method: "PUT", body: team.name.value });
+      team.reset();
+      updateTeams();
+    }
+    async function assignTeam() {
+      await fetch("/team", { method: "PATCH", body: `${assign.user.value},${assign.team.value}` });
+      assign.reset();
+      updateUsers();
+    }
+    window.addEventListener("DOMContentLoaded", async () => {
+      updateUsers();
+      updateTeams();
     });
+
   </script>
 </body>
 </html>
