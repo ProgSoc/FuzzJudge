@@ -16,6 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { T } from "../sample/client/assets/Scoreboard-B46voeWf.js";
 import { TOML, YAML, normalize } from "./deps.ts";
 
 export interface MarkdownDocument {
@@ -146,4 +147,9 @@ export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscr
   notify(msg: SubscriptionGroupMessage<T>): void {
     for (const [handler, _] of this.#subscriptions) handler(msg);
   }
+}
+
+export function deleteFalsey(obj: Record<string, unknown>): Record<string, unknown> {
+  for (const k in obj) if (!obj[k]) delete obj[k];
+  return obj;
 }
