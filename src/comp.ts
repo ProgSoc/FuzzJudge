@@ -188,6 +188,12 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]>
   #getProblems() {
     const list = [];
     for (const prob of this.#problems.values()) list.push(prob.toJSON());
+    list.sort((a, b) => {
+      const difficultyDelta = a.difficulty - b.difficulty;
+      const pointsDelta = a.points - b.points;
+      const nameSort = (a.doc.title < b.doc.title) ? -1 : (a.doc.title > b.doc.title ? 1 : 0);
+      return difficultyDelta || pointsDelta || nameSort;
+    });
     return list;
   }
 
