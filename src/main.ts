@@ -41,7 +41,7 @@ Backend
 
 import { loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
 import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
-import { accepts, pathJoin, serveFile, normalize } from "./deps.ts";
+import { accepts, pathJoin, serveFile, normalize, initZstd } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
@@ -56,7 +56,10 @@ export type SocketMessage = SubscriptionGroupMessage<{
   problems: FuzzJudgeProblemMessage[];
 }>;
 
+
 if (import.meta.main) {
+  initZstd();
+
   const root = await Deno.realPath(Deno.args[0] ?? ".");
 
   const compfile = loadMarkdown(await Deno.readTextFile(pathJoin(root, "./comp.md")));
