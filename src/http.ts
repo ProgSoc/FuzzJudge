@@ -117,3 +117,14 @@ export async function expectForm<T extends Record<string, null | ((value: string
     }),
   ) as { [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string };
 }
+
+export function catchWebsocket(
+  ctx: Request,
+  handler: (socket: WebSocket) => void,
+): void | never {
+  if (ctx.headers.get("Upgrade") === "websocket") {
+    const { socket, response } = Deno.upgradeWebSocket(ctx);
+    handler(socket);
+    throw response;
+  }
+}
