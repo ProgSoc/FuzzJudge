@@ -16,6 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { MaybeNull } from "https://deno.land/std@0.92.0/node/_utils.ts";
 import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
 import { DB, compressZstd, decompressZstd } from "./deps.ts";
 import { Subscribable } from "./util.ts";
@@ -127,6 +128,10 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return value;
   }
 
+  allMeta() {
+    return Object.fromEntries(this.#db.query<[string, string]>("SELECT * FROM comp"));
+  }
+
   user(id: number): User | undefined {
     return this.#db.queryEntries<User>("SELECT * FROM user WHERE id = ?", [id])[0];
   }
@@ -142,7 +147,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return this.#db.queryEntries<User>("SELECT * FROM user");
   }
 
-  createTeam(name: string): Team {
+  createTeam({ name = null as string | null }): Team {
     const seed = [...crypto.getRandomValues(new Uint8Array(8))].map((v) => v.toString(16).padStart(2, "0")).join("");
     return this.#db.queryEntries<Team>(
       `
@@ -153,7 +158,21 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     )[0];
   }
 
-  assignUserTeam(user: number, team: number) {
+  patchTeam(id: number, { name = null as string | null }): Team | undefined {
+    return this.#db.queryEntries<Team>(
+      `
+        UPDATE team SET name = :name WHERE id = :id
+        RETURNING *
+      `,
+      { id, name },
+    )[0];
+  }
+
+  deleteTeam(id: number) {
+    this.#db.query("DELETE FROM team WHERE id = :id", { id });
+  }
+
+  assignUserTeam({ user = null as number | null, team = null as number | null }) {
     this.#db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
   }
 
@@ -171,23 +190,20 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     )[0];
   }
 
-  updateUser(targetLogn: string, params: Record<string, string | number>): User {
+  patchUser(id: number, params: Record<string, unknown>): User | undefined {
     return this.#db.queryEntries<User>(
       `
       UPDATE user
-      SET (${Object.keys(params).join(",")})
-      = (${Object.keys(params)
-        .map((_) => "?")
-        .join(",")})
-      WHERE id = ?
+      SET (${Object.keys(params).join(", ")}) = (${Object.keys(params).map(v => `:${v}`).join(", ")})
+      WHERE id = :id
       RETURNING *
       `,
-      [...Object.values(params), targetLogn],
+      { id, ...params },
     )[0];
   }
 
-  deleteUser(params: { logn: string }) {
-    this.#db.query("DELETE FROM user WHERE logn = :logn", params);
+  deleteUser(id: number) {
+    this.#db.query("DELETE FROM user WHERE id = :id", { id });
   }
 
   async basicAuth({ logn, pass }: { logn: string; pass: Uint8Array }): Promise<User | null> {
@@ -264,6 +280,24 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
         v.time = new Date(v.time);
         return v;
       });
+  }
+
+  getSubmissionOut(id: number): string | undefined {
+    const data = this.#db.query<[Uint8Array]>("SELECT out FROM subm WHERE id = :id", { id })[0]?.[0];
+    if (!data) return;
+    return this.#decStr(data);
+  }
+
+  getSubmissionCode(id: number): string | undefined {
+    const data = this.#db.query<[Uint8Array]>("SELECT code FROM subm WHERE id = :id", { id })[0]?.[0];
+    if (!data) return;
+    return this.#decStr(data);
+  }
+
+  getSubmissionVler(id: number): string | undefined {
+    const data = this.#db.query<[Uint8Array]>("SELECT vler FROM subm WHERE id = :id", { id })[0]?.[0];
+    if (!data) return;
+    return this.#decStr(data);
   }
 
   /** @deprecated */

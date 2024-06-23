@@ -147,3 +147,8 @@ export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscr
     for (const [handler, _] of this.#subscriptions) handler(msg);
   }
 }
+
+export function deleteFalsey(obj: Record<string, unknown>): Record<string, unknown> {
+  for (const k in obj) if (!obj[k]) delete obj[k];
+  return obj;
+}

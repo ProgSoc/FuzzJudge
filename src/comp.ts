@@ -156,11 +156,11 @@ export class FuzzJudgeProblem {
   }
 }
 
-export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]> {
+export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemSetMessage> {
   #problems: Map<string, FuzzJudgeProblem> = new Map();
 
   constructor(root: string) {
-    super(() => this.#getProblems());
+    super(() => this.toJSON());
     for (const ent of walkSync(root, {
       includeDirs: false,
       includeSymlinks: false,
@@ -185,7 +185,7 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]>
     return this.#problems[Symbol.iterator]();
   }
 
-  #getProblems() {
+  toJSON(): FuzzJudgeProblemSetMessage {
     const list = [];
     for (const prob of this.#problems.values()) list.push(prob.toJSON());
     list.sort((a, b) => {
@@ -199,7 +199,7 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]>
 
   #addProblem(slug: string, prob: FuzzJudgeProblem) {
     this.#problems.set(slug, prob);
-    this.notify(this.#getProblems());
+    this.notify(this.toJSON());
   }
 
   get(slug: string): FuzzJudgeProblem | undefined {

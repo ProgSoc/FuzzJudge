@@ -36,7 +36,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <th> Team </th>
     <th> Points </th>
     {#each sorted_questions as question}
-      <th class="question-num">{question.slug}</th>
+      <th class="question-num">{question.doc.icon}</th>
     {/each}
   </tr>
   {#each scoreboard as team, i}

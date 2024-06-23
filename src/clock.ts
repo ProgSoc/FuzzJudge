@@ -70,8 +70,8 @@ export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
 
   adjustStart(time: Date, { keepDuration = false }) {
     const delta = this.#start.getTime() - time.getTime();
-    this.#start = time;
-    if (keepDuration) this.#finish = new Date(this.#finish.getTime() - delta);
+    this.#start = new Date(this.#db.setMeta("/comp/clock/start", time.toJSON()));
+    if (keepDuration) this.#finish = new Date(this.#db.setMeta("/comp/clock/finish", new Date(this.#finish.getTime() - delta).toJSON()));
     this.notify(this.now());
   }
 
@@ -84,6 +84,7 @@ export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
       newFinish = timeOrMinutesDuration;
     }
     if (newFinish < this.#start) throw new RangeError("Finish time must be after start.");
+    this.#finish = new Date(this.#db.setMeta("/comp/clock/finish", newFinish.toJSON()));
     this.notify(this.now());
   }
 
