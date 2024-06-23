@@ -60,7 +60,7 @@ export class FuzzJudgeProblem {
   }
 
   points(): number {
-    return Number(Object(this.#doc.config)?.points) || 0; // catch NaN
+    return Number(Object(this.#doc.front)?.points) || 0; // catch NaN
   }
 
   async fuzz(seed: string): Promise<string> {

@@ -25,7 +25,13 @@ export type ClockState =
   | "stop"
 ;
 
-export class CompetitionClock extends Subscribable<CompetitionClock> {
+export type CompetitionClockMessage = {
+  start: Date,
+  finish: Date,
+  hold: Date | null,
+};
+
+export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
   #db: CompetitionDB;
   #state: ClockState = "hold";
   #start: Date;
@@ -33,7 +39,7 @@ export class CompetitionClock extends Subscribable<CompetitionClock> {
   #hold: Date | null;
 
   constructor(opts: { db: CompetitionDB, plannedStart: Date, plannedFinish: Date }) {
-    super();
+    super(() => this.notify(this.now()));
     this.#db = opts.db;
     this.#start = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/start", opts.plannedStart.toJSON()));
     this.#finish = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/finish", opts.plannedFinish.toJSON()));
@@ -65,7 +71,7 @@ export class CompetitionClock extends Subscribable<CompetitionClock> {
     const delta = this.#start.getTime() - time.getTime();
     this.#start = time;
     if (keepDuration) this.#finish = new Date(this.#finish.getTime() - delta);
-    this.notify(this);
+    this.notify(this.now());
   }
 
   adjustFinish(timeOrMinutesDuration: Date | number) {
@@ -77,12 +83,12 @@ export class CompetitionClock extends Subscribable<CompetitionClock> {
       newFinish = timeOrMinutesDuration;
     }
     if (newFinish < this.#start) throw new RangeError("Finish time must be after start.");
-    this.notify(this);
+    this.notify(this.now());
   }
 
   hold() {
     this.#hold = new Date();
-    this.notify(this);
+    this.notify(this.now());
   }
 
   release({ extendDuration = false }) {
@@ -90,6 +96,6 @@ export class CompetitionClock extends Subscribable<CompetitionClock> {
     const delta = this.#hold.getTime() - Date.now();
     if (extendDuration) this.#finish = new Date(this.#finish.getTime() - delta);
     this.#hold = null;
-    this.notify(this);
+    this.notify(this.now());
   }
 }

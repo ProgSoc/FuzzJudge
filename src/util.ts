@@ -83,18 +83,47 @@ export function indent(pre: string, text: string): string {
 
 export type SubscriptionHandler<T> = (ctx: T) => void | Promise<void>;
 
+
 export class Subscribable<T> {
   #subscribers: Set<SubscriptionHandler<T>> = new Set();
+  #triggerInitial?: () => void;
+
+  constructor(triggerInitial?: () => void) {
+    this.#triggerInitial = triggerInitial;
+  }
 
   subscribe(fn: SubscriptionHandler<T>) {
     this.#subscribers.add(fn);
+    this.#triggerInitial?.();
+    return fn;
   }
 
   unsubscribe(fn: SubscriptionHandler<T>) {
     this.#subscribers.delete(fn);
+    return fn;
   }
 
   notify(ctx: T) {
     for (const handler of this.#subscribers) handler(ctx);
+  }
+}
+
+export type SubscriptionGroupContext<K extends string, T> = {
+  kind: K,
+  value: T,
+};
+
+export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscribable<{ [K in keyof T]: { kind: K, value: T[K] } }[keyof T]> {
+  #channels: { [K in keyof T]: { target: Subscribable<T[K]>, handler: SubscriptionHandler<T[K]> } };
+
+  constructor(channels: { [K in keyof T]: Subscribable<T[K]> }) {
+    super();
+    this.#channels = Object();
+    for (const kind in channels) {
+      const target = channels[kind];
+      const handler: SubscriptionHandler<T[typeof kind]> = ctx => this.notify({ kind, value: ctx });
+      target.subscribe(handler);
+      this.#channels[kind] = { target, handler };
+    }
   }
 }
