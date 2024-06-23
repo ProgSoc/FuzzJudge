@@ -81,49 +81,66 @@ export function indent(pre: string, text: string): string {
   return text.replaceAll(/^/gm, pre);
 }
 
-export type SubscriptionHandler<T> = (ctx: T) => void | Promise<void>;
+export type SubscriptionHandler<T> = (msg: T) => void | Promise<void>;
 
 
 export class Subscribable<T> {
   #subscribers: Set<SubscriptionHandler<T>> = new Set();
-  #triggerInitial?: () => void;
+  #getInitial?: () => T;
 
-  constructor(triggerInitial?: () => void) {
-    this.#triggerInitial = triggerInitial;
+  constructor(getInitial?: () => T) {
+    this.#getInitial = getInitial;
   }
 
   subscribe(fn: SubscriptionHandler<T>) {
     this.#subscribers.add(fn);
-    this.#triggerInitial?.();
+    if (this.#getInitial) fn(this.#getInitial());
     return fn;
   }
 
   unsubscribe(fn: SubscriptionHandler<T>) {
     this.#subscribers.delete(fn);
-    return fn;
   }
 
-  notify(ctx: T) {
-    for (const handler of this.#subscribers) handler(ctx);
+  notify(msg: T) {
+    for (const handler of this.#subscribers) handler(msg);
   }
 }
 
-export type SubscriptionGroupContext<K extends string, T> = {
-  kind: K,
-  value: T,
-};
+export type SubscriptionGroupMessage<T extends Record<string, unknown>> = { [K in keyof T]: { kind: K, value: T[K] } }[keyof T];
 
-export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscribable<{ [K in keyof T]: { kind: K, value: T[K] } }[keyof T]> {
-  #channels: { [K in keyof T]: { target: Subscribable<T[K]>, handler: SubscriptionHandler<T[K]> } };
+export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscribable<SubscriptionGroupMessage<T>> {
+  #channels: { [K in keyof T]: Subscribable<T[K]> };
+  #subscriptions: Map<SubscriptionHandler<SubscriptionGroupMessage<T>>, { [K in keyof T]: SubscriptionHandler<T[K]> }> = new Map();
 
   constructor(channels: { [K in keyof T]: Subscribable<T[K]> }) {
     super();
-    this.#channels = Object();
-    for (const kind in channels) {
-      const target = channels[kind];
-      const handler: SubscriptionHandler<T[typeof kind]> = ctx => this.notify({ kind, value: ctx });
-      target.subscribe(handler);
-      this.#channels[kind] = { target, handler };
+    this.#channels = channels;
+  }
+
+  subscribe(fn: SubscriptionHandler<SubscriptionGroupMessage<T>>): SubscriptionHandler<SubscriptionGroupMessage<T>> {
+    if (this.#subscriptions.has(fn)) return fn;
+    const subscription = Object();
+    for (const kind in this.#channels) {
+      const target = this.#channels[kind];
+      const handler = target.subscribe(msg => fn({ kind, value: msg }));
+      subscription[kind] = handler;
     }
+    this.#subscriptions.set(fn, subscription);
+    return fn;
+  }
+
+  unsubscribe(fn: SubscriptionHandler<SubscriptionGroupMessage<T>>) {
+    const subscription = this.#subscriptions.get(fn);
+    if (!subscription) return;
+    for (const kind in this.#channels) {
+      const target = this.#channels[kind];
+      target.unsubscribe(subscription[kind]);
+    }
+    this.#subscriptions.delete(fn);
+  }
+
+  notify(msg: SubscriptionGroupMessage<T>): void {
+    for (const [handler, _] of this.#subscriptions) handler(msg);
   }
 }
