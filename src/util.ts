@@ -43,7 +43,7 @@ export function frontMatter(
 export function loadMarkdown(text: string, linkPrefix = ""): MarkdownDocument {
   const { front, body } = frontMatter(text);
   const [titleMatch, titleHead, icon, titleTail] = body.match(/^# (.*)(\p{RGI_Emoji})?(.*)\n?/) ?? [];
-  const title = (titleHead + titleTail).trim().replaceAll(/\s{+}/, " ");
+  const title = ((titleHead || "") + (titleTail || "")).trim().replaceAll(/\s{+}/, " ");
   const summary = body.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
   const publicAssets = new Set<string>();
   let outputBody = body.replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
