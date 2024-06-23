@@ -28,13 +28,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       {secondsToString(timeStateData.secondsUntilCompetitionStart)}
     </div>
     <div class="small subtitle">{secondsToBinary(timeStateData.secondsUntilCompetitionStart)}</div>
-  {:else if timeStateData.phase === CompState.LIVE_WITH_SCORES}
+  {:else if timeStateData.phase === CompState.LIVE_UNFROZEN}
     <div class="small">Competition ends in...</div>
     <div>
       {secondsToString(timeStateData.secondsUntilCompetitionEnd)}
     </div>
-    <div class="small subtitle">The scoreboard will freeze at {dateToTimeString(timeStateData.times.freeze)}</div>
-  {:else if timeStateData.phase === CompState.LIVE_WITHOUT_SCORES}
+    <div class="small subtitle">
+      The scoreboard will freeze at {dateToTimeString(timeStateData.times.hold ?? timeStateData.times.finish)}
+    </div>
+  {:else if timeStateData.phase === CompState.LIVE_FROZEN || timeStateData.phase === CompState.LIVE_UNFROZEN_NO_FREEZE}
     <div class="small">Competition ends in...</div>
     <div>
       {secondsToString(timeStateData.secondsUntilCompetitionEnd)}
