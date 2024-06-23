@@ -80,7 +80,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
       score.penalty = Math.max(0, (latest - this.#clock.now().start.getTime()) / 60_000) + 20 * nPenalties;
       teamScore.total.points += score.points;
       teamScore.total.penalty += score.penalty;
-      teamScore.problems[slug];
+      teamScore.problems[slug] = score;
     }
     return teamScore;
   }
