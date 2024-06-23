@@ -34,7 +34,7 @@ export function frontMatter(
     toml: TOML.parse,
     yaml: YAML.parse,
   },
-): { front?: unknown, body: string } {
+): { front?: unknown; body: string } {
   const [_all, _delim, format, front] = text.match(/^(`{3,})([^ ]*?)\n(.*?)(?<=\n)\1(\n|$)/s) ?? [];
   if (_all === undefined) return { body: text };
   return { front: parsers[format]?.(front), body: text.slice(_all.length) };
@@ -42,24 +42,25 @@ export function frontMatter(
 
 export function loadMarkdown(text: string, linkPrefix = ""): MarkdownDocument {
   const { front, body } = frontMatter(text);
-  const [titleMatch, titleHead, icon, titleTail] = body.match(new RegExp(`^# (.*?)(\\p{RGI_Emoji})?(.*)\\n?`, "mv")) ?? [];
+  const [titleMatch, titleHead, icon, titleTail] =
+    body.match(new RegExp(`^# (.*?)(\\p{RGI_Emoji})?(.*)\\n?`, "mv")) ?? [];
   const title = ((titleHead || "") + (titleTail || "")).trim().replaceAll(/\s{+}/g, " ");
   const summary = body.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
   const publicAssets = new Set<string>();
-  let outputBody = body.replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
-    if (link.startsWith("//") || /^\w+:/.test(link)) {
-      return match;
-    }
-    else if (linkPrefix !== "") {
-      const newLink = linkPrefix + normalize("/" + link);
-      publicAssets.add(newLink);
-      return match.replace(link, newLink);
-    }
-    else {
-      publicAssets.add(link);
-      return match;
-    }
-  }).trim();
+  let outputBody = body
+    .replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
+      if (link.startsWith("//") || /^\w+:/.test(link)) {
+        return match;
+      } else if (linkPrefix !== "") {
+        const newLink = normalize("/" + link);
+        publicAssets.add(newLink);
+        return match.replace(link, linkPrefix + newLink);
+      } else {
+        publicAssets.add(link);
+        return match;
+      }
+    })
+    .trim();
   if (outputBody.length > 0) outputBody += "\n";
   return {
     front,
@@ -82,7 +83,6 @@ export function indent(pre: string, text: string): string {
 }
 
 export type SubscriptionHandler<T> = (msg: T) => void | Promise<void>;
-
 
 export class Subscribable<T> {
   #subscribers: Set<SubscriptionHandler<T>> = new Set();
@@ -107,11 +107,14 @@ export class Subscribable<T> {
   }
 }
 
-export type SubscriptionGroupMessage<T extends Record<string, unknown>> = { [K in keyof T]: { kind: K, value: T[K] } }[keyof T];
+export type SubscriptionGroupMessage<T extends Record<string, unknown>> = {
+  [K in keyof T]: { kind: K; value: T[K] };
+}[keyof T];
 
 export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscribable<SubscriptionGroupMessage<T>> {
   #channels: { [K in keyof T]: Subscribable<T[K]> };
-  #subscriptions: Map<SubscriptionHandler<SubscriptionGroupMessage<T>>, { [K in keyof T]: SubscriptionHandler<T[K]> }> = new Map();
+  #subscriptions: Map<SubscriptionHandler<SubscriptionGroupMessage<T>>, { [K in keyof T]: SubscriptionHandler<T[K]> }> =
+    new Map();
 
   constructor(channels: { [K in keyof T]: Subscribable<T[K]> }) {
     super();
@@ -123,7 +126,7 @@ export class SubscriptionGroup<T extends Record<string, unknown>> extends Subscr
     const subscription = Object();
     for (const kind in this.#channels) {
       const target = this.#channels[kind];
-      const handler = target.subscribe(msg => fn({ kind, value: msg }));
+      const handler = target.subscribe((msg) => fn({ kind, value: msg }));
       subscription[kind] = handler;
     }
     this.#subscriptions.set(fn, subscription);
