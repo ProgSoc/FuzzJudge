@@ -33,18 +33,25 @@ export type TeamScore = {
   problems: Record<string, ProblemScore>,
 };
 
-export class CompetitionScoreboard extends Subscribable<CompetitionScoreboard> {
+export type CompetitionScoreboardMessage = {
+  rank: number,
+  name: string,
+  score: TeamScore,
+}[];
+
+export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMessage> {
   #db: CompetitionDB;
   #clock: CompetitionClock;
   #problems: Record<string, FuzzJudgeProblem>;
   #frozen: boolean;
 
   constructor(opts: { db: CompetitionDB, clock: CompetitionClock, problems: Record<string, FuzzJudgeProblem> }) {
-    super();
+    super(() => this.notify(this.fullScoreboard()));
     this.#db = opts.db;
     this.#clock = opts.clock;
     this.#problems = opts.problems;
     this.#frozen = false;
+    this.#db.subscribe(() => this.notify(this.fullScoreboard()));
   }
 
   teamScoreboard(team: number) {
@@ -78,7 +85,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboard> {
     return teamScore;
   }
 
-  fullScoreboard() {
+  fullScoreboard(): CompetitionScoreboardMessage {
     if (this.#frozen) {
       return JSON.parse(this.#db.getOrSetDefaultMeta("/comp/scoreboard.frozen")!);
     }
@@ -95,6 +102,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboard> {
       const penaltyDelta = a.score.total.penalty - b.score.total.penalty;
       return pointsDelta || penaltyDelta;
     });
+    return rankings;
   }
 
   freeze() {

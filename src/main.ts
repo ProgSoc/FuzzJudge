@@ -39,7 +39,7 @@ Backend
 
 */
 
-import { loadMarkdown, SubscriptionHandler } from "./util.ts";
+import { loadMarkdown, SubscriptionGroup, SubscriptionHandler } from "./util.ts";
 import { FuzzJudgeProblem } from "./comp.ts";
 import { accepts, pathJoin, walk, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
@@ -47,8 +47,7 @@ import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
 import { CompetitionDB, UserRoles } from "./db.ts";
 import { CompetitionClock } from "./clock.ts";
-import { makeListenerGroup } from "./live/notificationService.ts";
-import { makeSocketService, SocketMessage } from "./live/socketData.ts";
+import { CompetitionScoreboard } from "./score.ts";
 
 if (import.meta.main) {
   const root = await Deno.realPath(Deno.args[0] ?? ".");
@@ -80,8 +79,11 @@ if (import.meta.main) {
     plannedFinish: new Date(Object(compfile.front)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
   });
 
-  const socketService = makeSocketService({
+  const scoreboard = new CompetitionScoreboard({ db, clock, problems });
+
+  const live = new SubscriptionGroup({
     clock,
+    scoreboard,
   });
 
   const auth = new Auth({
@@ -96,15 +98,10 @@ if (import.meta.main) {
   const router = new Router({
     GET: (req) => {
       catchWebsocket(req, (socket) => {
-        socket.addEventListener("open", () => {
-          const unsubscribe = socketService.subscribe((msg) => {
-            socket.send(JSON.stringify(msg));
-          });
-
-          socket.addEventListener("close", unsubscribe);
-        });
+        const handler = live.subscribe(msg => socket.send(JSON.stringify(msg)));
+        socket.addEventListener("close", () => live.unsubscribe(handler));
       });
-      return HEADER
+      return HEADER;
     },
     BREW: (_) => new Response("418 I'm a Teapot", { status: 418 }),
     "/auth": async (req) => {
@@ -186,10 +183,7 @@ if (import.meta.main) {
       "/clock": {
         GET: (req) => {
           catchWebsocket(req, (socket) => {
-            const handler: SubscriptionHandler<CompetitionClock> = (clock) => {
-              socket.send(JSON.stringify(clock.now()));
-            };
-            socket.addEventListener("open", () => clock.subscribe(handler));
+            const handler = clock.subscribe(msg => socket.send(JSON.stringify(msg)));
             socket.addEventListener("close", () => clock.unsubscribe(handler));
           });
           return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
