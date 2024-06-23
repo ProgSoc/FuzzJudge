@@ -69,7 +69,7 @@ if (import.meta.main) {
   const clock = new CompetitionClock({
     db,
     plannedStart: new Date(Object(compfile.front)?.times?.start || new Date().toJSON()),
-    plannedFinish: new Date(Object(compfile.front)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
+    plannedFinish: new Date(Object(compfile.front)?.times?.finish || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
   });
 
   const scoreboard = new CompetitionScoreboard({ db, clock, problems });
