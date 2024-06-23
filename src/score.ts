@@ -19,7 +19,7 @@
 import { Subscribable } from "./util.ts";
 import { CompetitionDB } from "./db.ts";
 import { CompetitionClock } from "./clock.ts";
-import { FuzzJudgeProblem } from "./comp.ts";
+import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
 
 export type ProblemScore = {
   points: number,
@@ -42,10 +42,10 @@ export type CompetitionScoreboardMessage = {
 export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMessage> {
   #db: CompetitionDB;
   #clock: CompetitionClock;
-  #problems: Record<string, FuzzJudgeProblem>;
+  #problems: FuzzJudgeProblemSet;
   #frozen: boolean;
 
-  constructor(opts: { db: CompetitionDB, clock: CompetitionClock, problems: Record<string, FuzzJudgeProblem> }) {
+  constructor(opts: { db: CompetitionDB, clock: CompetitionClock, problems: FuzzJudgeProblemSet }) {
     super(() => this.fullScoreboard());
     this.#db = opts.db;
     this.#clock = opts.clock;
@@ -57,7 +57,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
   teamScoreboard(team: number) {
     // return sorted by score (then penalty score)
     const teamScore: TeamScore = { total: { points: 0, penalty: 0 }, problems: {} };
-    for (const [slug, prob] of Object.entries(this.#problems)) {
+    for (const [slug, prob] of this.#problems) {
       const submissions = this.#db.getSubmissionSkeletons(team, slug);
       const score: ProblemScore = {
         points: 0,
