@@ -109,7 +109,18 @@ if (import.meta.main) {
 
   //
   const router = new Router({
-    GET: (_) => HEADER,
+    GET: (req) => {
+      catchWebsocket(req, (socket) => {
+        socket.addEventListener("open", () => {
+          const unsubscribe = socketService.subscribe((msg) => {
+            socket.send(JSON.stringify(msg));
+          });
+
+          socket.addEventListener("close", unsubscribe);
+        });
+      });
+      return HEADER
+    },
     BREW: (_) => new Response("418 I'm a Teapot", { status: 418 }),
     "/auth": async (req) => {
       const user = await auth.protect(req);
