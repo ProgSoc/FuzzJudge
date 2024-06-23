@@ -20,7 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import SvelteMarkdown from "svelte-markdown";
 
-  export let question_data: FuzzJudgeProblemMessage | undefined;
+  export let question_data: FuzzJudgeProblemMessage;
   export let solved: boolean;
   export let setSolved: (slug: string) => void;
 
@@ -67,9 +67,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         </div>
       {/if}
 
-      {#if $selected_question !== undefined}
-        <SubmissionArea {setSolved} />
-      {/if}
+      <SubmissionArea {setSolved} />
     {/if}
   </div>
 </div>
