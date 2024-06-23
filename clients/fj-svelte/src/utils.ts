@@ -160,3 +160,7 @@ export const showing_questions_at_current_time = (times: CompTimes): boolean => 
   const state = get_current_comp_state(times);
   return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES;
 };
+
+export function unreachable(x: never): never {
+  throw new Error(`Unreachable code reached: ${x}`);
+}
