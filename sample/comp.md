@@ -42,4 +42,4 @@ There are 2 points systems:
 
 ## Prizes
 
-1st place: $1500 2nd place: $900 3rd place: $600
+1st place: \$1500 2nd place: \$900 3rd place: \$600
