@@ -19,12 +19,6 @@
 import { CompetitionDB } from "./db.ts";
 import { Subscribable } from "./util.ts";
 
-interface TimeConfig {
-  start: Date;
-  freeze: Date;
-  stop: Date;
-}
-
 export type ClockState =
   | "live"
   | "hold"
