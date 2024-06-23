@@ -22,6 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     type TimeStateData,
     getCurrentTimeStateData,
     runRepeatedly,
+    makeCallDeduper,
   } from "../utils";
   import { get_questions, get_comp_info } from "../api";
   import { onDestroy, onMount } from "svelte";
@@ -46,17 +47,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let compTimes: CompTimes | undefined = undefined;
   let questions: Record<string, QuestionMeta> | undefined = undefined;
 
+  const competitionStartDeduper = makeCallDeduper();
+
   let liveState = initLiveState();
   liveState.listenClock((clock) => {
-    console.log("Received clock");
     compTimes = clock;
-  });
 
-  let loadingErrors: string[] = [];
-  function pushError(err: string) {
-    loadingErrors.push(err);
-    loadingErrors = loadingErrors;
-  }
+    const msUntilStart = Math.floor(Math.max(0, clock.start.getTime() - Date.now()));
+
+    // If the time was moved forwards, reset the question visibility to null
+    if (msUntilStart > 0 && questions != null) {
+      questions = undefined;
+    }
+
+    // Queue question visibility to show once the competition is started
+    competitionStartDeduper.tryRun(msUntilStart, async () => {
+      questions = await get_questions();
+    });
+  });
 
   get_comp_info().then((data) => {
     window.document.title = data.title;
@@ -101,14 +109,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Sidebar {questions} />
 
   <!-- main content -->
-  {#if loadingErrors.length > 0}
-    <div class="loading">
-      Error loading questions:<br />
-      {#each loadingErrors as error}
-        <code>{error}</code>
-      {/each}
-    </div>
-  {:else if timeStateData === undefined}
+  {#if timeStateData === undefined}
     <Loading />
   {:else if timeStateData.questionsVisible}
     {#if questions === undefined}
