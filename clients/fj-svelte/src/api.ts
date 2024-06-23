@@ -13,8 +13,14 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { SocketMessage } from "../../../src/live/socketData.ts";
-import { parse_scoreboard, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
+import {
+  exists,
+  parse_scoreboard,
+  question_order,
+  type CompTimes,
+  type QuestionMeta,
+  type ScoreboardUser,
+} from "./utils";
 
 export const BACKEND_SERVER: string = "";
 
@@ -129,3 +135,25 @@ export const submit_solution = async (
 export const open_fuzz = (slug: string) => {
   window.open(`${BACKEND_SERVER}/comp/prob/${slug}/fuzz`, "_blank");
 };
+
+export async function isQuestionSolved(slug: string) {
+  const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
+    method: "GET",
+  });
+
+  const text = await res.text();
+  return text === "OK";
+}
+
+export async function getQuestionSolvedSet(questionSlugs: string[]) {
+  const remainingSolved = await Promise.all(
+    questionSlugs.map(async (slug) => {
+      if (await isQuestionSolved(slug)) {
+        return slug;
+      }
+      return null;
+    }),
+  );
+
+  return new Set(remainingSolved.filter(exists));
+}
