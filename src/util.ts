@@ -16,7 +16,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { T } from "../sample/client/assets/Scoreboard-B46voeWf.js";
 import { TOML, YAML, normalize } from "./deps.ts";
 
 export interface MarkdownDocument {
