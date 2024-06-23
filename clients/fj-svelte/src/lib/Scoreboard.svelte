@@ -26,8 +26,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let errors: string[] = [];
 
-  $: teams = scoreboard.sort((a, b) => b.rank - a.rank);
-  $: sorted_questions = Object.values(questions).sort((a, b) => a.slug.localeCompare(b.slug));
+  $: sorted_questions = Object.values(questions).sort((a, b) => a.points - b.points);
 </script>
 
 <h1>Scoreboard</h1>
@@ -40,7 +39,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <th class="question-num">{question.slug}</th>
     {/each}
   </tr>
-  {#each teams as team, i}
+  {#each scoreboard as team, i}
     <tr>
       <td class="position">
         {i + 1}
@@ -49,11 +48,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         {truncate_username(team.name)}
       </td>
       <td class="points">
-        {team.rank}
+        {team.score.total.points}
       </td>
       {#each sorted_questions as question}
-        <td class={`result`} class:solved={team.score.problems[question.slug].solved}>
-          {#if team.score.problems[question.slug].solved}
+        <td class={`result`} class:solved={team.score.problems[question.slug]?.solved}>
+          {#if team.score.problems[question.slug]?.solved}
             ✓
           {/if}
         </td>

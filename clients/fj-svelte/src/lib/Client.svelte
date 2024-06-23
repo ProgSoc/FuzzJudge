@@ -22,9 +22,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     type TimeStateData,
     getCurrentTimeStateData,
     runRepeatedly,
-    makeCallDeduper,
   } from "../utils";
-  import { get_questions, get_comp_info } from "../api";
+  import { get_questions, get_comp_info, getQuestionSolvedSet } from "../api";
   import { onDestroy, onMount } from "svelte";
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
@@ -55,8 +54,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   liveState.listenClock((clock) => {
     compTimes = clock;
   });
-  liveState.listenQuestions((qs) => {
+  liveState.listenQuestions(async (qs) => {
     questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
+
+    solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
   });
   liveState.listenScoreboard((sb) => {
     scoreboard = sb;
