@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FuzzJudgeProblem } from "./comp.ts";
+import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
 import { DB, compressZstd, decompressZstd } from "./deps.ts";
 import { Subscribable } from "./util.ts";
 
@@ -52,9 +52,9 @@ export type Submission = {
 
 export class CompetitionDB extends Subscribable<CompetitionDB> {
   #db: DB;
-  #problems: Record<string, FuzzJudgeProblem>;
+  #problems: FuzzJudgeProblemSet;
 
-  constructor(path: string, problems: Record<string, FuzzJudgeProblem>) {
+  constructor(path: string, problems: FuzzJudgeProblemSet) {
     super();
     this.#problems = problems;
     this.#db = new DB(path);
@@ -210,8 +210,8 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
 
   score(params: { team: number }): number {
     let total = 0;
-    for (const id of this.solvedSet(params)) {
-      total += Object(this.#problems[id].doc().front)?.problem?.points ?? 0;
+    for (const slug of this.solvedSet(params)) {
+      total += Object(this.#problems.get(slug)!.doc().front)?.problem?.points ?? 0;
     }
     return total;
   }

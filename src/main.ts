@@ -39,9 +39,9 @@ Backend
 
 */
 
-import { loadMarkdown, SubscriptionGroup, SubscriptionHandler } from "./util.ts";
-import { FuzzJudgeProblem } from "./comp.ts";
-import { accepts, pathJoin, walk, serveFile, normalize } from "./deps.ts";
+import { loadMarkdown, SubscriptionGroup } from "./util.ts";
+import { FuzzJudgeProblemSet } from "./comp.ts";
+import { accepts, pathJoin, serveFile, normalize } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
@@ -54,21 +54,7 @@ if (import.meta.main) {
 
   const compfile = loadMarkdown(await Deno.readTextFile(pathJoin(root, "./comp.md")));
 
-  const problems: Record<string, FuzzJudgeProblem> = {};
-  for await (const ent of walk(root, {
-    includeDirs: false,
-    includeSymlinks: false,
-    match: [/prob\.md/],
-    maxDepth: 2,
-  })) {
-    try {
-      const slug = FuzzJudgeProblem.getSlug(ent.path);
-      const problem = new FuzzJudgeProblem(slug, ent.path, loadMarkdown(await Deno.readTextFile(ent.path), ent.path));
-      problems[problem.slug()] = problem;
-    } catch (e) {
-      console.error(`Could not load "${ent.path}": ${e}`);
-    }
-  }
+  const problems = new FuzzJudgeProblemSet(root);
 
   const db = new CompetitionDB(pathJoin(root, "comp.db"), problems);
   db.resetUser({ logn: "admin", role: "admin" }, false);
@@ -84,6 +70,7 @@ if (import.meta.main) {
   const live = new SubscriptionGroup({
     clock,
     scoreboard,
+    problems,
   });
 
   const auth = new Auth({
@@ -192,22 +179,22 @@ if (import.meta.main) {
       "/prob": {
         GET: () => Object.keys(problems).join("\n"),
         "/:id": {
-          "/icon": (_req, { id }) => problems[id!].doc().icon,
-          "/name": (_req, { id }) => problems[id!].doc().title,
-          "/brief": (_req, { id }) => problems[id!].doc().summary,
-          "/difficulty": (_req, { id }) => Object(problems[id!].doc().front)?.problem?.difficulty,
-          "/points": (_req, { id }) => Object(problems[id!].doc().front)?.problem?.points,
+          "/icon": (_req, { id }) => problems.get(id!)!.doc().icon,
+          "/name": (_req, { id }) => problems.get(id!)!.doc().title,
+          "/brief": (_req, { id }) => problems.get(id!)!.doc().summary,
+          "/difficulty": (_req, { id }) => Object(problems.get(id!)!.doc().front)?.problem?.difficulty,
+          "/points": (_req, { id }) => Object(problems.get(id!)!.doc().front)?.problem?.points,
           "/solution": (_) => new Response("451 Unavailable For Legal Reasons", { status: 451 }),
           // Gated (by time and auth) utils ...
           "/instructions": async (req, { id }) => {
             // clock.protect();
             await auth.protect(req);
-            return new Response(problems[id!].doc().body, { headers: { "Content-Type": "text/markdown" } });
+            return new Response(problems.get(id!)!.doc().body, { headers: { "Content-Type": "text/markdown" } });
           },
           "/fuzz": async (req, { id }) => {
             // clock.protect();
             const user = await auth.protect(req);
-            return await problems[id!].fuzz(db.userTeam(user.team).seed);
+            return await problems.get(id!)!.fuzz(db.userTeam(user.team).seed);
           },
           "/judge": {
             GET: async (req, { id: problemId }) => {
@@ -243,7 +230,7 @@ if (import.meta.main) {
               }
               const time = new Date();
               const t0 = performance.now();
-              const { correct, errors } = await problems[problemId!].judge(
+              const { correct, errors } = await problems.get(problemId!)!.judge(
                 db.userTeam(user.team).seed,
                 submissionOutput,
               );
@@ -271,7 +258,7 @@ if (import.meta.main) {
             await auth.protect(req);
             // clock.protect();
             const normalisedAssetPath = normalize("/" + assetPath);
-            if (problems[problemId!].doc().publicAssets.has(normalisedAssetPath)) {
+            if (problems.get(problemId!)!.doc().publicAssets.has(normalisedAssetPath)) {
               return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
             } else {
               return undefined;

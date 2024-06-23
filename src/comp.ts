@@ -16,8 +16,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { basename, dirname, pathJoin } from "./deps.ts";
-import { MarkdownDocument } from "./util.ts";
+import { basename, dirname, pathJoin, walkSync } from "./deps.ts";
+import { MarkdownDocument, Subscribable, loadMarkdown } from "./util.ts";
+
+export type FuzzJudgeProblemMessage = {
+  slug: string,
+  doc: {
+    title: string,
+    icon?: string,
+    summary?: string,
+    body: string,
+  },
+  points: number,
+  difficulty: number,
+};
+
+export type FuzzJudgeProblemSetMessage = FuzzJudgeProblemMessage[];
 
 export class FuzzJudgeProblem {
   #doc: MarkdownDocument;
@@ -51,6 +65,20 @@ export class FuzzJudgeProblem {
     for (const key in this.#envFuzz) this.#envFuzz[key] = String(this.#envFuzz[key]);
   }
 
+  toJSON(): FuzzJudgeProblemMessage {
+    return {
+      slug: this.#slug,
+      doc: {
+        title: this.#doc.title ?? this.#slug,
+        icon: this.#doc.icon,
+        summary: this.#doc.summary,
+        body: this.#doc.body,
+      },
+      points: this.points(),
+      difficulty: this.difficulty(),
+    };
+  }
+
   slug(): string {
     return this.#slug;
   }
@@ -60,7 +88,11 @@ export class FuzzJudgeProblem {
   }
 
   points(): number {
-    return Number(Object(this.#doc.front)?.points) || 0; // catch NaN
+    return Number(Object(this.#doc.front)?.problem?.points) || 0; // catch NaN
+  }
+
+  difficulty(): number {
+    return Number(Object(this.#doc.front)?.problem?.difficulty) || 0; // catch NaN
   }
 
   async fuzz(seed: string): Promise<string> {
@@ -121,5 +153,46 @@ export class FuzzJudgeProblem {
     this.#submissionCounts[seed] = (this.#submissionCounts[seed] ?? 0) + 1;
 
     return { limited: false, retry: 0 };
+  }
+}
+
+export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemMessage[]> {
+  #problems: Map<string, FuzzJudgeProblem> = new Map();
+
+  constructor(root: string) {
+    super(() => this.#getProblems());
+    for (const ent of walkSync(root, {
+      includeDirs: false,
+      includeSymlinks: false,
+      match: [/prob\.md/],
+      maxDepth: 2,
+    })) {
+      try {
+        const slug = FuzzJudgeProblem.getSlug(ent.path);
+        const problem = new FuzzJudgeProblem(slug, ent.path, loadMarkdown(Deno.readTextFileSync(ent.path), ent.path));
+        this.#problems.set(slug, problem);
+      } catch (e) {
+        console.error(`Could not load "${ent.path}": ${e}`);
+      }
+    }
+  }
+
+  [Symbol.iterator]() {
+    return this.#problems[Symbol.iterator]();
+  }
+
+  #getProblems() {
+    const list = [];
+    for (const prob of this.#problems.values()) list.push(prob.toJSON());
+    return list;
+  }
+
+  #addProblem(slug: string, prob: FuzzJudgeProblem) {
+    this.#problems.set(slug, prob);
+    this.notify(this.#getProblems());
+  }
+
+  get(slug: string): FuzzJudgeProblem | undefined {
+    return this.#problems.get(slug)
   }
 }
