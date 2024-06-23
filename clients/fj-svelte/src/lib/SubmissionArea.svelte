@@ -74,7 +74,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       </div>
     </div>
     <div class="text-area-buttons">
-      <button on:click={() => submit($selected_question)}>
+      <button class="submit" on:click={() => submit($selected_question)}>
         {waiting_on_server ? "Processing..." : "Submit"}
       </button>
     </div>
@@ -98,6 +98,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     min-height: 3rem;
   }
 
+  .source-submission {
+    max-width: 20rem;
+  }
+
+  .submit {
+    height: 3rem;
+    width: 10rem;
+  }
+
   button {
     color: var(--text-sec);
     background-color: var(--bg-sec);
@@ -116,9 +125,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 
   .input-span {
-    color: green;
+    color: var(--accent-text);
+    text-decoration: underline;
     &:hover {
-      color: lightgreen;
       cursor: pointer;
     }
   }
