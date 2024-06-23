@@ -19,12 +19,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     type CompTimes,
     type QuestionMeta,
     selected_question,
-    getStateEndTime,
     type TimeStateData,
     getCurrentTimeStateData,
     runRepeatedly,
   } from "../utils";
-  import { get_questions, get_comp_info, get_comp_times } from "../api";
+  import { get_questions, get_comp_info } from "../api";
   import { onDestroy, onMount } from "svelte";
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
@@ -36,12 +35,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { get_username } from "../api";
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
-
-  // There's no cleaner way of doing this, right?
-  let destroyed = false;
-  onDestroy(() => {
-    destroyed = true;
-  });
+  import { initLiveState } from "../apiLive";
 
   let username = "Loading...";
 
@@ -51,6 +45,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let compTimes: CompTimes | undefined = undefined;
   let questions: Record<string, QuestionMeta> | undefined = undefined;
+
+  let liveState = initLiveState();
+  liveState.listenClock((clock) => {
+    console.log("Received clock");
+    compTimes = clock;
+  });
 
   let loadingErrors: string[] = [];
   function pushError(err: string) {
@@ -69,34 +69,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     }
   });
 
-  onMount(async () => {
-    try {
-      compTimes = await get_comp_times();
-      if (destroyed) return;
-      if (compTimes === undefined) {
-        pushError("Could not load competition times");
-        return;
-      }
-
-      // Wait until questions can be loaded
-      const millisecondsUntilQuestions = Math.max(0, compTimes.start.getTime() - Date.now()) + 500;
-      await new Promise((resolve) => setTimeout(resolve, millisecondsUntilQuestions));
-      if (destroyed) return;
-
-      questions = await get_questions();
-    } catch (err: any) {
-      pushError(err.message ?? err.toString());
-    }
-  });
-
   const set_solved = (slug: string) => {
     if (questions === undefined) return;
-
     questions[slug].solved = true;
   };
-
-  // FIXME
-  $: !(questions !== undefined) || selected_question.set(Object.values(questions).find((q) => q.num === 1)?.slug ?? "");
 
   enum ShowingPopout {
     None,

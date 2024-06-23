@@ -13,14 +13,8 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-  parse_scoreboard,
-  parse_times,
-  question_order,
-  type CompTimes,
-  type QuestionMeta,
-  type ScoreboardUser,
-} from "./utils";
+import type { SocketMessage } from "../../../src/live/socketData.ts";
+import { parse_scoreboard, question_order, type CompTimes, type QuestionMeta, type ScoreboardUser } from "./utils";
 
 export const BACKEND_SERVER: string = "";
 
@@ -108,11 +102,6 @@ const get_question_data = async (slug: string) => {
   });
 
   return data;
-};
-
-export const get_comp_times = async () => {
-  const times_string = await (await fetch(`${BACKEND_SERVER}/comp/clock`)).text();
-  return parse_times(times_string);
 };
 
 export const submit_solution = async (
