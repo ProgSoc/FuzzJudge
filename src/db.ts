@@ -129,8 +129,11 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return this.#db.queryEntries<User>("SELECT * FROM user WHERE id = ?", [id])[0];
   }
 
-  userTeam(id: number): Team {
-    return this.#db.queryEntries<Team>("SELECT * FROM team WHERE user = ?", [id])[0];
+  userTeam(id: number): Team | undefined {
+    const user: User | undefined = this.#db.queryEntries<User>("SELECT * FROM user WHERE id = ?", [id])[0];
+    if (!user) return undefined;
+    const team: Team | undefined = this.#db.queryEntries<Team>("SELECT * FROM team WHERE id = ?", [user.team])[0];
+    return team;
   }
 
   allUsers(): User[] {
