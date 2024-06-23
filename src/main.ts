@@ -85,8 +85,10 @@ if (import.meta.main) {
   const router = new Router({
     GET: (req) => {
       catchWebsocket(req, (socket) => {
-        const handler = live.subscribe(msg => socket.send(JSON.stringify(msg)));
-        socket.addEventListener("close", () => live.unsubscribe(handler));
+        socket.addEventListener("open", () => {
+          const handler = live.subscribe(msg => socket.send(JSON.stringify(msg)));
+          socket.addEventListener("close", () => live.unsubscribe(handler));
+        });
       });
       return HEADER;
     },
