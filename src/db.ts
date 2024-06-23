@@ -105,7 +105,8 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   }
 
   getOrSetDefaultMeta<T extends string | undefined>(
-    key: string, defaultValue?: T,
+    key: string,
+    defaultValue?: T,
   ): T extends undefined ? string | null : string {
     const value = this.#db.query<[string]>("SELECT val FROM comp WHERE key = ?", [key])[0]?.[0] ?? null;
     if (value === null && defaultValue !== undefined) {
@@ -121,7 +122,8 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
         INSERT INTO comp VALUES (:k, :v)
         ON CONFLICT DO UPDATE SET val = :v
       `,
-      { k: key, v: value });
+      { k: key, v: value },
+    );
     return value;
   }
 
@@ -141,7 +143,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   }
 
   createTeam(name: string): Team {
-    const seed = [...crypto.getRandomValues(new Uint8Array(8))].map(v => v.toString(16).padStart(2, "0")).join("");
+    const seed = [...crypto.getRandomValues(new Uint8Array(8))].map((v) => v.toString(16).padStart(2, "0")).join("");
     return this.#db.queryEntries<Team>(
       `
         INSERT INTO team VALUES (NULL, :seed, :name)
@@ -253,10 +255,15 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   }
 
   getSubmissionSkeletons(teamId: number, problemId: string): Omit<Submission, "out" | "code" | "vler" | "vlms">[] {
-    return this.#db.queryEntries<Submission>(
-      "SELECT id, team, prob, time, ok FROM subm WHERE team = ? AND prob = ?",
-      [teamId, problemId],
-    );
+    return this.#db
+      .queryEntries<Submission>("SELECT id, team, prob, time, ok FROM subm WHERE team = ? AND prob = ?", [
+        teamId,
+        problemId,
+      ])
+      .map((v) => {
+        v.time = new Date(v.time);
+        return v;
+      });
   }
 
   /** @deprecated */
