@@ -1,8 +1,4 @@
 export {
-  KATEX_CSS,
-  render as renderMarkdown,
-} from "https://deno.land/x/gfm@0.6.0/mod.ts";
-export {
   compress as compressZstd,
   decompress as decompressZstd,
   init as initZstd,

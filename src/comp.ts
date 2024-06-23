@@ -17,10 +17,10 @@
  */
 
 import { basename, dirname, pathJoin } from "./deps.ts";
-import { FuzzJudgeDocument } from "./util.ts";
+import { MarkdownDocument } from "./util.ts";
 
 export class FuzzJudgeProblem {
-  #doc: FuzzJudgeDocument;
+  #doc: MarkdownDocument;
   #configPath: string;
   #slug: string;
   #cmdFuzz: string;
@@ -31,19 +31,23 @@ export class FuzzJudgeProblem {
   #previousSubmissionTimes: Record<string, number> = {};
   #submissionCounts: Record<string, number> = {};
 
-  constructor(configPath: string, doc: FuzzJudgeDocument) {
+  static getSlug(configPath: string): string {
+    return basename(dirname(configPath));
+  }
+
+  constructor(slug: string, configPath: string, doc: MarkdownDocument) {
     this.#doc = doc;
     this.#configPath = configPath;
-    this.#slug = basename(dirname(configPath));
-    this.#cmdFuzz = Object(doc.config).fuzz?.exec?.[0] ?? pathJoin(configPath, "../fuzz");
-    this.#cmdJudge = Object(doc.config).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
-    this.#argsFuzz = Array.from(Object(doc.config).fuzz?.exec ?? [])
+    this.#slug = slug;
+    this.#cmdFuzz = Object(doc.front).fuzz?.exec?.[0] ?? pathJoin(configPath, "../fuzz");
+    this.#cmdJudge = Object(doc.front).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
+    this.#argsFuzz = Array.from(Object(doc.front).fuzz?.exec ?? [])
       .map(String)
       .slice(1);
-    this.#argsJudge = Array.from(Object(doc.config).judge?.exec ?? [])
+    this.#argsJudge = Array.from(Object(doc.front).judge?.exec ?? [])
       .map(String)
       .slice(1);
-    this.#envFuzz = Object(doc.config).fuzz?.env ?? {};
+    this.#envFuzz = Object(doc.front).fuzz?.env ?? {};
     for (const key in this.#envFuzz) this.#envFuzz[key] = String(this.#envFuzz[key]);
   }
 
@@ -51,7 +55,7 @@ export class FuzzJudgeProblem {
     return this.#slug;
   }
 
-  doc(): FuzzJudgeDocument {
+  doc(): MarkdownDocument {
     return this.#doc;
   }
 

@@ -61,7 +61,8 @@ if (import.meta.main) {
     maxDepth: 2,
   })) {
     try {
-      const problem = new FuzzJudgeProblem(ent.path, loadMarkdown(await Deno.readTextFile(ent.path)));
+      const slug = FuzzJudgeProblem.getSlug(ent.path);
+      const problem = new FuzzJudgeProblem(slug, ent.path, loadMarkdown(await Deno.readTextFile(ent.path), ent.path));
       problems[problem.slug()] = problem;
     } catch (e) {
       console.error(`Could not load "${ent.path}": ${e}`);
@@ -73,8 +74,8 @@ if (import.meta.main) {
 
   const clock = new CompetitionClock({
     db,
-    plannedStart: new Date(Object(compfile.config)?.times?.start || new Date().toJSON()),
-    plannedFinish: new Date(Object(compfile.config)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
+    plannedStart: new Date(Object(compfile.front)?.times?.start || new Date().toJSON()),
+    plannedFinish: new Date(Object(compfile.front)?.times?.start || new Date(Date.now() + 180 * 60 * 1000).toJSON()), // 3 hrs
   });
 
   const auth = new Auth({
@@ -202,14 +203,14 @@ if (import.meta.main) {
           "/icon": (_req, { id }) => problems[id!].doc().icon,
           "/name": (_req, { id }) => problems[id!].doc().title,
           "/brief": (_req, { id }) => problems[id!].doc().summary,
-          "/difficulty": (_req, { id }) => (problems[id!].doc().config as any)?.problem?.difficulty,
-          "/points": (_req, { id }) => (problems[id!].doc().config as any)?.problem?.points,
+          "/difficulty": (_req, { id }) => Object(problems[id!].doc().front)?.problem?.difficulty,
+          "/points": (_req, { id }) => Object(problems[id!].doc().front)?.problem?.points,
           "/solution": (_) => new Response("451 Unavailable For Legal Reasons", { status: 451 }),
           // Gated (by time and auth) utils ...
           "/instructions": async (req, { id }) => {
             // clock.protect();
             await auth.protect(req);
-            return problems[id!].doc().body;
+            return new Response(problems[id!].doc().body, { headers: { "Content-Type": "text/markdown" } });
           },
           "/fuzz": async (req, { id }) => {
             // clock.protect();
