@@ -30,8 +30,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       }
 
       return q.difficulty === includes;
-    })
-    .sort((a, b) => a.slug.localeCompare(b.slug));
+    });
 </script>
 
 {#if list.length > 0}

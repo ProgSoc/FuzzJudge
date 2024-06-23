@@ -85,6 +85,8 @@ if (import.meta.main) {
     problems,
   });
 
+  live.subscribe(console.log);
+
   const auth = new Auth({
     basic: async ({ username, password }) => {
       return await db.basicAuth({
@@ -230,7 +232,7 @@ if (import.meta.main) {
         },
       },
       "/prob": {
-        GET: () => [...new Map(problems[Symbol.iterator]()).keys()].join("\n"),
+        GET: () => problems.toJSON().map(v => v.slug + "\n").join(""),
         "/:id": {
           "/icon": (_req, { id }) => problems.get(id!)!.doc().icon,
           "/name": (_req, { id }) => problems.get(id!)!.doc().title,
@@ -247,7 +249,7 @@ if (import.meta.main) {
           "/fuzz": async (req, { id }) => {
             // clock.protect();
             const user = await auth.protect(req);
-            return await problems.get(id!)!.fuzz(db.userTeam(user.team).seed);
+            return await problems.get(id!)!.fuzz(db.userTeam(user.team)!.seed);
           },
           "/judge": {
             GET: async (req, { id: problemId }) => {
@@ -285,7 +287,7 @@ if (import.meta.main) {
               const t0 = performance.now();
               const { correct, errors } = await problems
                 .get(problemId!)!
-                .judge(db.userTeam(user.team).seed, submissionOutput);
+                .judge(db.userTeam(user.team)!.seed, submissionOutput);
               const t1 = performance.now();
 
               db.postSubmission({
