@@ -98,7 +98,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
       });
     }
     rankings.sort((a, b) => {
-      const pointsDelta = a.score.total.points - b.score.total.points;
+      const pointsDelta = b.score.total.points - a.score.total.points;
       const penaltyDelta = a.score.total.penalty - b.score.total.penalty;
       return pointsDelta || penaltyDelta;
     });
