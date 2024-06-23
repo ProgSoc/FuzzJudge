@@ -18,6 +18,7 @@
 
 import { FuzzJudgeProblem } from "./comp.ts";
 import { DB, compressZstd, decompressZstd } from "./deps.ts";
+import { Subscribable } from "./util.ts";
 
 export type Team = {
   id: number;
@@ -49,14 +50,12 @@ export type Submission = {
   vlms: number;
 };
 
-export type DBSubscriptionHandler = (db: CompetitionDB) => void | Promise<void>;
-
-export class CompetitionDB {
+export class CompetitionDB extends Subscribable<CompetitionDB> {
   #db: DB;
   #problems: Record<string, FuzzJudgeProblem>;
-  #subscribers: Set<DBSubscriptionHandler> = new Set();
 
   constructor(path: string, problems: Record<string, FuzzJudgeProblem>) {
+    super();
     this.#problems = problems;
     this.#db = new DB(path);
     this.#db.execute(`
@@ -86,6 +85,10 @@ export class CompetitionDB {
         vler BLOB,
         vlms REAL
       );
+      CREATE TABLE IF NOT EXISTS comp (
+        key  TEXT     PRIMARY KEY,
+        val  TEXT
+      );
     `);
   }
 
@@ -101,16 +104,25 @@ export class CompetitionDB {
     return new TextDecoder().decode(decompressZstd(input.buffer));
   }
 
-  #notify() {
-    for (const fn of this.#subscribers) fn(this);
+  getOrSetDefaultMeta<T extends string | undefined>(
+    key: string, defaultValue?: T,
+  ): T extends undefined ? string | null : string {
+    const value = this.#db.query<[string]>("SELECT val FROM comp WHERE key = ?", [key])[0]?.[0] ?? null;
+    if (value === null && defaultValue !== undefined) {
+      this.#db.query("INSERT INTO comp VALUES (?, ?)", [key, defaultValue]);
+      return defaultValue;
+    }
+    return value;
   }
 
-  subscribe(fn: DBSubscriptionHandler): void {
-    this.#subscribers.add(fn);
-  }
-
-  unsubscribe(fn: DBSubscriptionHandler): void {
-    this.#subscribers.delete(fn);
+  setMeta(key: string, value: string): string {
+    this.#db.query(
+      `
+        INSERT INTO comp VALUES (:k, :v)
+        ON CONFLICT DO UPDATE SET val = :v
+      `,
+      { k: key, v: value });
+    return value;
   }
 
   user(id: number): User | undefined {
@@ -214,7 +226,7 @@ export class CompetitionDB {
         vler: this.#encStr(params.vler),
       },
     )[0][0];
-    this.#notify();
+    this.notify(this);
     return id;
   }
 

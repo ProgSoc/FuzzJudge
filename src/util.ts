@@ -75,3 +75,21 @@ export function undent(text: string): string {
 export function indent(pre: string, text: string): string {
   return text.replaceAll(/^/gm, pre);
 }
+
+export type SubscriptionHandler<T> = (ctx: T) => void | Promise<void>;
+
+export class Subscribable<T> {
+  #subscribers: Set<SubscriptionHandler<T>> = new Set();
+
+  subscribe(fn: SubscriptionHandler<T>) {
+    this.#subscribers.add(fn);
+  }
+
+  unsubscribe(fn: SubscriptionHandler<T>) {
+    this.#subscribers.delete(fn);
+  }
+
+  notify(ctx: T) {
+    for (const handler of this.#subscribers) handler(ctx);
+  }
+}
