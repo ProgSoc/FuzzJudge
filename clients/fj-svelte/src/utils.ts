@@ -13,6 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { onDestroy } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
 export const selected_question: Writable<string> = writable("");
@@ -122,6 +123,98 @@ export enum CompState {
   FINISHED,
 }
 
+export type TimeStateData = {
+  times: CompTimes;
+  phase: CompState;
+  nextPhase: CompState;
+  secondsUntilNextPhase: number;
+  nextPhaseStart: Date;
+
+  questionsVisible: boolean;
+
+  secondsUntilScoreboardFreeze: number;
+  secondsUntilCompetitionEnd: number;
+  secondsUntilCompetitionStart: number;
+  scoreboardFreezeTimeSeconds: number;
+};
+
+function currentCompState(times: CompTimes, now: Date) {
+  if (now < times.start) {
+    return CompState.BEFORE;
+  } else if (now < times.freeze) {
+    return CompState.LIVE_WITH_SCORES;
+  } else if (now < times.stop) {
+    return CompState.LIVE_WITHOUT_SCORES;
+  } else {
+    return CompState.FINISHED;
+  }
+}
+
+function nextPhaseFromPhase(phase: CompState): CompState {
+  switch (phase) {
+    case CompState.BEFORE:
+      return CompState.LIVE_WITH_SCORES;
+    case CompState.LIVE_WITH_SCORES:
+      return CompState.LIVE_WITHOUT_SCORES;
+    case CompState.LIVE_WITHOUT_SCORES:
+      return CompState.FINISHED;
+    case CompState.FINISHED:
+      return CompState.BEFORE;
+    default:
+      unreachable(phase);
+  }
+}
+
+function phaseEndTime(times: CompTimes, phase: CompState): Date {
+  switch (phase) {
+    case CompState.BEFORE:
+      return times.start;
+    case CompState.LIVE_WITH_SCORES:
+      return times.freeze;
+    case CompState.LIVE_WITHOUT_SCORES:
+      return times.stop;
+    case CompState.FINISHED:
+      return times.stop;
+    default:
+      unreachable(phase);
+  }
+}
+
+export function getCurrentTimeStateData(times: CompTimes): TimeStateData {
+  function msToS(ms: number) {
+    return Math.floor(Math.max(0, ms) / 1000);
+  }
+
+  const now = new Date(Date.now());
+  const phase = currentCompState(times, now);
+  const nextPhase = nextPhaseFromPhase(phase);
+  const nextPhaseStart = phaseEndTime(times, nextPhase);
+  const secondsUntilNextPhase = msToS(nextPhaseStart.getTime() - now.getTime());
+
+  const secondsUntilScoreboardFreeze = msToS(times.freeze.getTime() - now.getTime());
+  const secondsUntilCompetitionEnd = msToS(times.stop.getTime() - now.getTime());
+  const secondsUntilCompetitionStart = msToS(times.start.getTime() - now.getTime());
+  const scoreboardFreezeTimeSeconds = msToS(times.stop.getTime() - Math.max(times.freeze.getTime(), now.getTime()));
+
+  const questionsVisiblePhases = [CompState.LIVE_WITH_SCORES, CompState.LIVE_WITHOUT_SCORES];
+  const questionsVisible = questionsVisiblePhases.includes(phase);
+
+  return {
+    times,
+    phase,
+    nextPhase,
+    secondsUntilNextPhase,
+    nextPhaseStart,
+
+    questionsVisible,
+
+    secondsUntilScoreboardFreeze,
+    secondsUntilCompetitionEnd,
+    secondsUntilCompetitionStart,
+    scoreboardFreezeTimeSeconds,
+  };
+}
+
 export const get_current_comp_state = (times: CompTimes) => {
   const now = new Date(Date.now());
   if (now < times.start) {
@@ -135,6 +228,21 @@ export const get_current_comp_state = (times: CompTimes) => {
   }
 };
 
+export const getFollowingCompState = (state: CompState) => {
+  switch (state) {
+    case CompState.BEFORE:
+      return CompState.LIVE_WITH_SCORES;
+    case CompState.LIVE_WITH_SCORES:
+      return CompState.LIVE_WITHOUT_SCORES;
+    case CompState.LIVE_WITHOUT_SCORES:
+      return CompState.FINISHED;
+    case CompState.FINISHED:
+      return CompState.BEFORE;
+    default:
+      unreachable(state);
+  }
+};
+
 export const get_state_start_time = (times: CompTimes, state: CompState): Date => {
   switch (state) {
     case CompState.LIVE_WITH_SCORES:
@@ -144,6 +252,24 @@ export const get_state_start_time = (times: CompTimes, state: CompState): Date =
       return times.freeze;
     case CompState.FINISHED:
       return times.stop;
+    default:
+      unreachable(state);
+  }
+};
+
+export const getStateEndTime = (times: CompTimes, state: CompState): Date => {
+  switch (state) {
+    case CompState.BEFORE:
+      return times.start;
+    case CompState.LIVE_WITH_SCORES:
+      return times.freeze;
+    case CompState.LIVE_WITHOUT_SCORES:
+      return times.stop;
+    case CompState.FINISHED:
+      // This function shouldn't be called in this context anyway, but this might help prevent negative countdowns later
+      return new Date(Date.now());
+    default:
+      unreachable(state);
   }
 };
 
@@ -156,11 +282,20 @@ export const get_time_till_next_state = (times: CompTimes | undefined, current: 
   return get_state_start_time(times, current + 1).getTime() - new Date().getTime();
 };
 
-export const showing_questions_at_current_time = (times: CompTimes): boolean => {
-  const state = get_current_comp_state(times);
-  return state === CompState.LIVE_WITH_SCORES || state === CompState.LIVE_WITHOUT_SCORES;
-};
-
 export function unreachable(x: never): never {
   throw new Error(`Unreachable code reached: ${x}`);
+}
+
+export function runRepeatedly(callback: () => void) {
+  let animFrameRef: number;
+  function update() {
+    requestAnimationFrame(update);
+    callback();
+  }
+
+  update();
+
+  onDestroy(() => {
+    cancelAnimationFrame(animFrameRef);
+  });
 }
