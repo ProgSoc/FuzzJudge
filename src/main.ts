@@ -82,6 +82,7 @@ if (import.meta.main) {
 
   const socketService = makeSocketService({
     clock,
+    problems,
   });
 
   const auth = new Auth({
@@ -104,7 +105,7 @@ if (import.meta.main) {
           socket.addEventListener("close", unsubscribe);
         });
       });
-      return HEADER
+      return HEADER;
     },
     BREW: (_) => new Response("418 I'm a Teapot", { status: 418 }),
     "/auth": async (req) => {

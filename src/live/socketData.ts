@@ -1,15 +1,20 @@
 import { CompetitionClock } from "../clock.ts";
+import { FuzzJudgeProblem } from "../comp.ts";
 import { ListenerGroup, makeListenerGroup } from "./notificationService.ts";
+import { makeCallDeduper } from "./utils.ts";
 
 type SocketInitArgs = {
   clock: CompetitionClock;
+  problems: Record<string, FuzzJudgeProblem>;
 };
 
 function makeSocketListenerGroups(args: SocketInitArgs) {
   return {
     clock: makeListenerGroup(() => args.clock.now()),
     scoreboard: makeListenerGroup(() => null),
-    questions: makeListenerGroup(() => null),
+
+    // TODO: later
+    // questions: makeListenerGroup<Record<string, FuzzJudgeProblem> | null>(() => null),
   };
 }
 
@@ -26,16 +31,43 @@ export type SocketMessage = {
 }[SocketMessageKind];
 
 // deno-lint-ignore no-explicit-any
-type MessageValueFromType<T extends SocketMessageVariant<string, any>, K extends SocketMessageKind> = T extends SocketMessageVariant<K, infer V> ? V : never;
+type MessageValueFromType<
+  T extends SocketMessageVariant<string, any>,
+  K extends SocketMessageKind,
+> = T extends SocketMessageVariant<K, infer V> ? V : never;
 export type MessageValue<K extends SocketMessageKind> = MessageValueFromType<SocketMessage, K>;
 
 export function makeSocketService(args: SocketInitArgs) {
   const listenerGroups = makeSocketListenerGroups(args);
 
-  // Subscribe to clock
-  args.clock.subscribe((clock) => {
+  const competitionStartDeduper = makeCallDeduper();
+
+  // TODO: later
+  // let questionsVisible = false;
+  // function updateQuestions(clock: CompetitionClock) {
+  //   const times = clock.now();
+  //   const msUntilStart = Math.floor(Math.max(0, times.start.getTime() - Date.now()));
+
+  //   // If the time was moved forwards, reset the question visibility to null
+  //   if (msUntilStart > 0 && questionsVisible) {
+  //     listenerGroups.questions.notify(null);
+  //     questionsVisible = false;
+  //   }
+
+  //   // Queue question visibility to show once the competition is started
+  //   competitionStartDeduper.tryRun(msUntilStart, () => {
+  //     listenerGroups.questions.notify(args.problems);
+  //     questionsVisible = true;
+  //   });
+  // }
+
+  // Subscribe to clock and question updates
+  args.clock.subscribe(async (clock) => {
     listenerGroups.clock.notify(clock.now());
+    // updateQuestions(clock);
   });
+
+  // updateQuestions(args.clock);
 
   const listeners = new Set<(msg: SocketMessage) => void>();
   const subscribe = (listener: (msg: SocketMessage) => void) => {
