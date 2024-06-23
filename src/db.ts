@@ -211,7 +211,7 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   score(params: { team: number }): number {
     let total = 0;
     for (const id of this.solvedSet(params)) {
-      total += Object(this.#problems[id].doc().config).problem.points ?? 0;
+      total += Object(this.#problems[id].doc().front)?.problem?.points ?? 0;
     }
     return total;
   }

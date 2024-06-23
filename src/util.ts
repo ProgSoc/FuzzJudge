@@ -16,15 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { KATEX_CSS, TOML, YAML, normalize, renderMarkdown } from "./deps.ts";
+import { TOML, YAML, normalize } from "./deps.ts";
 
-export interface FuzzJudgeDocument {
-  config?: unknown;
+export interface MarkdownDocument {
+  front?: unknown;
   title?: string;
-  summary?: string;
   icon?: string;
-  publicAssets: Set<string>;
+  summary?: string;
   body: string;
+  publicAssets: Set<string>;
 }
 
 export function frontMatter(
@@ -34,35 +34,40 @@ export function frontMatter(
     toml: TOML.parse,
     yaml: YAML.parse,
   },
-): [unknown, string] {
-  const [_all, _delim, format, front] = text.match(/^(`{3,})(\w*)\n(.*?)(?<=\n)\1(\n|$)/s) ?? [];
-  if (_all === undefined) return [undefined, text];
-  return [parsers[format]?.(front), text.slice(_all.length)];
+): { front?: unknown, body: string } {
+  const [_all, _delim, format, front] = text.match(/^(`{3,})([^ ]*)\n(.*?)(?<=\n)\1(\n|$)/s) ?? [];
+  if (_all === undefined) return { body: text };
+  return { front: parsers[format]?.(front), body: text.slice(_all.length) };
 }
 
-export function loadMarkdown(fileText: string): FuzzJudgeDocument {
-  const [config, markdown] = frontMatter(fileText);
-  let html = renderMarkdown(markdown, {
-    allowMath: true,
-  });
-  if (html.includes("katex")) {
-    html = `<style>\n${indent("    ", KATEX_CSS)}\n</style>\n${html}`;
-  }
-  const titleRaw = html.match(/<h1.*>(.*?)<\/h1>/)?.[1].replaceAll(/<.*>/g, "");
-  const icon = titleRaw?.match(/\p{RGI_Emoji}/v)?.[0];
-  const title = (icon !== undefined ? titleRaw?.replace(icon!, "") : titleRaw)?.trim();
-  const summary = html.match(/<p.*>(.*?)<\/p>/)?.[1].replaceAll(/<.*>/g, "");
+export function loadMarkdown(text: string, linkPrefix = ""): MarkdownDocument {
+  const { front, body } = frontMatter(text);
+  const [titleMatch, titleHead, icon, titleTail] = body.match(/^# (.*)(\p{RGI_Emoji})?(.*)\n?/) ?? [];
+  const title = (titleHead + titleTail).trim().replaceAll(/\s{+}/, " ");
+  const summary = body.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
   const publicAssets = new Set<string>();
-  for (const [_, link] of markdown.matchAll(/!?\[.*?\]\(([^:]+?)\)/g)) {
-    publicAssets.add(normalize("/" + link));
-  }
+  let outputBody = body.replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
+    if (link.startsWith("//") || /^\w+:/.test(link)) {
+      return match;
+    }
+    else if (linkPrefix !== "") {
+      const newLink = linkPrefix + normalize("/" + link);
+      publicAssets.add(newLink);
+      return match.replace(link, newLink);
+    }
+    else {
+      publicAssets.add(link);
+      return match;
+    }
+  }).trim();
+  if (outputBody.length > 0) outputBody += "\n";
   return {
-    config,
+    front,
     title,
     summary,
     icon,
     publicAssets,
-    body: title === undefined ? html : html.replace(/<h1.*>(.*?)<\/h1>/, ""),
+    body: titleMatch === undefined ? outputBody : outputBody.replace(titleMatch, ""),
   };
 }
 
