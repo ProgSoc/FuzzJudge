@@ -22,13 +22,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 {#if timeStateData.phase === CompState.BEFORE}
   <span>Competition starts in {secondsToString(timeStateData.secondsUntilCompetitionStart)}</span>
-{:else if timeStateData.phase === CompState.LIVE_WITH_SCORES}
+{:else if timeStateData.phase === CompState.LIVE_UNFROZEN}
   <span>
     Competition ends in {secondsToString(timeStateData.secondsUntilCompetitionEnd)}. The scoreboard will freeze at {dateToTimeString(
-      timeStateData.times.freeze,
+      timeStateData.times.hold ?? timeStateData.times.finish,
     )}
   </span>
-{:else if timeStateData.phase === CompState.LIVE_WITHOUT_SCORES}
+{:else if timeStateData.phase === CompState.LIVE_FROZEN || timeStateData.phase === CompState.LIVE_UNFROZEN_NO_FREEZE}
   <span>
     Competition ends in {secondsToString(timeStateData.secondsUntilCompetitionEnd)}.
   </span>

@@ -25,6 +25,10 @@ export type SocketMessage = {
   [K in SocketMessageKind]: SocketChannels[K] extends ListenerGroup<infer T> ? SocketMessageVariant<K, T> : never;
 }[SocketMessageKind];
 
+// deno-lint-ignore no-explicit-any
+type MessageValueFromType<T extends SocketMessageVariant<string, any>, K extends SocketMessageKind> = T extends SocketMessageVariant<K, infer V> ? V : never;
+export type MessageValue<K extends SocketMessageKind> = MessageValueFromType<SocketMessage, K>;
+
 export function makeSocketService(args: SocketInitArgs) {
   const listenerGroups = makeSocketListenerGroups(args);
 
