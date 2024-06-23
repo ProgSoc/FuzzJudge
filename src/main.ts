@@ -106,7 +106,33 @@ if (import.meta.main) {
       const user = await auth.protect(req);
       return new Response(user.logn);
     },
+    "/void": (_req) => {
+      return auth.reject();
+    },
+    "/admin": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        // console.log([...Deno.readDirSync(import.meta.resolve("/"))]);
+        return new Response(
+          await Deno.readFile(new URL(import.meta.resolve("./admin.html"))),
+          { headers: { "Content-Type": "text/html" } },
+        );
+      },
+    },
+    "/team": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        return new Response(JSON.stringify(db.allTeams()));
+      },
+    },
     "/user": {
+      GET: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        return new Response(JSON.stringify(db.allUsers()));
+      },
       PUT: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();

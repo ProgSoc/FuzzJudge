@@ -90,7 +90,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
       return JSON.parse(this.#db.getOrSetDefaultMeta("/comp/scoreboard.frozen")!);
     }
     const rankings = [];
-    for (const team of this.#db.teams()) {
+    for (const team of this.#db.allTeams()) {
       rankings.push({
         rank: 0,
         name: team.name,

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+</head>
+<body>
+  <h1>FuzzJudge Admin Panel</h1>
+  <h2>Users</h2>
+  <pre><output id="users"></output></pre>
+  <h2>Teams</h2>
+  <pre><output id="teams"></output></pre>
+  <hr/>
+  <form action="javascript:void(0)">
+    <button onclick=""></button>
+  </form>
+  <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+      for (const user of (await fetch("/user").then(r => r.json()))) {
+        users.insertAdjacentText(
+          "beforeend",
+          JSON.stringify({ logn: user.logn, name: user.name, team: user.team, role: user.role }),
+        );
+      }
+      for (const team of (await fetch("/team").then(r => r.json()))) {
+        teams.insertAdjacentText(
+          "beforeend",
+          JSON.stringify({ name: team.name, seed: team.seed }),
+        );
+      }
+    });
+  </script>
+</body>
+</html>
