@@ -185,10 +185,7 @@ if (import.meta.main) {
         GET: req => {
           catchWebsocket(req, socket => {
             const handler: SubscriptionHandler<CompetitionClock> = (clock) => {
-              socket.send(new Blob(
-                [JSON.stringify(clock.now())],
-                { type: "application/json" },
-              ));
+              socket.send(JSON.stringify(clock.now()));
             };
             socket.addEventListener("open", () => clock.subscribe(handler));
             socket.addEventListener("close", () => clock.unsubscribe(handler));
