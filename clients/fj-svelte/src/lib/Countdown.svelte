@@ -1,12 +1,12 @@
-<!-- 
+<!--
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by the
 Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 for more details.
 
 You should have received a copy of the GNU Lesser General Public License along
@@ -15,11 +15,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import {
-    get_state_start_time,
-    type CompState,
-    type CompTimes,
-  } from "../utils";
+  import { get_state_start_time, type CompState, type CompTimes } from "../utils";
 
   export let comp_times: CompTimes;
   export let until_state: CompState;
@@ -35,9 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   (function update() {
     anim_frame_ref = requestAnimationFrame(update);
     const now = new Date(Date.now());
-    const seconds_till: number = Math.floor(
-      (start_time.getTime() - now.getTime()) / 1000,
-    );
+    const seconds_till: number = Math.floor((start_time.getTime() - now.getTime()) / 1000);
 
     time_left_bin = seconds_till.toString(2).padStart(10, "0");
 

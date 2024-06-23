@@ -1,12 +1,12 @@
-<!-- 
+<!--
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by the
 Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 for more details.
 
 You should have received a copy of the GNU Lesser General Public License along
@@ -24,17 +24,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </script>
 
 {#if question !== undefined}
-  <div
-    class={`option ${$selected_question === question?.slug ? "selected" : ""}`}
-    on:click={select}
-  >
+  <div class={`option ${$selected_question === question?.slug ? "selected" : ""}`} on:click={select}>
     <div class="icon">
       {question?.icon}
     </div>
     <div class="name">
-      <span style={question?.solved ? "text-decoration: line-through;" : ""}
-        >{question.num}. {question.name}</span
-      >
+      <span style={question?.solved ? "text-decoration: line-through;" : ""}>{question.num}. {question.name}</span>
       <br />
       <!-- <span class="subtext">{$q_.brief}</span> -->
       <span class="subtext">{question?.points} points</span>

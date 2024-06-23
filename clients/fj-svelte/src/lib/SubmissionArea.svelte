@@ -1,12 +1,12 @@
-<!-- 
+<!--
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by the
 Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 for more details.
 
 You should have received a copy of the GNU Lesser General Public License along
@@ -28,8 +28,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let source_value = "";
 
   selected_question.subscribe((_) => {
-      submission_value = "";
-      source_value = "";
+    submission_value = "";
+    source_value = "";
   });
 
   const submit = (slug: string) => {
@@ -39,19 +39,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
     waiting_on_server = true;
 
-    submit_solution(slug, submission_value, source_value).then(
-      ({ correct, message }) => {
-        waiting_on_server = false;
+    submit_solution(slug, submission_value, source_value).then(({ correct, message }) => {
+      waiting_on_server = false;
 
-        if (slug === $selected_question) {
-          error_message.set(message);
-        }
+      if (slug === $selected_question) {
+        error_message.set(message);
+      }
 
-        if (correct && set_solved !== undefined) {
-          set_solved(slug);
-        }
-      },
-    );
+      if (correct && set_solved !== undefined) {
+        set_solved(slug);
+      }
+    });
   };
 </script>
 
@@ -59,9 +57,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="section">
     <div class="text-area-buttons">
       <span class="get-input">
-        To begin, <span
-          class="input-span"
-          on:click={() => open_fuzz($selected_question)}
+        To begin, <span class="input-span" on:click={() => open_fuzz($selected_question)}
           >grab your question input!
         </span></span
       >
@@ -73,10 +69,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       </div>
       <div class="source-submission">
         <h2>Solution source</h2>
-        <p>
-          Please include any of the source code used to solve the problem. This
-          may be manually reviewed later.
-        </p>
+        <p>Please include any of the source code used to solve the problem. This may be manually reviewed later.</p>
         <textarea bind:value={source_value} />
       </div>
     </div>

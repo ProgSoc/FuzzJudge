@@ -1,2 +1,5 @@
 .sl
 .vscode
+
+clients/fj-svelte/node_modules
+clients/fj-svelte/dist

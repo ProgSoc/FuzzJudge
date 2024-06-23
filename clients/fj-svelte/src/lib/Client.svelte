@@ -115,10 +115,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 
   // FIXME
-  $: !(questions !== undefined) ||
-    selected_question.set(
-      Object.values(questions).find((q) => q.num === 1)?.slug ?? "",
-    );
+  $: !(questions !== undefined) || selected_question.set(Object.values(questions).find((q) => q.num === 1)?.slug ?? "");
 
   enum ShowingPopout {
     None,
@@ -132,20 +129,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="layout">
   <div class="top-bar">
     <div>
-      <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}
-        >Comp Info</button
-      >
-      <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}
-        >Scoreboard</button
-      >
+      <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}>Comp Info</button>
+      <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}>Scoreboard</button>
       {#if comp_times !== undefined && (current_state === CompState.LIVE_WITH_SCORES || current_state === CompState.LIVE_WITHOUT_SCORES)}
-        <span
-          >Remaining: <Countdown
-            {comp_times}
-            until_state={CompState.FINISHED}
-            show_binary={false}
-          /></span
-        >
+        <span>Remaining: <Countdown {comp_times} until_state={CompState.FINISHED} show_binary={false} /></span>
       {/if}
     </div>
     <div>
@@ -159,10 +146,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <!-- main content -->
   {#if comp_times === undefined || showing_questions_at_current_time(comp_times)}
     {#if questions !== undefined}
-      <QuestionContents
-        question_data={questions[$selected_question]}
-        {set_solved}
-      />
+      <QuestionContents question_data={questions[$selected_question]} {set_solved} />
     {:else if loading_errors.length > 0}
       <div class="loading">
         Error loading questions:<br />
@@ -187,17 +171,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   {/if}
 </div>
 
-<Popout
-  shown={showing_popout === ShowingPopout.Scoreboard}
-  close={() => (showing_popout = ShowingPopout.None)}
->
+<Popout shown={showing_popout === ShowingPopout.Scoreboard} close={() => (showing_popout = ShowingPopout.None)}>
   <Scoreboard {questions} />
 </Popout>
 
-<Popout
-  shown={showing_popout === ShowingPopout.CompInfo}
-  close={() => (showing_popout = ShowingPopout.None)}
->
+<Popout shown={showing_popout === ShowingPopout.CompInfo} close={() => (showing_popout = ShowingPopout.None)}>
   <CompInfo />
 </Popout>
 
