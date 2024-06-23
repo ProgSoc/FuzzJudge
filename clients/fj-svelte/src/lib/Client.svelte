@@ -56,8 +56,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
   liveState.listenQuestions(async (qs) => {
     questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
-
     solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
+    if ($selected_question === "" && questions) {
+      selected_question.set(Object.keys(questions)[0] ?? "");
+    }
   });
   liveState.listenScoreboard((sb) => {
     scoreboard = sb;
