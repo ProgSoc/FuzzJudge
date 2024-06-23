@@ -46,7 +46,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
   #frozen: boolean;
 
   constructor(opts: { db: CompetitionDB, clock: CompetitionClock, problems: Record<string, FuzzJudgeProblem> }) {
-    super(() => this.notify(this.fullScoreboard()));
+    super(() => this.fullScoreboard());
     this.#db = opts.db;
     this.#clock = opts.clock;
     this.#problems = opts.problems;
