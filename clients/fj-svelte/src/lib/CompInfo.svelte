@@ -17,6 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { get_comp_info } from "../api";
   import Loading from "./Loading.svelte";
 
+  import SvelteMarkdown from "svelte-markdown";
+
   let title: string | undefined = undefined;
   let instructions = "";
 
@@ -30,5 +32,5 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Loading />
 {:else}
   <h1 style="margin-top: -0.2rem;">{title}</h1>
-  {@html instructions}
+  <SvelteMarkdown source={instructions} />
 {/if}
