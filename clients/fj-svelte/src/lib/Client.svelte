@@ -108,7 +108,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <!-- main content -->
   {#if timeStateData === undefined}
     <Loading />
-  {:else if timeStateData.questionsVisible}
+  {:else if timeStateData.questionsVisible && $selected_question !== ''}
     {#if questions === undefined}
       <Loading />
     {:else}
