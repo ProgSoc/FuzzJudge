@@ -64,6 +64,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    min-width: 50vw;
+  }
+
+  .popout-fullscreen {
+    position: fixed;
+    overflow: auto;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-prim);
+    color: var(--text-prim);
+    box-shadow: 0 0 50px 15px #000;
+    inset: 0px;
   }
 
   .popout-fullscreen {
