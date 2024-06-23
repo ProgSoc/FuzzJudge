@@ -51,8 +51,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
   let solvedQuestions = new Set<string>();
 
-  const competitionStartDeduper = makeCallDeduper();
-
   let liveState = initLiveState();
   liveState.listenClock((clock) => {
     compTimes = clock;
@@ -77,6 +75,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   const setSolved = (slug: string) => {
     solvedQuestions.add(slug);
+    solvedQuestions = solvedQuestions;
   };
 
   enum ShowingPopout {
@@ -99,7 +98,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
     <div>
       Logged in as <b>{username}</b>
-      <a href="/auth" title="Enter empty credentials">Logout</a>
+      <a href="/void" title="Enter empty credentials">Logout</a>
     </div>
   </div>
 

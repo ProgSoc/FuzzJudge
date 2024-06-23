@@ -42,6 +42,7 @@ export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
     super(() => this.now());
     this.#db = opts.db;
     this.#start = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/start", opts.plannedStart.toJSON()));
+    if (opts.plannedFinish < opts.plannedStart) opts.plannedFinish = opts.plannedStart;
     this.#finish = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/finish", opts.plannedFinish.toJSON()));
     this.#hold = null;
   }
