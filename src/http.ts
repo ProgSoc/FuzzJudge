@@ -18,7 +18,7 @@
 
 export type Handler = (
   req: Request,
-  data: Record<string | number, string | undefined>,
+  data: Record<string, string>,
 ) => Response | BodyInit | undefined | Promise<Response | BodyInit | undefined>;
 
 export interface Route {
@@ -77,7 +77,7 @@ export class Router {
       if (result !== undefined) {
         const responseOrBodyInit = await (methods?.[req.method.toUpperCase() as Uppercase<string>] ?? handler)?.(
           req,
-          result.groups,
+          result.groups as Record<string, string>,
         );
         const foundMethod = methods?.[req.method.toUpperCase() as Uppercase<string>] !== undefined;
         if (responseOrBodyInit instanceof Response) {

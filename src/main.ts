@@ -39,7 +39,7 @@ Backend
 
 */
 
-import { loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
+import { deleteFalsey, loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
 import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
 import { accepts, pathJoin, serveFile, normalize, initZstd } from "./deps.ts";
 import { Auth } from "./auth.ts";
@@ -77,15 +77,11 @@ if (import.meta.main) {
 
   const scoreboard = new CompetitionScoreboard({ db, clock, problems });
 
-  clock.adjustStart(new Date(), { keepDuration: true });
-
   const live = new SubscriptionGroup({
     clock,
     scoreboard,
     problems,
   });
-
-  live.subscribe(console.log);
 
   const auth = new Auth({
     basic: async ({ username, password }) => {
@@ -118,7 +114,6 @@ if (import.meta.main) {
       GET: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();
-        // console.log([...Deno.readDirSync(import.meta.resolve("/"))]);
         return new Response(
           await Deno.readFile(new URL(import.meta.resolve("./admin.html"))),
           { headers: { "Content-Type": "text/html" } },
@@ -131,18 +126,34 @@ if (import.meta.main) {
         if (role !== "admin") auth.reject();
         return new Response(JSON.stringify(db.allTeams()));
       },
-      PUT: async (req) => {
+      POST: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();
-        db.createTeam(await req.text());
-        return new Response("201 Created\n", { status: 201 });
+        const team = db.createTeam(deleteFalsey(Object.fromEntries(await req.formData())) as any);
+        return new Response(
+          JSON.stringify(team),
+          {
+            status: 201,
+            headers: {
+              "Content-Type": "application/json",
+              "Location": `${req.url}/${team.id}`,
+            },
+          },
+        );
       },
-      PATCH: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        const [user, team] = (await req.text()).split(",").map(Number);
-        db.assignUserTeam(user, team);
-        return new Response(null, { status: 204 });
+      "/:id": {
+        PATCH: async (req, { id }) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          db.patchTeam(parseInt(id), deleteFalsey(Object.fromEntries(await req.formData())) as any);
+          return new Response(null, { status: 204 });
+        },
+        DELETE: async (req, { id }) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          db.deleteTeam(parseInt(id));
+          return new Response(null, { status: 204 });
+        },
       },
     },
     "/user": {
@@ -151,59 +162,38 @@ if (import.meta.main) {
         if (role !== "admin") auth.reject();
         return new Response(JSON.stringify(db.allUsers()));
       },
-      PUT: async (req) => {
+      POST: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();
-        const { role: newUserRole, logn: newUserLogn } = await expectForm(req, { logn: null, role: null });
-        if (!["admin", "competitor"].includes(newUserRole))
-          throw new Response("400 Bad Request\n\nExpected 'role' to be one of 'admin', or 'competitor'.\n", {
-            status: 400,
-          });
-        db.resetUser({ logn: newUserLogn, role: newUserRole as UserRoles });
-        return new Response("201 Created\n", { status: 201 });
+        const user = db.resetUser(deleteFalsey(Object.fromEntries(await req.formData())) as any);
+        return new Response(
+          JSON.stringify(user),
+          {
+            status: 201,
+            headers: {
+              "Content-Type": "application/json",
+              "Location": `${req.url}/${user.id}`,
+            },
+          },
+        );
       },
-      PATCH: async (req) => {
-        const requester = await auth.protect(req);
-        expectMime(req, "application/x-www-form-urlencoded");
-        const form = new URLSearchParams(await req.text());
-        const targetLogn = new URL(req.url).searchParams.get("logn");
-        if (targetLogn === null) return new Response("400 Bad Request\n\nInvalid search logn.\n", { status: 400 });
-        const toUpdate: Record<string, string | number> = {};
-        let passedChecks = false;
-        if (requester.role === "admin" || targetLogn === requester.logn) {
-          const name = form.get("name") || null;
-          if (name) toUpdate["name"] = name;
-          passedChecks = true;
-        }
-        if (requester.role === "admin") {
-          const logn = form.get("logn") || null;
-          const role = form.get("role") || null;
-          if (logn) toUpdate["logn"] = logn;
-          if (role) toUpdate["role"] = role;
-          passedChecks = true;
-        }
-        if (!passedChecks) auth.reject();
-        try {
-          if (Object.keys(toUpdate).length === 0) {
-            return new Response("400 Bad Request\n\nNothing specified to update.\n", { status: 400 });
-          }
-          db.updateUser(targetLogn, toUpdate);
+      "/:id": {
+        PATCH: async (req, { id }) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          db.patchUser(parseInt(id), deleteFalsey(Object.fromEntries(await req.formData())) as any);
           return new Response(null, { status: 204 });
-        } catch {
-          return new Response("409 Conflict\n\nLogin already exists.\n", { status: 409 });
-        }
-      },
-      DELETE: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        expectMime(req, "application/x-www-form-urlencoded");
-        const targetLogn = new URL(req.url).searchParams.get("logn");
-        if (targetLogn === null) return new Response("400 Bad Request\n\nInvalid search logn.\n", { status: 400 });
-        db.deleteUser({ logn: targetLogn });
-        return new Response(null, { status: 204 });
+        },
+        DELETE: async (req, { id }) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          db.deleteUser(parseInt(id));
+          return new Response(null, { status: 204 });
+        },
       },
     },
-    "/client/*": (req, { 0: path }) => {
+    "/client/*": async (req, { 0: path }) => {
+      await auth.protect(req);
       if (!path || path === "") {
         path = "index.html";
       } else if (path.endsWith("/")) {
@@ -212,6 +202,51 @@ if (import.meta.main) {
       return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
     },
     "/comp": {
+      "/meta": {
+        GET: async (req) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          return new Response(JSON.stringify(db.allMeta()), { headers: { "Content-Type": "application/json" } });
+        },
+      },
+      "/submissions": {
+        GET: async (req) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          const params = new URL(req.url).searchParams;
+          return new Response(
+            JSON.stringify(db.getSubmissionSkeletons(parseInt(params.get("team")!), params.get("slug")!)),
+            { headers: { "Content-Type": "application/json" } },
+          );
+        },
+      },
+      "/submission": {
+        GET: async (req) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          const params = new URL(req.url).searchParams;
+          switch (params.get("kind")) {
+            case "out": {
+              return new Response(
+                JSON.stringify(db.getSubmissionOut(parseInt(params.get("subm")!))),
+                { headers: { "Content-Type": "application/json" } },
+              );
+            }
+            case "code": {
+              return new Response(
+                JSON.stringify(db.getSubmissionCode(parseInt(params.get("subm")!))),
+                { headers: { "Content-Type": "application/json" } },
+              );
+            }
+            case "vler": {
+              return new Response(
+                JSON.stringify(db.getSubmissionVler(parseInt(params.get("subm")!))),
+                { headers: { "Content-Type": "application/json" } },
+              );
+            }
+          }
+        },
+      },
       "/name": () => compfile.title ?? "FuzzJudge Competition",
       "/brief": () => compfile.summary ?? "",
       "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
@@ -228,7 +263,19 @@ if (import.meta.main) {
             const handler = clock.subscribe((msg) => socket.send(JSON.stringify(msg)));
             socket.addEventListener("close", () => clock.unsubscribe(handler));
           });
-          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "text/json" } });
+          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "application/json" } });
+        },
+        PATCH: async (req) => {
+          const { role } = await auth.protect(req);
+          if (role !== "admin") auth.reject();
+          const { kind, time, keep } = deleteFalsey(Object.fromEntries(await req.formData()));
+          console.log({ kind, time, keep });
+          if (kind === "start") {
+            clock.adjustStart(new Date(time as string), { keepDuration: !!keep });
+          } else {
+            clock.adjustFinish(new Date(time as string));
+          }
+          return new Response(null, { status: 204 });
         },
       },
       "/prob": {
