@@ -205,7 +205,8 @@ if (import.meta.main) {
       PATCH: async (req) => {
         const { role } = await auth.protect(req);
         if (role !== "admin") auth.reject();
-        db.manualJudge(parseInt(params.get("id")!), parseInt(params.get("ok")!));
+        const params = new URL(req.url).searchParams;
+        db.manualJudge(parseInt(params.get("id")!), Boolean(parseInt(params.get("ok")!)));
         return new Response(null, { status: 204 });
       },
     },
