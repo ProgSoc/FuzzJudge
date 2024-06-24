@@ -81,9 +81,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   </div>
   <div class="sec error-message-area">
     {#if $error_message !== undefined}
-      <code class="error-message">
+      <pre class="error-message">
         {$error_message}
-      </code>
+      </pre>
     {/if}
   </div>
 </div>

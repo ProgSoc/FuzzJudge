@@ -26,6 +26,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let errors: string[] = [];
 
+  // Hack for the day
+  $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
+
   $: sorted_questions = Object.values(questions).sort((a, b) => a.points - b.points);
 </script>
 
@@ -39,7 +42,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <th class="question-num">{question.doc.icon}</th>
     {/each}
   </tr>
-  {#each scoreboard as team, i}
+  {#each filteredTeams as team, i}
     <tr>
       <td class="position">
         {i + 1}

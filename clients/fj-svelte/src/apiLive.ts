@@ -36,7 +36,7 @@ export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
   ws.addEventListener("message", ({ data }) => {
     callback(JSON.parse(data));
   });
-  ws.addEventListener("error", () => listenOnWebsocket(callback));
+  ws.addEventListener("close", () => setTimeout(() => listenOnWebsocket(callback), 1000));
 }
 
 export function initLiveState() {
