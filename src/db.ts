@@ -256,6 +256,10 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return total;
   }
 
+  manualJudge(id: number, ok: boolean) {
+    this.#db.query("UPDATE subm SET ok = :ok WHERE id = :id", {id, ok});
+  }
+
   postSubmission({ code, ok, out, prob, team, time, vler, vlms }: Omit<Submission, "id">, resubmit = false): number {
     if (resubmit && ok) {
       this.#db.query<[number]>(

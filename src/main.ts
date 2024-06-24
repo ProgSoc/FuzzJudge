@@ -201,6 +201,14 @@ if (import.meta.main) {
       }
       return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
     },
+    "/mark": {
+      PATCH: async (req) => {
+        const { role } = await auth.protect(req);
+        if (role !== "admin") auth.reject();
+        db.manualJudge(parseInt(params.get("id")!), parseInt(params.get("ok")!));
+        return new Response(null, { status: 204 });
+      },
+    },
     "/comp": {
       "/meta": {
         GET: async (req) => {
