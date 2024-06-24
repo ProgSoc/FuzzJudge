@@ -98,11 +98,11 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
   }
 
   #encStr(input: string) {
-    return compressZstd(new TextEncoder().encode(input).buffer);
+    return compressZstd(new TextEncoder().encode(input));
   }
 
   #decStr(input: Uint8Array) {
-    return new TextDecoder().decode(decompressZstd(input.buffer));
+    return new TextDecoder().decode(decompressZstd(input));
   }
 
   getOrSetDefaultMeta<T extends string | undefined>(
