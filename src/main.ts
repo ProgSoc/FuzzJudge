@@ -296,7 +296,7 @@ if (import.meta.main) {
           "/fuzz": async (req, { id }) => {
             // clock.protect();
             const user = await auth.protect(req);
-            return await problems.get(id!)!.fuzz(db.userTeam(user.team)!.seed);
+            return await problems.get(id!)!.fuzz(db.userTeam(user.id)!.seed);
           },
           "/judge": {
             GET: async (req, { id: problemId }) => {
@@ -334,7 +334,7 @@ if (import.meta.main) {
               const t0 = performance.now();
               const { correct, errors } = await problems
                 .get(problemId!)!
-                .judge(db.userTeam(user.team)!.seed, submissionOutput);
+                .judge(db.userTeam(user.id)!.seed, submissionOutput);
               const t1 = performance.now();
 
               db.postSubmission({
