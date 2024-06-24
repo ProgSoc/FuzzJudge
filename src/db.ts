@@ -256,14 +256,24 @@ export class CompetitionDB extends Subscribable<CompetitionDB> {
     return total;
   }
 
-  postSubmission(params: Omit<Submission, "id">): number {
+  postSubmission({ code, ok, out, prob, team, time, vler, vlms }: Omit<Submission, "id">, resubmit = false): number {
+    if (resubmit && ok) {
+      this.#db.query<[number]>(
+        `
+          UPDATE subm SET (out, code, vler, vlms) = (:out, :code, :vler, :vlms)
+          WHERE prob = :prob AND team = :team AND ok = TRUE
+          RETURNING id
+        `,
+        { out: this.#encStr(out), code: this.#encStr(code), vler: this.#encStr(vler), vlms, prob, team },
+      );
+    }
     const id = this.#db.query<[number]>(
       "INSERT INTO subm VALUES (NULL, :team, :prob, :time, :out, :code, :ok, :vler, :vlms) RETURNING id",
       {
-        ...params,
-        out: this.#encStr(params.out),
-        code: this.#encStr(params.code),
-        vler: this.#encStr(params.vler),
+        ok, prob, team, time, vlms,
+        out: this.#encStr(out),
+        code: this.#encStr(code),
+        vler: this.#encStr(vler),
       },
     )[0][0];
     this.notify(this);
