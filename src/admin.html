@@ -31,7 +31,7 @@
     <fieldset>
       <legend>Create Team</legend>
       <input type="text" name="name"/>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
     </fieldset>
   </form>
 
@@ -40,7 +40,7 @@
       <legend>Patch Team</legend>
       <label>Team ID: <input type="text" name="id"/></label>
       <label>Name: <input type="text" name="name"/></label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
     </fieldset>
   </form>
 
@@ -51,7 +51,7 @@
       <legend>Create User</legend>
       <label>Login: <input type="text" name="logn"/></label>
       <label>Role: <select name="role"><option value="admin">Administrator</option><option selected value="competitor">Competitor</option></select></label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
     </fieldset>
   </form>
 
@@ -63,7 +63,7 @@
       <label>Login: <input type="text" name="logn"/></label>
       <label>Name: <input type="text" name="name"/></label>
       <label>Role: <select name="role"><option value="" selected>-</option><option value="admin">Administrator</option><option value="competitor">Competitor</option></select></label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
     </fieldset>
   </form>
 
@@ -74,7 +74,7 @@
       <legend>Get Submissions</legend>
       <label>Team ID: <input type="text" name="team"/></label>
       <label>Slug: <input type="text" name="slug"/></label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
       <output name="result"></output>
     </fieldset>
   </form>
@@ -91,7 +91,7 @@
           <option value="vler">Validation Errors</option>
         </select>
       </label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
       <output name="result"></output>
     </fieldset>
   </form>
@@ -108,9 +108,9 @@
           <option value="finish">Finishing Time</option>
         </select>
       </label>
-      <label>Time: <input type="datetime-local" name="time"/></label>
+      <label>Time ISO8601: <input type="value" name="time"/></label>
       <label>Keep Duration (Moving Start): <input type="checkbox" name="keep"/></label>
-      <button onclick="doFetch(this.form)">Submit</button>
+      <button type="button" onclick="doFetch(this.form)">Submit</button>
     </fieldset>
   </form>
 
