@@ -14,23 +14,35 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { type Icon } from "../types";
 
-  let dots = 0;
+  export let icon: Icon;
 
-  const interval = setInterval(() => {
-    dots = (dots + 1) % 4;
-  }, 500);
+  const styles: any = {
+    width: icon.width,
+  };
 
-  onDestroy(() => {
-    clearInterval(interval);
-  });
+  if (icon.height !== undefined) {
+    styles.height = icon.height;
+  }
+
+  const css = Object.entries(styles)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
 </script>
 
-<div class="loading">Loading{".".repeat(dots)}</div>
+<span class:darken-on-hover={icon.darkenOnHover === true}>
+  <img src={icon.dataUri} alt={icon.alt} style={css} aria-label={icon.ariaLabel} />
+</span>
 
 <style>
-  .loading {
-    margin: 2rem;
+  .darken-on-hover:hover {
+    filter: brightness(0.6);
+  }
+
+  img {
+    display: block;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 </style>

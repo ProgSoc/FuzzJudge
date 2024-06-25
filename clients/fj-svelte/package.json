@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "deno run -A hot-reloader.ts",
+    "dev": "deno run -A scripts/hot-reloader.ts",
     "build": "vite build",
+    "build-icons": "deno run -A scripts/icons-to-data-uris.ts",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "fmt": "npx prettier --write --plugin prettier-plugin-svelte ."
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",

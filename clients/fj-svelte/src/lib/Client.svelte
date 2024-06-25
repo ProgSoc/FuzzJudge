@@ -36,6 +36,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { initLiveState } from "../apiLive";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import type { CompetitionScoreboardMessage } from "../../../../src/score";
+  import Icon from "./Icon.svelte";
+  import icons from "../icons";
 
   export let scoreboardMode: boolean = false;
 
@@ -100,15 +102,25 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="layout">
     <div class="top-bar">
       <div>
-        <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>Comp Info</button>
-        <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>Scoreboard</button>
+        <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>
+          <span class="vertical-center">
+            <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
+          </span>
+        </button>
+        <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>
+          <span class="vertical-center">
+            <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
+          </span>
+        </button>
+      </div>
+      <div class="countdown">
         {#if timeStateData !== undefined}
           <InlineCountdown {timeStateData} />
         {/if}
       </div>
       <div>
         Logged in as <b>{username}</b>
-        <a href="/void" title="Enter empty credentials">Logout</a>
+        <a href="/void" title="Enter empty credentials"> Logout</a>
       </div>
     </div>
 
@@ -129,6 +141,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       {/if}
     {:else if timeStateData.phase !== CompState.FINISHED}
       <div class="locked-message">
+        <div class="lock-icon">
+          <Icon icon={icons.locked} />
+        </div>
         <PageCountdown {timeStateData} />
       </div>
     {:else}
@@ -172,6 +187,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       "question-list question-instructions";
   }
 
+  .vertical-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .top-bar {
     grid-area: top-bar;
     display: flex;
@@ -184,6 +205,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   .locked-message {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
@@ -196,5 +218,31 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .lock-icon {
+    opacity: 0.4;
+    margin-bottom: 0.2rem;
+  }
+
+  @media (width < 600px) {
+    .countdown {
+      visibility: hidden;
+      width: 0px;
+    }
+  }
+
+  .topbar-button-label {
+    margin-left: 5px;
+  }
+
+  @media (width < 600px) {
+    .topbar-button-label {
+      height: 14px;
+      visibility: hidden;
+      width: 0px;
+      margin-left: 0px;
+      padding: 0px;
+    }
   }
 </style>

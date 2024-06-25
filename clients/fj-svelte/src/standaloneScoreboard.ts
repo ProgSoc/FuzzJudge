@@ -20,7 +20,7 @@ const app = new App({
   target: document.getElementById("app")!,
   props: {
     scoreboardMode: true,
-  }
+  },
 });
 
 export default app;

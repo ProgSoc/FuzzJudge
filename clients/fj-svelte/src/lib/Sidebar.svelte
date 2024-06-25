@@ -16,6 +16,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import ListGroup from "./ListGroup.svelte";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import Icon from "./Icon.svelte";
+  import icons from "../icons";
 
   export let questions: Record<string, FuzzJudgeProblemMessage> = {};
   export let solvedQuestions: Set<string>;
@@ -35,9 +37,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <h2 class="list-title">Questions</h2>
       <button class="toggle-button" on:click={toggleOpen}>
         {#if open}
-          &#60;
+          <Icon icon={icons.arrowleft} />
         {:else}
-          &#62;
+          <Icon icon={icons.arrowright} />
         {/if}
       </button>
     </div>
@@ -51,9 +53,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="closed-question-list">
     <button class="toggle-button" on:click={toggleOpen}>
       {#if open}
-        &#60;
+        <Icon icon={icons.arrowleft} />
       {:else}
-        &#62;
+        <Icon icon={icons.arrowright} />
       {/if}
     </button>
   </div>
@@ -72,6 +74,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     border: none;
     cursor: pointer;
     border-radius: 0.5rem;
+    min-width: max-content;
   }
   .question-list {
     grid-area: question-list;
@@ -102,6 +105,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     color: var(--text-sec);
     max-width: fit-content;
   }
+
   .list-title-div {
     display: flex;
     justify-content: space-between;

@@ -13,13 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-  exists,
-  parseScoreboard,
-  questionOrder,
-  type QuestionMeta,
-  type ScoreboardUser,
-} from "./utils";
+import { exists, parseScoreboard, questionOrder, type QuestionMeta, type ScoreboardUser } from "./utils";
 
 export const BACKEND_SERVER: string = "";
 

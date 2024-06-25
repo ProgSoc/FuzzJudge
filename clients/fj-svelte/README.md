@@ -9,7 +9,8 @@ npm install
 npm run build
 ```
 
-Output will be in `./dist`
+Output will be in `./dist`. 
+If you have edited any of the icons, run `npm run build-icons` before building (requires Deno).
 
 ## Starting dev server
 
