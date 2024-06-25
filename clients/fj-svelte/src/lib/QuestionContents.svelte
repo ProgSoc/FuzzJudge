@@ -27,7 +27,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let questionInstructions: any;
 
   // Reset scroll to top when a new question is selected
-  const unsub_scroll_up = selectedQuestion.subscribe((slug) => {
+  const unsubScrollUp = selectedQuestion.subscribe((slug) => {
     if (slug === undefined) return;
 
     if (questionInstructions !== undefined) {
@@ -36,7 +36,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   onDestroy(() => {
-    unsub_scroll_up();
+    unsubScrollUp();
   });
 </script>
 
