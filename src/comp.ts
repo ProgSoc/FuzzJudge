@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colours, basename, dirname, pathJoin, walkSync } from "./deps.ts";
+import { TermColours, basename, dirname, pathJoin, walkSync } from "./deps.ts";
 import { MarkdownDocument, Subscribable, indent, loadMarkdown } from "./util.ts";
 
 export type FuzzJudgeProblemMessage = {
@@ -192,7 +192,7 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemSetMessage
         this.#problems.set(slug, problem);
       } catch (e) {
         const errors = indent("    ", e.toString());
-        console.error(`${Colours.red("ERR")} Could not load problem "${ent.path}":\n${errors})}`);
+        console.error(`${TermColours.red("ERR")} Could not load problem "${ent.path}":\n${errors})}`);
       }
     }
   }
