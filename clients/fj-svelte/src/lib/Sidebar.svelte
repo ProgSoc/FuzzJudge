@@ -15,7 +15,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import ListGroup from "./ListGroup.svelte";
-  import { type QuestionMeta } from "../utils";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
 
   export let questions: Record<string, FuzzJudgeProblemMessage> = {};

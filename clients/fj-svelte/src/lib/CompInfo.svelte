@@ -14,14 +14,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { get_comp_info } from "../api";
+  import { getCompInfo } from "../api";
   import Loading from "./Loading.svelte";
   import SvelteMarkdown from "svelte-markdown";
 
   let title: string | undefined = undefined;
   let instructions = "";
 
-  get_comp_info().then((data) => {
+  getCompInfo().then((data) => {
     title = data.title;
     instructions = data.instructions;
   });

@@ -14,36 +14,37 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { writable } from "svelte/store";
-  import { selected_question } from "../utils";
-  import { submit_solution, open_fuzz } from "../api";
+  import { selectedQuestion } from "../utils";
+  import { submitSolution, openFuzz } from "../api";
 
   export let setSolved: (slug: string) => void;
 
-  let waiting_on_server = false;
+  let waitingOnServer = false;
 
-  let error_message = writable("");
+  let errorMessage: string | undefined = undefined;
 
-  let submission_value = "";
-  let source_value = "";
+  let submissionValue = "";
+  let sourceValue = "";
 
-  selected_question.subscribe((_) => {
-    submission_value = "";
-    source_value = "";
+  selectedQuestion.subscribe((_) => {
+    submissionValue = "";
+    sourceValue = "";
+    waitingOnServer = false;
+    errorMessage = undefined;
   });
 
   const submit = (slug: string) => {
-    if (waiting_on_server === true) return;
+    if (waitingOnServer === true) return;
 
-    error_message.set("");
+    errorMessage = undefined;
 
-    waiting_on_server = true;
+    waitingOnServer = true;
 
-    submit_solution(slug, submission_value, source_value).then(({ correct, message }) => {
-      waiting_on_server = false;
+    submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
+      waitingOnServer = false;
 
-      if (slug === $selected_question) {
-        error_message.set(message);
+      if (slug === $selectedQuestion) {
+        errorMessage = message;
       }
 
       if (correct && setSolved !== undefined) {
@@ -57,7 +58,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="section">
     <div class="text-area-buttons">
       <span class="get-input">
-        To begin, <span class="input-span" on:click={() => open_fuzz($selected_question)}
+        To begin, <span class="input-span" on:click={() => openFuzz($selectedQuestion)}
           >grab your question input!
         </span></span
       >
@@ -65,24 +66,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div class="section submission-areas">
       <div class="solution-submission">
         <h2>Question Solution</h2>
-        <textarea bind:value={submission_value} />
+        <textarea bind:value={submissionValue} />
       </div>
       <div class="source-submission">
         <h2>Solution source</h2>
         <p>Please include any of the source code used to solve the problem. This may be manually reviewed later.</p>
-        <textarea bind:value={source_value} />
+        <textarea bind:value={sourceValue} />
       </div>
     </div>
     <div class="text-area-buttons">
-      <button class="submit" on:click={() => submit($selected_question)}>
-        {waiting_on_server ? "Processing..." : "Submit"}
+      <button class="submit" on:click={() => submit($selectedQuestion)}>
+        {waitingOnServer ? "Processing..." : "Submit"}
       </button>
     </div>
   </div>
   <div class="sec error-message-area">
-    {#if $error_message !== undefined}
+    {#if errorMessage !== undefined}
       <pre class="error-message">
-        {$error_message}
+        {errorMessage}
       </pre>
     {/if}
   </div>
