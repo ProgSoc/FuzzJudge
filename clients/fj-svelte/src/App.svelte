@@ -16,6 +16,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import Client from "./lib/Client.svelte";
 
+  export let scoreboardMode: boolean = false;
+
   // For hot reloading
   try {
     const socket = new WebSocket(`ws://localhost:25566`);
@@ -28,4 +30,4 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 </script>
 
-<Client />
+<Client {scoreboardMode} />
