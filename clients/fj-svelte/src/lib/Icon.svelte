@@ -41,6 +41,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 
   img {
+    display: block;
     -webkit-user-drag: none;
     user-select: none;
   }

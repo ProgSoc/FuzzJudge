@@ -104,23 +104,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <div>
         <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>
           <span class="vertical-center">
-            <Icon icon={icons.info} /><span style="margin-left: 5px;"> Comp Info </span>
+            <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
           </span>
         </button>
         <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>
           <span class="vertical-center">
-            <Icon icon={icons.scoreboard} /><span style="margin-left: 5px;"> Scoreboard </span>
+            <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
           </span>
         </button>
       </div>
-      <div>
+      <div class="countdown">
         {#if timeStateData !== undefined}
           <InlineCountdown {timeStateData} />
         {/if}
       </div>
       <div>
         Logged in as <b>{username}</b>
-        <a href="/void" title="Enter empty credentials">Logout</a>
+        <a href="/void" title="Enter empty credentials"> Logout</a>
       </div>
     </div>
 
@@ -223,5 +223,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   .lock-icon {
     opacity: 0.4;
     margin-bottom: 0.2rem;
+  }
+
+  @media (width < 600px) {
+    .countdown {
+      visibility: hidden;
+      width: 0px;
+    }
+  }
+
+  .topbar-button-label {
+    margin-left: 5px;
+  }
+
+  @media (width < 600px) {
+    .topbar-button-label {
+      height: 14px;
+      visibility: hidden;
+      width: 0px;
+      margin-left: 0px;
+      padding: 0px;
+    }
   }
 </style>
