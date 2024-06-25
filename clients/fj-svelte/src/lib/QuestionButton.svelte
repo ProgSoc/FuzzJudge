@@ -26,7 +26,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </script>
 
 <div
-  aria-label="question input"
+  aria-label={`Select ${question.doc.title}`}
   role="link"
   tabindex="0"
   on:keyup={select}
