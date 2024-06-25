@@ -90,13 +90,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       </button>
     </div>
   </div>
-  <div class="sec error-message-area">
-    {#if errorMessage !== undefined}
-      <pre class="error-message">
+</div>
+<div class="error-message-area">
+  {#if errorMessage !== undefined}
+    <pre class="error-message">
         {errorMessage}
       </pre>
-    {/if}
-  </div>
+  {/if}
 </div>
 
 <style>

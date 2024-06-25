@@ -14,6 +14,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script>
+  import Icon from "./Icon.svelte";
+  import icons from "../icons";
+
   export let shown = false;
   export let close = () => {};
 
@@ -31,12 +34,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 {#if shown}
   <div class="content-centered" class:popout={!maximized} class:popout-fullscreen={maximized}>
-    <button class="close" on:click={close}>X</button>
+    <button class="close" on:click={close}>
+      <Icon icon={icons.cross} />
+    </button>
     <button class="maximise" on:click={onMaximiseToggle}>
       {#if maximized}
-        &gt;-&lt;
+        <Icon icon={icons.minimise} />
       {:else}
-        &lt;-&gt;
+        <Icon icon={icons.maximise} />
       {/if}
     </button>
     <div class="contents">
