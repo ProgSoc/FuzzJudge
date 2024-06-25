@@ -58,7 +58,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="section">
     <div class="text-area-buttons">
       <span class="get-input">
-        To begin, <span class="input-span" on:click={() => openFuzz($selectedQuestion)}
+        To begin, <span
+          aria-label="question input"
+          role="link"
+          tabindex="0"
+          on:click={() => openFuzz($selectedQuestion)}
+          on:keyup={(e) => {
+            if (e.key === "Enter") {
+              openFuzz($selectedQuestion);
+            }
+          }}
+          class="input-span"
           >grab your question input!
         </span></span
       >

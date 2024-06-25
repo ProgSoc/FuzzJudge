@@ -25,9 +25,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class={`option ${$selectedQuestion === question?.slug ? "selected" : ""}`} on:click={select}>
+<button class="option" class:selected={$selectedQuestion === question?.slug} on:click={select}>
   <div class="icon">
     {question.doc.icon}
   </div>
@@ -42,10 +40,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       ✓
     {/if}
   </div>
-</div>
+</button>
 
 <style>
   .option {
+    all: unset;
     color: var(--text-sec);
     cursor: pointer;
     padding: 0.3rem;
