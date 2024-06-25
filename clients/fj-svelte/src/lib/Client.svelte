@@ -17,14 +17,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import {
     CompState,
     type CompTimes,
-    type QuestionMeta,
     selectedQuestion,
     type TimeStateData,
     getCurrentTimeStateData,
     runRepeatedly,
   } from "../utils";
-  import { getQuestions, getCompInfo, getQuestionSolvedSet } from "../api";
-  import { onDestroy, onMount } from "svelte";
+  import { getCompInfo, getQuestionSolvedSet } from "../api";
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
   import Sidebar from "./Sidebar.svelte";
@@ -38,6 +36,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { initLiveState } from "../apiLive";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import type { CompetitionScoreboardMessage } from "../../../../src/score";
+
+  export let scoreboardMode: boolean = false;
 
   let username = "Loading...";
 
@@ -90,61 +90,69 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let showingPopout: ShowingPopout = ShowingPopout.None;
 </script>
 
-<div class="layout">
-  <div class="top-bar">
-    <div>
-      <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>Comp Info</button>
-      <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>Scoreboard</button>
-      {#if timeStateData !== undefined}
-        <InlineCountdown {timeStateData} />
-      {/if}
-    </div>
-    <div>
-      Logged in as <b>{username}</b>
-      <a href="/void" title="Enter empty credentials">Logout</a>
-    </div>
-  </div>
-
-  <Sidebar {solvedQuestions} {questions} />
-
-  <!-- main content -->
-  {#if timeStateData === undefined}
-    <Loading />
-  {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
-    {#if questions === undefined}
-      <Loading />
-    {:else}
-      <QuestionContents
-        question={questions[$selectedQuestion]}
-        solved={solvedQuestions.has($selectedQuestion)}
-        {setSolved}
-      />
-    {/if}
-  {:else if timeStateData.phase !== CompState.FINISHED}
-    <div class="locked-message">
-      <PageCountdown {timeStateData} />
-    </div>
+{#if scoreboardMode}
+  {#if questions !== undefined && scoreboard !== undefined}
+    <Scoreboard {questions} {scoreboard} />
   {:else}
-    <div class="locked-message">
-      <div class="finished-message">
-        <h1>Competition Finished</h1>
-        <p>You can no longer submit solutions.</p>
+    <Loading />
+  {/if}
+{:else}
+  <div class="layout">
+    <div class="top-bar">
+      <div>
+        <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>Comp Info</button>
+        <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>Scoreboard</button>
+        {#if timeStateData !== undefined}
+          <InlineCountdown {timeStateData} />
+        {/if}
+      </div>
+      <div>
+        Logged in as <b>{username}</b>
+        <a href="/void" title="Enter empty credentials">Logout</a>
       </div>
     </div>
-  {/if}
-</div>
 
-<Popout shown={showingPopout === ShowingPopout.Scoreboard} close={() => (showingPopout = ShowingPopout.None)}>
-  {#if questions === undefined || scoreboard === undefined}
-    <Loading />
-  {:else}
-    <Scoreboard {questions} {scoreboard} />
-  {/if}
-</Popout>
+    <Sidebar {solvedQuestions} {questions} />
 
-<Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
-  <CompInfo />
-</Popout>
+    <!-- main content -->
+    {#if timeStateData === undefined}
+      <Loading />
+    {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
+      {#if questions === undefined}
+        <Loading />
+      {:else}
+        <QuestionContents
+          question={questions[$selectedQuestion]}
+          solved={solvedQuestions.has($selectedQuestion)}
+          {setSolved}
+        />
+      {/if}
+    {:else if timeStateData.phase !== CompState.FINISHED}
+      <div class="locked-message">
+        <PageCountdown {timeStateData} />
+      </div>
+    {:else}
+      <div class="locked-message">
+        <div class="finished-message">
+          <h1>Competition Finished</h1>
+          <p>You can no longer submit solutions.</p>
+        </div>
+      </div>
+    {/if}
+  </div>
+
+  <Popout shown={showingPopout === ShowingPopout.Scoreboard} close={() => (showingPopout = ShowingPopout.None)}>
+    {#if questions === undefined || scoreboard === undefined}
+      <Loading />
+    {:else}
+      <Scoreboard {questions} {scoreboard} />
+    {/if}
+  </Popout>
+
+  <Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
+    <CompInfo />
+  </Popout>
+{/if}
 
 <style>
   .layout {
