@@ -25,7 +25,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
-<button class="option" class:selected={$selectedQuestion === question?.slug} on:click={select}>
+<div
+  aria-label="question input"
+  role="link"
+  tabindex="0"
+  on:keyup={select}
+  class="option"
+  class:selected={$selectedQuestion === question?.slug}
+  on:click={select}
+>
   <div class="icon">
     {question.doc.icon}
   </div>
@@ -40,11 +48,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       ✓
     {/if}
   </div>
-</button>
+</div>
 
 <style>
   .option {
-    all: unset;
     color: var(--text-sec);
     cursor: pointer;
     padding: 0.3rem;
