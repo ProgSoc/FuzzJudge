@@ -9,7 +9,8 @@ npm install
 npm run build
 ```
 
-Output will be in `./dist`
+Output will be in `./dist`. 
+If you have edited any of the icons, run `npm run build-icons` before building (requires Deno).
 
 ## Starting dev server
 
@@ -17,7 +18,6 @@ Output will be in `./dist`
 npm install
 npm run dev <PATH TO COMP>
 ```
-If you have edited any of the icons, run `npm run build-icons` before building (requires Deno).
 
 `<PATH TO COMP>` is optional, if not provided the sample questions will be used.
 Requires Deno.
