@@ -15,16 +15,15 @@
 
 import {
   exists,
-  parse_scoreboard,
-  question_order,
-  type CompTimes,
+  parseScoreboard,
+  questionOrder,
   type QuestionMeta,
   type ScoreboardUser,
 } from "./utils";
 
 export const BACKEND_SERVER: string = "";
 
-export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
+export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
 
   try {
@@ -42,10 +41,10 @@ export let get_questions = async (): Promise<Record<string, QuestionMeta>> => {
     }
 
     for (const slug of arr) {
-      questions[slug] = await get_question_data(slug);
+      questions[slug] = await getQuestion(slug);
     }
 
-    const sorted = Object.values(questions).sort(question_order);
+    const sorted = Object.values(questions).sort(questionOrder);
 
     for (let i = 0; i < sorted.length; i++) {
       sorted[i].num = i + 1;
@@ -61,14 +60,14 @@ export interface ScoreboardEvent {
   new_scoreboard: ScoreboardUser[];
 }
 
-export const subscribe_to_scoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<() => void> => {
+export const subscribeToScoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<() => void> => {
   const server = window.location.hostname;
   const port = 8080;
 
   const socket = new WebSocket(`ws://${server}:${port}`);
 
   socket.addEventListener("message", (event) => {
-    callback({ new_scoreboard: parse_scoreboard(event.data) });
+    callback({ new_scoreboard: parseScoreboard(event.data) });
   });
 
   return () => {
@@ -76,21 +75,21 @@ export const subscribe_to_scoreboard = async (callback: (data: ScoreboardEvent) 
   };
 };
 
-export const get_comp_info = async (): Promise<{ title: string; instructions: string }> => {
+export const getCompInfo = async (): Promise<{ title: string; instructions: string }> => {
   const title = await (await fetch(`${BACKEND_SERVER}/comp/name`)).text();
   const instructions = await (await fetch(`${BACKEND_SERVER}/comp/instructions`)).text();
   return { title, instructions };
 };
 
-export const get_scoreboard = async (): Promise<ScoreboardUser[]> => {
-  return parse_scoreboard(await (await fetch(`${BACKEND_SERVER}/comp/scoreboard`)).text());
+export const getScoreboard = async (): Promise<ScoreboardUser[]> => {
+  return parseScoreboard(await (await fetch(`${BACKEND_SERVER}/comp/scoreboard`)).text());
 };
 
-export const get_username = async (): Promise<string> => {
+export const getUsername = async (): Promise<string> => {
   return await fetch(`${BACKEND_SERVER}/auth`).then((r) => r.text());
 };
 
-const get_question_data = async (slug: string) => {
+const getQuestion = async (slug: string) => {
   const data: QuestionMeta = {
     slug,
     num: -1,
@@ -110,7 +109,7 @@ const get_question_data = async (slug: string) => {
   return data;
 };
 
-export const submit_solution = async (
+export const submitSolution = async (
   slug: string,
   output: string,
   source: string,
@@ -132,7 +131,7 @@ export const submit_solution = async (
   };
 };
 
-export const open_fuzz = (slug: string) => {
+export const openFuzz = (slug: string) => {
   window.open(`${BACKEND_SERVER}/comp/prob/${slug}/fuzz`, "_blank");
 };
 

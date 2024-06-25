@@ -15,23 +15,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import SubmissionArea from "./SubmissionArea.svelte";
-  import { type QuestionMeta, selected_question, difficulty_name } from "../utils";
+  import { selectedQuestion, difficultyName } from "../utils";
   import { onDestroy } from "svelte";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
   import SvelteMarkdown from "svelte-markdown";
 
-  export let question_data: FuzzJudgeProblemMessage;
+  export let question: FuzzJudgeProblemMessage;
   export let solved: boolean;
   export let setSolved: (slug: string) => void;
 
-  let question_instructions: any;
+  let questionInstructions: any;
 
   // Reset scroll to top when a new question is selected
-  const unsub_scroll_up = selected_question.subscribe((slug) => {
+  const unsub_scroll_up = selectedQuestion.subscribe((slug) => {
     if (slug === undefined) return;
 
-    if (question_instructions !== undefined) {
-      question_instructions.scrollTop = 0;
+    if (questionInstructions !== undefined) {
+      questionInstructions.scrollTop = 0;
     }
   });
 
@@ -40,13 +40,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 </script>
 
-<div class="question" bind:this={question_instructions}>
+<div class="question" bind:this={questionInstructions}>
   <div id="question-instructions" class="question-instructions">
-    {#if $selected_question !== undefined}
-      {#if question_data !== undefined}
+    {#if $selectedQuestion !== undefined}
+      {#if question !== undefined}
         <h1 style="margin-top: 0px;">
           <span style={solved ? "text-decoration: line-through;" : ""}>
-            {question_data.doc.title}
+            {question.doc.title}
           </span>
 
           {#if solved}
@@ -57,13 +57,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <div style="margin-left: 1rem;">
           <span style="margin-right: 1rem; opacity:0.7;"
             ><b>Difficulty:</b>
-            {difficulty_name(question_data.difficulty)}</span
+            {difficultyName(question.difficulty)}</span
           >
-          <span style="opacity:0.7;"><b>Points:</b> {question_data.points}</span>
+          <span style="opacity:0.7;"><b>Points:</b> {question.points}</span>
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={question_data.doc.body} />
+          <SvelteMarkdown source={question.doc.body} />
         </div>
       {/if}
 

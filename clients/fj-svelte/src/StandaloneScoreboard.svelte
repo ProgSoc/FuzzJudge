@@ -18,16 +18,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Scoreboard from "./lib/Scoreboard.svelte";
   import { type QuestionMeta } from "./utils";
 
-  import { get_questions, get_comp_info } from "./api";
+  import { getQuestions, getCompInfo } from "./api";
 
   let questions: Record<string, QuestionMeta> | undefined = undefined;
   let loading_error: string | undefined = undefined;
 
-  get_comp_info().then((data) => {
+  getCompInfo().then((data) => {
     window.document.title = data.title;
   });
 
-  get_questions()
+  getQuestions()
     .then((q) => {
       questions = q;
     })

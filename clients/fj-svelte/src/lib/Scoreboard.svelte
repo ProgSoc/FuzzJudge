@@ -15,9 +15,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { type QuestionMeta, truncate_username, type ScoreboardUser } from "../utils";
+  import { type QuestionMeta, truncateUsername, type ScoreboardUser } from "../utils";
 
-  import { get_scoreboard, subscribe_to_scoreboard, type ScoreboardEvent } from "../api";
+  import { getScoreboard, subscribeToScoreboard, type ScoreboardEvent } from "../api";
   import type { CompetitionScoreboardMessage } from "../../../../src/score";
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
 
@@ -29,7 +29,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   // Hack for the day
   $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
 
-  $: sorted_questions = Object.values(questions).sort((a, b) => a.points - b.points);
+  $: sortedQuestions = Object.values(questions).sort((a, b) => a.points - b.points);
 </script>
 
 <h1>Scoreboard</h1>
@@ -38,7 +38,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <th> Position </th>
     <th> Team </th>
     <th> Points </th>
-    {#each sorted_questions as question}
+    {#each sortedQuestions as question}
       <th class="question-num">{question.doc.icon}</th>
     {/each}
   </tr>
@@ -48,12 +48,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         {i + 1}
       </td>
       <td class="team-name">
-        {truncate_username(team.name)}
+        {truncateUsername(team.name)}
       </td>
       <td class="points">
         {team.score.total.points}
       </td>
-      {#each sorted_questions as question}
+      {#each sortedQuestions as question}
         <td class={`result`} class:solved={team.score.problems[question.slug]?.solved}>
           {#if team.score.problems[question.slug]?.solved}
             ✓

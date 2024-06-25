@@ -15,19 +15,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
-  import { type QuestionMeta, selected_question } from "../utils";
+  import { type QuestionMeta, selectedQuestion } from "../utils";
 
   export let question: FuzzJudgeProblemMessage;
   export let solved: boolean;
 
   const select = () => {
-    selected_question.set(question?.slug ?? "");
+    selectedQuestion.set(question?.slug ?? "");
   };
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class={`option ${$selected_question === question?.slug ? "selected" : ""}`} on:click={select}>
+<div class={`option ${$selectedQuestion === question?.slug ? "selected" : ""}`} on:click={select}>
   <div class="icon">
     {question.doc.icon}
   </div>

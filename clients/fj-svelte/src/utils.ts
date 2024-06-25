@@ -17,7 +17,7 @@ import { onDestroy } from "svelte";
 import { writable, type Writable } from "svelte/store";
 import type { MessageValue } from "../../../src/live/socketData";
 
-export const selected_question: Writable<string> = writable("");
+export const selectedQuestion: Writable<string> = writable("");
 
 export interface QuestionMeta {
   slug: string;
@@ -31,7 +31,7 @@ export interface QuestionMeta {
   brief: string;
 }
 
-export const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
+export const questionOrder = (a: QuestionMeta, b: QuestionMeta): number => {
   if (a.difficulty !== b.difficulty) {
     return a.difficulty - b.difficulty;
   }
@@ -50,7 +50,7 @@ export const question_order = (a: QuestionMeta, b: QuestionMeta): number => {
   return 1;
 };
 
-export const difficulty_name = (d: number) => {
+export const difficultyName = (d: number) => {
   switch (d) {
     case 0:
       return "Tutorial";
@@ -64,22 +64,10 @@ export const difficulty_name = (d: number) => {
   return "Unknown";
 };
 
-export const truncate_username = (username: string) => {
+export const truncateUsername = (username: string) => {
   const MAX_LENGTH = 14;
   return username.length > MAX_LENGTH ? username.slice(0, MAX_LENGTH) + "…" : username;
 };
-
-// export let get_questions = async (): Promise<{
-//   questions: Record<string, QuestionMeta>;
-//   sorted_questions: Record<string, QuestionMeta[]>;
-// }> => {
-//   let questions = JSON.parse(await (await fetch("questions.json")).text());
-//   let sorted_questions = JSON.parse(
-//     await (await fetch("sorted_questions.json")).text(),
-//   );
-//
-//   return { questions, sorted_questions };
-// };
 
 export interface ScoreboardUser {
   name: string;
@@ -87,7 +75,8 @@ export interface ScoreboardUser {
   solved: string[];
 }
 
-export const parse_scoreboard = (data: string): ScoreboardUser[] => {
+/** @deprecated */
+export const parseScoreboard = (data: string): ScoreboardUser[] => {
   let lines = data.split("\n");
   let users: ScoreboardUser[] = [];
 

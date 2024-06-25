@@ -18,12 +18,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     CompState,
     type CompTimes,
     type QuestionMeta,
-    selected_question,
+    selectedQuestion,
     type TimeStateData,
     getCurrentTimeStateData,
     runRepeatedly,
   } from "../utils";
-  import { get_questions, get_comp_info, getQuestionSolvedSet } from "../api";
+  import { getQuestions, getCompInfo, getQuestionSolvedSet } from "../api";
   import { onDestroy, onMount } from "svelte";
   import CompInfo from "./CompInfo.svelte";
   import Popout from "./Popout.svelte";
@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import QuestionContents from "./QuestionContents.svelte";
   import Loading from "./Loading.svelte";
 
-  import { get_username } from "../api";
+  import { getUsername } from "../api";
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import { initLiveState } from "../apiLive";
@@ -41,7 +41,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   let username = "Loading...";
 
-  get_username().then((name) => {
+  getUsername().then((name) => {
     username = name;
   });
 
@@ -57,15 +57,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   liveState.listenQuestions(async (qs) => {
     questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
     solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
-    if ($selected_question === "" && questions) {
-      selected_question.set(Object.keys(questions)[0] ?? "");
+    if ($selectedQuestion === "" && questions) {
+      selectedQuestion.set(Object.keys(questions)[0] ?? "");
     }
   });
   liveState.listenScoreboard((sb) => {
     scoreboard = sb;
   });
 
-  get_comp_info().then((data) => {
+  getCompInfo().then((data) => {
     window.document.title = data.title;
   });
 
@@ -87,14 +87,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     CompInfo,
   }
 
-  let showing_popout: ShowingPopout = ShowingPopout.None;
+  let showingPopout: ShowingPopout = ShowingPopout.None;
 </script>
 
 <div class="layout">
   <div class="top-bar">
     <div>
-      <button on:click={() => (showing_popout = ShowingPopout.CompInfo)}>Comp Info</button>
-      <button on:click={() => (showing_popout = ShowingPopout.Scoreboard)}>Scoreboard</button>
+      <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>Comp Info</button>
+      <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>Scoreboard</button>
       {#if timeStateData !== undefined}
         <InlineCountdown {timeStateData} />
       {/if}
@@ -110,13 +110,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <!-- main content -->
   {#if timeStateData === undefined}
     <Loading />
-  {:else if timeStateData.questionsVisible && $selected_question !== ""}
+  {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
     {#if questions === undefined}
       <Loading />
     {:else}
       <QuestionContents
-        question_data={questions[$selected_question]}
-        solved={solvedQuestions.has($selected_question)}
+        question={questions[$selectedQuestion]}
+        solved={solvedQuestions.has($selectedQuestion)}
         {setSolved}
       />
     {/if}
@@ -134,7 +134,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   {/if}
 </div>
 
-<Popout shown={showing_popout === ShowingPopout.Scoreboard} close={() => (showing_popout = ShowingPopout.None)}>
+<Popout shown={showingPopout === ShowingPopout.Scoreboard} close={() => (showingPopout = ShowingPopout.None)}>
   {#if questions === undefined || scoreboard === undefined}
     <Loading />
   {:else}
@@ -142,7 +142,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   {/if}
 </Popout>
 
-<Popout shown={showing_popout === ShowingPopout.CompInfo} close={() => (showing_popout = ShowingPopout.None)}>
+<Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
   <CompInfo />
 </Popout>
 
