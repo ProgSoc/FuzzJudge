@@ -22,7 +22,7 @@ const wss = new WebSocketServer(25566);
 
 let running: boolean = false;
 
-let comp_dir = "../../../ProgComp2024/comp";
+let comp_dir = "../../sample";
 
 if (Deno.args.length > 0) {
   comp_dir = Deno.args[0];

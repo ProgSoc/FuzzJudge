@@ -23,14 +23,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   export let solvedQuestions: Set<string>;
   export let includes: number | ((difficulty: number) => boolean) = 0;
 
-  $: list = Object.values(questions)
-    .filter((q) => {
-      if (typeof includes === "function") {
-        return includes(q.difficulty);
-      }
+  $: list = Object.values(questions).filter((q) => {
+    if (typeof includes === "function") {
+      return includes(q.difficulty);
+    }
 
-      return q.difficulty === includes;
-    });
+    return q.difficulty === includes;
+  });
 </script>
 
 {#if list.length > 0}
