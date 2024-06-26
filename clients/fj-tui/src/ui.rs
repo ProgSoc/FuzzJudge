@@ -26,13 +26,21 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
     )
     .split(main_layout[1]);
 
+    let mut top_bar_text = vec![];
+
+    top_bar_text.extend(vec![
+        "Logged in as ".into(),
+        app_state.session.creds.username.clone().italic(),
+        ".".into(),
+    ]);
+
+    if let Some(clock) = &app_state.clock {
+        top_bar_text.push(" | ".into());
+        top_bar_text.push(clock.countdown_string().into());
+    }
+
     frame.render_widget(
-        Paragraph::new(Line::from(vec![
-            "Logged in as ".into(),
-            app_state.session.creds.username.clone().italic(),
-            ".".into(),
-        ]))
-        .block(Block::bordered()),
+        Paragraph::new(Line::from(top_bar_text)).block(Block::bordered()),
         main_layout[0],
     );
 
@@ -154,7 +162,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
 
     frame.render_widget(
         Paragraph::new(console_text)
-            .wrap(Wrap { trim: false })
+            .wrap(Wrap { trim: true })
             .block(Block::bordered().title("Console"))
             .scroll((app_state.console.scroll.scroll as u16, 0)),
         question_area[1],

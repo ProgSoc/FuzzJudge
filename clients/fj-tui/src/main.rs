@@ -1,3 +1,4 @@
+use api::connect_to_web_socket;
 use state::AppState;
 use std::time::Instant;
 use std::{error::Error, io, sync::Arc};
@@ -22,10 +23,11 @@ mod console;
 mod key;
 mod md;
 mod problem;
+mod scroll;
 mod state;
 mod ui;
 mod utils;
-mod scroll;
+mod clock;
 
 use clap::Parser;
 
@@ -89,6 +91,10 @@ async fn get_question(app_state: Arc<Mutex<AppState>>, _: ()) {
     app_state.selected_problem_borrow_mut().select(Some(0));
 }
 
+async fn start_web_socket(app_state: Arc<Mutex<AppState>>, _: ()) {
+    connect_to_web_socket("ws://localhost:1989/", app_state.clone()).await;
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
@@ -98,6 +104,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let app_state = AppStateMutex::new(server.clone(), creds.clone());
 
     app_state.run_async(get_question, ());
+    app_state.run_async(start_web_socket, ());
 
     enable_raw_mode()?;
     let mut stdout = io::stdout();

@@ -3,7 +3,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 use ratatui::widgets::ListState;
 use tokio::sync::Mutex;
 
-use crate::{api, auth, console::ConsoleState, key::KeyState, problem::Problem, scroll::Scroll};
+use crate::{api, auth, clock::Clock, console::ConsoleState, key::KeyState, problem::Problem, scroll::Scroll};
 
 pub struct AppState {
     pub problems: Vec<Problem>,
@@ -12,6 +12,7 @@ pub struct AppState {
     pub instructions_scroll: Scroll,
     pub console: ConsoleState,
     pub key: KeyState,
+    pub clock: Option<Clock>,
     selected_problem: ListState,
 }
 
@@ -25,6 +26,7 @@ impl AppState {
             instructions_scroll: Scroll::new(),
             console: ConsoleState::default(),
             key: KeyState::default(),
+            clock: None,
         }
     }
 
