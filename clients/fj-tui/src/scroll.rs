@@ -5,6 +5,7 @@ pub struct Scroll {
     pub scroll: usize,
     pub content_length: usize,
     pub scroll_state: ScrollbarState,
+    pub view_port_size: usize,
 }
 
 impl Scroll {
@@ -13,6 +14,7 @@ impl Scroll {
             scroll: 0,
             scroll_state: ScrollbarState::default(),
             content_length: 0,
+            view_port_size: 0,
         }
     }
 
@@ -29,13 +31,25 @@ impl Scroll {
 
     pub fn set_content_length(&mut self, content_length: usize) {
         self.content_length = content_length;
-        self.scroll_state = self.scroll_state.content_length(content_length);
-        if self.scroll > content_length {
-            self.set_position(content_length);
-        }
+        self.scroll_state = self.scroll_state.content_length(self.bottom());
+        self.clamp();
+    }
+
+    pub fn set_view_port_size(&mut self, view_port_size: usize) {
+        self.view_port_size = view_port_size;
+        self.scroll_state = self.scroll_state.content_length(self.bottom());
+        self.clamp();
+    }
+
+    pub fn clamp(&mut self) {
+        self.scroll = self.scroll.clamp(0, self.bottom())
+    }
+
+    fn bottom(&self) -> usize {
+        self.content_length.saturating_sub(self.view_port_size)
     }
 
     pub fn to_bottom(&mut self) {
-        self.set_position(self.content_length);
+        self.set_position(self.bottom());
     }
 }

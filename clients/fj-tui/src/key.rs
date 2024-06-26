@@ -26,6 +26,7 @@ pub fn handle_press(app_state: AppStateMutex, key: KeyEvent) {
             KeyCode::Char(':') => {
                 app_state.run_sync(|mut app_state| {
                     app_state.console.typing = true;
+                    app_state.console.scroll.to_bottom();
                     app_state.key.command_buffer.clear();
                 });
             }
@@ -88,6 +89,18 @@ pub fn handle_press(app_state: AppStateMutex, key: KeyEvent) {
                         app_state.key.command_buffer.clear();
                     });
                 }
+            }
+            KeyCode::PageUp => {
+                app_state.run_sync(|mut app_state| {
+                    app_state.console.scroll.offset(-1);
+                    app_state.key.command_buffer.clear();
+                });
+            }
+            KeyCode::PageDown => {
+                app_state.run_sync(|mut app_state| {
+                    app_state.console.scroll.offset(1);
+                    app_state.key.command_buffer.clear();
+                });
             }
             _ => {}
         };

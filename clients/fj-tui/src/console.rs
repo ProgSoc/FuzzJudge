@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{scroll::Scroll, utils::clamp_zero, AppState, AppStateMutex};
+use crate::{scroll::Scroll, AppState, AppStateMutex};
 
 #[derive(Default)]
 pub struct ConsoleState {
@@ -9,15 +9,13 @@ pub struct ConsoleState {
     pub command_history: Vec<String>,
     pub typing: bool,
     pub scroll: Scroll,
-    pub height: usize,
 }
 
 impl ConsoleState {
     pub fn println(&mut self, message: &str) {
         self.messages.push(message.to_string());
         self.scroll.set_content_length(self.line_count());
-        self.scroll
-            .set_position(clamp_zero(self.height as i32 - self.line_count() as i32  - 14) as usize);
+        self.scroll.to_bottom();
     }
 
     pub fn eprintln(&mut self, message: &str) {
@@ -29,6 +27,11 @@ impl ConsoleState {
             .iter()
             .map(|s| s.lines().count())
             .sum::<usize>()
+    }
+
+    pub fn clear(&mut self) {
+        self.messages.clear();
+        self.scroll.set_content_length(0);
     }
 }
 
@@ -66,7 +69,7 @@ pub fn exec(command: &str, app_state: AppStateMutex) {
             todo!();
         }
         "clear" => {
-            app_state.run_sync(|mut state| state.console.messages.clear());
+            app_state.run_sync(|mut state| state.console.clear());
         }
         "echo" => {
             app_state.println(&args.join(" "));

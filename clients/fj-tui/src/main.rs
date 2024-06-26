@@ -99,10 +99,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     app_state.run_async(get_question, ());
 
-    app_state.run_sync(|mut app_state| {
-        app_state.console.height = 17;
-    });
-
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
@@ -129,7 +125,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         let timeout = tick_rate.saturating_sub(last_tick.elapsed());
         if event::poll(timeout)? {
             if let Event::Key(key) = event::read()? {
-                if key.code == KeyCode::Char('q') {
+                let typing = app_state.run_sync(|app_state| app_state.console.typing);
+                if !typing && key.code == KeyCode::Char('q') {
                     break;
                 }
 

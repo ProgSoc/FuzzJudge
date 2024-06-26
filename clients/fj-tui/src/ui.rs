@@ -87,10 +87,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
 
     let question_area = Layout::new(
         Direction::Vertical,
-        [
-            Constraint::Min(0),
-            Constraint::Max(app_state.console.height as u16),
-        ],
+        [Constraint::Min(0), Constraint::Max(17)],
     )
     .split(inner_layout[1]);
 
@@ -98,6 +95,10 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
     app_state
         .instructions_scroll
         .set_content_length(contents.len());
+
+    app_state
+        .instructions_scroll
+        .set_view_port_size(question_area[0].height.saturating_sub(5) as usize);
 
     frame.render_widget(
         Paragraph::new(contents)
@@ -115,6 +116,11 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
         }),
         &mut app_state.instructions_scroll.scroll_state,
     );
+
+    app_state
+        .console
+        .scroll
+        .set_view_port_size(question_area[1].height.saturating_sub(4) as usize);
 
     let mut console_text: Vec<Line> = app_state
         .console
