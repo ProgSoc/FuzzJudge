@@ -162,7 +162,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
 
     frame.render_widget(
         Paragraph::new(console_text)
-            .wrap(Wrap { trim: true })
+            .wrap(Wrap { trim: false })
             .block(Block::bordered().title("Console"))
             .scroll((app_state.console.scroll.scroll as u16, 0)),
         question_area[1],
