@@ -1,6 +1,6 @@
 use reqwest::Client;
 
-use crate::auth::{self, Credentials};
+use crate::{api::Session, auth::{self, Credentials}};
 
 #[derive(Debug, Default)]
 pub struct Problem {
@@ -14,14 +14,13 @@ pub struct Problem {
 
 impl Problem {
     pub async fn fetch_all(
-        server: &String,
-        creds: &Credentials,
+        sess: &Session,
     ) -> Result<Vec<Self>, Box<dyn std::error::Error>> {
         let client = reqwest::Client::new();
 
         let slugs = client
-            .get(&format!("{server}/comp/prob"))
-            .header("Authorization", creds.auth_header_value())
+            .get(sess.server.join("/comp/prob").unwrap())
+            .header("Authorization", sess.creds.auth_header_value())
             .send()
             .await?
             .text()
@@ -29,7 +28,7 @@ impl Problem {
 
         let mut problems = Vec::new();
         for slug in slugs.lines() {
-            problems.push(Self::fetch(slug, server, &creds, &client).await?);
+            problems.push(Self::fetch(slug, sess).await?);
         }
 
         Ok(problems)
@@ -37,35 +36,37 @@ impl Problem {
 
     async fn fetch(
         slug: &str,
-        server: &String,
-        creds: &Credentials,
-        client: &Client,
+        sess: &Session,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let title = reqwest::get(&format!("{server}/comp/prob/{slug}/name"))
+
+        let url = sess.server.join("/comp/prob/").unwrap();
+        let prob_url = url.join(&slug).unwrap();
+
+        let title = reqwest::get(prob_url.join("name").unwrap())
             .await?
             .text()
             .await?;
 
-        let icon = reqwest::get(&format!("{server}/comp/prob/{slug}/icon"))
+        let icon = reqwest::get(prob_url.join("icon").unwrap())
             .await?
             .text()
             .await?;
 
-        let difficulty = reqwest::get(&format!("{server}/comp/prob/{slug}/difficulty"))
+        let difficulty = reqwest::get(prob_url.join("difficulty").unwrap())
             .await?
             .text()
             .await?
             .parse()?;
 
-        let points = reqwest::get(&format!("{server}/comp/prob/{slug}/points"))
+        let points = reqwest::get(prob_url.join("points").unwrap())
             .await?
             .text()
             .await?
             .parse()?;
 
-        let instructions = client
-            .get(&format!("{server}/comp/prob/{slug}/instructions"))
-            .header("Authorization", creds.auth_header_value())
+        let instructions = sess.client
+            .get(prob_url.join("instructions").unwrap())
+            .header("Authorization", sess.creds.auth_header_value())
             .send()
             .await?
             .text()

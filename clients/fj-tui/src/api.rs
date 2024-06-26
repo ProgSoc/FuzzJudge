@@ -1,4 +1,4 @@
-use crate::{auth::Credentials, clock::Clock, state::AppState};
+use crate::{auth::Credentials, clock::Clock, problem::Problem, state::AppState};
 use std::{
     error::Error,
     sync::{Arc, Mutex},
@@ -8,17 +8,19 @@ use std::{
 pub struct Session {
     pub creds: Credentials,
     pub logged_in: bool,
-    pub server: String,
-    client: reqwest::Client,
+    pub server: Url,
+    pub client: reqwest::Client,
 }
 
 use futures_util::{future, pin_mut, StreamExt};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use url::Url;
 
 impl Session {
     pub fn new(server: String, creds: Credentials) -> Self {
         Self {
-            server,
+            // This was checked earlier so we can unwrap.
+            server: Url::parse(&server).unwrap(),
             creds,
             logged_in: false,
             client: reqwest::Client::new(),
@@ -26,9 +28,13 @@ impl Session {
     }
 
     pub async fn fuzz(&self, slug: String) -> Result<String, String> {
+        let url = self.server.join("/comp/prob").unwrap();
+        let url = url.join(&format!("{}/", &slug)).unwrap();
+        let url = url.join("/fuzz").unwrap();
+
         let response = self
             .client
-            .get(&format!("{}/comp/prob/{}/fuzz", self.server, slug))
+            .get(url)
             .header("Authorization", self.creds.auth_header_value())
             .send()
             .await
@@ -59,6 +65,70 @@ impl Session {
             .await?;
 
         Ok(response)
+    }
+
+    async fn fetch_problem(&self, slug: &str) -> Result<Problem, Box<dyn std::error::Error>> {
+        let url = self.server.join("/comp/prob/").unwrap();
+        let prob_url = url.join(&format!("{}/", &slug)).unwrap();
+
+        let title = reqwest::get(prob_url.join("name").unwrap())
+            .await?
+            .text()
+            .await?;
+
+        let icon = reqwest::get(prob_url.join("icon").unwrap())
+            .await?
+            .text()
+            .await?;
+
+        let difficulty = reqwest::get(prob_url.join("difficulty").unwrap())
+            .await?
+            .text()
+            .await?
+            .parse()?;
+
+        let points = reqwest::get(prob_url.join("points").unwrap())
+            .await?
+            .text()
+            .await?
+            .parse()?;
+
+        let instructions = self
+            .client
+            .get(prob_url.join("instructions").unwrap())
+            .header("Authorization", self.creds.auth_header_value())
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        Ok(Problem {
+            slug: slug.to_string(),
+            title,
+            icon,
+            difficulty,
+            points,
+            instructions,
+        })
+    }
+
+    pub async fn fetch_all_problems(&self) -> Result<Vec<Problem>, Box<dyn std::error::Error>> {
+        let client = reqwest::Client::new();
+
+        let slugs = client
+            .get(self.server.join("/comp/prob").unwrap())
+            .header("Authorization", self.creds.auth_header_value())
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        let mut problems = Vec::new();
+        for slug in slugs.lines() {
+            problems.push(self.fetch_problem(slug).await?);
+        }
+
+        Ok(problems)
     }
 }
 

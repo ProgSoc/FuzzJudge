@@ -1,5 +1,6 @@
 use api::connect_to_web_socket;
 use state::AppState;
+use url::Url;
 use std::time::Instant;
 use std::{error::Error, io, sync::Arc};
 use tokio::sync::Mutex;
@@ -19,6 +20,7 @@ use crate::state::AppStateMutex;
 
 mod api;
 mod auth;
+mod clock;
 mod console;
 mod key;
 mod md;
@@ -27,7 +29,6 @@ mod scroll;
 mod state;
 mod ui;
 mod utils;
-mod clock;
 
 use clap::Parser;
 
@@ -75,15 +76,13 @@ struct Args {
 }
 
 async fn get_question(app_state: Arc<Mutex<AppState>>, _: ()) {
-    let (server, creds) = {
-        let app_state = app_state.lock().await;
-        (
-            app_state.session.server.clone(),
-            app_state.session.creds.clone(),
-        )
-    };
-
-    let problems = Problem::fetch_all(&server, &creds).await.unwrap();
+    let problems = app_state
+        .lock()
+        .await
+        .session
+        .fetch_all_problems()
+        .await
+        .unwrap();
 
     let mut app_state = app_state.lock().await;
 
@@ -100,6 +99,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let server = args.server;
     let creds = auth::Credentials::new(&args.username, &args.password);
+
+    if Url::parse(&server).is_err() {
+        eprintln!("Invalid server URL: {}", server);
+        return Ok(());
+    }
 
     let app_state = AppStateMutex::new(server.clone(), creds.clone());
 

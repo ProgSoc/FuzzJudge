@@ -402,6 +402,7 @@ dependencies = [
  "tokio",
  "tokio-macros",
  "tokio-tungstenite",
+ "url",
 ]
 
 [[package]]
