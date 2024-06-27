@@ -1,5 +1,3 @@
-
-
 #[derive(Debug, Default)]
 pub struct Problem {
     pub slug: String,
@@ -9,4 +7,3 @@ pub struct Problem {
     pub points: i32,
     pub instructions: String,
 }
-

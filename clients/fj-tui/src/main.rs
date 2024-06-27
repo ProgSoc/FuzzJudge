@@ -54,7 +54,6 @@ struct Args {
     /// Example: `--on-recieve-problem "mkdir prob ; fuzz \$q > prob/\$q.txt"`
     #[arg(long)]
     on_recieve_problem: Option<String>,
-
     // #[arg(long)]
     // auto_submit: Option<String>,
     //
@@ -127,7 +126,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    const SPLASH_TEXT: &str = "  __ _       _         _ 
+    const SPLASH_TEXT: &str = "  __ _       _         _
  / _(_)     | |_ _   _(_)
 | |_| |_____| __| | | | |
 |  _| |_____| |_| |_| | |

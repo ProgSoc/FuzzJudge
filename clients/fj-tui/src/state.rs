@@ -3,7 +3,10 @@ use std::{future::Future, pin::Pin, sync::Arc};
 use ratatui::widgets::ListState;
 use tokio::sync::Mutex;
 
-use crate::{api, auth, clock::Clock, console::ConsoleState, event::EventSubscriptions, key::KeyState, problem::Problem, scroll::Scroll};
+use crate::{
+    api, auth, clock::Clock, console::ConsoleState, event::EventSubscriptions, key::KeyState,
+    problem::Problem, scroll::Scroll,
+};
 
 pub struct AppState {
     pub problems: Vec<Problem>,
@@ -73,9 +76,10 @@ impl AppStateMutex {
             tokio::runtime::Runtime::new().unwrap(),
         ));
 
-        let sess = rt.lock().unwrap().block_on(async {
-            api::Session::new(server, creds.clone()).await
-        });
+        let sess = rt
+            .lock()
+            .unwrap()
+            .block_on(async { api::Session::new(server, creds.clone()).await });
 
         let sess = match sess {
             Ok(s) => s,
@@ -139,11 +143,7 @@ impl AppStateMutex {
         let app_state = self.app_state.clone();
         let rt = self.rt.lock().unwrap();
         rt.spawn(async move {
-            let app_state_cpy = app_state.clone();
-
             let _ = f(app_state).await;
-
-            let app_state = app_state_cpy.lock().await;
         });
     }
 }

@@ -3,7 +3,6 @@ use std::{path::PathBuf, sync::Arc};
 
 pub struct Session {
     pub creds: Credentials,
-    pub logged_in: bool,
     pub server: Url,
     pub client: reqwest::Client,
 }
@@ -48,7 +47,6 @@ impl Session {
         Ok(Self {
             server,
             creds,
-            logged_in: false,
             client,
         })
     }
@@ -214,7 +212,7 @@ pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mut
                     .lock()
                     .await
                     .console
-                    .println(&format!("Error: {}", e));
+                    .println(&format!("WebSocketError: {}", e));
             }
         })
     };

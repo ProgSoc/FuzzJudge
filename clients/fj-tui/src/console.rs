@@ -1,6 +1,4 @@
-
-
-use crate::{scroll::Scroll};
+use crate::scroll::Scroll;
 
 #[derive(Default)]
 pub struct ConsoleState {
@@ -76,4 +74,3 @@ impl ConsoleState {
         self.scroll.to_bottom();
     }
 }
-

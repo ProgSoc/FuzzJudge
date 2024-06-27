@@ -1,4 +1,4 @@
-use ratatui::Frame;
+use ratatui::{text::Text, Frame};
 
 use crate::{
     clock::{self, ClockState},
@@ -23,12 +23,36 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
     )
     .split(frame.size());
 
+    let top_bar_area = main_layout[0];
+
     let inner_layout = Layout::new(
         Direction::Horizontal,
         [Constraint::Length(30), Constraint::Min(0)],
     )
     .split(main_layout[1]);
 
+    let question_list_area = inner_layout[0];
+
+    let question_area = Layout::new(
+        Direction::Vertical,
+        [Constraint::Min(0), Constraint::Max(17)],
+    )
+    .split(inner_layout[1]);
+
+    let instructions_area = question_area[0];
+    let console_area = question_area[1];
+
+    top_bar(&app_state, frame, top_bar_area);
+    question_list(&mut app_state, frame, question_list_area);
+    instructions(&mut app_state, question_area, frame, instructions_area);
+    console(app_state, console_area, frame);
+}
+
+fn top_bar(
+    app_state: &tokio::sync::MutexGuard<AppState>,
+    frame: &mut Frame,
+    top_bar_area: ratatui::prelude::Rect,
+) {
     let mut top_bar_text = vec![];
 
     top_bar_text.extend(vec![
@@ -44,15 +68,25 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
 
     frame.render_widget(
         Paragraph::new(Line::from(top_bar_text)).block(Block::bordered()),
-        main_layout[0],
+        top_bar_area,
     );
+}
 
+fn question_list(
+    app_state: &mut tokio::sync::MutexGuard<AppState>,
+    frame: &mut Frame,
+    question_list_area: ratatui::prelude::Rect,
+) {
     let block = Block::new().title("Questions").borders(Borders::ALL);
 
     let items: Vec<ListItem> = app_state
         .problems
         .iter()
-        .map(|p| ListItem::from(format!("{} {}\n   {} Points", p.icon, p.title, p.points)))
+        .map(|p| {
+            let title = Line::from(format!("{} {}", p.icon, p.title));
+            let points = Line::from(format!("    {} Points", p.points).dark_gray());
+            ListItem::from(vec![title, points])
+        })
         .collect();
 
     const SELECTED_STYLE: Style = Style::new().bg(SLATE.c400).add_modifier(Modifier::BOLD);
@@ -65,10 +99,17 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
 
     frame.render_stateful_widget(
         list,
-        inner_layout[0],
+        question_list_area,
         app_state.selected_problem_borrow_mut_no_scroll(),
     );
+}
 
+fn instructions(
+    app_state: &mut tokio::sync::MutexGuard<AppState>,
+    question_area: std::rc::Rc<[ratatui::prelude::Rect]>,
+    frame: &mut Frame,
+    instructions_area: ratatui::prelude::Rect,
+) {
     let (title, md_source, difficulty, points) =
         match app_state.selected_problem_borrow().selected() {
             Some(s) => (
@@ -94,8 +135,8 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
         ClockState::During => {
             md::render(&md, &mut contents);
 
-            contents.insert(0, Line::from(title));
-            contents.insert(1, Line::from("-----------------------------------------"));
+            contents.insert(0, Line::from(title.clone()));
+            contents.insert(1, Line::from("-".repeat(title.len() + 5)));
             contents.insert(
                 2,
                 Line::from(vec!["Difficulty: ".into(), difficulty_label(difficulty)]),
@@ -114,12 +155,6 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
         }
     }
 
-    let question_area = Layout::new(
-        Direction::Vertical,
-        [Constraint::Min(0), Constraint::Max(17)],
-    )
-    .split(inner_layout[1]);
-
     // FIXME: line-wrapping creates more lines than just len()
     app_state
         .instructions_scroll
@@ -134,22 +169,28 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
             .wrap(Wrap { trim: false })
             .block(Block::bordered())
             .scroll((app_state.instructions_scroll.scroll as u16, 0)),
-        question_area[0],
+        instructions_area,
     );
 
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight).symbols(scrollbar::VERTICAL),
-        question_area[0].inner(Margin {
+        instructions_area.inner(Margin {
             vertical: 1,
             horizontal: 0,
         }),
         &mut app_state.instructions_scroll.scroll_state,
     );
+}
 
+fn console(
+    mut app_state: tokio::sync::MutexGuard<AppState>,
+    console_area: ratatui::prelude::Rect,
+    frame: &mut Frame,
+) {
     app_state
         .console
         .scroll
-        .set_view_port_size(question_area[1].height.saturating_sub(4) as usize);
+        .set_view_port_size(console_area.height.saturating_sub(4) as usize);
 
     let mut console_text: Vec<Line> = app_state
         .console
@@ -176,7 +217,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
     let mut console_input: Vec<Span> = vec!["> ".blue()];
     if app_state.console.typing {
         console_input.push(app_state.console.command_buffer.clone().into());
-        console_input.push("█".rapid_blink());
+        console_input.push("█".slow_blink());
     }
 
     console_text.push(Line::from(console_input));
@@ -186,12 +227,12 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
             .wrap(Wrap { trim: false })
             .block(Block::bordered().title("Console"))
             .scroll((app_state.console.scroll.scroll as u16, 0)),
-        question_area[1],
+        console_area,
     );
 
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalLeft).symbols(scrollbar::VERTICAL),
-        question_area[1].inner(Margin {
+        console_area.inner(Margin {
             vertical: 2,
             horizontal: 0,
         }),

@@ -1,5 +1,8 @@
 use markdown::mdast;
-use ratatui::{style::Stylize, text::{Line, Span}};
+use ratatui::{
+    style::Stylize,
+    text::{Line, Span},
+};
 
 use crate::utils::pad_end;
 
@@ -17,9 +20,7 @@ pub fn render<'a>(md: &'a mdast::Node, contents: &mut Vec<Line<'a>>) {
 
             contents.push(Line::from(""));
             contents.extend(render_children(&heading.children));
-            contents.push(Line::from(
-                "-------------------------------------------------",
-            ));
+            contents.push(Line::from("-".repeat(40)));
         }
         mdast::Node::ListItem(list_iten) => {
             let mut children = render_children(&list_iten.children);
@@ -32,8 +33,8 @@ pub fn render<'a>(md: &'a mdast::Node, contents: &mut Vec<Line<'a>>) {
             let width = code.value.lines().map(|l| l.len()).max().unwrap_or(0);
 
             for line in code.value.lines() {
-                let line: Span = pad_end(line, width).black().on_white();
-                let indent: Span = "    |".into();
+                let line: Span = pad_end(line, width).white().on_dark_gray();
+                let indent: Span = ">    ".into();
                 contents.push(Line::from(vec![indent, line]));
             }
 
@@ -43,11 +44,10 @@ pub fn render<'a>(md: &'a mdast::Node, contents: &mut Vec<Line<'a>>) {
             push(contents, format!("[IMAGE {}]", image.alt.as_str()).red());
         }
         mdast::Node::InlineCode(code) => {
-            push(contents, code.value.clone().black().on_white());
+            push(contents, code.value.clone().white().on_dark_gray());
         }
         mdast::Node::Link(link) => {
             let children = render_children(&link.children);
-
             join(contents, children);
             push(contents, " [".into());
             push(contents, link.url.clone().blue().underlined());
@@ -63,7 +63,6 @@ pub fn render<'a>(md: &'a mdast::Node, contents: &mut Vec<Line<'a>>) {
         }
         mdast::Node::BlockQuote(blockquote) => {
             let children = render_children(&blockquote.children);
-
             for child in children {
                 let mut child = child;
                 if !child.spans.is_empty() {

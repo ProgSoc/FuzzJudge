@@ -24,8 +24,7 @@ impl Scroll {
     }
 
     pub fn offset(&mut self, offset: i32) {
-        self.scroll =
-            (self.scroll as i32 + offset).clamp(0, self.content_length as i32) as usize;
+        self.scroll = (self.scroll as i32 + offset).clamp(0, self.content_length as i32) as usize;
         self.scroll_state = self.scroll_state.position(self.scroll);
     }
 
