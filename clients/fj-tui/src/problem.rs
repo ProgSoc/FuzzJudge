@@ -1,6 +1,4 @@
-use reqwest::Client;
 
-use crate::{api::Session, auth::{self, Credentials}};
 
 #[derive(Debug, Default)]
 pub struct Problem {

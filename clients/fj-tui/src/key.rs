@@ -66,7 +66,7 @@ pub fn handle_press(app_state: AppStateMutex, key: KeyEvent) {
             app_state.run_sync(|mut app_state| {
                 app_state
                     .instructions_scroll
-                    .offset(-1 * modifier.unwrap_or(1) as i32);
+                    .offset(-(modifier.unwrap_or(1) as i32));
                 app_state.key.command_buffer.clear();
             });
         }

@@ -32,7 +32,7 @@ pub fn render<'a>(md: &'a mdast::Node, contents: &mut Vec<Line<'a>>) {
             let width = code.value.lines().map(|l| l.len()).max().unwrap_or(0);
 
             for line in code.value.lines() {
-                let line: Span = pad_end(line, width).black().on_white().into();
+                let line: Span = pad_end(line, width).black().on_white();
                 let indent: Span = "    |".into();
                 contents.push(Line::from(vec![indent, line]));
             }

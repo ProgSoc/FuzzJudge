@@ -26,8 +26,8 @@ impl Clock {
 
     pub fn time_until_next_state(&self) -> chrono::TimeDelta {
         match self.state() {
-            ClockState::Before => self.start - DateTime::from(Utc::now()),
-            ClockState::During => self.finish - DateTime::from(Utc::now()),
+            ClockState::Before => self.start - Utc::now(),
+            ClockState::During => self.finish - Utc::now(),
             ClockState::After => chrono::Duration::zero(),
         }
     }

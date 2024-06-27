@@ -219,7 +219,7 @@ fn tokenize(command: &str) -> Vec<String> {
             continue;
         }
 
-        current.push(c.clone());
+        current.push(c);
         escaped = false;
     }
 
@@ -285,7 +285,7 @@ impl Output {
             }
             Output::IntoMutex(mutex) => {
                 let mut guard = mutex.lock().await;
-                guard.push_str(&message);
+                guard.push_str(message);
             }
         }
     }
@@ -396,7 +396,7 @@ async fn handle_variable(
         }
     }
 
-    return "".to_string();
+    "".to_string()
 }
 
 async fn process_arg(arg: &str, app_state: Arc<tokio::sync::Mutex<AppState>>, env: &Env) -> String {

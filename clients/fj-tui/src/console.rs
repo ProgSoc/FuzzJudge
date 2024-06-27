@@ -1,9 +1,6 @@
-use std::{path::PathBuf, sync::Arc};
 
-use async_recursion::async_recursion;
-use tokio::{io::AsyncWriteExt, process::Command};
 
-use crate::{scroll::Scroll, AppState, AppStateMutex};
+use crate::{scroll::Scroll};
 
 #[derive(Default)]
 pub struct ConsoleState {

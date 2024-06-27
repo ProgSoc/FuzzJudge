@@ -66,7 +66,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
     frame.render_stateful_widget(
         list,
         inner_layout[0],
-        &mut app_state.selected_problem_borrow_mut_no_scroll(),
+        app_state.selected_problem_borrow_mut_no_scroll(),
     );
 
     let (title, md_source, difficulty, points) =
@@ -74,7 +74,7 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
             Some(s) => (
                 app_state.problems[s].title.clone(),
                 app_state.problems[s].instructions.clone(),
-                app_state.problems[s].difficulty.clone(),
+                app_state.problems[s].difficulty,
                 app_state.problems[s].points,
             ),
             None => ("".to_string(), "No problem selected".to_string(), 0, 0),

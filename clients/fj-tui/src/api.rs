@@ -174,7 +174,7 @@ impl Session {
             }
         };
 
-        Ok(problems.into_iter().collect::<Result<Vec<_>, _>>()?)
+        problems.into_iter().collect::<Result<Vec<_>, _>>()
     }
 }
 
@@ -227,7 +227,7 @@ async fn handle_web_socket_message(
     text: &str,
     app_state: Arc<tokio::sync::Mutex<AppState>>,
 ) -> Result<(), String> {
-    let json: serde_json::Value = serde_json::from_str(&text).map_err(|e| e.to_string())?;
+    let json: serde_json::Value = serde_json::from_str(text).map_err(|e| e.to_string())?;
 
     if let Some(kind) = json.get("kind") {
         match kind.as_str().ok_or("Expected `kind`")? {

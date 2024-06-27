@@ -32,17 +32,17 @@ impl AppState {
         }
     }
 
-    pub fn selected_problem_borrow<'a>(&'a self) -> &'a ListState {
+    pub fn selected_problem_borrow(&self) -> &ListState {
         &self.selected_problem
     }
 
     /// Resets scroll
-    pub fn selected_problem_borrow_mut<'a>(&'a mut self) -> &'a mut ListState {
+    pub fn selected_problem_borrow_mut(&mut self) -> &mut ListState {
         self.instructions_scroll.set_position(0);
         &mut self.selected_problem
     }
 
-    pub fn selected_problem_borrow_mut_no_scroll<'a>(&'a mut self) -> &'a mut ListState {
+    pub fn selected_problem_borrow_mut_no_scroll(&mut self) -> &mut ListState {
         &mut self.selected_problem
     }
 }
