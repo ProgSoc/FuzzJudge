@@ -1,31 +1,33 @@
 use api::connect_to_web_socket;
+use ratatui::crossterm;
 use state::AppState;
-use url::Url;
 use std::time::Instant;
 use std::{error::Error, io, sync::Arc};
 use tokio::sync::Mutex;
+use url::Url;
 
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
-        event::{self, Event, KeyCode},
+        event::{Event, KeyCode},
         execute,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     },
     Terminal,
 };
 
-use crate::problem::Problem;
 use crate::state::AppStateMutex;
 
 mod api;
 mod auth;
 mod clock;
 mod console;
+mod event;
 mod key;
 mod md;
 mod problem;
 mod scroll;
+mod shell;
 mod state;
 mod ui;
 mod utils;
@@ -47,35 +49,20 @@ struct Args {
     #[arg(short, long, default_value_t = String::from(""))]
     password: String,
 
-    /// Automatically write problem inputs to a file when received.
-    /// Provide a format string with any number of `%s` which will be replaced with the ID of the
-    /// problem to specify the path.
-    /// Example: `--save-problem-inputs ./inputs/%s.txt`
-    #[arg(long)]
-    save_problem_inputs: Option<String>,
-
-    /// Command to run when a problem is received.
-    /// Provide a format string with any number of `%s` which will be replaced with the ID of the
-    /// problem to specify the command.
-    /// Example: `--on-recieve-problem "echo \"i = `$(cat ./inputs/%s.txt)`\n\n\" > %s.py"`
+    /// Command to run when a new problem is recieved.
+    /// `$q` will be set to the problem ID. (remember to escape `$` in your terminal)
+    /// Example: `--on-recieve-problem "mkdir prob ; fuzz \$q > prob/\$q.txt"`
     #[arg(long)]
     on_recieve_problem: Option<String>,
 
-    /// Provide a format string with any number of `%s` which will be replaced with the ID of the
-    /// problem to specify a command to run to generate a solution. `stdout` will be submitted
-    /// to the server. Will only work if `--watch` is also provided. If may be useful to use
-    /// `stderr` for debugging output so that this dose not have to be removed before submission.
-    #[arg(long)]
-    auto_submit: Option<String>,
-
-    /// Provide a format string with any number of `%s` which will be replaced with the ID of the
-    /// problem to specify a path to watch for changes. When the file changes, the `--auto-submit`
-    /// command will be run and the file will be submitted.
-    #[arg(long)]
-    watch: Option<String>,
+    // #[arg(long)]
+    // auto_submit: Option<String>,
+    //
+    // #[arg(long)]
+    // watch: Option<String>,
 }
 
-async fn get_question(app_state: Arc<Mutex<AppState>>, _: ()) {
+async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
     let problems = app_state
         .lock()
         .await
@@ -83,6 +70,24 @@ async fn get_question(app_state: Arc<Mutex<AppState>>, _: ()) {
         .fetch_all_problems()
         .await
         .unwrap();
+
+    let cmds = app_state.lock().await.events.new_problem.clone();
+
+    for cmd in cmds {
+        for problem in &problems {
+            let mut env = shell::Env::default();
+            env.insert("q".to_string(), problem.slug.clone());
+
+            shell::exec(
+                &cmd,
+                app_state.clone(),
+                &shell::Output::ToConsole,
+                None,
+                &env,
+            )
+            .await
+        }
+    }
 
     let mut app_state = app_state.lock().await;
 
@@ -107,7 +112,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let app_state = AppStateMutex::new(server.clone(), creds.clone());
 
-    app_state.run_async(get_question, ());
+    app_state.run_sync(|mut app_state| {
+        if let Some(on_recieve_problem) = args.on_recieve_problem {
+            app_state.events.new_problem.push(on_recieve_problem);
+        }
+    });
+
+    app_state.run_async(get_questions, ());
     app_state.run_async(start_web_socket, ());
 
     enable_raw_mode()?;
@@ -134,8 +145,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         let _ = terminal.draw(|f| app_state.run_sync(|app_state| ui::draw(f, app_state)));
 
         let timeout = tick_rate.saturating_sub(last_tick.elapsed());
-        if event::poll(timeout)? {
-            if let Event::Key(key) = event::read()? {
+        if crossterm::event::poll(timeout)? {
+            if let Event::Key(key) = crossterm::event::read()? {
                 let typing = app_state.run_sync(|app_state| app_state.console.typing);
                 if !typing && key.code == KeyCode::Char('q') {
                     break;
@@ -148,9 +159,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         if last_tick.elapsed() >= tick_rate {
             last_tick = Instant::now();
         }
-        // if !app_state.running {
-        //     break;
-        // }
+
+        let running = app_state.run_sync(|app_state| app_state.running);
+        if !running {
+            break;
+        }
     }
 
     disable_raw_mode()?;

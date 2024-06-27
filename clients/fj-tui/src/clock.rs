@@ -6,6 +6,7 @@ pub struct Clock {
     // pub hold: String,
 }
 
+#[derive(PartialEq)]
 pub enum ClockState {
     Before,
     During,

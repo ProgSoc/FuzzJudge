@@ -1,14 +1,6 @@
 use std::fs::File;
 use std::io::Write;
 
-pub fn clamp_zero(n: i32) -> i32 {
-    if n < 0 {
-        0
-    } else {
-        n
-    }
-}
-
 pub fn pad_end(s: &str, width: usize) -> String {
     let mut s = s.to_string();
     assert!(s.len() <= width);

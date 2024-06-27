@@ -3,7 +3,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 use ratatui::widgets::ListState;
 use tokio::sync::Mutex;
 
-use crate::{api, auth, clock::Clock, console::ConsoleState, key::KeyState, problem::Problem, scroll::Scroll};
+use crate::{api, auth, clock::Clock, console::ConsoleState, event::EventSubscriptions, key::KeyState, problem::Problem, scroll::Scroll};
 
 pub struct AppState {
     pub problems: Vec<Problem>,
@@ -13,19 +13,21 @@ pub struct AppState {
     pub console: ConsoleState,
     pub key: KeyState,
     pub clock: Option<Clock>,
+    pub events: EventSubscriptions,
     selected_problem: ListState,
 }
 
 impl AppState {
-    pub fn new(server: String, creds: auth::Credentials) -> Self {
+    pub fn new(session: api::Session) -> Self {
         Self {
             problems: vec![],
-            session: api::Session::new(server, creds),
+            session,
             running: true,
             selected_problem: ListState::default(),
             instructions_scroll: Scroll::new(),
             console: ConsoleState::default(),
             key: KeyState::default(),
+            events: EventSubscriptions::default(),
             clock: None,
         }
     }
@@ -70,7 +72,20 @@ impl AppStateMutex {
         let rt = Arc::new(std::sync::Mutex::new(
             tokio::runtime::Runtime::new().unwrap(),
         ));
-        let app_state = Arc::new(tokio::sync::Mutex::new(AppState::new(server, creds)));
+
+        let sess = rt.lock().unwrap().block_on(async {
+            api::Session::new(server, creds.clone()).await
+        });
+
+        let sess = match sess {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Connection Error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+        let app_state = Arc::new(tokio::sync::Mutex::new(AppState::new(sess)));
         Self { rt, app_state }
     }
 
@@ -93,12 +108,25 @@ impl AppStateMutex {
         })
     }
 
-    /// Execute an async function with access to the app state mutex.
+    /// Execute an async function with access to the app state mutex. It needs to be like this
+    /// because we don't have async closures yet.
     ///
     /// # Arguments
     /// * `f` - The function to run. Function should be a pointer to an async function that
     /// takes the mutex-guarded app state and any data you want to pass through.
     /// * `a` - The data to pass through to the function.
+    ///
+    /// # Example
+    /// ```rust
+    /// async fn add(app_state: Arc<Mutex<AppState>>, (a, b): (i32, i32)) {
+    ///    let mut app_state = app_state.lock().await;
+    ///    app_state.console.println(&format!("{} + {} = {}", a, b, a + b));
+    /// }
+    ///
+    /// ...
+    ///
+    /// app_state.run_async(add, (1, 2));
+    /// ```
     pub fn run_async<T, A>(&self, f: fn(Arc<Mutex<AppState>>, A) -> T, a: A)
     where
         T: Future<Output = ()> + 'static + Send,

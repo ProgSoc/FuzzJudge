@@ -1,6 +1,9 @@
 use ratatui::Frame;
 
-use crate::{md, AppState};
+use crate::{
+    clock::{self, ClockState},
+    md, AppState,
+};
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Margin},
@@ -66,32 +69,50 @@ pub fn draw(frame: &mut Frame, mut app_state: tokio::sync::MutexGuard<AppState>)
         &mut app_state.selected_problem_borrow_mut_no_scroll(),
     );
 
-    let (title, contents, difficulty, points) = match app_state.selected_problem_borrow().selected()
-    {
-        Some(s) => (
-            app_state.problems[s].title.clone(),
-            app_state.problems[s].instructions.clone(),
-            app_state.problems[s].difficulty.clone(),
-            app_state.problems[s].points,
-        ),
-        None => ("".to_string(), "No problem selected".to_string(), 0, 0),
+    let (title, md_source, difficulty, points) =
+        match app_state.selected_problem_borrow().selected() {
+            Some(s) => (
+                app_state.problems[s].title.clone(),
+                app_state.problems[s].instructions.clone(),
+                app_state.problems[s].difficulty.clone(),
+                app_state.problems[s].points,
+            ),
+            None => ("".to_string(), "No problem selected".to_string(), 0, 0),
+        };
+
+    let mut contents: Vec<Line> = vec![];
+
+    let clock_state = if let Some(clock) = &app_state.clock {
+        clock.state()
+    } else {
+        clock::ClockState::During
     };
 
-    let md = markdown::to_mdast(&contents, &markdown::ParseOptions::default()).unwrap();
-    let mut contents: Vec<Line> = vec![];
-    md::render(&md, &mut contents);
+    let md = markdown::to_mdast(&md_source, &markdown::ParseOptions::default()).unwrap();
 
-    contents.insert(0, Line::from(title));
-    contents.insert(1, Line::from("-----------------------------------------"));
-    contents.insert(
-        2,
-        Line::from(vec!["Difficulty: ".into(), difficulty_label(difficulty)]),
-    );
-    contents.insert(
-        3,
-        Line::from(vec!["Points: ".into(), points.to_string().into()]),
-    );
-    contents.insert(4, Line::from(vec![]));
+    match clock_state {
+        ClockState::During => {
+            md::render(&md, &mut contents);
+
+            contents.insert(0, Line::from(title));
+            contents.insert(1, Line::from("-----------------------------------------"));
+            contents.insert(
+                2,
+                Line::from(vec!["Difficulty: ".into(), difficulty_label(difficulty)]),
+            );
+            contents.insert(
+                3,
+                Line::from(vec!["Points: ".into(), points.to_string().into()]),
+            );
+            contents.insert(4, Line::from(vec![]));
+        }
+        ClockState::Before => {
+            contents.push(Line::from("The competition has not started yet.".bold()));
+        }
+        ClockState::After => {
+            contents.push(Line::from("The competition has ended.".bold()));
+        }
+    }
 
     let question_area = Layout::new(
         Direction::Vertical,

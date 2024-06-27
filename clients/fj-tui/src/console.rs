@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
+
+use async_recursion::async_recursion;
+use tokio::{io::AsyncWriteExt, process::Command};
 
 use crate::{scroll::Scroll, AppState, AppStateMutex};
 
@@ -9,6 +12,8 @@ pub struct ConsoleState {
     pub command_history: Vec<String>,
     pub typing: bool,
     pub scroll: Scroll,
+    pub commnand_history_index: usize,
+    pub pre_history_command: Option<String>,
 }
 
 impl ConsoleState {
@@ -33,55 +38,45 @@ impl ConsoleState {
         self.messages.clear();
         self.scroll.set_content_length(0);
     }
-}
 
-async fn handle_fuzz(app_state: Arc<tokio::sync::Mutex<AppState>>, slug: String) {
-    let response = app_state.lock().await.session.fuzz(slug).await;
+    pub fn history_previous(&mut self) {
+        if self.pre_history_command.is_none() || self.command_history.is_empty() {
+            return;
+        }
 
-    match response {
-        Ok(response) => {
-            app_state.lock().await.console.println(&response);
+        let max_idx = self.command_history.len() - 1;
+
+        if self.commnand_history_index == 0 {
+            self.command_buffer = self.pre_history_command.as_ref().unwrap().clone();
+            self.pre_history_command = None;
+            return;
         }
-        Err(e) => {
-            app_state.lock().await.console.eprintln(&e);
+
+        self.commnand_history_index =
+            (self.commnand_history_index as i32 - 1).clamp(0, max_idx as i32) as usize;
+
+        self.command_buffer = self.command_history[max_idx - self.commnand_history_index].clone();
+
+        self.scroll.to_bottom();
+    }
+
+    pub fn history_next(&mut self) {
+        if self.command_history.is_empty() {
+            return;
         }
+
+        let max_idx = self.command_history.len() - 1;
+
+        if self.pre_history_command.is_none() {
+            self.pre_history_command = Some(self.command_buffer.clone());
+        } else {
+            self.commnand_history_index =
+                (self.commnand_history_index as i32 + 1).clamp(0, max_idx as i32) as usize;
+        }
+
+        self.command_buffer = self.command_history[max_idx - self.commnand_history_index].clone();
+
+        self.scroll.to_bottom();
     }
 }
 
-pub fn exec(command: &str, app_state: AppStateMutex) {
-    let mut parts = command.split_whitespace().filter(|s| !s.is_empty());
-    let command = parts.next().unwrap_or_default();
-    let args = parts.collect::<Vec<&str>>();
-
-    match command {
-        "help" => {
-            todo!();
-        }
-        "f" | "fuzz" => {
-            if args.is_empty() {
-                app_state.println("Usage: fuzz <slug>");
-                return;
-            }
-
-            app_state.run_async(handle_fuzz, args[0].to_string());
-        }
-        "j" | "judge" => {
-            todo!();
-        }
-        "clear" => {
-            app_state.run_sync(|mut state| state.console.clear());
-        }
-        "echo" => {
-            app_state.println(&args.join(" "));
-        }
-        "cat" => {
-            todo!();
-        }
-        "q" | "quit" | "exit" => {
-            app_state.run_sync(|mut state| state.running = false);
-        }
-        _ => {
-            app_state.println(&format!("Unknown command: {}", command));
-        }
-    }
-}
