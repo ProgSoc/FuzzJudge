@@ -18,7 +18,7 @@
 
 import { MaybeNull } from "https://deno.land/std@0.92.0/node/_utils.ts";
 import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
-import { DB, compressZstd, decompressZstd } from "./deps.ts";
+import { DB, compressZstd, decompressZstd } from "../deps.ts";
 import { Subscribable } from "./util.ts";
 
 export type Team = {

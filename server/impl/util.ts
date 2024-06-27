@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TOML, YAML, normalize } from "./deps.ts";
+import { TOML, YAML, normalize } from "../deps.ts";
 
 export interface MarkdownDocument {
   front?: unknown;

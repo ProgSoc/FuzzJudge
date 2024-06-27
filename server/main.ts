@@ -39,15 +39,15 @@ Backend
 
 */
 
-import { deleteFalsey, loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
-import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
+import { deleteFalsey, loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./impl/util.ts";
+import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./impl/comp.ts";
 import { accepts, pathJoin, serveFile, normalize, initZstd } from "./deps.ts";
-import { Auth } from "./auth.ts";
-import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
+import { Auth } from "./impl/auth.ts";
+import { Router, catchWebsocket, expectForm, expectMime } from "./impl/http.ts";
 import { HEADER } from "./version.ts";
-import { CompetitionDB, UserRoles } from "./db.ts";
-import { CompetitionClock, CompetitionClockMessage } from "./clock.ts";
-import { CompetitionScoreboard, CompetitionScoreboardMessage } from "./score.ts";
+import { CompetitionDB, UserRoles } from "./impl/db.ts";
+import { CompetitionClock, CompetitionClockMessage } from "./impl/clock.ts";
+import { CompetitionScoreboard, CompetitionScoreboardMessage } from "./impl/score.ts";
 
 // Temporary
 export type SocketMessage = SubscriptionGroupMessage<{
