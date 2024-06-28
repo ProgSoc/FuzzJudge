@@ -41,11 +41,11 @@ impl ConsoleState {
             .iter()
             .map(|m| {
                 let mut m = m.clone();
-                if m.chars().last() == Some('\n') {
+                if m.ends_with('\n') {
                     m.pop();
                 }
 
-                m.split("\n")
+                m.split('\n')
                     .map(|l| number_of_lines_when_broken(&format!("> {}", l), self.console_width))
                     .sum::<usize>()
             })
@@ -65,7 +65,8 @@ impl ConsoleState {
         let max_idx = self.command_history.len() - 1;
 
         if self.command_history_index == 0 {
-            self.command_buffer = self.pre_history_command.as_ref().unwrap().clone();
+            self.command_buffer
+                .clone_from(self.pre_history_command.as_ref().unwrap());
             self.pre_history_command = None;
             return;
         }
@@ -73,7 +74,8 @@ impl ConsoleState {
         self.command_history_index =
             (self.command_history_index as i32 - 1).clamp(0, max_idx as i32) as usize;
 
-        self.command_buffer = self.command_history[max_idx - self.command_history_index].clone();
+        self.command_buffer
+            .clone_from(&self.command_history[max_idx - self.command_history_index]);
 
         self.scroll.to_bottom();
     }
@@ -92,7 +94,8 @@ impl ConsoleState {
                 (self.command_history_index as i32 + 1).clamp(0, max_idx as i32) as usize;
         }
 
-        self.command_buffer = self.command_history[max_idx - self.command_history_index].clone();
+        self.command_buffer
+            .clone_from(&self.command_history[max_idx - self.command_history_index]);
 
         self.scroll.to_bottom();
     }

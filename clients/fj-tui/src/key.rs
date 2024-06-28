@@ -135,7 +135,7 @@ fn handle_typing(app_state: AppStateMutex, key: KeyEvent) {
 
             app_state.run_sync(|mut app_state| {
                 app_state.console.typing = false;
-                cmd = app_state.console.command_buffer.clone();
+                cmd.clone_from(&app_state.console.command_buffer);
 
                 let push_to_history = if let Some(last) = app_state.console.command_history.last() {
                     last != &cmd

@@ -43,6 +43,7 @@ impl Scroll {
         self.content_length.saturating_sub(self.view_port_height)
     }
 
+    #[allow(clippy::wrong_self_convention)]
     pub fn to_bottom(&mut self) {
         self.set_position(self.bottom());
     }
