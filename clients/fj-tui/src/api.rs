@@ -13,7 +13,7 @@ use futures_util::{
     pin_mut, StreamExt,
 };
 use tokio_tungstenite::connect_async;
-use url::{ParseError, Url};
+use url::Url;
 
 impl Session {
     #[async_recursion]

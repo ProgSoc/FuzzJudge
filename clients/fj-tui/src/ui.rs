@@ -1,13 +1,8 @@
-use ratatui::{
-    text::{Text, ToText},
-    Frame,
-};
+use ratatui::Frame;
 
 use crate::{
     clock::{self, ClockState},
-    md,
-    utils::number_of_lines_when_broken,
-    AppState,
+    md, AppState,
 };
 
 use ratatui::{
