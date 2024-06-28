@@ -313,6 +313,7 @@ pub enum OutputMode {
 pub struct Output {
     status: i32,
     stdout: String,
+    #[allow(dead_code)]
     stderr: String,
     mode: OutputMode,
     app_state: Arc<tokio::sync::Mutex<AppState>>,

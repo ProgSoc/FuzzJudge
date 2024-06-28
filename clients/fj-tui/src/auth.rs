@@ -13,7 +13,8 @@ impl Credentials {
     }
 
     pub fn auth_header_value(&self) -> String {
-        let encoded = base64::encode(format!("{}:{}", self.username, self.password));
+        let raw = format!("{}:{}", self.username, self.password);
+        let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, raw);
         format!("Basic {}", encoded)
     }
 }

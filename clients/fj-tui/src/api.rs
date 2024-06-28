@@ -55,6 +55,7 @@ impl Session {
     }
 
     /// For tests.
+    #[allow(dead_code)]
     pub fn new_no_connection() -> Self {
         Self {
             server: Url::parse("http://localhost").unwrap(),
