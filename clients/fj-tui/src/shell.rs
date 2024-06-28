@@ -491,6 +491,7 @@ mod tests {
             ("echo 2>1", Some(""), 0),
             ("cat 1", Some("2"), 0),
             ("rm 1", Some(""), 0),
+            ("echo \"a\\na\"", Some("a\na"), 0),
             ("echo \" > f\"", Some(" > f"), 0),
             ("echo \" | && > < ; f\"", Some(" | && > < ; f"), 0),
             (

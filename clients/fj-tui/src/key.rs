@@ -148,7 +148,7 @@ fn handle_typing(app_state: AppStateMutex, key: KeyEvent) {
 
                 app_state.console.messages.push(cmd.clone());
                 app_state.console.command_buffer.clear();
-                app_state.console.commnand_history_index = 0;
+                app_state.console.command_history_index = 0;
                 app_state.console.pre_history_command = None;
             });
 
@@ -163,7 +163,7 @@ fn handle_typing(app_state: AppStateMutex, key: KeyEvent) {
             app_state.run_sync(|mut app_state| {
                 app_state.console.typing = false;
                 app_state.console.command_buffer.clear();
-                app_state.console.commnand_history_index = 0;
+                app_state.console.command_history_index = 0;
                 app_state.console.pre_history_command = None;
             });
         }

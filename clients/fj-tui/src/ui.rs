@@ -2,7 +2,9 @@ use ratatui::Frame;
 
 use crate::{
     clock::{self, ClockState},
-    md, AppState,
+    md,
+    utils::number_of_lines_when_broken,
+    AppState,
 };
 
 use ratatui::{
@@ -155,13 +157,13 @@ fn instructions(
         }
     }
 
-    // let paragraph_width = instructions_area.width.saturating_sub(4) as usize;
-    // let lines = contents
-    //     .iter()
-    //     .map(|l| number_of_lines_when_broken(&l.to_string(), paragraph_width))
-    //     .sum::<usize>();
-
-    let lines = contents.len();
+    // HACK: Because of line-wrapping in the ratatui paragraph, we need to approximate
+    //       the number of lines ourself.
+    let paragraph_width = instructions_area.width.saturating_sub(4) as usize;
+    let lines = contents
+        .iter()
+        .map(|l| number_of_lines_when_broken(&l.to_string(), paragraph_width))
+        .sum::<usize>();
 
     app_state.instructions_scroll.set_content_length(lines);
 
@@ -195,7 +197,10 @@ fn console(
     app_state
         .console
         .scroll
-        .set_view_port_height(console_area.height.saturating_sub(4) as usize);
+        .set_view_port_height(console_area.height.saturating_sub(2) as usize);
+
+    let width = console_area.width.saturating_sub(2) as usize;
+    app_state.console.set_console_width(width);
 
     let mut console_text: Vec<Line> = app_state
         .console
@@ -226,13 +231,6 @@ fn console(
     }
 
     console_text.push(Line::from(console_input));
-
-    // let width = console_area.width.saturating_sub(4) as usize;
-    // let lines = console_text
-    //     .iter()
-    //     .map(|l| number_of_lines_when_broken(&l.to_string(), width))
-    //     .sum::<usize>();
-    // app_state.console.scroll.set_content_length(lines);
 
     frame.render_widget(
         Paragraph::new(console_text)
