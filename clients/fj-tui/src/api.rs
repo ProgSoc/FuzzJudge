@@ -8,9 +8,12 @@ pub struct Session {
 }
 
 use async_recursion::async_recursion;
-use futures_util::{future, pin_mut, StreamExt};
+use futures_util::{
+    future::{self, join_all},
+    pin_mut, StreamExt,
+};
 use tokio_tungstenite::connect_async;
-use url::Url;
+use url::{ParseError, Url};
 
 impl Session {
     #[async_recursion]
@@ -103,41 +106,52 @@ impl Session {
         Ok(response)
     }
 
-    async fn fetch_problem(&self, slug: &str) -> Result<Problem, Box<dyn std::error::Error>> {
+    async fn fetch_problem(&self, slug: &str) -> Result<Problem, String> {
         let url = self.server.join("/comp/prob/").unwrap();
         let prob_url = url.join(&format!("{}/", &slug)).unwrap();
 
-        // TODO: tokio::join! this
         let title = reqwest::get(prob_url.join("name").unwrap())
-            .await?
+            .await
+            .map_err(|e| e.to_string())?
             .text()
-            .await?;
+            .await
+            .map_err(|e| e.to_string())?;
 
         let icon = reqwest::get(prob_url.join("icon").unwrap())
-            .await?
+            .await
+            .map_err(|e| e.to_string())?
             .text()
-            .await?;
+            .await
+            .map_err(|e| e.to_string())?;
 
         let difficulty = reqwest::get(prob_url.join("difficulty").unwrap())
-            .await?
+            .await
+            .map_err(|e| e.to_string())?
             .text()
-            .await?
-            .parse()?;
+            .await
+            .map_err(|e| e.to_string())?
+            .parse()
+            .map_err(|e: std::num::ParseIntError| e.to_string())?;
 
         let points = reqwest::get(prob_url.join("points").unwrap())
-            .await?
+            .await
+            .map_err(|e| e.to_string())?
             .text()
-            .await?
-            .parse()?;
+            .await
+            .map_err(|e| e.to_string())?
+            .parse()
+            .map_err(|e: std::num::ParseIntError| e.to_string())?;
 
         let instructions = self
             .client
             .get(prob_url.join("instructions").unwrap())
             .header("Authorization", self.creds.auth_header_value())
             .send()
-            .await?
+            .await
+            .map_err(|e| e.to_string())?
             .text()
-            .await?;
+            .await
+            .map_err(|e| e.to_string())?;
 
         Ok(Problem {
             slug: slug.to_string(),
@@ -162,17 +176,17 @@ impl Session {
             .await
             .map_err(|e| e.to_string())?;
 
-        let mut problems = Vec::new();
+        let problems = join_all(
+            slugs
+                .lines()
+                .map(|slug| self.fetch_problem(slug))
+                .collect::<Vec<_>>(),
+        )
+        .await
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()?;
 
-        tokio::join! {
-            async {
-                for slug in slugs.lines() {
-                    problems.push(self.fetch_problem(slug).await.map_err(|e| e.to_string()));
-                }
-            }
-        };
-
-        problems.into_iter().collect::<Result<Vec<_>, _>>()
+        Ok(problems)
     }
 }
 

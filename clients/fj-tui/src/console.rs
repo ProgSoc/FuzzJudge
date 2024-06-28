@@ -14,12 +14,14 @@ pub struct ConsoleState {
 impl ConsoleState {
     pub fn println(&mut self, message: &str) {
         self.messages.push(message.to_string());
+
         self.scroll.set_content_length(self.line_count());
+
         self.scroll.to_bottom();
     }
 
     pub fn eprintln(&mut self, message: &str) {
-        self.messages.push(format!("ERROR: {}", message));
+        self.println(&format!("ERROR: {}", message));
     }
 
     pub fn line_count(&self) -> usize {

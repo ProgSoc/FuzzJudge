@@ -22,8 +22,10 @@ pub async fn exec(
     }
 
     if let Some((l, r)) = split_by_oper(command, "&") {
-        exec(&l, app_state.clone(), output, None, env).await;
-        exec(&r, app_state.clone(), output, None, env).await;
+        tokio::join! {
+            exec(&l, app_state.clone(), output, None, env),
+            exec(&r, app_state.clone(), output, None, env)
+        };
         return;
     }
 
