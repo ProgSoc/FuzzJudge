@@ -121,7 +121,7 @@ async fn wrapped_exec(
     shell::exec(
         &cmd,
         app_state.clone(),
-        &shell::Output::ToConsole,
+        shell::OutputMode::ToConsole,
         None,
         &env,
     )

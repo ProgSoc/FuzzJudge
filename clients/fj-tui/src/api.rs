@@ -54,6 +54,15 @@ impl Session {
         })
     }
 
+    /// For tests.
+    pub fn new_no_connection() -> Self {
+        Self {
+            server: Url::parse("http://localhost").unwrap(),
+            creds: Credentials::default(),
+            client: reqwest::Client::new(),
+        }
+    }
+
     pub async fn fuzz(&self, slug: String) -> Result<String, String> {
         let url = self.server.join("/comp/prob/").unwrap();
         let url = url.join(&format!("{}/", &slug)).unwrap();

@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Credentials {
     pub username: String,
     password: String,

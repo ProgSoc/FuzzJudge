@@ -1,8 +1,13 @@
-use ratatui::{text::Text, Frame};
+use ratatui::{
+    text::{Text, ToText},
+    Frame,
+};
 
 use crate::{
     clock::{self, ClockState},
-    md, AppState,
+    md,
+    utils::number_of_lines_when_broken,
+    AppState,
 };
 
 use ratatui::{
@@ -155,14 +160,19 @@ fn instructions(
         }
     }
 
-    // FIXME: line-wrapping creates more lines than just len()
-    app_state
-        .instructions_scroll
-        .set_content_length(contents.len());
+    // let paragraph_width = instructions_area.width.saturating_sub(4) as usize;
+    // let lines = contents
+    //     .iter()
+    //     .map(|l| number_of_lines_when_broken(&l.to_string(), paragraph_width))
+    //     .sum::<usize>();
+
+    let lines = contents.len();
+
+    app_state.instructions_scroll.set_content_length(lines);
 
     app_state
         .instructions_scroll
-        .set_view_port_size(question_area[0].height.saturating_sub(5) as usize);
+        .set_view_port_height(question_area[0].height.saturating_sub(5) as usize);
 
     frame.render_widget(
         Paragraph::new(contents)
@@ -190,7 +200,7 @@ fn console(
     app_state
         .console
         .scroll
-        .set_view_port_size(console_area.height.saturating_sub(4) as usize);
+        .set_view_port_height(console_area.height.saturating_sub(4) as usize);
 
     let mut console_text: Vec<Line> = app_state
         .console
@@ -221,6 +231,13 @@ fn console(
     }
 
     console_text.push(Line::from(console_input));
+
+    // let width = console_area.width.saturating_sub(4) as usize;
+    // let lines = console_text
+    //     .iter()
+    //     .map(|l| number_of_lines_when_broken(&l.to_string(), width))
+    //     .sum::<usize>();
+    // app_state.console.scroll.set_content_length(lines);
 
     frame.render_widget(
         Paragraph::new(console_text)

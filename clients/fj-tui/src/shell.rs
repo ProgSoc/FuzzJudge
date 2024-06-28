@@ -11,37 +11,68 @@ pub type Env = HashMap<String, String>;
 pub async fn exec(
     command: &str,
     app_state: Arc<tokio::sync::Mutex<AppState>>,
-    output: &Output,
+    output_mode: OutputMode,
     piped_input: Option<String>,
     env: &Env,
-) {
-    if let Some((l, r)) = split_by_oper(command, ";") {
-        exec(&l, app_state.clone(), output, None, env).await;
-        exec(&r, app_state.clone(), output, None, env).await;
-        return;
+) -> Output {
+    let mut output = Output::new(output_mode, app_state.clone());
+
+    if let Some((l, r)) = split_by_oper(command, ";", false) {
+        exec(&l, app_state.clone(), output_mode, None, env).await;
+        exec(&r, app_state.clone(), output_mode, None, env).await;
+        return output;
     }
 
-    if let Some((l, r)) = split_by_oper(command, "&") {
+    if let Some((l, r)) = split_by_oper(command, "&", false) {
         tokio::join! {
-            exec(&l, app_state.clone(), output, None, env),
-            exec(&r, app_state.clone(), output, None, env)
+            exec(&l, app_state.clone(), output_mode, None, env),
+            exec(&r, app_state.clone(), output_mode, None, env)
         };
-        return;
+        return output;
     }
 
-    if let Some((l, r)) = split_by_oper(command, ">") {
-        // TODO: deal with things after the path
-        let output = Output::ToFile(PathBuf::from(process_arg(&r, app_state.clone(), env).await));
-        exec(&l, app_state.clone(), &output, None, env).await;
-        return;
+    if let Some((l, r)) = split_by_oper(command, "&&", false) {
+        let l_output = exec(&l, app_state.clone(), output_mode, None, env).await;
+        if l_output.status == 0 {
+            let r_output = exec(&r, app_state.clone(), output_mode, None, env).await;
+            return r_output;
+        } else {
+            return l_output;
+        }
     }
 
-    if let Some((l, r)) = split_by_oper(command, "|") {
-        let output = Output::Piped {
-            command: r.to_string(),
-        };
-        exec(&l, app_state.clone(), &output, None, env).await;
-        return;
+    if let Some((l, r)) = split_by_oper(command, "|", true) {
+        app_state
+            .lock()
+            .await
+            .console
+            .println(&format!("running piped {command}"));
+
+        let l_output = exec(&l, app_state.clone(), OutputMode::Piped, None, env).await;
+        let r_output = exec(
+            &r,
+            app_state.clone(),
+            output_mode,
+            Some(l_output.stdout),
+            env,
+        )
+        .await;
+        return r_output;
+    }
+
+    if let Some((l, r)) = split_by_oper(command, ">", true) {
+        let l_output = exec(&l, app_state.clone(), OutputMode::Piped, None, env).await;
+
+        write_file(
+            app_state.clone(),
+            (
+                PathBuf::from(process_arg(&r, app_state.clone(), env).await),
+                l_output.stdout.clone(),
+            ),
+        )
+        .await;
+
+        return output;
     }
 
     let words = tokenize(command);
@@ -73,7 +104,8 @@ pub async fn exec(
                     .await
                     .console
                     .eprintln("Usage: fuzz <slug>");
-                return;
+                output.status = 1;
+                return output;
             }
 
             app_state.lock().await.console.println("Request sent...");
@@ -87,7 +119,7 @@ pub async fn exec(
                 Err(e) => e.to_string(),
             };
 
-            output.println(&out, app_state.clone(), env).await
+            output.println(&out).await;
         }
         "j" | "judge" => {
             if args.len() != 2 {
@@ -96,7 +128,8 @@ pub async fn exec(
                     .await
                     .console
                     .eprintln("Usage: judge <slug> <source-path>");
-                return;
+                output.status = 1;
+                return output;
             }
 
             let solution = if let Some(input) = piped_input {
@@ -107,7 +140,8 @@ pub async fn exec(
                     .await
                     .console
                     .eprintln("No solution was provided. Please pipe the solution into this command. e.g. `echo \"solution\" | judge <slug> <source-path>`");
-                return;
+                output.status = 1;
+                return output;
             };
 
             let slug = args[0].to_string();
@@ -127,15 +161,13 @@ pub async fn exec(
                 Err(e) => e.to_string(),
             };
 
-            output.println(&out, app_state.clone(), env).await
+            output.println(&out).await;
         }
         "clear" => {
             app_state.lock().await.console.clear();
         }
         "echo" => {
-            output
-                .println(&args.join(" "), app_state.clone(), env)
-                .await;
+            output.println(&args.join(" ")).await;
         }
         "cat" => {
             if args.len() != 1 {
@@ -144,7 +176,8 @@ pub async fn exec(
                     .await
                     .console
                     .eprintln("Usage: cat <file-path>");
-                return;
+                output.status = 1;
+                return output;
             }
 
             let path = PathBuf::from(&args[0]);
@@ -153,10 +186,13 @@ pub async fn exec(
 
             let out = match res {
                 Ok(content) => content,
-                Err(e) => e.to_string(),
+                Err(e) => {
+                    output.status = 1;
+                    e.to_string()
+                }
             };
 
-            output.println(&out, app_state.clone(), env).await;
+            output.println(&out).await;
         }
         "q" | "quit" | "exit" => {
             app_state.lock().await.running = false;
@@ -170,8 +206,9 @@ pub async fn exec(
                 .spawn();
 
             if let Err(e) = cmd {
-                output.println(&e.to_string(), app_state.clone(), env).await;
-                return;
+                output.println(&e.to_string()).await;
+                output.status = 1;
+                return output;
             }
 
             let mut child = cmd.unwrap();
@@ -183,14 +220,18 @@ pub async fn exec(
 
             let cmd_output = child.wait_with_output().await;
 
+            output.status = cmd_output.as_ref().unwrap().status.code().unwrap_or(1);
+
             let out = match cmd_output {
                 Ok(output) => String::from_utf8_lossy(&output.stdout).to_string(),
                 Err(e) => e.to_string(),
             };
 
-            output.println(&out, app_state.clone(), env).await;
+            output.println(&out).await;
         }
     }
+
+    output
 }
 fn tokenize(command: &str) -> Vec<String> {
     let mut tokens = vec![];
@@ -232,15 +273,23 @@ fn tokenize(command: &str) -> Vec<String> {
     tokens
 }
 
-fn split_by_oper(command: &str, oper: &str) -> Option<(String, String)> {
+fn split_by_oper(command: &str, oper: &str, last: bool) -> Option<(String, String)> {
     let words = command.split_whitespace().filter(|s| !s.is_empty());
 
     let mut oper_pos = None;
 
-    for (i, word) in words.clone().enumerate() {
-        if word == oper {
-            oper_pos = Some(i);
-            break;
+    if last {
+        for (i, word) in words.clone().enumerate() {
+            if word == oper {
+                oper_pos = Some(i);
+            }
+        }
+    } else {
+        for (i, word) in words.clone().enumerate() {
+            if word == oper {
+                oper_pos = Some(i);
+                break;
+            }
         }
     }
 
@@ -253,41 +302,43 @@ fn split_by_oper(command: &str, oper: &str) -> Option<(String, String)> {
     None
 }
 
-#[derive(Clone)]
-pub enum Output {
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
+pub enum OutputMode {
+    #[default]
     ToConsole,
-    ToFile(PathBuf),
-    Piped { command: String },
-    IntoMutex(Arc<tokio::sync::Mutex<String>>),
+    Piped,
+}
+
+#[derive(Clone)]
+pub struct Output {
+    status: i32,
+    stdout: String,
+    stderr: String,
+    mode: OutputMode,
+    app_state: Arc<tokio::sync::Mutex<AppState>>,
 }
 
 impl Output {
-    pub async fn println(
-        &self,
-        message: &str,
-        app_state: Arc<tokio::sync::Mutex<AppState>>,
-        env: &Env,
-    ) {
-        match self {
-            Output::ToConsole => {
-                app_state.lock().await.console.println(message);
+    pub fn new(mode: OutputMode, app_state: Arc<tokio::sync::Mutex<AppState>>) -> Self {
+        Self {
+            mode,
+            app_state,
+            status: 0,
+            stdout: String::new(),
+            stderr: String::new(),
+        }
+    }
+}
+
+impl Output {
+    pub async fn println(&mut self, s: &str) {
+        match self.mode {
+            OutputMode::Piped => {
+                self.stdout.push_str(s);
+                self.stdout.push('\n');
             }
-            Output::ToFile(path) => {
-                write_file(app_state, (path.clone(), message.to_string())).await;
-            }
-            Output::Piped { command } => {
-                exec(
-                    command,
-                    app_state.clone(),
-                    &Output::ToConsole,
-                    Some(message.to_string()),
-                    env,
-                )
-                .await;
-            }
-            Output::IntoMutex(mutex) => {
-                let mut guard = mutex.lock().await;
-                guard.push_str(message);
+            OutputMode::ToConsole => {
+                self.app_state.lock().await.console.println(s);
             }
         }
     }
@@ -363,18 +414,9 @@ async fn handle_variable(
         command.remove(0);
         command.pop();
 
-        let output = Arc::new(tokio::sync::Mutex::new("".to_string()));
-        exec(
-            &command,
-            app_state.clone(),
-            &Output::IntoMutex(output.clone()),
-            None,
-            env,
-        )
-        .await;
-        let output = output.lock().await.clone();
+        let output = exec(&command, app_state.clone(), OutputMode::Piped, None, env).await;
 
-        return output;
+        return output.stdout;
     }
 
     match var {
@@ -414,4 +456,64 @@ async fn process_arg(arg: &str, app_state: Arc<tokio::sync::Mutex<AppState>>, en
     }
 
     new_arg
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::api;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_shell() {
+        let app_state = AppState::new(api::Session::new_no_connection());
+        let app_state = Arc::new(tokio::sync::Mutex::new(app_state));
+        let mut env = Env::new();
+        env.insert("a".to_string(), "Some Value".to_string());
+
+        // TODO: Support all of these
+        let input_output_compare_tests = vec![
+            ("echo hello", Some("hello"), 0),
+            ("echo hello world", Some("hello world"), 0),
+            ("echo a ; echo b ; echo c", Some("a\nb\nc"), 0),
+            ("fuzz a a  a a a  aa a a", None, 1),
+            ("cat", None, 1),
+            ("echo a$a.a", Some("aSome Value.a"), 0),
+            (
+                "cat && echo hello",
+                Some("ERROR: Usage: cat <file-path>"),
+                1,
+            ),
+            ("echo hello && echo hello", Some("hello\nhello"), 0),
+            ("cat non-existent-file", None, 1),
+            ("ahjsdkjashldkjashdashdkj", None, 1),
+            ("echo $(echo $(echo hi) hi) hello)", Some("hi hi hello"), 0),
+            ("echo 2>1", Some(""), 0),
+            ("cat 1", Some("2"), 0),
+            ("rm 1", Some(""), 0),
+            ("echo \" > f\"", Some(" > f"), 0),
+            ("echo \" | && > < ; f\"", Some(" | && > < ; f"), 0),
+            (
+                "echo \"$(echo \"hi\" \" hi\") hello\"",
+                Some("hi  hi hello"),
+                0,
+            ),
+        ];
+
+        for (input, output, status) in input_output_compare_tests {
+            let cmd_output =
+                exec(input, app_state.clone(), OutputMode::ToConsole, None, &env).await;
+            println!("testing: {}", input);
+
+            assert_eq!(cmd_output.status, status);
+
+            let console_output = app_state.lock().await.console.messages.join("\n");
+
+            if let Some(output) = output {
+                assert_eq!(console_output, output);
+            }
+
+            app_state.lock().await.console.messages.clear();
+        }
+    }
 }

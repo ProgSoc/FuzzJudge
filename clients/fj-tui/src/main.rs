@@ -77,14 +77,14 @@ async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
             let mut env = shell::Env::default();
             env.insert("q".to_string(), problem.slug.clone());
 
-            shell::exec(
+            let _ = shell::exec(
                 &cmd,
                 app_state.clone(),
-                &shell::Output::ToConsole,
+                shell::OutputMode::Piped,
                 None,
                 &env,
             )
-            .await
+            .await;
         }
     }
 
