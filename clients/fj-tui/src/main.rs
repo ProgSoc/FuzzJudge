@@ -22,7 +22,6 @@ mod api;
 mod auth;
 mod clock;
 mod console;
-mod event;
 mod key;
 mod md;
 mod problem;
@@ -70,7 +69,7 @@ async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
         .await
         .unwrap();
 
-    let cmds = app_state.lock().await.events.new_problem.clone();
+    let cmds = app_state.lock().await.on_new_problem.clone();
 
     for cmd in cmds {
         for problem in &problems {
@@ -113,7 +112,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     app_state.run_sync(|mut app_state| {
         if let Some(on_recieve_problem) = args.on_recieve_problem {
-            app_state.events.new_problem.push(on_recieve_problem);
+            app_state.on_new_problem.push(on_recieve_problem);
         }
     });
 

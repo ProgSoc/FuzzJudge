@@ -4,8 +4,7 @@ use ratatui::widgets::ListState;
 use tokio::sync::Mutex;
 
 use crate::{
-    api, auth, clock::Clock, console::ConsoleState, event::EventSubscriptions, key::KeyState,
-    problem::Problem, scroll::Scroll,
+    api, auth, clock::Clock, console::ConsoleState, key::KeyState, problem::Problem, scroll::Scroll,
 };
 
 pub struct AppState {
@@ -16,7 +15,8 @@ pub struct AppState {
     pub console: ConsoleState,
     pub key: KeyState,
     pub clock: Option<Clock>,
-    pub events: EventSubscriptions,
+    /// Commands run when a new problem is added. `$q` assigned to slug.
+    pub on_new_problem: Vec<String>,
     selected_problem: ListState,
 }
 
@@ -30,7 +30,7 @@ impl AppState {
             instructions_scroll: Scroll::new(),
             console: ConsoleState::default(),
             key: KeyState::default(),
-            events: EventSubscriptions::default(),
+            on_new_problem: vec![],
             clock: None,
         }
     }
