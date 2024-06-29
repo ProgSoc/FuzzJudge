@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TermColours, basename, dirname, pathJoin, walkSync } from "./deps.ts";
+import { TermColours, basename, dirname, pathJoin, walkSync } from "../deps.ts";
 import { MarkdownDocument, Subscribable, indent, loadMarkdown } from "./util.ts";
 
 export type FuzzJudgeProblemMessage = {
