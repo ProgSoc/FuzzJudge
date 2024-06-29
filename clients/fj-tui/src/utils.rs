@@ -29,9 +29,9 @@ pub fn number_of_lines_when_broken(s: &str, width: usize) -> usize {
             // Split word if can't fit.
             if words_seen_this_line != 0 {
                 i = last_word_start;
-                lines += 1;
             }
 
+            lines += 1;
             column = 0;
             words_seen_this_line = 0;
         }

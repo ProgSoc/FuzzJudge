@@ -94,7 +94,14 @@ async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
 }
 
 async fn start_web_socket(app_state: Arc<Mutex<AppState>>, _: ()) {
-    connect_to_web_socket("ws://localhost:1989/", app_state.clone()).await;
+    let socket_addr = {
+        let app_state = app_state.lock().await;
+        let mut addr = app_state.session.server.clone();
+        addr.set_scheme("ws").unwrap();
+        addr
+    };
+
+    connect_to_web_socket(socket_addr.as_str(), app_state.clone()).await;
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
