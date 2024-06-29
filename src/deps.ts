@@ -4,6 +4,7 @@ export {
   init as initZstd,
 } from "https://deno.land/x/zstd_wasm@0.0.21/deno/zstd.ts";
 export { DB } from "https://deno.land/x/sqlite@v3.8/mod.ts";
+export * as TermColours from "https://deno.land/std@0.224.0/fmt/colors.ts";
 
 // i really don't like this :cry:
 // i miss my no-magic https imports - oli

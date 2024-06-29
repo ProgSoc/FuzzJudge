@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { basename, dirname, pathJoin, walkSync } from "./deps.ts";
-import { MarkdownDocument, Subscribable, loadMarkdown } from "./util.ts";
+import { TermColours, basename, dirname, pathJoin, walkSync } from "./deps.ts";
+import { MarkdownDocument, Subscribable, indent, loadMarkdown } from "./util.ts";
 
 export type FuzzJudgeProblemMessage = {
   slug: string;
@@ -53,8 +53,23 @@ export class FuzzJudgeProblem {
     this.#doc = doc;
     this.#configPath = configPath;
     this.#slug = slug;
-    this.#cmdFuzz = Object(doc.front).fuzz?.exec?.[0] ?? pathJoin(configPath, "../fuzz");
-    this.#cmdJudge = Object(doc.front).judge?.exec?.[0] ?? pathJoin(configPath, "../judge");
+
+    const REQUIRED_FIELDS = [["fuzz", "exec"], ["judge", "exec"], ["problem", "difficulty"], ["problem", "points"]];
+    const errors: string[] = [];
+    for (const [section, value] of REQUIRED_FIELDS) {
+      if (Object(doc.front)?.[section] === undefined) {
+        errors.push(`Expected section \"${section}\"`)
+      }
+      if (Object(doc.front)?.[section]?.[value] === undefined) {
+        errors.push(`Expected value \"${value}\" in section \"${section}\"`);
+      }
+    }
+    if (errors.length > 0) {
+      throw errors.join("\n");
+    }
+
+    this.#cmdFuzz = Object(doc.front).fuzz?.exec?.[0];
+    this.#cmdJudge = Object(doc.front).judge?.exec?.[0];
     this.#argsFuzz = Array.from(Object(doc.front).fuzz?.exec ?? [])
       .map(String)
       .slice(1);
@@ -176,7 +191,8 @@ export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemSetMessage
         );
         this.#problems.set(slug, problem);
       } catch (e) {
-        console.error(`Could not load "${ent.path}": ${e}`);
+        const errors = indent("    ", e.toString());
+        console.error(`${TermColours.red("ERR")} Could not load problem "${ent.path}":\n${errors})}`);
       }
     }
   }
