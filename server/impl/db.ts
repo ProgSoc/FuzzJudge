@@ -16,10 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MaybeNull } from "https://deno.land/std@0.92.0/node/_utils.ts";
-import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
+import { FuzzJudgeProblemSet } from "./comp.ts";
 import { DB, compressZstd, decompressZstd } from "../deps.ts";
-import { Subscribable } from "./util.ts";
+import { Subscribable } from "./subscribable.ts";
 
 export type Team = {
   id: number;

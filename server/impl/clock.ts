@@ -17,7 +17,7 @@
  */
 
 import { CompetitionDB } from "./db.ts";
-import { Subscribable } from "./util.ts";
+import { Subscribable } from "./subscribable.ts";
 
 export type ClockState =
   | "live"

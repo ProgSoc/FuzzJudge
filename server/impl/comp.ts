@@ -17,7 +17,9 @@
  */
 
 import { TermColours, basename, dirname, pathJoin, walkSync } from "../deps.ts";
-import { MarkdownDocument, Subscribable, indent, loadMarkdown } from "./util.ts";
+import { indent } from "./util.ts";
+import { MarkdownDocument, loadMarkdown } from "./markdown.ts";
+import { Subscribable } from "./subscribable.ts";
 
 export type FuzzJudgeProblemMessage = {
   slug: string;
