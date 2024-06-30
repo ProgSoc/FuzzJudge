@@ -1,3 +1,18 @@
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along
+ * with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 use crate::{auth::Credentials, clock::Clock, problem::Problem, state::AppState};
 use std::{path::PathBuf, sync::Arc};
 
@@ -201,7 +216,7 @@ impl Session {
 }
 
 pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mutex<AppState>>) {
-    let (_rx, stdin_rx) = futures_channel::mpsc::unbounded();
+    let (_tx, rx) = futures_channel::mpsc::unbounded();
 
     let (ws_stream, _) = connect_async(server).await.expect("Failed to connect");
 
@@ -213,17 +228,13 @@ pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mut
 
     let (write, read) = ws_stream.split();
 
-    let outgoing = stdin_rx.map(Ok).forward(write);
+    let send_msg = rx.map(Ok).forward(write);
     let on_msg = {
         read.for_each(|message| async {
             let data = match message {
                 Ok(data) => data.into_data(),
                 Err(e) => {
-                    app_state
-                        .lock()
-                        .await
-                        .console
-                        .println(&format!("Error: {}", e));
+                    app_state.lock().await.console.eprintln(&e.to_string());
                     return;
                 }
             };
@@ -241,8 +252,8 @@ pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mut
         })
     };
 
-    pin_mut!(outgoing, on_msg);
-    future::select(outgoing, on_msg).await;
+    pin_mut!(send_msg, on_msg);
+    future::select(send_msg, on_msg).await;
 }
 
 async fn handle_web_socket_message(
@@ -258,18 +269,18 @@ async fn handle_web_socket_message(
 
                 let start: String = value["start"]
                     .as_str()
-                    .ok_or("Expected `kind`")?
+                    .ok_or("Expected `start`")?
                     .to_string();
                 let finish: String = value["finish"]
                     .as_str()
-                    .ok_or("Expected `kind`")?
+                    .ok_or("Expected `finish`")?
                     .to_string();
 
                 let start = chrono::DateTime::parse_from_rfc3339(&start)
                     .map_err(|_| "Could not parse start time")?
                     .to_utc();
                 let finish = chrono::DateTime::parse_from_rfc3339(&finish)
-                    .map_err(|_| "Could not parse start time")?
+                    .map_err(|_| "Could not parse finish time")?
                     .to_utc();
 
                 // let hold = value["hold"].as_str().unwrap().to_string();
@@ -279,10 +290,7 @@ async fn handle_web_socket_message(
             "scoreboard" => {}
             "problems" => {}
             _ => {
-                app_state.lock().await.console.println(&format!(
-                    "Unknown web-socket message kind: {}",
-                    kind.as_str().unwrap()
-                ));
+                return Err(format!("Unknown message kind: {}", kind));
             }
         }
     }
