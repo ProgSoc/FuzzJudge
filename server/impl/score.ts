@@ -16,10 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Subscribable } from "./util.ts";
+import { Subscribable } from "./subscribable.ts";
 import { CompetitionDB } from "./db.ts";
 import { CompetitionClock } from "./clock.ts";
-import { FuzzJudgeProblem, FuzzJudgeProblemSet } from "./comp.ts";
+import { FuzzJudgeProblemSet } from "./comp.ts";
 
 export type ProblemScore = {
   points: number,
