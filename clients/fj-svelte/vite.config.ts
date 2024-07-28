@@ -14,4 +14,9 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      '@server': '../../server',
+    },
+  },
 });

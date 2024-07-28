@@ -61,7 +61,7 @@ const build = () => {
 };
 
 const proc = new Deno.Command("deno", {
-  args: ["run", "--watch", "-A", "../../src/main.ts", comp_dir],
+  args: ["run", "--watch", "-A", "../../server/main.ts", comp_dir],
 }).spawn();
 
 const _ = proc.output();
