@@ -39,7 +39,7 @@ $ deno run --watch -A src/main.ts sample/
 
 ## Problem Format
 
-A problem directory should contain a markdown document `prob.md` and any other required files. For an full examples see [the sample questions](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
+A problem directory should contain a markdown document `prob.md` and any other required files. For full examples, see [the sample questions](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
 
 ### Fuzz
 
@@ -51,10 +51,10 @@ exec = ["deno", "run", "fuzz.ts"]
 env = { KEY = 123 }
 ```
 
-- `cmd` is the command to be run to generate the problem input.
+- `exec` is the command to be run to generate the problem input.
 - `env` is any any environment variables to set for the command.
 
-The command is executed in the path of the problem directory with the seed appended to the end of the specified arguments list (so for example the command above would be executed as `deno run fuzz.ts someseed123`). The seed can be any string. The resulting problem input for that seed should then be sent to `stdout`.
+The command is executed in the path of the problem directory with the seed appended to the end of the specified arguments list (so for example, the command above would be executed as `deno run fuzz.ts someseed123`). The seed can be any string. The resulting problem input for that seed should then be sent to `stdout`.
 
 ### Judge
 
