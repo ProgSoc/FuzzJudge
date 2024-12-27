@@ -17,3 +17,7 @@ export { accepts, serveFile } from "jsr:@std/http@0.224.5";
 export { walkSync } from "jsr:@std/fs@0.223.0";
 export * as TOML from "jsr:@std/toml@0.223.0";
 export * as YAML from "jsr:@std/yaml@0.223.0";
+
+// Routing refactor to Hono
+export { Hono } from "jsr:@hono/hono@4.6.14";
+export { appendTrailingSlash } from "jsr:@hono/hono@4.6.14/trailing-slash";

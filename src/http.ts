@@ -21,127 +21,39 @@ export type Handler = (
   data: Record<string, string>,
 ) => Response | BodyInit | undefined | Promise<Response | BodyInit | undefined>;
 
-export type Route<T, Vars> = {
-  [verbs: Uppercase<string>]: (ctx: Request, matches: Record<keyof T, string>) => Response | Promise<Response>,
-} & {
-  [K in keyof T as K extends string ? `/:${K}` : never]: Route<T[K], Vars | K>
-  // [paths: `/${string}`]: unknown,
-};
+export interface Route {
+  [verbs: Uppercase<string>]: Handler;
+  [paths: `/${string}`]: Route | Handler;
+}
 
-function route<T extends Route<unknown, unknown>>(r: T) { return r }
-
-
-route({
-  "GET": (a, b) => new Response,
-  "/a:id": {
-    // POST: (ctx, { id }) => new Response,
+export function expectMime(ctx: Request, type: string) {
+  if (ctx.headers.get("Content-Type") !== type) {
+    throw new Response(`415 Unsupported Media Type\n\nExpected '${type}'`, { status: 415 });
   }
-})
+}
 
-// export interface Route {
-//   [verbs: Uppercase<string>]: Handler;
-//   [paths: `/${string}`]: Route | Handler;
-// }
+export async function expectForm<T extends Record<string, null | ((value: string) => unknown)>>(
+  ctx: Request,
+  fields: T,
+): Promise<{ [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string }> {
+  expectMime(ctx, "application/x-www-form-urlencoded");
+  const params = new URLSearchParams(await ctx.text());
+  return Object.fromEntries(
+    Object.entries(fields).map(([field, map]) => {
+      const value = params.get(field);
+      if (value === null) throw new Response(`400 Bad Request\n\nMissing form field '${field}'\n`, { status: 400 });
+      return [field, map?.(value) ?? value];
+    }),
+  ) as { [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string };
+}
 
-// export class Router {
-//   #table: Route;
-//   #routes: Record<
-//     string,
-//     { pattern: URLPattern; handler?: Handler; methods?: { [verb: Uppercase<string>]: Handler } }
-//   > = {};
-
-//   constructor(route: Route) {
-//     this.#table = route;
-//     this.update((table) => table);
-//   }
-
-//   #extract(base: string, baseRoute: Route) {
-//     for (const [pathOrVerb, handlerOrRoute] of Object.entries(baseRoute)) {
-//       if (pathOrVerb.startsWith("/")) {
-//         const path = pathOrVerb;
-//         if (handlerOrRoute instanceof Function) {
-//           const handler = handlerOrRoute;
-//           const pathname = base + path;
-//           this.#routes[pathname] = {
-//             pattern: new URLPattern({ pathname }),
-//             handler,
-//           };
-//         } else {
-//           const route = handlerOrRoute;
-//           this.#extract(base + path, route);
-//         }
-//       } else {
-//         const verb = pathOrVerb as Uppercase<string>;
-//         const handler = handlerOrRoute;
-//         const pathname = base || "/";
-//         const route = (this.#routes[pathname] ??= {
-//           pattern: new URLPattern({ pathname }),
-//           methods: {},
-//         });
-//         route.methods![verb] = handler;
-//       }
-//     }
-//   }
-
-//   update(map: (route: Route) => Route) {
-//     this.#table = map(this.#table);
-//     this.#extract("", this.#table);
-//   }
-
-//   async route(req: Request): Promise<Response> {
-//     for (const [_, { pattern, handler, methods }] of Object.entries(this.#routes)) {
-//       const result = pattern.exec(req.url)?.pathname;
-//       if (result !== undefined) {
-//         const responseOrBodyInit = await (methods?.[req.method.toUpperCase() as Uppercase<string>] ?? handler)?.(
-//           req,
-//           result.groups as Record<string, string>,
-//         );
-//         const foundMethod = methods?.[req.method.toUpperCase() as Uppercase<string>] !== undefined;
-//         if (responseOrBodyInit instanceof Response) {
-//           return responseOrBodyInit;
-//         } else if (responseOrBodyInit === undefined) {
-//           if (Object.keys(methods ?? {}).length > 0 && !foundMethod) {
-//             return new Response("405 Method Not Allowed (No method handler)", { status: 405 });
-//           } else {
-//             return new Response("404 Not Found (No resource)", { status: 404 });
-//           }
-//         } else {
-//           return new Response(responseOrBodyInit);
-//         }
-//       }
-//     }
-//     return new Response("404 Not Found (No route)", { status: 404 });
-//   }
-// }
-
-// export function expectMime(ctx: Request, type: string) {
-//   if (ctx.headers.get("Content-Type") !== type) {
-//     throw new Response(`415 Unsupported Media Type\n\nExpected '${type}'`, { status: 415 });
-//   }
-// }
-
-// export async function expectForm<T extends Record<string, null | ((value: string) => unknown)>>(
-//   ctx: Request,
-//   fields: T,
-// ): Promise<{ [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string }> {
-//   expectMime(ctx, "application/x-www-form-urlencoded");
-//   const params = new URLSearchParams(await ctx.text());
-//   return Object.fromEntries(
-//     Object.entries(fields).map(([field, map]) => {
-//       const value = params.get(field);
-//       if (value === null) throw new Response(`400 Bad Request\n\nMissing form field '${field}'\n`, { status: 400 });
-//       return [field, map?.(value) ?? value];
-//     }),
-//   ) as { [K in keyof T]: T[K] extends (value: string) => unknown ? ReturnType<T[K]> : string };
-// }
-
-// export function catchWebsocket(
-//   ctx: Request,
-//   handler: (socket: WebSocket) => void,
-// ): void | never {
-//   if (ctx.headers.get("Upgrade") === "websocket") {
-//     const { socket, response } = Deno.upgradeWebSocket(ctx);
-//     handler(socket);
-//     throw response;
-//   }
-// }
+export function catchWebsocket(
+  ctx: Request,
+  handler: (socket: WebSocket) => void,
+): void | never {
+  if (ctx.headers.get("Upgrade") === "websocket") {
+    const { socket, response } = Deno.upgradeWebSocket(ctx);
+    handler(socket);
+    throw response;
+  }
+}

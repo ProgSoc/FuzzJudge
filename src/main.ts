@@ -41,7 +41,7 @@ Backend
 
 import { deleteFalsey, loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
 import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
-import { accepts, pathJoin, serveFile, normalize, initZstd } from "./deps.ts";
+import { accepts, pathJoin, serveFile, normalize, initZstd, Hono, appendTrailingSlash } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
@@ -92,296 +92,319 @@ if (import.meta.main) {
     },
   });
 
-  const router = new Router({
-    GET: (req) => {
-      catchWebsocket(req, (socket) => {
+  // Many components of the API are only available to administrators,
+  // and this is used to enforce it in cases where the role of the user is otherwise unused.
+  const enforceAdmin = async (req: Request): Promise<void> | never => {
+    const { role } = await auth.protect(req);
+    if (role !== "admin") {
+      auth.reject();
+    }
+  };
+
+  // Convenience constants for relevant HTTP methods.
+  const GET = "GET";
+  const POST = "POST";
+  const PATCH = "PATCH";
+  const DELETE = "DELETE";
+  const BREW = "BREW";
+
+  const app = new Hono();
+
+  // Due to the different matching of `/client/` and `/client/:path{.*}`,
+  // we cannot use `trimTrailingSlash` since no redirect will happen on `/client`
+  // and instead the router will match to the `/client/:path{.*}` pattern.
+  // The `appendTrailingSlash` middleware only triggers on GET requests,
+  // hence all routes for GET requests below have an associated path that ends with "/",
+  // while other HTTP methods do not.
+  app.use(appendTrailingSlash());
+
+  // The routing definitions are put together in a single chained statement
+  // for the `app` Hono router. For readability,
+  // each route has the HTTP method written explicitly as an uppercase constant value
+  // followed by the path or list of paths that match the given logic
+  // (rather than representing via nested object definitions).
+
+  // No regex bounds are placed on the `:id` route parameter for problem IDs,
+  // to give more freedom to folder naming conventions in the question repository.
+
+  app
+    .on(GET, "/", (c) => {
+      catchWebsocket(c.req.raw, (socket) => {
         socket.addEventListener("open", () => {
           const handler = live.subscribe((msg) => socket.send(JSON.stringify(msg)));
           socket.addEventListener("close", () => live.unsubscribe(handler));
         });
       });
-      return HEADER;
-    },
-    BREW: (_) => new Response("418 I'm a Teapot", { status: 418 }),
-    "/auth": async (req) => {
-      const user = await auth.protect(req);
-      return new Response(user.logn);
-    },
-    "/void": (_req) => {
+      return c.text(HEADER);
+    })
+    .on(BREW, "/", (c) => {
+      return c.body("418 I'm a Teapot", 418);
+    })
+    .on(GET, "/auth/", async (c) => {
+      const user = await auth.protect(c.req.raw);
+      return c.body(user.logn, 200);
+    })
+    .on(GET, "/void/", (_c) => {
       return auth.reject();
-    },
-    "/admin": {
-      GET: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        return new Response(
-          await Deno.readFile(new URL(import.meta.resolve("./admin.html"))),
-          { headers: { "Content-Type": "text/html" } },
-        );
-      },
-    },
-    "/team": {
-      GET: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        return new Response(JSON.stringify(db.allTeams()));
-      },
-      POST: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        const team = db.createTeam(deleteFalsey(Object.fromEntries(await req.formData())) as any);
-        return new Response(
-          JSON.stringify(team),
-          {
-            status: 201,
-            headers: {
-              "Content-Type": "application/json",
-              "Location": `${req.url}/${team.id}`,
-            },
-          },
-        );
-      },
-      "/:id": {
-        PATCH: async (req, { id }) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          db.patchTeam(parseInt(id), deleteFalsey(Object.fromEntries(await req.formData())) as any);
-          return new Response(null, { status: 204 });
-        },
-        DELETE: async (req, { id }) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          db.deleteTeam(parseInt(id));
-          return new Response(null, { status: 204 });
-        },
-      },
-    },
-    "/user": {
-      GET: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        return new Response(JSON.stringify(db.allUsers()));
-      },
-      POST: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        const user = db.resetUser(deleteFalsey(Object.fromEntries(await req.formData())) as any);
-        return new Response(
-          JSON.stringify(user),
-          {
-            status: 201,
-            headers: {
-              "Content-Type": "application/json",
-              "Location": `${req.url}/${user.id}`,
-            },
-          },
-        );
-      },
-      "/:id": {
-        PATCH: async (req, { id }) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          db.patchUser(parseInt(id), deleteFalsey(Object.fromEntries(await req.formData())) as any);
-          return new Response(null, { status: 204 });
-        },
-        DELETE: async (req, { id }) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          db.deleteUser(parseInt(id));
-          return new Response(null, { status: 204 });
-        },
-      },
-    },
-    "/client/*": async (req, { 0: path }) => {
-      await auth.protect(req);
-      if (!path || path === "") {
-        path = "index.html";
-      } else if (path.endsWith("/")) {
-        path += "index.html";
+    })
+    .on(GET, "/admin/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const adminPanel = await Deno.readFile(new URL(import.meta.resolve("./admin.html")));
+      return c.body(adminPanel, 200, { "Content-Type": "text/html" });
+    })
+    .on(GET, "/team/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      return c.body(JSON.stringify(db.allTeams()));
+    })
+    .on(POST, "/team", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const team = db.createTeam(deleteFalsey(Object.fromEntries(await c.req.raw.formData())) as any);
+      return c.body(JSON.stringify(team), 201, {
+        "Context-Type": "application/json",
+        "Location": `${c.req.raw.url}/${team.id}`,
+      });
+    }) 
+    .on(PATCH, "/team/:id{\\d+}", async (c) => {
+      // We assume that the IDs of the teams are stored as integers.
+      await enforceAdmin(c.req.raw);
+      const id = c.req.param("id");
+      db.patchTeam(parseInt(id), deleteFalsey(Object.fromEntries(await c.req.raw.formData())) as any);
+      return c.body(null, 204);
+    })
+    .on(DELETE, "/team/:id{\\d+}", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const id = c.req.param("id");
+      db.deleteTeam(parseInt(id));
+      return c.body(null, 204);
+    })
+    .on(GET, "/user/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      return c.body(JSON.stringify(db.allUsers()));
+    })
+    .on(POST, "/user", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const user = db.resetUser(deleteFalsey(Object.fromEntries(await c.req.raw.formData())) as any);
+      return c.body(JSON.stringify(user), 201, {
+        "Context-Type": "application/json",
+        "Location": `${c.req.raw.url}/${user.id}`,
+      });
+    })
+    .on(PATCH, "/user/:id{\\d+}", async (c) => {
+      // We assume that the IDs of the users are stored as integers.
+      await enforceAdmin(c.req.raw);
+      const id = c.req.param("id");
+      db.patchUser(parseInt(id), deleteFalsey(Object.fromEntries(await c.req.raw.formData())) as any);
+      return c.body(null, 204);
+    })
+    .on(DELETE, "/user/:id{\\d+}", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const id = c.req.param("id");
+      db.deleteUser(parseInt(id));
+      return c.body(null, 204);
+    })
+    .on(GET, ["/client/", "/client/:path{.*}"], async (c) => {
+      // The use of two patterns here is to make it easier to capture the path of
+      // any assets that need to be accessed when loading the client resource.
+
+      // The trailing slash being present is to ensure that
+      // the CSS and JS assets being loaded by the compiled Svelte HTML files will find the
+      // right directory, since the sources use relative referencing starting with `./assets/`.
+      await auth.protect(c.req.raw);
+      const path = c.req.param("path") ?? "index.html";
+      return serveFile(c.req.raw, pathJoin(root, "client", normalize("/" + path)));
+    })
+    .on(PATCH, "/mark/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const params = new URL(c.req.raw.url).searchParams;
+      db.manualJudge(parseInt(params.get("id")!), Boolean(parseInt(params.get("ok")!)));
+      return c.body(null, 204);
+    })
+    .on(GET, "/comp/meta/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      return c.body(
+        JSON.stringify(db.allMeta()),
+        200,
+        { "Content-Type": "application/json" },
+      );
+    })
+    .on(GET, "/comp/submissions/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const params = new URL(c.req.raw.url).searchParams;
+      return c.body(
+        JSON.stringify(db.getSubmissionSkeletons(parseInt(params.get("team")!), params.get("slug")!)),
+        200,
+        { "Content-Type": "application/json" },
+      );
+    })
+    .on(GET, "/comp/submission/", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const params = new URL(c.req.raw.url).searchParams;
+      const kind = params.get("kind")!;
+
+      const submId = parseInt(params.get("subm")!);
+      const submBody = kind === "out" ? JSON.stringify(db.getSubmissionOut(submId)) :
+        kind === "code" ? JSON.stringify(db.getSubmissionCode(submId)) :
+        kind === "vler" ? JSON.stringify(db.getSubmissionVler(submId)) :
+        "Non-existent submission";
+
+      return c.body(submBody, 200, { "Content-Type": "application/json" });
+    })
+    .on(GET, "/comp/name/", (c) => {
+      return c.body(compfile.title ?? "FuzzJudge Competition");
+    })
+    .on(GET, "/comp/brief/", (c) => {
+      return c.body(compfile.summary ?? "");
+    })
+    .on(GET, "/comp/instructions/", (c) => {
+      return c.body(compfile.body, 200, { "Content-Type": "text/html" });
+    })
+    .on(GET, "/comp/scoreboard/", (c) => {
+      if (c.req.raw.headers.get("Upgrade") === "websocket") {
+        // TODO: websocket upgrades and new live scoreboard format
       }
-      return serveFile(req, pathJoin(root, "client", normalize("/" + path)));
-    },
-    "/mark": {
-      PATCH: async (req) => {
-        const { role } = await auth.protect(req);
-        if (role !== "admin") auth.reject();
-        const params = new URL(req.url).searchParams;
-        db.manualJudge(parseInt(params.get("id")!), Boolean(parseInt(params.get("ok")!)));
-        return new Response(null, { status: 204 });
-      },
-    },
-    "/comp": {
-      "/meta": {
-        GET: async (req) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          return new Response(JSON.stringify(db.allMeta()), { headers: { "Content-Type": "application/json" } });
-        },
-      },
-      "/submissions": {
-        GET: async (req) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          const params = new URL(req.url).searchParams;
-          return new Response(
-            JSON.stringify(db.getSubmissionSkeletons(parseInt(params.get("team")!), params.get("slug")!)),
-            { headers: { "Content-Type": "application/json" } },
-          );
-        },
-      },
-      "/submission": {
-        GET: async (req) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          const params = new URL(req.url).searchParams;
-          switch (params.get("kind")) {
-            case "out": {
-              return new Response(
-                JSON.stringify(db.getSubmissionOut(parseInt(params.get("subm")!))),
-                { headers: { "Content-Type": "application/json" } },
-              );
-            }
-            case "code": {
-              return new Response(
-                JSON.stringify(db.getSubmissionCode(parseInt(params.get("subm")!))),
-                { headers: { "Content-Type": "application/json" } },
-              );
-            }
-            case "vler": {
-              return new Response(
-                JSON.stringify(db.getSubmissionVler(parseInt(params.get("subm")!))),
-                { headers: { "Content-Type": "application/json" } },
-              );
-            }
-          }
-        },
-      },
-      "/name": () => compfile.title ?? "FuzzJudge Competition",
-      "/brief": () => compfile.summary ?? "",
-      "/instructions": () => new Response(compfile.body, { headers: { "Content-Type": "text/html" } }),
-      "/scoreboard": (req) => {
-        // clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
-        if (req.headers.get("Upgrade") == "websocket") {
-          // TODO: websocket upgrades and new live scoreboard format
-        }
-        return new Response(db.oldScoreboard(), { headers: { "Content-Type": "text/csv" } });
-      },
-      "/clock": {
-        GET: (req) => {
-          catchWebsocket(req, (socket) => {
-            const handler = clock.subscribe((msg) => socket.send(JSON.stringify(msg)));
-            socket.addEventListener("close", () => clock.unsubscribe(handler));
-          });
-          return new Response(JSON.stringify(clock.now()), { headers: { "Content-Type": "application/json" } });
-        },
-        PATCH: async (req) => {
-          const { role } = await auth.protect(req);
-          if (role !== "admin") auth.reject();
-          const { kind, time, keep } = deleteFalsey(Object.fromEntries(await req.formData()));
-          console.log({ kind, time, keep });
-          if (kind === "start") {
-            clock.adjustStart(new Date(time as string), { keepDuration: !!keep });
-          } else {
-            clock.adjustFinish(new Date(time as string));
-          }
-          return new Response(null, { status: 204 });
-        },
-      },
-      "/prob": {
-        GET: () => problems.toJSON().map(v => v.slug + "\n").join(""),
-        "/:id": {
-          "/icon": (_req, { id }) => problems.get(id!)!.doc().icon,
-          "/name": (_req, { id }) => problems.get(id!)!.doc().title,
-          "/brief": (_req, { id }) => problems.get(id!)!.doc().summary,
-          "/difficulty": (_req, { id }) => Object(problems.get(id!)!.doc().front)?.problem?.difficulty,
-          "/points": (_req, { id }) => Object(problems.get(id!)!.doc().front)?.problem?.points,
-          "/solution": (_) => new Response("451 Unavailable For Legal Reasons", { status: 451 }),
-          // Gated (by time and auth) utils ...
-          "/instructions": async (req, { id }) => {
-            // clock.protect();
-            await auth.protect(req);
-            return new Response(problems.get(id!)!.doc().body, { headers: { "Content-Type": "text/markdown" } });
-          },
-          "/fuzz": async (req, { id }) => {
-            // clock.protect();
-            const user = await auth.protect(req);
-            return await problems.get(id!)!.fuzz(db.userTeam(user.id)!.seed);
-          },
-          "/judge": {
-            GET: async (req, { id: problemId }) => {
-              // clock.protect();
-              const user = await auth.protect(req);
-              return db.solved({ team: user.team, prob: problemId! }) ? "OK" : "Not Solved";
-            },
-            POST: async (req, { id: problemId }) => {
-              // clock.protect();
-              const user = await auth.protect(req);
-              if (db.solved({ team: user.team, prob: problemId! })) {
-                return new Response("409 Conflict\n\nProblem already solved.\n");
-              }
-              if (req.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
-                return new Response("415 Unsupported Media Type (Expected application/x-www-form-urlencoded)", {
-                  status: 415,
-                });
-              }
-              const body = await req.text();
-              const submissionOutput = new URLSearchParams(body).get("output");
-              if (submissionOutput === null) {
-                return new Response(
-                  "400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n",
-                  { status: 400 },
-                );
-              }
-              const submissionCode = new URLSearchParams(body).get("source");
-              if (submissionCode === null) {
-                return new Response(
-                  "400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n",
-                  { status: 400 },
-                );
-              }
-              const time = new Date();
-              const t0 = performance.now();
-              const { correct, errors } = await problems
-                .get(problemId!)!
-                .judge(db.userTeam(user.id)!.seed, submissionOutput);
-              const t1 = performance.now();
+      return c.body(db.oldScoreboard(), 200, { "Content-Type": "text/csv" });
+    })
+    .on(GET, "/comp/clock/", (c) => {
+      catchWebsocket(c.req.raw, (socket) => {
+        const handler = clock.subscribe((msg) => socket.send(JSON.stringify(msg)));
+        socket.addEventListener("close", () => clock.unsubscribe(handler));
+      });
+      return c.body(JSON.stringify(clock.now()), 200, { "Content-Type": "application/json" });
+    })
+    .on(PATCH, "/comp/clock", async (c) => {
+      await enforceAdmin(c.req.raw);
+      const { kind, time, keep } = deleteFalsey(Object.fromEntries(await c.req.raw.formData()));
+      console.log({ kind, time, keep });
+      if (kind === "start") {
+        clock.adjustStart(new Date(time as string), { keepDuration: !!keep });
+      } else {
+        clock.adjustFinish(new Date(time as string));
+      }
+      return c.body(null, 204);
+    })
+    .on(GET, "/comp/prob/", (c) => {
+      return c.body(problems.toJSON().map(v => v.slug + "\n").join(""));
+    })
+    .on(GET, "/comp/prob/:id/icon/", (c) => {
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ? c.notFound() : c.body(problem.doc().icon);
+    })
+    .on(GET, "/comp/prob/:id/name/", (c) => {
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ? c.notFound() : c.body(problem.doc().title);
+    })
+    .on(GET, "/comp/prob/:id/brief/", (c) => {
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ? c.notFound() : c.body(problem.doc().summary);
+    })
+    .on(GET, "/comp/prob/:id/difficulty/", (c) => {
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ?
+        c.notFound() :
+        c.body(Object(problem.doc().front)?.problem?.difficulty);
+    })
+    .on(GET, "/comp/prob/:id/points/", (c) => {
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ?
+        c.notFound() :
+        c.body(Object(problem.doc().front)?.problem?.points);
+    })
+    .on(GET, "/comp/prob/:id/solution/", (c) => {
+      // What we do not have cannot be stolen: problem solutions are not store explicitly,
+      // but rather a verification of the submission is accessible by `/comp/prob/:id/judge`.
+      return c.body("Unavailable for Legal Reasons", 451);
+    })
+    .on(GET, "/comp/prob/:id/instructions/", async (c) => {
+      await auth.protect(c.req.raw);
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ?
+        c.notFound() :
+        c.body(problem.doc().body, 200, { "Content-Type": "text/markdown" });
+    })
+    .on(GET, "/comp/prob/:id/fuzz/", async (c) => {
+      const user = await auth.protect(c.req.raw);
+      const problem = problems.get(c.req.param("id"));
+      return problem === undefined ?
+        c.notFound() :
+        c.body(await problem.fuzz(db.userTeam(user.id)!.seed));
+    })
+    .on(GET, "/comp/prob/:id/judge/", async (c) => {
+      const user = await auth.protect(c.req.raw);
+      const problemId = c.req.param("id");
+      return problems.get(problemId) === undefined ?
+        c.notFound() :
+        c.body(db.solved({ team: user.team, prob: problemId }) ? "OK" : "Not Solved");
+    })
+    .on(POST, "/comp/prob/:id/judge", async (c) => {
+      const user = await auth.protect(c.req.raw);
+      const problemId = c.req.param("id");
 
-              db.postSubmission({
-                team: user.team,
-                prob: problemId!,
-                time,
-                out: submissionOutput,
-                code: submissionCode,
-                ok: correct,
-                vler: errors || "",
-                vlms: t1 - t0,
-              });
+      if (problems.get(problemId) === undefined) {
+        return c.notFound();
+      }
 
-              if (correct) {
-                return "Approved! ✅\n";
-              } else {
-                return new Response(`422 Unprocessable Content\n\nSolution rejected.\n\n${errors}\n`, { status: 422 });
-              }
-            },
-          },
-          "/assets/*": async (req, { id: problemId, 0: assetPath }) => {
-            await auth.protect(req);
-            // clock.protect();
-            const normalisedAssetPath = normalize("/" + assetPath);
-            if (problems.get(problemId!)!.doc().publicAssets.has(normalisedAssetPath)) {
-              return await serveFile(req, pathJoin(root, problemId!, normalize("/" + assetPath)));
-            } else {
-              return undefined;
-            }
-          },
-        },
-      },
-    },
-  });
+      if (db.solved({ team: user.team, prob: problemId })) {
+        return c.body("Problem already solved.\n", 409);
+      }
+      if (c.req.raw.headers.get("Content-Type") !== "application/x-www-form-urlencoded") {
+        return c.body("Unsupported Media Type (Expected application/x-www-form-urlencoded)", 415);
+      }
+
+      const body = await c.req.raw.text();
+      const submissionOutput = new URLSearchParams(body).get("output");
+      if (submissionOutput === null) {
+        return c.body("Please include the output of your solution.\n", 400);
+      }
+      const submissionCode = new URLSearchParams(body).get("source");
+      if (submissionCode === null) {
+        return c.body("Please include the source code of your solution.\n", 400);
+      }
+
+      const time = new Date();
+      const t0 = performance.now();
+      const { correct, errors } = await problems
+        .get(problemId)
+        .judge(db.userTeam(user.id)!.seed, submissionOutput);
+      const t1 = performance.now(); 
+
+      db.postSubmission({
+        team: user.team,
+        prob: problemId!,
+        time,
+        out: submissionOutput,
+        code: submissionCode,
+        ok: correct,
+        vler: errors || "",
+        vlms: t1 - t0,
+      });
+
+      if (correct) {
+        return c.body("Approved! ✅\n");
+      } else {
+        return c.body(`Solution rejected.\n\n${errors || ""}`, 422);
+      }
+    })
+    .on(GET, "/comp/prob/:id/assets/:assetPath{.*}", async (c) => {
+      await auth.protect(c.req.raw);
+
+      const problemId = c.req.param("id");
+      const assetPath = c.req.param("assetPath");
+
+      if (problems.get(problemId) === undefined) {
+        return c.notFound();
+      }
+
+      const normalisedAssetPath = normalize("/" + assetPath);
+      if (problems.get(problemId)!.doc().publicAssets.has(normalisedAssetPath)) {
+        return serveFile(c.req.raw, pathJoin(root, problemId, normalisedAssetPath));
+      } else {
+        return c.notFound();
+      }
+    });
 
   await Deno.serve({
     port: 1989,
-    handler: (req) => router.route(req),
+    handler: app.fetch,
     onError: (e) => {
       if (e instanceof Response) return e;
       else if (e instanceof Error)
