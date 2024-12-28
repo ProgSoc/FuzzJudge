@@ -20,4 +20,3 @@ export * as YAML from "jsr:@std/yaml@0.223.0";
 
 // Routing refactor to Hono
 export { Hono } from "jsr:@hono/hono@4.6.14";
-export { appendTrailingSlash } from "jsr:@hono/hono@4.6.14/trailing-slash";

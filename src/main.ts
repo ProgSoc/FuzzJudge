@@ -41,7 +41,7 @@ Backend
 
 import { deleteFalsey, loadMarkdown, SubscriptionGroup, SubscriptionGroupMessage } from "./util.ts";
 import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./comp.ts";
-import { accepts, pathJoin, serveFile, normalize, initZstd, Hono, appendTrailingSlash } from "./deps.ts";
+import { accepts, pathJoin, serveFile, normalize, initZstd, Hono } from "./deps.ts";
 import { Auth } from "./auth.ts";
 import { Router, catchWebsocket, expectForm, expectMime } from "./http.ts";
 import { HEADER } from "./version.ts";
@@ -113,10 +113,32 @@ if (import.meta.main) {
   // Due to the different matching of `/client/` and `/client/:path{.*}`,
   // we cannot use `trimTrailingSlash` since no redirect will happen on `/client`
   // and instead the router will match to the `/client/:path{.*}` pattern.
-  // The `appendTrailingSlash` middleware only triggers on GET requests,
-  // hence all routes for GET requests below have an associated path that ends with "/",
-  // while other HTTP methods do not.
-  app.use(appendTrailingSlash());
+  // The `appendTrailingSlash` middleware causes a permanent redirect (301),
+  // so instead we implement custom middleware that uses a non-permanent redirect (302)
+  // that acts in the same way.
+
+  // Currently, the use of non-permanent redirects and with Hono strict mode on
+  // is to specifically account for the loading of CSS and JS resources from
+  // the Svelte-compiled HTML file. When strict mode is off, and `/client`
+  // is requested, `/assets/<resource>` is fetched instead of the correct
+  // `/client/assets/<resource>`, but this does not happen if `/client/` is requested instead.
+  // If both `/client` and `/client/` can be made to work correctly when fetching
+  // such resources under `strict: false`, then we should disable strict mode
+  // and no longer use this custom middleware.
+  const appendNonPermanentTrailingSlash = () => {
+    return async function appendNonPermanentTrailingSlash(c, next) {
+      await next();
+
+      if (c.res.status === 404 && c.req.method === GET && !c.req.path.endsWith("/")) {
+        const url = new URL(c.req.url);
+        url.pathname += "/";
+
+        c.res = c.redirect(url.toString(), 302);
+      }
+    };
+  };
+
+  app.use(appendNonPermanentTrailingSlash());
 
   // The routing definitions are put together in a single chained statement
   // for the `app` Hono router. For readability,
@@ -152,7 +174,7 @@ if (import.meta.main) {
       const adminPanel = await Deno.readFile(new URL(import.meta.resolve("./admin.html")));
       return c.body(adminPanel, 200, { "Content-Type": "text/html" });
     })
-    .on(GET, "/team/", async (c) => {
+    .on(GET, "/team/*", async (c) => {
       await enforceAdmin(c.req.raw);
       return c.body(JSON.stringify(db.allTeams()));
     })
