@@ -15,7 +15,7 @@ services:
     build: 
       context: ./server
     volumes:
-      - ./competition:/competition
+      - ./sample:/competition
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/comp`) || PathPrefix(`/auth`)"

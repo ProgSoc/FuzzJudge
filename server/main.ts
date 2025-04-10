@@ -46,7 +46,6 @@ import { loadMarkdown } from "./impl/markdown.ts";
 import { SubscriptionGroup, SubscriptionGroupMessage, SubscriptionHandler } from "./impl/subscribable.ts";
 import { FuzzJudgeProblemMessage, FuzzJudgeProblemSet } from "./impl/comp.ts";
 import { Auth } from "./impl/auth.ts";
-import { Router, catchWebsocket } from "./impl/http.ts";
 import { CompetitionDB } from "./impl/db.ts";
 import { CompetitionClock, CompetitionClockMessage } from "./impl/clock.ts";
 import { CompetitionScoreboard, CompetitionScoreboardMessage } from "./impl/score.ts";
@@ -441,12 +440,11 @@ if (import.meta.main) {
   probRouter.get("/:id/assets/*", async (c, next) => {
     await auth.protect(c.req.raw);
     // clock.protect();
-    const normalisedAssetPath = normalize("/" + c.req.param("0"));
-    if (problems.get(c.req.param("id"))!.doc().publicAssets.has(normalisedAssetPath)) {
-      return serveStatic({ path: pathJoin(root, c.req.param("id"), normalisedAssetPath) })(c, next)
+    const probId = c.req.param("id");
 
-    }
-    return c.notFound()
+    return serveStatic({
+      root: pathJoin(root, "problems", probId, "assets"),
+    })(c, next);
   })
 
   compRouter.route("/prob", probRouter)
