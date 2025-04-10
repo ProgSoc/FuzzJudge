@@ -1,0 +1,30 @@
+services:
+  router:
+    image: traefik:v3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+  server:
+    build: 
+      context: ./server
+    volumes:
+      - ./competition:/competition
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/comp`) || PathPrefix(`/auth`)"
+      - "traefik.http.services.server.loadbalancer.server.port=1989"
+  fj-svelte:
+    build: 
+      context: ./clients/fj-svelte
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fj-svelte.rule=Host(`localhost`)"
+      - "traefik.http.services.fj-svelte.loadbalancer.server.port=80"
+  
