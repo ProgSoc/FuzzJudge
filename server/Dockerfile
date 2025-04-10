@@ -21,6 +21,9 @@ WORKDIR /app
 # Copy the necessary files
 COPY . .
 
+# Fix https://github.com/denoland/deno_docker/issues/373
+ENV LD_LIBRARY_PATH /usr/lib:/usr/local/lib
+
 # Install dependencies
 RUN deno cache --lock --no-check ./main.ts
 
