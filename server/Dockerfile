@@ -31,7 +31,7 @@ ENV BASE_URL=$BASE_URL
 RUN deno cache --lock --no-check ./main.ts
 
 # Run the application
-CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-write", "./main.ts", "/competition"]
+CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-write", "--allow-env","./main.ts", "/competition"]
 
 # Expose the port the app runs on
 EXPOSE 1989
