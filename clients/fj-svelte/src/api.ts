@@ -15,7 +15,7 @@
 
 import { exists, parseScoreboard, questionOrder, type QuestionMeta, type ScoreboardUser } from "./utils";
 
-export const BACKEND_SERVER: string = "";
+export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
 
 export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};

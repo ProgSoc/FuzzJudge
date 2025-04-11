@@ -63,6 +63,12 @@ export type SocketMessage = SubscriptionGroupMessage<{
 if (import.meta.main) {
   const app = new Hono();
 
+  const baseUrl = Deno.env.get("BASE_URL")
+
+  if (baseUrl) {
+    app.basePath(baseUrl);
+  }
+
   await initZstd();
 
   const root = await Deno.realPath(Deno.args[0] ?? ".");

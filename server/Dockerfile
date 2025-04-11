@@ -23,6 +23,9 @@ COPY . .
 
 # Fix https://github.com/denoland/deno_docker/issues/373
 ENV LD_LIBRARY_PATH /usr/lib:/usr/local/lib
+ARG BASE_URL
+# Set the environment variable for the backend URL
+ENV BASE_URL=$BASE_URL
 
 # Install dependencies
 RUN deno cache --lock --no-check ./main.ts
