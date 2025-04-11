@@ -63,7 +63,7 @@ export type SocketMessage = SubscriptionGroupMessage<{
 if (import.meta.main) {
   const app = new Hono();
 
-  initZstd();
+  await initZstd();
 
   const root = await Deno.realPath(Deno.args[0] ?? ".");
 
