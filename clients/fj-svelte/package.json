@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "deno run -A scripts/hot-reloader.ts",
+    "dev": "vite dev",
     "build": "vite build",
     "build-icons": "deno run -A scripts/icons-to-data-uris.ts",
     "preview": "vite preview",

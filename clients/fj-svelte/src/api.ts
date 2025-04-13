@@ -56,9 +56,9 @@ export interface ScoreboardEvent {
 
 export const subscribeToScoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<() => void> => {
   const server = window.location.hostname;
-  const port = 8080;
+  // const port = 8080;
 
-  const socket = new WebSocket(`ws://${server}:${port}`);
+  const socket = new WebSocket(`ws://${server}${BACKEND_SERVER}`);
 
   socket.addEventListener("message", (event) => {
     callback({ new_scoreboard: parseScoreboard(event.data) });

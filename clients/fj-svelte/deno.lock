@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "redirects": {
     "https://deno.land/std/fs/mod.ts": "https://deno.land/std@0.224.0/fs/mod.ts"
   },
@@ -183,11 +183,11 @@
         "npm:prettier-plugin-svelte@^3.2.4",
         "npm:prettier@^3.3.2",
         "npm:svelte-check@^3.6.7",
-        "npm:svelte-markdown@^0.4.1",
+        "npm:svelte-markdown@~0.4.1",
         "npm:svelte@^4.2.12",
         "npm:tslib@^2.6.2",
         "npm:typescript@^5.2.2",
-        "npm:vite@^5.2.0"
+        "npm:vite@^5.4.10"
       ]
     }
   }
