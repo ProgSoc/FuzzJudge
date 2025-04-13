@@ -15,7 +15,7 @@
 
 use std::sync::Arc;
 
-use ratatui::crossterm::event::{KeyCode, KeyEvent};
+use ratatui::crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 
 use crate::{shell, state::AppState, AppStateMutex};
 
@@ -25,6 +25,10 @@ pub struct KeyState {
 }
 
 pub fn handle_press(app_state: AppStateMutex, key: KeyEvent) {
+    if key.kind != KeyEventKind::Press {
+        return;
+    }
+
     let typing = app_state.run_sync(|app_state| app_state.console.typing);
 
     if typing {
@@ -144,6 +148,10 @@ async fn wrapped_exec(
 }
 
 fn handle_typing(app_state: AppStateMutex, key: KeyEvent) {
+    if key.kind != KeyEventKind::Press {
+        return;
+    }
+
     match key.code {
         KeyCode::Enter => {
             let mut cmd = String::new();
