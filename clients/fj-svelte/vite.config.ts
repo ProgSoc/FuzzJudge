@@ -19,4 +19,13 @@ export default defineConfig({
       '@server': '../../server',
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:1989",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  }
 });
