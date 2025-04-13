@@ -54,11 +54,12 @@ export interface ScoreboardEvent {
   new_scoreboard: ScoreboardUser[];
 }
 
-export const subscribeToScoreboard = async (callback: (data: ScoreboardEvent) => void): Promise<() => void> => {
-  const server = window.location.hostname;
-  // const port = 8080;
+export const subscribeToScoreboard =  (callback: (data: ScoreboardEvent) => void): () => void => {
+  try {
+  const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}/comp/scoreboard`;
+  
 
-  const socket = new WebSocket(`ws://${server}${BACKEND_SERVER}`);
+  const socket = new WebSocket(wsURL);
 
   socket.addEventListener("message", (event) => {
     callback({ new_scoreboard: parseScoreboard(event.data) });
@@ -67,6 +68,11 @@ export const subscribeToScoreboard = async (callback: (data: ScoreboardEvent) =>
   return () => {
     socket.close();
   };
+} catch (error) {
+    console.error("Error subscribing to scoreboard:", error);
+
+    return () => {}
+}
 };
 
 export const getCompInfo = async (): Promise<{ title: string; instructions: string }> => {

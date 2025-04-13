@@ -17,17 +17,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Client from "./lib/Client.svelte";
 
   export let scoreboardMode: boolean = false;
-
-  // For hot reloading
-  try {
-    const socket = new WebSocket(`ws://localhost:25566`);
-
-    socket.addEventListener("message", (event) => {
-      window.location.reload();
-    });
-  } catch (e) {
-    console.error("Failed to connect to hot-reloading socket: ", e);
-  }
 </script>
 
 <Client {scoreboardMode} />

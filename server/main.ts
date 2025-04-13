@@ -141,7 +141,7 @@ if (import.meta.main) {
     const { role } = await auth.protect(c.req.raw);
     if (role !== "admin") auth.reject();
 
-    const fileContent = await Deno.readFile(new URL(import.meta.resolve("./admin.html")))
+    const fileContent = await Deno.readFile(new URL(import.meta.resolve("./impl/admin.html")))
 
     return c.body(fileContent, {
       headers: {

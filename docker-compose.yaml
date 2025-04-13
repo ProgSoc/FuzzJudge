@@ -20,7 +20,7 @@ services:
       - ./sample:/competition
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/comp`) || PathPrefix(`/auth`)"
+      - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/api`)"
       - "traefik.http.services.server.loadbalancer.server.port=1989"
   fj-svelte:
     build: 
