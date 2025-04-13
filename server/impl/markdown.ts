@@ -35,6 +35,7 @@ export function frontMatter(
     yaml: YAML.parse,
   },
 ): { front?: unknown; body: string } {
+  text = text.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
   const [_all, _delim, format, front] = text.match(/^(`{3,})([^ ]*?)\n(.*?)(?<=\n)\1(\n|$)/s) ?? [];
   if (_all === undefined) return { body: text };
   return { front: parsers[format]?.(front), body: text.slice(_all.length) };
