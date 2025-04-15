@@ -17,6 +17,8 @@ import { exists, parseScoreboard, questionOrder, type QuestionMeta, type Scorebo
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
 
+console.log("Backend server URL:", BACKEND_SERVER);
+
 export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
 
@@ -58,6 +60,7 @@ export const subscribeToScoreboard =  (callback: (data: ScoreboardEvent) => void
   try {
   const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}/comp/scoreboard`;
   
+  console.log("Connecting to scoreboard websocket at", wsURL);
 
   const socket = new WebSocket(wsURL);
 

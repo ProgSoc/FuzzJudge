@@ -15,9 +15,11 @@ services:
     build: 
       context: ./server
       args:
-        - VITE_BACKEND_URL=/api
+        - BASE_PATH=/api
     volumes:
       - ./sample:/competition
+    ports:
+      - "1989:1989"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/api`)"
@@ -26,7 +28,7 @@ services:
     build: 
       context: ./clients/fj-svelte
       args:
-        - BASE_URL=/api
+        - VITE_BACKEND_URL=http://localhost/api
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fj-svelte.rule=Host(`localhost`)"

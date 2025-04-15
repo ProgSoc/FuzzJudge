@@ -7,6 +7,7 @@ export default defineConfig({
   base: "",
   plugins: [svelte()],
   build: {
+    sourcemap: "inline",
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
