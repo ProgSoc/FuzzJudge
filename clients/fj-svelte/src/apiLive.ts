@@ -47,8 +47,7 @@ function makeSvelteSubscribable<T>() {
 }
 
 export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
-  const wsAddress = BACKEND_SERVER
-  const ws = new WebSocket(wsAddress);
+  const ws = new WebSocket(BACKEND_SERVER.replace(/^http/, "ws"));
   ws.addEventListener("message", ({ data }) => {
     callback(JSON.parse(data));
   });
