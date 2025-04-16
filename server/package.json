@@ -14,7 +14,11 @@
     "@bokuweb/zstd-wasm": "^0.0.27",
     "@std/toml": "npm:@jsr/std__toml",
     "@std/yaml": "npm:@jsr/std__yaml",
-    "drizzle-orm": "^0.41.0"
+    "drizzle-orm": "^0.41.0",
+    "gray-matter": "^4.0.3",
+    "remark": "^15.0.1",
+    "toml": "^3.0.0",
+    "zod": "^3.24.2"
   },
   "scripts": {
     "build": "bun build ./main.ts --outdir=./dist --minify --target bun --sourcemap"

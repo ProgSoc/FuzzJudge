@@ -1,3 +1,5 @@
+import path from "path";
+import { parseArgs } from "util";
 /*
  * FuzzJudge - Randomised input judging server, designed for ProgComp.
  * Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
@@ -29,4 +31,17 @@ export function indent(pre: string, text: string): string {
 export function deleteFalsey(obj: Record<string, unknown>): Record<string, unknown> {
   for (const k in obj) if (!obj[k]) delete obj[k];
   return obj;
+}
+
+export function getCompetitionRoot() {
+  const { positionals} = parseArgs({
+      args: Bun.argv,
+      allowPositionals: true,
+  })
+  
+  const pathPositional = positionals[2] ?? "./"
+  
+  const root = path.resolve(pathPositional)
+
+  return root
 }

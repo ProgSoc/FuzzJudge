@@ -41,7 +41,7 @@ Backend
 
 
 import { HEADER } from "../version.ts";
-import { deleteFalsey } from "./util.ts";
+import { deleteFalsey, getCompetitionRoot } from "./util.ts";
 import { loadMarkdown } from "./markdown.ts";
 import { createFuzzJudgeProblemSet, type FuzzJudgeProblemMessage, type FuzzJudgeProblemSetMessage } from "./comp.ts";
 import { Auth } from "./auth.ts";
@@ -58,30 +58,27 @@ import path from "path"
 import { parseArgs } from "util";
 import { fileURLToPath } from "bun";
 import { ee } from "./ee.ts";
-import { createCompetitionDB } from "./db/index.ts";
+import { createCompetitionDB, migrateDB } from "./db/index.ts";
+import { allUsers, deleteUser, patchUser, resetUser } from "./services/user.service.ts";
+import { allTeams, createTeam, deleteTeam, getUserTeam, patchTeam, userTeam } from "./services/team.service.ts";
+import { postSubmission, solved } from "./services/submission.service.ts";
 
 export const { websocket, upgradeWebSocket } = createBunWebSocket<ServerWebSocket>();
 
 await initZstd();
+migrateDB()
 
-const { positionals} = parseArgs({
-    args: Bun.argv,
-    allowPositionals: true,
-})
-
-const pathPositional = positionals[2] ?? "./"
-
-const root = path.resolve(pathPositional)
+const root = getCompetitionRoot()
 
 const compfile = loadMarkdown(
     await Bun.file(path.join(root, "./comp.md")).text(),
 );
 
-const problems = createFuzzJudgeProblemSet(root);
+// const problems = createFuzzJudgeProblemSet(root);
 
-const db = createCompetitionDB(path.join(root, "comp.db"), problems);
+// const db = createCompetitionDB(path.join(root, "comp.db"), problems);
 
-db.resetUser({ logn: "admin", role: "admin" }, false);
+resetUser({ logn: "admin", role: "admin" }, false);
 
 export type SocketMessage = { kind: "clock", value: CompetitionClockMessage } | { kind: "problems", value: FuzzJudgeProblemMessage[] } | { kind: "scoreboard", value: CompetitionScoreboardMessage };
 
@@ -96,7 +93,7 @@ const clock = await createClock(
     ), // 3 hrs
 );
 
-const scoreboard = createCompetitionScoreboard(db, clock, problems);
+// const scoreboard = createCompetitionScoreboard(db, clock, problems);
 
 const auth = new Auth({
     basic: async ({ username, password }) => {
@@ -116,7 +113,7 @@ const teamRouter = new Hono()
     .get("/", async (c) => {
         const { role } = await auth.protect(c.req.raw);
         if (role !== "admin") auth.reject();
-        return c.json(db.allTeams());
+        return c.json(allTeams());
     })
     .post("/", async (c) => {
         const { role } = await auth.protect(c.req.raw);
@@ -124,7 +121,7 @@ const teamRouter = new Hono()
 
         const formData = await c.req.formData();
 
-        const team = await db.createTeam(
+        const team = await createTeam(
             deleteFalsey(Object.fromEntries(formData.entries())) as any,
         );
         return c.json(team, {
@@ -141,7 +138,7 @@ const teamRouter = new Hono()
 
         const formData = await c.req.formData();
 
-        db.patchTeam(
+        patchTeam(
             parseInt(c.req.param("id")),
             deleteFalsey(Object.fromEntries(formData.entries())) as any,
         );
@@ -151,7 +148,7 @@ const teamRouter = new Hono()
         const { role } = await auth.protect(c.req.raw);
         if (role !== "admin") auth.reject();
 
-        db.deleteTeam(parseInt(c.req.param("id")));
+        deleteTeam(parseInt(c.req.param("id")));
         return c.body(null, { status: 204 });
     });
 
@@ -159,7 +156,7 @@ const userRouter = new Hono()
     .get("/", async (c) => {
         const { role } = await auth.protect(c.req.raw);
         if (role !== "admin") auth.reject();
-        return c.json(db.allUsers());
+        return c.json(allUsers());
     })
     .post("/", async (c) => {
         const { role } = await auth.protect(c.req.raw);
@@ -167,7 +164,7 @@ const userRouter = new Hono()
 
         const formData = await c.req.formData();
 
-        const user = await db.resetUser(
+        const user = await resetUser(
             deleteFalsey(Object.fromEntries(formData.entries())) as any,
         );
         return c.json(user, {
@@ -184,7 +181,7 @@ const userRouter = new Hono()
 
         const formData = await c.req.formData();
 
-        db.patchUser(
+        await patchUser(
             parseInt(c.req.param("id")),
             deleteFalsey(Object.fromEntries(formData.entries())) as any,
         );
@@ -194,7 +191,7 @@ const userRouter = new Hono()
         const { role } = await auth.protect(c.req.raw);
         if (role !== "admin") auth.reject();
 
-        db.deleteUser(parseInt(c.req.param("id")));
+        await deleteUser(parseInt(c.req.param("id")));
         return c.body(null, { status: 204 });
     });
 
@@ -255,7 +252,7 @@ const probRouter = new Hono()
     .get("/:id/fuzz", async (c) => {
         // clock.protect();
         const user = await auth.protect(c.req.raw);
-        const userTeam = await db.userTeam(user.id);
+        const userTeam = await getUserTeam(user.id);
 
         if (!userTeam) {
             return c.body("403 Forbidden\n\nUser not in a team.\n", {
@@ -280,7 +277,7 @@ const probRouter = new Hono()
         }
 
         return c.text(
-            await db.solved({ team: user.team, prob: c.req.param("id")! })
+            await solved({ team: user.team, prob: c.req.param("id")! })
                 ? "OK"
                 : "Not Solved",
         );
@@ -295,7 +292,7 @@ const probRouter = new Hono()
             });
         }
 
-        if (await db.solved({ team: user.team, prob: c.req.param("id")! })) {
+        if (await solved({ team: user.team, prob: c.req.param("id")! })) {
             return c.body("409 Conflict\n\nProblem already solved.\n", {
                 status: 409,
             });
@@ -325,7 +322,7 @@ const probRouter = new Hono()
         const time = new Date();
         const t0 = performance.now();
 
-        const userTeam = await db.userTeam(user.id);
+        const userTeam = await getUserTeam(user.id);
 
         if (!userTeam) {
             return c.body("403 Forbidden\n\nUser not in a team.\n", {
@@ -338,7 +335,7 @@ const probRouter = new Hono()
             .judge(userTeam.seed, submissionOutput);
         const t1 = performance.now();
 
-        db.postSubmission({
+        await postSubmission({
             team: user.team,
             prob: c.req.param("id")!,
             time: time.toString(),
