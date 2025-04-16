@@ -27,7 +27,7 @@ export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
 
   try {
-    const res = await fetch(`${BACKEND_SERVER}/comp/prob`);
+    const res = await client.comp.prob.$get()
 
     if (!res.ok) {
       throw "Failed to fetch questions";

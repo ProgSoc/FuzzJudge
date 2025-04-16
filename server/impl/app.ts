@@ -71,7 +71,7 @@ const { positionals} = parseArgs({
 
 const pathPositional = positionals[2];
 
-const root = path.join(path.dirname( fileURLToPath(import.meta.file)),  pathPositional ?? ".")
+const root = path.join(path.dirname( fileURLToPath(import.meta.url)),  pathPositional ?? ".")
 
 const compfile = loadMarkdown(
     await Bun.file(path.join(root, "./comp.md")).text(),
@@ -469,7 +469,7 @@ const compRouter = new Hono()
     });
 
 const basePath = Bun.env["BASE_PATH"] ?? "/";
-const app = new Hono().basePath(basePath)
+const app = new Hono().basePath(basePath as "/")
     .get("/", async (c, next) => {
         // if not websocket return header
         if (c.req.header("Upgrade") !== "websocket") {

@@ -258,16 +258,19 @@ export function createFuzzJudgeProblemSet(root: string): FuzzJudgeProblemSet {
     match: [/prob\.md/],
     maxDepth: 2,
   })) {
+    const filePath = path.join(ent.parentPath,ent.name);
     try {
-      const slug = getSlugFromPath(ent.path);
 
-      const fileContent = fs.readFileSync(ent.path, "utf-8");
+      const slug = getSlugFromPath(filePath);
 
-      const problem = createFuzzJudgeProblem(slug, ent.path, loadMarkdown(fileContent, `/comp/prob/${slug}/assets`));
+      const fileContent = fs.readFileSync(filePath, "utf-8");
+
+      const problem = createFuzzJudgeProblem(slug, filePath, loadMarkdown(fileContent, `/comp/prob/${slug}/assets`));
+      console.log(`Loaded problem "${filePath}"`);
       problems.set(slug, problem);
     } catch (e) {
       const errors = e instanceof Error ? indent("    ", e.toString()) : "Unknown error";
-      console.error(`Could not load problem "${ent.path}":\n${errors})}`);
+      console.error(`Could not load problem "${filePath}":\n${errors})}`);
     }
   }
 

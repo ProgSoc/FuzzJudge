@@ -24,6 +24,7 @@ import path from "path";
 import { and, eq, isNotNull } from "drizzle-orm";
 import type { FuzzJudgeProblemSet } from "impl/comp.ts";
 import { ee } from "impl/ee.ts";
+import { fileURLToPath } from "bun";
 
 interface SubmissionParams extends Omit<schema.Submission, "out" | "code" | "vler"> {
   out: string,
@@ -33,7 +34,10 @@ interface SubmissionParams extends Omit<schema.Submission, "out" | "code" | "vle
 export const createCompetitionDB = (url: string, problems: FuzzJudgeProblemSet) => {
   const db = drizzle(url, { schema});
 
-  migrate(db, { migrationsFolder: path.join(import.meta.dir, "drizzle/migrations") });
+
+  console.log("Migrations folder:", "./drizzle/migrations");
+
+  migrate(db, { migrationsFolder: "./drizzle/migrations" });
 
   function encStr(input: string) {
     return Buffer.from(compress(new TextEncoder().encode(input)));

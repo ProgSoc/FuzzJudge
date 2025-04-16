@@ -17,7 +17,8 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "strict": true,
   },
   "include": [
     "src/**/*.ts",
