@@ -34,6 +34,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <h1>Scoreboard</h1>
 <table>
+  <thead>
   <tr>
     <th> Position </th>
     <th> Team </th>
@@ -42,6 +43,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <th class="question-num">{question.doc.icon}</th>
     {/each}
   </tr>
+  </thead>
+  <tbody>
   {#each filteredTeams as team, i}
     <tr>
       <td class="position">
@@ -62,6 +65,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       {/each}
     </tr>
   {/each}
+  </tbody>
 </table>
 
 {#if errors.length > 0}

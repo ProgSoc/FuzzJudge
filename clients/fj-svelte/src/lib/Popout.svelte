@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<script>
+<script lang="ts">
   import Icon from "./Icon.svelte";
   import icons from "../icons";
 
