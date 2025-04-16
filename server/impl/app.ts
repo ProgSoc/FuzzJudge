@@ -69,9 +69,9 @@ const { positionals} = parseArgs({
     allowPositionals: true,
 })
 
-const pathPositional = positionals[2];
+const pathPositional = positionals[2] ?? "./"
 
-const root = path.join(process.cwd(),  pathPositional ?? ".")
+const root = path.resolve(pathPositional)
 
 const compfile = loadMarkdown(
     await Bun.file(path.join(root, "./comp.md")).text(),
