@@ -12,17 +12,19 @@
     "fmt": "npx prettier --write --plugin prettier-plugin-svelte ."
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^3.0.2",
-    "@tsconfig/svelte": "^5.0.2",
-    "prettier": "^3.3.2",
-    "prettier-plugin-svelte": "^3.2.4",
-    "svelte": "^4.2.12",
-    "svelte-check": "^3.6.7",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
-    "vite": "^5.4.10"
+    "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "@tsconfig/svelte": "^5.0.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-svelte": "^3.3.3",
+    "svelte": "^5.27.0",
+    "svelte-check": "^4.1.6",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.2.6"
   },
   "dependencies": {
-    "svelte-markdown": "^0.4.1"
+    "hono": "^4.7.6",
+    "svelte-markdown": "^0.4.1",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

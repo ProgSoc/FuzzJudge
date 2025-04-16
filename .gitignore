@@ -2,3 +2,4 @@
 *.db
 sample/client/
 competition/
+node_modules/

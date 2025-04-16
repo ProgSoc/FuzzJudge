@@ -25,3 +25,4 @@ dist-ssr
 
 public/*.json
 src/icons.js
+*.tsbuildinfo

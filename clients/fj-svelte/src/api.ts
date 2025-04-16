@@ -12,10 +12,14 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
+import { hc} from "hono/client"
+import type { AppType } from "server/mod";
 import { exists, parseScoreboard, questionOrder, type QuestionMeta, type ScoreboardUser } from "./utils";
 
+
+
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
+const client = hc<AppType>(BACKEND_SERVER)
 
 console.log("Backend server URL:", BACKEND_SERVER);
 

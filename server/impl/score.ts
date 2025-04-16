@@ -16,10 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Subscribable } from "./subscribable.ts";
-import { CompetitionDB } from "./db.ts";
-import { CompetitionClock } from "./clock.ts";
-import { FuzzJudgeProblemSet } from "./comp.ts";
+import type { CompetitionClock } from "./clock.ts";
+import type { FuzzJudgeProblemSet } from "./comp.ts";
+import type { CompetitionDB } from "./db/index.ts";
+import { ee } from "./ee.ts";
 
 export type ProblemScore = {
   points: number,
@@ -39,26 +39,19 @@ export type CompetitionScoreboardMessage = {
   score: TeamScore,
 }[];
 
-export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMessage> {
-  #db: CompetitionDB;
-  #clock: CompetitionClock;
-  #problems: FuzzJudgeProblemSet;
-  #frozen: boolean;
+export function createCompetitionScoreboard(db: CompetitionDB, clock: CompetitionClock, problems: FuzzJudgeProblemSet) {
+  
+  let frozen = false;
 
-  constructor(opts: { db: CompetitionDB, clock: CompetitionClock, problems: FuzzJudgeProblemSet }) {
-    super(() => this.fullScoreboard());
-    this.#db = opts.db;
-    this.#clock = opts.clock;
-    this.#problems = opts.problems;
-    this.#frozen = false;
-    this.#db.subscribe(() => this.notify(this.fullScoreboard()));
-  }
+  ee.on("scoreboardUpdate", async () => {
+    ee.emit("scoreboard", await fullScoreboard());
+  })
 
-  teamScoreboard(team: number) {
+  async function teamScoreboard(team: number) {
     // return sorted by score (then penalty score)
     const teamScore: TeamScore = { total: { points: 0, penalty: 0 }, problems: {} };
-    for (const [slug, prob] of this.#problems) {
-      const submissions = this.#db.getSubmissionSkeletons(team, slug);
+    for (const [slug, prob] of problems) {
+      const submissions = await db.getSubmissionSkeletons(team, slug);
       const score: ProblemScore = {
         points: 0,
         penalty: 0,
@@ -77,7 +70,7 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
         if (time.getTime() > latest) latest = time.getTime();
       }
       // minutesSinceStart + 20 * failedTries
-      score.penalty = Math.max(0, (latest - this.#clock.now().start.getTime()) / 60_000) + 20 * nPenalties;
+      score.penalty = Math.max(0, (latest - clock.now().start.getTime()) / 60_000) + 20 * nPenalties;
       teamScore.total.points += score.points;
       teamScore.total.penalty += score.penalty;
       teamScore.problems[slug] = score;
@@ -85,16 +78,16 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
     return teamScore;
   }
 
-  fullScoreboard(): CompetitionScoreboardMessage {
-    if (this.#frozen) {
-      return JSON.parse(this.#db.getOrSetDefaultMeta("/comp/scoreboard.frozen")!);
+  async function fullScoreboard(): Promise<CompetitionScoreboardMessage> {
+    if (frozen) {
+      return JSON.parse(await db.getOrSetDefaultMeta("/comp/scoreboard.frozen") ?? undefined!);
     }
     const rankings = [];
-    for (const team of this.#db.allTeams()) {
+    for (const team of await db.allTeams()) {
       rankings.push({
         rank: 0,
         name: team.name,
-        score: this.teamScoreboard(team.id),
+        score: await teamScoreboard(team.id),
       });
     }
     rankings.sort((a, b) => {
@@ -105,12 +98,19 @@ export class CompetitionScoreboard extends Subscribable<CompetitionScoreboardMes
     return rankings;
   }
 
-  freeze() {
-    this.#db.getOrSetDefaultMeta("/comp/scoreboard.frozen", JSON.stringify(this.fullScoreboard()));
-    this.#frozen = true;
+  function freeze() {
+    db.getOrSetDefaultMeta("/comp/scoreboard.frozen", JSON.stringify(fullScoreboard()));
+    frozen = true;
   }
 
-  unfreeze() {
-    this.#frozen = false;
+  function unfreeze() {
+    frozen = false;
   }
+
+  return {
+    teamScoreboard,
+    fullScoreboard,
+    freeze,
+    unfreeze,
+  };
 }

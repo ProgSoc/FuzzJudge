@@ -16,7 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TOML, YAML, normalize } from "../deps.ts";
+import { TOML } from "bun";
+import * as YAML from '@std/yaml'
+import path from "path";
 
 export interface MarkdownDocument {
   front?: unknown;
@@ -52,7 +54,7 @@ export function loadMarkdown(text: string, linkPrefix = ""): MarkdownDocument {
       if (link.startsWith("//") || /^\w+:/.test(link)) {
         return match;
       } else if (linkPrefix !== "") {
-        const newLink = normalize("/" + link);
+        const newLink = path.normalize("/" + link);
         publicAssets.add(newLink);
         return match.replace(link, linkPrefix + newLink);
       } else {

@@ -16,10 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TermColours, basename, dirname, pathJoin, walkSync } from "../deps.ts";
 import { indent } from "./util.ts";
-import { MarkdownDocument, loadMarkdown } from "./markdown.ts";
-import { Subscribable } from "./subscribable.ts";
+import { type MarkdownDocument, loadMarkdown } from "./markdown.ts";
+import path from "path";
+import fs from "fs";
+import { ee } from "./ee.ts";
 
 export type FuzzJudgeProblemMessage = {
   slug: string;
@@ -35,127 +36,145 @@ export type FuzzJudgeProblemMessage = {
 
 export type FuzzJudgeProblemSetMessage = FuzzJudgeProblemMessage[];
 
-export class FuzzJudgeProblem {
-  #doc: MarkdownDocument;
-  #configPath: string;
-  #slug: string;
-  #cmdFuzz: string;
-  #cmdJudge: string;
-  #argsFuzz: string[];
-  #argsJudge: string[];
-  #envFuzz: Record<string, string>;
-  #previousSubmissionTimes: Record<string, number> = {};
-  #submissionCounts: Record<string, number> = {};
+export interface FuzzJudgeProblem {
+  toJSON: () => FuzzJudgeProblemMessage;
+  slug: string;
+  doc: MarkdownDocument;
+  points: () => number;
+  difficulty: () => number;
+  fuzz: (seed: string) => Promise<string>;
+  judge: (seed: string, input: string) => Promise<{ correct: boolean; errors?: string }>;
+}
 
-  static getSlug(configPath: string): string {
-    return basename(dirname(configPath));
+export function createFuzzJudgeProblem(slug: string, configPath: string, doc: MarkdownDocument): FuzzJudgeProblem {
+  const previousSubmissionTimes: Record<string, number> = {};
+  const submissionCounts: Record<string, number> = {};
+
+  const REQUIRED_FIELDS = [
+    ["fuzz", "exec"],
+    ["judge", "exec"],
+    ["problem", "difficulty"],
+    ["problem", "points"],
+  ];
+  const errors: string[] = [];
+  for (const [section, value] of REQUIRED_FIELDS) {
+    if (Object(doc.front)?.[section] === undefined) {
+      errors.push(`Expected section \"${section}\"`);
+    }
+    if (Object(doc.front)?.[section]?.[value] === undefined) {
+      errors.push(`Expected value \"${value}\" in section \"${section}\"`);
+    }
+  }
+  if (errors.length > 0) {
+    throw errors.join("\n");
   }
 
-  constructor(slug: string, configPath: string, doc: MarkdownDocument) {
-    this.#doc = doc;
-    this.#configPath = configPath;
-    this.#slug = slug;
+  const cmdFuzz = Object(doc.front).fuzz?.exec?.[0];
+  const cmdJudge = Object(doc.front).judge?.exec?.[0];
+  const argsFuzz = Array.from(Object(doc.front).fuzz?.exec ?? [])
+    .map(String)
+    .slice(1);
+  const argsJudge = Array.from(Object(doc.front).judge?.exec ?? [])
+    .map(String)
+    .slice(1);
+  const envFuzz = Object(doc.front).fuzz?.env ?? {};
+  for (const key in envFuzz) envFuzz[key] = String(envFuzz[key]);
 
-    const REQUIRED_FIELDS = [["fuzz", "exec"], ["judge", "exec"], ["problem", "difficulty"], ["problem", "points"]];
-    const errors: string[] = [];
-    for (const [section, value] of REQUIRED_FIELDS) {
-      if (Object(doc.front)?.[section] === undefined) {
-        errors.push(`Expected section \"${section}\"`)
-      }
-      if (Object(doc.front)?.[section]?.[value] === undefined) {
-        errors.push(`Expected value \"${value}\" in section \"${section}\"`);
-      }
-    }
-    if (errors.length > 0) {
-      throw errors.join("\n");
-    }
-
-    this.#cmdFuzz = Object(doc.front).fuzz?.exec?.[0];
-    this.#cmdJudge = Object(doc.front).judge?.exec?.[0];
-    this.#argsFuzz = Array.from(Object(doc.front).fuzz?.exec ?? [])
-      .map(String)
-      .slice(1);
-    this.#argsJudge = Array.from(Object(doc.front).judge?.exec ?? [])
-      .map(String)
-      .slice(1);
-    this.#envFuzz = Object(doc.front).fuzz?.env ?? {};
-    for (const key in this.#envFuzz) this.#envFuzz[key] = String(this.#envFuzz[key]);
-  }
-
-  toJSON(): FuzzJudgeProblemMessage {
+  function toJSON(): FuzzJudgeProblemMessage {
     return {
-      slug: this.#slug,
+      slug: slug,
       doc: {
-        title: this.#doc.title ?? this.#slug,
-        icon: this.#doc.icon,
-        summary: this.#doc.summary,
-        body: this.#doc.body,
+        title: doc.title ?? slug,
+        icon: doc.icon,
+        summary: doc.summary,
+        body: doc.body,
       },
-      points: this.points(),
-      difficulty: this.difficulty(),
+      points: points(),
+      difficulty: difficulty(),
     };
   }
 
-  slug(): string {
-    return this.#slug;
+  function points(): number {
+    return Number(Object(doc.front)?.problem?.points) || 0; // catch NaN
   }
 
-  doc(): MarkdownDocument {
-    return this.#doc;
+  function difficulty(): number {
+    return Number(Object(doc.front)?.problem?.difficulty) || 0; // catch NaN
   }
 
-  points(): number {
-    return Number(Object(this.#doc.front)?.problem?.points) || 0; // catch NaN
+  async function fuzz(seed: string): Promise<string> {
+    // Bun
+    const proc = Bun.spawn([cmdFuzz, ...argsFuzz, seed], {
+      cwd: path.join(configPath, ".."),
+      stdin: "pipe",
+      stdout: "pipe",
+      stderr: "pipe",
+      env: envFuzz,
+    });
+    const out = new Response(proc.stdout);
+    const err = new Response(proc.stderr);
+    await proc.exited;
+
+    const errText = await err.text();
+    if (errText.length > 0) {
+      console.error(errText);
+      throw new Error(`Fuzzing error: ${errText}`);
+    }
+
+    const outText = await out.text();
+    if (outText.length === 0) {
+      throw new Error("Fuzzing error: no output");
+    }
+
+    return outText;
   }
 
-  difficulty(): number {
-    return Number(Object(this.#doc.front)?.problem?.difficulty) || 0; // catch NaN
-  }
-
-  async fuzz(seed: string): Promise<string> {
-    const proc = new Deno.Command(this.#cmdFuzz, {
-      args: [...this.#argsFuzz, seed],
-      cwd: pathJoin(this.#configPath, ".."),
-      stdin: "piped",
-      stdout: "piped",
-      stderr: "piped",
-      env: this.#envFuzz,
-    }).spawn();
-    const out = await proc.output();
-    if (!out.success) console.error(new TextDecoder().decode(out.stderr));
-    return new TextDecoder().decode(out.stdout);
-  }
-
-  async judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
-    const { limited, retry } = this.#handleRateLimiting(seed);
+  async function judge(seed: string, input: string): Promise<{ correct: boolean; errors?: string }> {
+    const { limited, retry } = handleRateLimiting(seed);
     if (limited) {
       throw new Response(`429 Too Many Requests\n\nRetry after ${retry}s\n`, {
         status: 429,
         headers: [["Retry-After", retry.toFixed(0)]],
       });
     }
+    const proc = Bun.spawn([cmdJudge, ...argsJudge, seed], {
+      cwd: path.join(configPath, ".."),
+      stdin: new Response(input),
+      stdout: "pipe",
+      stderr: "pipe",
+    });
 
-    const proc = new Deno.Command(this.#cmdJudge, {
-      args: [...this.#argsJudge, seed],
-      cwd: pathJoin(this.#configPath, ".."),
-      stdin: "piped",
-      stdout: "piped",
-      stderr: "piped",
-    }).spawn();
-    await new Response(input).body?.pipeTo(proc.stdin);
-    const out = await proc.output();
-    const err = new TextDecoder().decode(out.stderr);
+    const out = new Response(proc.stdout);
+    const err = new Response(proc.stderr);
 
-    if (out.success) return { correct: true };
-    else return { correct: false, errors: err };
+    await proc.exited;
+
+    if (proc.exitCode === 0) {
+      return { correct: true };
+    }
+
+    const errText = await err.text();
+
+    if (errText.length > 0) {
+      console.error(errText);
+      return { correct: false, errors: errText };
+    }
+
+    const outText = await out.text();
+
+    if (outText.length > 0) {
+      return { correct: false, errors: outText };
+    }
+
+    return { correct: false, errors: "Unknown error" };
   }
 
-  #handleRateLimiting(seed: string): { limited: boolean; retry: number } {
+  function handleRateLimiting(seed: string): { limited: boolean; retry: number } {
     // Increase the interval by 5 seconds for each submission
-    const interval = 5 * 1000 * (this.#submissionCounts[seed] ?? 0); // ms
+    const interval = 5 * 1000 * (submissionCounts[seed] ?? 0); // ms
 
-    if (this.#previousSubmissionTimes[seed] !== undefined) {
-      const timeSinceLastSubmission = Date.now() - this.#previousSubmissionTimes[seed];
+    if (previousSubmissionTimes[seed] !== undefined) {
+      const timeSinceLastSubmission = Date.now() - previousSubmissionTimes[seed];
 
       if (timeSinceLastSubmission < interval) {
         const secondsToWait = (interval - timeSinceLastSubmission) / 1000;
@@ -166,61 +185,119 @@ export class FuzzJudgeProblem {
       }
     }
 
-    this.#previousSubmissionTimes[seed] = Date.now();
-    this.#submissionCounts[seed] = (this.#submissionCounts[seed] ?? 0) + 1;
+    previousSubmissionTimes[seed] = Date.now();
+    submissionCounts[seed] = (submissionCounts[seed] ?? 0) + 1;
 
     return { limited: false, retry: 0 };
   }
+
+  return {
+    toJSON,
+    slug,
+    doc,
+    points,
+    difficulty,
+    fuzz,
+    judge,
+  };
 }
 
-export class FuzzJudgeProblemSet extends Subscribable<FuzzJudgeProblemSetMessage> {
-  #problems: Map<string, FuzzJudgeProblem> = new Map();
+function walkSync(
+  root: string,
+  options: {
+    includeDirs?: boolean;
+    includeSymlinks?: boolean;
+    match?: RegExp[];
+    maxDepth?: number;
+  },
+) {
+  const { includeDirs = false, includeSymlinks = false, match = [], maxDepth = Infinity } = options;
 
-  constructor(root: string) {
-    super(() => this.toJSON());
-    for (const ent of walkSync(root, {
-      includeDirs: false,
-      includeSymlinks: false,
-      match: [/prob\.md/],
-      maxDepth: 2,
-    })) {
-      try {
-        const slug = FuzzJudgeProblem.getSlug(ent.path);
-        const problem = new FuzzJudgeProblem(
-          slug,
-          ent.path,
-          loadMarkdown(Deno.readTextFileSync(ent.path), `/comp/prob/${slug}/assets`),
-        );
-        this.#problems.set(slug, problem);
-      } catch (e) {
-        const errors = indent("    ", e.toString());
-        console.error(`${TermColours.red("ERR")} Could not load problem "${ent.path}":\n${errors})}`);
+  const results: fs.Dirent[] = [];
+
+  function walk(dir: string, depth: number) {
+    if (depth > maxDepth) return;
+
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        if (includeDirs) results.push(entry);
+        walk(fullPath, depth + 1);
+      } else if (entry.isFile() && (!includeSymlinks || !entry.isSymbolicLink())) {
+        if (match.some((regex) => regex.test(entry.name))) results.push(entry);
       }
     }
   }
 
-  [Symbol.iterator]() {
-    return this.#problems[Symbol.iterator]();
+  walk(root, 0);
+
+  return results;
+}
+
+// Static util from class
+export function getSlugFromPath(configPath: string): string {
+  return path.basename(path.dirname(configPath));
+}
+
+export interface FuzzJudgeProblemSet {
+  toJSON: () => FuzzJudgeProblemSetMessage;
+  addProblem: (slug: string, prob: FuzzJudgeProblem) => void;
+  get: (slug: string) => FuzzJudgeProblem | undefined;
+  [Symbol.iterator]: () => MapIterator<[string, FuzzJudgeProblem]>;
+}
+
+export function createFuzzJudgeProblemSet(root: string): FuzzJudgeProblemSet {
+  const problems = new Map<string, FuzzJudgeProblem>();
+
+  for (const ent of walkSync(root, {
+    includeDirs: false,
+    includeSymlinks: false,
+    match: [/prob\.md/],
+    maxDepth: 2,
+  })) {
+    try {
+      const slug = getSlugFromPath(ent.path);
+
+      const fileContent = fs.readFileSync(ent.path, "utf-8");
+
+      const problem = createFuzzJudgeProblem(slug, ent.path, loadMarkdown(fileContent, `/comp/prob/${slug}/assets`));
+      problems.set(slug, problem);
+    } catch (e) {
+      const errors = e instanceof Error ? indent("    ", e.toString()) : "Unknown error";
+      console.error(`Could not load problem "${ent.path}":\n${errors})}`);
+    }
   }
 
-  toJSON(): FuzzJudgeProblemSetMessage {
+  function toJSON(): FuzzJudgeProblemSetMessage {
     const list = [];
-    for (const prob of this.#problems.values()) list.push(prob.toJSON());
+    for (const prob of problems.values()) list.push(prob.toJSON());
     list.sort((a, b) => {
       const difficultyDelta = a.difficulty - b.difficulty;
       const pointsDelta = a.points - b.points;
-      const nameSort = (a.doc.title < b.doc.title) ? -1 : (a.doc.title > b.doc.title ? 1 : 0);
+      const nameSort = a.doc.title < b.doc.title ? -1 : a.doc.title > b.doc.title ? 1 : 0;
       return difficultyDelta || pointsDelta || nameSort;
     });
     return list;
   }
 
-  #addProblem(slug: string, prob: FuzzJudgeProblem) {
-    this.#problems.set(slug, prob);
-    this.notify(this.toJSON());
+  function addProblem(slug: string, prob: FuzzJudgeProblem) {
+    problems.set(slug, prob);
+    ee.emit("problems", toJSON());
   }
 
-  get(slug: string): FuzzJudgeProblem | undefined {
-    return this.#problems.get(slug);
+  function get(slug: string): FuzzJudgeProblem | undefined {
+    return problems.get(slug);
   }
+
+  
+
+  return {
+    toJSON,
+    addProblem,
+    get,
+    [Symbol.iterator]: () => problems[Symbol.iterator](),
+  };
 }
