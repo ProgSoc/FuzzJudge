@@ -34,12 +34,10 @@ interface SubmissionParams extends Omit<schema.Submission, "out" | "code" | "vle
 export const createCompetitionDB = (url: string, problems: FuzzJudgeProblemSet) => {
   const db = drizzle(url, { schema});
 
-  const migrationsFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "migrations")
-
-  console.log("Migrations folder:", migrationsFolder);
+  console.log("Migrations folder:", './migrations');
 
   migrate(db, {
-    migrationsFolder
+    migrationsFolder: "./migrations"
   });
 
   function encStr(input: string) {
