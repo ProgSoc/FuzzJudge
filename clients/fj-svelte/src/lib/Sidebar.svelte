@@ -15,7 +15,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import ListGroup from "./ListGroup.svelte";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
   import Icon from "./Icon.svelte";
   import icons from "../icons";
 

@@ -19,7 +19,7 @@ import { exists, parseScoreboard, questionOrder, type QuestionMeta, type Scorebo
 
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
-const client = hc<AppType>(BACKEND_SERVER)
+export const client = hc<AppType>(BACKEND_SERVER)
 
 console.log("Backend server URL:", BACKEND_SERVER);
 
@@ -62,7 +62,7 @@ export interface ScoreboardEvent {
 
 export const subscribeToScoreboard =  (callback: (data: ScoreboardEvent) => void): () => void => {
   try {
-  const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}/comp/scoreboard`;
+  const wsURL = `${client.comp.scoreboard.$url().toString().replace(/^http/, "ws")}`;
   
   console.log("Connecting to scoreboard websocket at", wsURL);
 

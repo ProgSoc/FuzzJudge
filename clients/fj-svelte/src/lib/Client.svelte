@@ -34,8 +34,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import { initLiveState } from "../apiLive";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
-  import type { CompetitionScoreboardMessage } from "../../../../src/score";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+  import type { CompetitionScoreboardMessage } from "server/impl/score";
   import Icon from "./Icon.svelte";
   import icons from "../icons";
 

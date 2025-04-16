@@ -17,9 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { onDestroy, onMount } from "svelte";
   import { type QuestionMeta, truncateUsername, type ScoreboardUser } from "../utils";
 
-  import { getScoreboard, subscribeToScoreboard, type ScoreboardEvent } from "../api";
-  import type { CompetitionScoreboardMessage } from "../../../../src/score";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { CompetitionScoreboardMessage } from "server/impl/score";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
 
   export let questions: Record<string, FuzzJudgeProblemMessage>;
   export let scoreboard: CompetitionScoreboardMessage;

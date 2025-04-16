@@ -96,7 +96,7 @@ const clock = await createClock(
     ), // 3 hrs
 );
 
-const _scoreboard = createCompetitionScoreboard(db, clock, problems);
+const scoreboard = createCompetitionScoreboard(db, clock, problems);
 
 const auth = new Auth({
     basic: async ({ username, password }) => {
@@ -443,6 +443,9 @@ const compRouter = new Hono()
                         ws.send(JSON.stringify(msg));
                     };
                     ee.on("clock",handler);
+                    // send initial data
+                    ws.send(JSON.stringify(clock.now()));
+                    console.log("WebSocket clock connection opened");
                 },
                 onClose: () => {
                     ee.off("clock", handler);
@@ -470,49 +473,52 @@ const compRouter = new Hono()
 
 const basePath = Bun.env["BASE_PATH"] ?? "/";
 const app = new Hono().basePath(basePath as "/")
-    .get("/", async (c, next) => {
-        // if not websocket return header
-        if (c.req.header("Upgrade") !== "websocket") {
-            return c.text(HEADER);
-        }
-
-        const upgr = await upgradeWebSocket(() => {
-            let problemHander: (data: FuzzJudgeProblemSetMessage) => void;
-            let clockHandler: (data: CompetitionClockMessage) => void;
-            let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
-
-            return {
-                onOpen: (_, ws) => {
-                    problemHander = (msg: FuzzJudgeProblemSetMessage) => {
-                        ws.send(JSON.stringify({ kind: "problems", value: msg }));
-                    };
-                    clockHandler = (msg) => {
-                        ws.send(JSON.stringify({ kind: "clock", value: msg }));
-                    };
-                    scoreboardHandler = (msg) => {
-                        ws.send(
-                            JSON.stringify({ kind: "scoreboard", value: msg }),
-                        );
-                    };
-
-                    ee.on("problems", problemHander);
-                    ee.on("clock", clockHandler);
-                    ee.on("scoreboard", scoreboardHandler);
-                },
-                onClose: () => {
-                    ee.off("problems", problemHander);
-                    ee.off("clock", clockHandler);
-                    ee.off("scoreboard", scoreboardHandler);
-                },
-            };
-        })(c, next);
-
-        if (upgr) {
-            return upgr;
-        }
-
+    .get("/", async (c) => {
         return c.text(HEADER);
     })
+    .get("/ws", upgradeWebSocket(() => {
+        let problemHander: (data: FuzzJudgeProblemSetMessage) => void;
+        let clockHandler: (data: CompetitionClockMessage) => void;
+        let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
+
+        return {
+            onOpen: async (e, ws) => {
+                problemHander = (msg: FuzzJudgeProblemSetMessage) => {
+                    ws.send(JSON.stringify({ kind: "problems", value: msg }));
+                };
+                clockHandler = (msg) => {
+                    ws.send(JSON.stringify({ kind: "clock", value: msg }));
+                };
+                scoreboardHandler = (msg) => {
+                    ws.send(
+                        JSON.stringify({ kind: "scoreboard", value: msg }),
+                    );
+                };
+
+                ee.on("problems", problemHander);
+                ee.on("clock", clockHandler);
+                ee.on("scoreboard", scoreboardHandler);
+                
+                // send initial data
+                ws.send(JSON.stringify({ kind: "problems", value: problems.toJSON() }));
+                ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
+                ws.send(
+                    JSON.stringify({
+                        kind: "scoreboard",
+                        value: await scoreboard.fullScoreboard()
+                    }),
+                );
+
+
+                console.log("WebSocket connection opened");
+            },
+            onClose: () => {
+                ee.off("problems", problemHander);
+                ee.off("clock", clockHandler);
+                ee.off("scoreboard", scoreboardHandler);
+            },
+        };
+    }))
     .on("BREW", ["/"], (c) => {
         return c.text("418 I'm a Teapot", 418);
     })
