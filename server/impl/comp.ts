@@ -265,7 +265,7 @@ export function createFuzzJudgeProblemSet(root: string): FuzzJudgeProblemSet {
 
       const fileContent = fs.readFileSync(filePath, "utf-8");
 
-      const problem = createFuzzJudgeProblem(slug, filePath, loadMarkdown(fileContent, `/comp/prob/${slug}/assets`));
+      const problem = createFuzzJudgeProblem(slug, filePath, loadMarkdown(fileContent, `/api/comp/prob/${slug}/assets`));
       console.log(`Loaded problem "${filePath}"`);
       problems.set(slug, problem);
     } catch (e) {

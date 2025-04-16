@@ -38,7 +38,6 @@ export async function createClock (db: CompetitionDB, plannedStart: Date, planne
   let start: Date;
   let finish: Date;
   let holdDate: Date | null;
-
   start = new Date(await db.getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()));
   if (plannedFinish < plannedStart) plannedFinish = plannedStart;
   finish = new Date(await db.getOrSetDefaultMeta("/comp/clock/finish", plannedFinish.toJSON()));
@@ -106,6 +105,7 @@ export async function createClock (db: CompetitionDB, plannedStart: Date, planne
     adjustFinish,
     hold,
     release,
+    protect,
   }
 }
 

@@ -56,7 +56,7 @@ export const createCompetitionDB = (url: string, problems: FuzzJudgeProblemSet) 
       where: (table) => eq(table.key, key),
     })
 
-    if (value === null && defaultValue !== undefined) {
+    if (value === undefined && defaultValue !== undefined) {
       // db.query("INSERT INTO comp VALUES (?, ?)", [key, defaultValue]);
       const [defVal] = await db.insert(schema.compTable).values({ key, val: defaultValue }).returning().onConflictDoNothing();
       return defVal.val as T extends undefined ? string | null : string;

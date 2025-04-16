@@ -71,7 +71,7 @@ const { positionals} = parseArgs({
 
 const pathPositional = positionals[2];
 
-const root = path.join(path.dirname( fileURLToPath(import.meta.url)),  pathPositional ?? ".")
+const root = path.join(process.cwd(),  pathPositional ?? ".")
 
 const compfile = loadMarkdown(
     await Bun.file(path.join(root, "./comp.md")).text(),
