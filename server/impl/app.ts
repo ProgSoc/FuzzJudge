@@ -498,16 +498,19 @@ const app = new Hono().basePath(basePath as "/")
                 ee.on("problems", problemHander);
                 ee.on("clock", clockHandler);
                 ee.on("scoreboard", scoreboardHandler);
+
+                setTimeout(async () => {
+                    ws.send(JSON.stringify({ kind: "problems", value: problems.toJSON() }));
+                    ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
+                    ws.send(
+                        JSON.stringify({
+                            kind: "scoreboard",
+                            value: await scoreboard.fullScoreboard()
+                        }),
+                    );
+                }, 1000);
                 
-                // send initial data
-                ws.send(JSON.stringify({ kind: "problems", value: problems.toJSON() }));
-                ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
-                ws.send(
-                    JSON.stringify({
-                        kind: "scoreboard",
-                        value: await scoreboard.fullScoreboard()
-                    }),
-                );
+                
 
 
                 console.log("WebSocket connection opened");
