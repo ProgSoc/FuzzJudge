@@ -548,7 +548,7 @@ const app = new Hono().basePath(basePath as "/")
         if (role !== "admin") auth.reject();
 
         const params = new URL(c.req.url).searchParams;
-        db.manualJudge(
+       await db.manualJudge(
             parseInt(params.get("id")!),
             Boolean(parseInt(params.get("ok")!)),
         );
