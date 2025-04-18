@@ -17,9 +17,11 @@
  */
 
 import type { CompetitionClock } from "./clock.ts";
-import type { FuzzJudgeProblemSet } from "./comp.ts";
-import type { CompetitionDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
+import { getOrSetDefaultMeta } from "./services/meta.service.ts";
+import type { Problem } from "./services/problems.service.ts";
+import { getSubmissionSkeletons } from "./services/submission.service.ts";
+import { allTeams } from "./services/team.service.ts";
 
 export type ProblemScore = {
   points: number,
@@ -39,7 +41,7 @@ export type CompetitionScoreboardMessage = {
   score: TeamScore,
 }[];
 
-export function createCompetitionScoreboard(db: CompetitionDB, clock: CompetitionClock, problems: FuzzJudgeProblemSet) {
+export function createCompetitionScoreboard(clock: CompetitionClock, problems: Problem[]) {
   
   let frozen = false;
 
@@ -50,8 +52,8 @@ export function createCompetitionScoreboard(db: CompetitionDB, clock: Competitio
   async function teamScoreboard(team: number) {
     // return sorted by score (then penalty score)
     const teamScore: TeamScore = { total: { points: 0, penalty: 0 }, problems: {} };
-    for (const [slug, prob] of problems) {
-      const submissions = await db.getSubmissionSkeletons(team, slug);
+    for (const problem of problems) {
+      const submissions = await getSubmissionSkeletons(team, problem.slug);
       const score: ProblemScore = {
         points: 0,
         penalty: 0,
@@ -62,7 +64,7 @@ export function createCompetitionScoreboard(db: CompetitionDB, clock: Competitio
       let latest = -Infinity;
       for (const { ok, time } of submissions) {
         if (ok) {
-          score.points = prob.points();
+          score.points = problem.problem.points;
           score.solved = true;
         } else {
           ++nPenalties;
@@ -73,17 +75,17 @@ export function createCompetitionScoreboard(db: CompetitionDB, clock: Competitio
       score.penalty = Math.max(0, (latest - clock.now().start.getTime()) / 60_000) + 20 * nPenalties;
       teamScore.total.points += score.points;
       teamScore.total.penalty += score.penalty;
-      teamScore.problems[slug] = score;
+      teamScore.problems[problem.slug] = score;
     }
     return teamScore;
   }
 
   async function fullScoreboard(): Promise<CompetitionScoreboardMessage> {
     if (frozen) {
-      return JSON.parse(await db.getOrSetDefaultMeta("/comp/scoreboard.frozen") ?? undefined!);
+      return JSON.parse(await getOrSetDefaultMeta("/comp/scoreboard.frozen") ?? undefined!);
     }
     const rankings = [];
-    for (const team of await db.allTeams()) {
+    for (const team of await allTeams()) {
       rankings.push({
         rank: 0,
         name: team.name,
@@ -99,7 +101,7 @@ export function createCompetitionScoreboard(db: CompetitionDB, clock: Competitio
   }
 
   function freeze() {
-    db.getOrSetDefaultMeta("/comp/scoreboard.frozen", JSON.stringify(fullScoreboard()));
+    getOrSetDefaultMeta("/comp/scoreboard.frozen", JSON.stringify(fullScoreboard()));
     frozen = true;
   }
 

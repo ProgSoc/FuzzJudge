@@ -3,7 +3,7 @@ import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "impl/db";
 import { submissionTable, type Submission } from "impl/db/schema";
 import { ee } from "impl/ee";
-import { getProblem, getProblemData } from "./problems.service";
+import { getProblemData } from "./problems.service";
 import { getCompetitionRoot } from "impl/util";
 
 interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
@@ -50,7 +50,7 @@ export async function score(params: { team: number }): Promise<number> {
   const competitionRoot = getCompetitionRoot();
   let total = 0;
   for (const slug of await solvedSet(params)) {
-    const problemMeta = await getProblem(competitionRoot, slug)
+    const problemMeta = await getProblemData(competitionRoot, slug)
     total +=  problemMeta.problem.points
   }
   return total;

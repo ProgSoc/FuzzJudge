@@ -1,0 +1,89 @@
+{
+  "version": "4",
+  "remote": {
+    "https://deno.land/std@0.223.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
+    "https://deno.land/std@0.223.0/assert/assertion_error.ts": "ba8752bd27ebc51f723702fac2f54d3e94447598f54264a6653d6413738a8917",
+    "https://deno.land/std@0.223.0/bytes/concat.ts": "9cac3b4376afbef98ff03588eb3cf948e0d1eb6c27cfe81a7651ab6dd3adc54a",
+    "https://deno.land/std@0.223.0/bytes/copy.ts": "f29c03168853720dfe82eaa57793d0b9e3543ebfe5306684182f0f1e3bfd422a",
+    "https://deno.land/std@0.223.0/io/_common.ts": "36705cdb4dfcd338d6131bca1b16e48a4d5bf0d1dada6ce397268e88c17a5835",
+    "https://deno.land/std@0.223.0/io/_constants.ts": "3c7ad4695832e6e4a32e35f218c70376b62bc78621ef069a4a0a3d55739f8856",
+    "https://deno.land/std@0.223.0/io/buffer.ts": "4d1f805f350433e418002accec798bc6c33ce18f614afa65f987c202d7b2234e",
+    "https://deno.land/std@0.223.0/io/iterate_reader.ts": "1e5e4fea22d8965afb7df4ee9ab9adda0a0fc581adbea31bc2f2d25453f8a6e9",
+    "https://deno.land/std@0.223.0/io/reader_from_stream_reader.ts": "a75bbc93f39df8b0e372cc1fbdc416a7cbf2a39fc4c09ddb057f1241100191c5",
+    "https://deno.land/std@0.223.0/io/to_readable_stream.ts": "ed03a44a1ec1cc55a85a857acf6cac472035298f6f3b6207ea209f93b4aefb39",
+    "https://deno.land/std@0.223.0/io/to_writable_stream.ts": "ef422e0425963c8a1e0481674e66c3023da50f0acbe5ef51ec9789efc3c1e2ed",
+    "https://deno.land/std@0.223.0/io/write_all.ts": "24aac2312bb21096ae3ae0b102b22c26164d3249dff96dbac130958aa736f038",
+    "https://deno.land/std@0.223.0/streams/_common.ts": "948735ef6d140cd6916dca861197b88fc57db52c2f923c392b7a14033d8fed4b",
+    "https://deno.land/std@0.223.0/streams/buffer.ts": "e012de72a53ad17c56512488e9afb6f4b6ed046b32fc1415ae7a4e6fc0efce38",
+    "https://deno.land/std@0.223.0/streams/byte_slice_stream.ts": "5bbdcadb118390affa9b3d0a0f73ef8e83754f59bb89df349add669dd9369713",
+    "https://deno.land/std@0.223.0/streams/delimiter_stream.ts": "4e4050740ff27a8824defa6c96126229ef9d794c4ace4ef9cabb10b5ad4a5d14",
+    "https://deno.land/std@0.223.0/streams/early_zip_readable_streams.ts": "21f5cf6dd36381c6a50c31a7727b5bd219f6382bbb7a413418595c3e466c4d14",
+    "https://deno.land/std@0.223.0/streams/iterate_reader.ts": "a50bed95514736c3c554e4c69ea2d8d2699252e4e74507769999d22c3886c777",
+    "https://deno.land/std@0.223.0/streams/limited_bytes_transform_stream.ts": "b22a45a337374e863c4eb1867ec6b8ad3e68620a6c52fe837746060ea610e6f1",
+    "https://deno.land/std@0.223.0/streams/limited_transform_stream.ts": "4c47da5ca38a30fa9f33b0f1a61d4548e7f52a9a58c294b0f430f680e44cc543",
+    "https://deno.land/std@0.223.0/streams/merge_readable_streams.ts": "73eed8ff54c9111b8b974b11a5a11c1ed0b7800e0157c39277ccac3ed14721e2",
+    "https://deno.land/std@0.223.0/streams/mod.ts": "d56624832b9649b680c74ab9c77e746e8be81ae1a24756cc04623e25a0d43ce9",
+    "https://deno.land/std@0.223.0/streams/readable_stream_from_reader.ts": "4289a63836f73901441c1879f2be76eea2a983920f4b10a4a9b8a6d8c29ece56",
+    "https://deno.land/std@0.223.0/streams/reader_from_iterable.ts": "82f1ecef32ec70c7841ca2a54b09c73167d940f0578bec91e874bb8cd42ba8f3",
+    "https://deno.land/std@0.223.0/streams/reader_from_stream_reader.ts": "dda702bd365a133be8bdbc5a1ba96c67b350c3504410632f3a833895bfc7bae3",
+    "https://deno.land/std@0.223.0/streams/text_delimiter_stream.ts": "94dfc900204e306496c1b58c80473db57b6097afdcb8ea9eaff453a193a659f1",
+    "https://deno.land/std@0.223.0/streams/text_line_stream.ts": "21f33d3922e019ec1a1676474beb543929cb564ec99b69cd2654e029e0f45bd5",
+    "https://deno.land/std@0.223.0/streams/to_array_buffer.ts": "1a9c07c4a396ce557ab205c44415815ab13b614fed94a12f62b80f8e650c726d",
+    "https://deno.land/std@0.223.0/streams/to_blob.ts": "bf5daaae50fa8f57e0c8bfd7474ebac16ac09e130e3d01ef2947ae5153912b4a",
+    "https://deno.land/std@0.223.0/streams/to_json.ts": "b6a908d0da7cd30956e5fbbfa7460747e50b8f307d1041282ed6fe9070d579ee",
+    "https://deno.land/std@0.223.0/streams/to_text.ts": "6f93593bdfc2cea5cca39755ea5caf0d4092580c0a713dfe04a1e85c60df331f",
+    "https://deno.land/std@0.223.0/streams/to_transform_stream.ts": "4c4836455ef89bab9ece55975ee3a819f07d3d8b0e43101ec7f4ed033c8a2b61",
+    "https://deno.land/std@0.223.0/streams/writable_stream_from_writer.ts": "62f2712d3a7bebd981fca8bd5140192c37450f9c4aa94283f7ca833e46bc7485",
+    "https://deno.land/std@0.223.0/streams/writer_from_stream_writer.ts": "b0e39ef607dfdc5abdfb627edf61a9672809463e2bb022afcbaf0cd006c40feb",
+    "https://deno.land/std@0.223.0/streams/zip_readable_streams.ts": "53eb10d7557539b489bd858907aab6dd28247f074b3446573801de3150cb932e",
+    "https://deno.land/x/vegas@v1.3.0/mod.ts": "122b3c826dc6c5de5d95389f397c5ff69fcd7a3dfca75cc010b41017b2245817",
+    "https://jspm.dev/npm:seedrandom@3.0.5!cjs": "b726cc1a41e99691c25d6af1711b75353494b59e7d530d8e93c1b40a002ce9a1",
+    "https://jspm.dev/npm:seedrandom@3.0.5/lib/alea!cjs": "a5f648ecf27278fa971c3a5c9c97de3451b91f814106b6dfa03d3fdff7ab62f5",
+    "https://jspm.dev/npm:seedrandom@3.0.5/lib/xor4096.js!cjs": "e2792a8423247a660ff36e4686d19e338293d7adf3cd23d5eead032f2a204ade",
+    "https://jspm.dev/npm:seedrandom@3.0.5/seedrandom!cjs": "90156324b6b69efad145fb802607a81c977e0633089758a388f28d2f72c72d91",
+    "https://jspm.dev/seedrandom": "dce9ea596ca9b58319a2a159e24ccfae3d7400dd0b8b4d6aa896db98cc2d6896"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@types/bun@latest"
+      ]
+    },
+    "members": {
+      "clients/fj-svelte": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@sveltejs/vite-plugin-svelte@^3.0.2",
+            "npm:@tsconfig/svelte@^5.0.2",
+            "npm:hono@^4.7.6",
+            "npm:prettier-plugin-svelte@^3.2.4",
+            "npm:prettier@^3.3.2",
+            "npm:svelte-check@^3.6.7",
+            "npm:svelte-markdown@~0.4.1",
+            "npm:svelte@^4.2.12",
+            "npm:tslib@^2.8.1",
+            "npm:typescript@^5.8.3",
+            "npm:vite-tsconfig-paths@^5.1.4",
+            "npm:vite@^6.2.6"
+          ]
+        }
+      },
+      "server": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@bokuweb/zstd-wasm@^0.0.27",
+            "npm:@jsr/std__toml@*",
+            "npm:@jsr/std__yaml@*",
+            "npm:@types/bun@^1.2.9",
+            "npm:drizzle-kit@~0.30.6",
+            "npm:drizzle-orm@0.41",
+            "npm:gray-matter@^4.0.3",
+            "npm:remark@^15.0.1",
+            "npm:toml@3",
+            "npm:zod@^3.24.2"
+          ]
+        }
+      }
+    }
+  }
+}

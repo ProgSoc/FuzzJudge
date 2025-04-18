@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "impl/db";
+import { db } from "../db/index.ts";
 import { compTable } from "impl/db/schema";
 
 /**
@@ -48,7 +48,7 @@ export async function setMeta(key: string, value: string): Promise<string> {
  * Get all meta keys and values
  * @returns all meta values
  */
-async function allMeta() {
+export async function allMeta() {
   const allCompetitions = await db.query.compTable.findMany();
 
   return Object.fromEntries(allCompetitions.map((comp) => [comp.key, comp.val] as [string, string]));

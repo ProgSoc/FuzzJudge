@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type CompetitionDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
+import { getOrSetDefaultMeta, setMeta } from "./services/meta.service.ts";
 
 export type ClockState =
   | "live"
@@ -33,14 +33,14 @@ export type CompetitionClockMessage = {
 
 
 
-export async function createClock (db: CompetitionDB, plannedStart: Date, plannedFinish: Date) {
+export async function createClock (plannedStart: Date, plannedFinish: Date) {
   let state: ClockState = "hold";
   let start: Date;
   let finish: Date;
   let holdDate: Date | null;
-  start = new Date(await db.getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()));
+  start = new Date(await getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()));
   if (plannedFinish < plannedStart) plannedFinish = plannedStart;
-  finish = new Date(await db.getOrSetDefaultMeta("/comp/clock/finish", plannedFinish.toJSON()));
+  finish = new Date(await getOrSetDefaultMeta("/comp/clock/finish", plannedFinish.toJSON()));
   holdDate = null;
 
 
@@ -68,8 +68,8 @@ export async function createClock (db: CompetitionDB, plannedStart: Date, planne
 
   async function adjustStart(time: Date, { keepDuration = false }) {
     const delta = start.getTime() - time.getTime();
-    start = new Date(await db.setMeta("/comp/clock/start", time.toJSON()));
-    if (keepDuration) finish = new Date(await db.setMeta("/comp/clock/finish", new Date(finish.getTime() - delta).toJSON()));
+    start = new Date(await setMeta("/comp/clock/start", time.toJSON()));
+    if (keepDuration) finish = new Date(await setMeta("/comp/clock/finish", new Date(finish.getTime() - delta).toJSON()));
     ee.emit("clock", now())
   }
 
@@ -82,7 +82,7 @@ export async function createClock (db: CompetitionDB, plannedStart: Date, planne
       newFinish = timeOrMinutesDuration;
     }
     if (newFinish < start) throw new RangeError("Finish time must be after start.");
-    finish = new Date(await db.setMeta("/comp/clock/finish", newFinish.toJSON()));
+    finish = new Date(await setMeta("/comp/clock/finish", newFinish.toJSON()));
     ee.emit("clock", now());
   }
 

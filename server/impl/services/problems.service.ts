@@ -3,21 +3,7 @@ import matter from "gray-matter";
 import { TOML } from "bun";
 import { z } from "zod";
 import fs from "fs/promises";
-import { HTTPException
-} from 'hono/http-exception'
-
-/**
- * [fuzz]
-exec = ["deno", "run", "fuzz.ts"]
-env = {}
-
-[judge]
-exec = ["deno", "run", "judge.ts"]
-
-[problem]
-points = 20
-difficulty = 3
- */
+import { HTTPException } from "hono/http-exception";
 
 const problemSpec = z.object({
   fuzz: z.object({
@@ -31,7 +17,6 @@ const problemSpec = z.object({
   }),
 
   problem: z.object({
-    title: z.string(),
     points: z.number(),
     difficulty: z.number(),
   }),
@@ -39,8 +24,22 @@ const problemSpec = z.object({
 
 type ProblemSpec = z.infer<typeof problemSpec>;
 
+export interface MarkdownAttributes { title: string; summary: string | undefined; icon: string; publicAssets: Set<string>; body: string }
+
+export type FuzzJudgeProblemMessage = {
+  slug: string;
+  doc: {
+    title: string;
+    icon?: string;
+    summary?: string;
+    body: string;
+  };
+  points: number;
+  difficulty: number;
+};
+
 export async function getProblemData(root: string, slug: string) {
-  const problemFile = await Bun.file(path.join(root, slug, "prob.md"))
+  const problemFile = await Bun.file(path.join(root, slug, "prob.md"));
 
   if (!problemFile.exists()) {
     throw new HTTPException(404, {
@@ -62,15 +61,20 @@ export async function getProblemData(root: string, slug: string) {
     throw new Error(`Problem data validation failed: ${problemData.error}`);
   }
 
+  const attributes = parseMarkdownAttributes(content, `/problems/${slug}/`);
+
   return {
     ...problemData.data,
+    attributes,
+    slug,
     content,
   };
 }
 
-interface Problem extends ProblemSpec {
+export interface Problem extends ProblemSpec {
   slug: string;
   content: string;
+  attributes: MarkdownAttributes;
 }
 
 /**
@@ -102,27 +106,10 @@ export async function getProblems(root: string): Promise<Problem[]> {
 
   for (const problemPath of problemPaths) {
     const problemData = await getProblemData(root, problemPath);
-    problems.push({
-      slug: problemPath,
-      ...problemData,
-    });
+    problems.push(problemData);
   }
 
   return problems;
-}
-
-/**
- * Get a problem by its slug and root directory
- * @param root The root directory of the competition
- * @param slug The slug of the problem e.g. hello-world
- * @returns A Problem object
- */
-export async function getProblem(root: string, slug: string): Promise<Problem> {
-  const problemData = await getProblemData(root, slug);
-  return {
-    slug,
-    ...problemData,
-  };
 }
 
 /**
@@ -133,10 +120,10 @@ export async function getProblem(root: string, slug: string): Promise<Problem> {
  * @returns The output of the fuzzing process
  */
 export async function fuzzProblem(root: string, slug: string, seed: string) {
-  const problem = await getProblem(root, slug);
+  const problem = await getProblemData(root, slug);
   const configPath = path.join(root, slug);
   const proc = Bun.spawn([...problem.fuzz.exec, seed], {
-    cwd: path.join(configPath, ".."),
+    cwd: configPath,
     stdin: "pipe",
     stdout: "pipe",
     stderr: "pipe",
@@ -178,22 +165,22 @@ type JudgeResult =
  * @returns A JudgeResult object
  */
 export async function judgeProblem(root: string, slug: string, seed: string, input: string): Promise<JudgeResult> {
-  const problem = await getProblem(root, slug); // get the problem metadata
+  const problem = await getProblemData(root, slug); // get the problem metadata
   const configPath = path.join(root, slug); // path to the problem directory (e.g. /path/to/comp/hello-world)
 
   const proc = Bun.spawn([...problem.judge.exec, seed], {
-    cwd: path.join(configPath, ".."),
+    cwd: configPath,
     stdin: new Response(input),
     stdout: "pipe",
     stderr: "pipe",
   });
 
-  const out = new Response(proc.stdout); 
+  const out = new Response(proc.stdout);
   const err = new Response(proc.stderr);
 
   await proc.exited;
 
-  if (proc.exitCode === 0) { 
+  if (proc.exitCode === 0) {
     // check if the process exited successfully
     return { correct: true };
   }
@@ -215,5 +202,57 @@ export async function judgeProblem(root: string, slug: string, seed: string, inp
 }
 
 /**
- * Problem JSON
+ * Problem Markdown attributes parser
+ *
+ * Uses a series of regexes to parse the attributes of the markdown instructions
+ *
+ * @param body The markdown body
+ * @param linkPrefix The prefix to add to links
+ * @returns The parsed attributes
  */
+export function parseMarkdownAttributes(
+  body: string,
+  linkPrefix: string = "",
+) {
+  const [titleMatch, titleHead, icon, titleTail] =
+    body.match(new RegExp(`^# (.*?)(\\p{RGI_Emoji})?(.*)\\n?`, "mv")) ?? [];
+  const title = ((titleHead || "") + (titleTail || "")).trim().replaceAll(/\s{+}/g, " ");
+  const summary = body.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
+  const publicAssets = new Set<string>();
+  let outputBody = body
+    .replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
+      if (link.startsWith("//") || /^\w+:/.test(link)) {
+        return match;
+      } else if (linkPrefix !== "") {
+        const newLink = path.normalize("/" + link);
+        publicAssets.add(newLink);
+        return match.replace(link, linkPrefix + newLink);
+      } else {
+        publicAssets.add(link);
+        return match;
+      }
+    })
+    .trim();
+  if (outputBody.length > 0) outputBody += "\n";
+  return {
+    title,
+    summary,
+    icon,
+    publicAssets,
+    body: titleMatch === undefined ? outputBody : outputBody.replace(titleMatch, ""),
+  };
+}
+
+export function problemToMessage (problem: Problem): FuzzJudgeProblemMessage {
+  return {
+    slug: problem.slug,
+    doc: {
+      title: problem.attributes.title,
+      icon: problem.attributes.icon,
+      summary: problem.attributes.summary,
+      body: problem.content,
+    },
+    points: problem.problem.points,
+    difficulty: problem.problem.difficulty,
+  };
+}
