@@ -19,6 +19,7 @@ import type { SocketMessage } from "@server/main.ts";
 import type { CompetitionClockMessage } from "@server/impl/clock";
 import type { CompetitionScoreboardMessage } from "@server/impl/score";
 import type { FuzzJudgeProblemMessage } from "@server/impl/comp";
+import { BACKEND_SERVER } from "./api.ts";
 
 function makeSvelteSubscribable<T>() {
   const subscribers = new Set<(value: T) => void>();
@@ -46,8 +47,11 @@ function makeSvelteSubscribable<T>() {
 }
 
 export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
-  const wsAddress = "/";
-  const ws = new WebSocket(wsAddress);
+  const wsUrl = BACKEND_SERVER.replace(/^http/, "ws")
+
+  console.log("Connecting to websocket at", wsUrl);
+
+  const ws = new WebSocket(wsUrl);
   ws.addEventListener("message", ({ data }) => {
     callback(JSON.parse(data));
   });

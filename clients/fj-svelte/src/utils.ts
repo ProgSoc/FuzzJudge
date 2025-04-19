@@ -213,3 +213,15 @@ export function runRepeatedly(callback: () => void) {
 export function exists<T>(val: T | null | undefined): val is T {
   return val !== null && val !== undefined;
 }
+
+/**
+ * Creates a WebSocket URL from a given path.
+ * @param path The path to the WebSocket server
+ * @returns The WebSocket URL
+ */
+export function createWsUrl (path: string) {
+  const proto = window.location.protocol === "https:" ? "wss" : "ws";
+  const port = window.location.port ? `:${window.location.port}` : "";
+  const url = `${proto}://${window.location.host}${port}${path}`;
+  return url;
+}

@@ -6,6 +6,10 @@ WORKDIR /app
 COPY . .
 # Install dependencies
 RUN npm install --frozen-lockfile --prefer-offline --no-audit --progress=false
+
+ARG VITE_BACKEND_URL
+# Set the environment variable for the backend URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 # Build the application
 RUN npm run build
 

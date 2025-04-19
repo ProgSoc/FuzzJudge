@@ -7,6 +7,7 @@ export default defineConfig({
   base: "",
   plugins: [svelte()],
   build: {
+    sourcemap: "inline",
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
@@ -19,4 +20,14 @@ export default defineConfig({
       '@server': '../../server',
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:1989",
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/api/, ""), // remove /api prefix
+      },
+    },
+  }
 });
