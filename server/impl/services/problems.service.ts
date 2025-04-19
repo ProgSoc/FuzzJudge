@@ -24,7 +24,13 @@ const problemSpec = z.object({
 
 type ProblemSpec = z.infer<typeof problemSpec>;
 
-export interface MarkdownAttributes { title: string; summary: string | undefined; icon: string; publicAssets: Set<string>; body: string }
+export interface MarkdownAttributes {
+  title: string;
+  summary: string | undefined;
+  icon: string;
+  publicAssets: Set<string>;
+  body: string;
+}
 
 export type FuzzJudgeProblemMessage = {
   slug: string;
@@ -210,16 +216,16 @@ export async function judgeProblem(root: string, slug: string, seed: string, inp
  * @param linkPrefix The prefix to add to links
  * @returns The parsed attributes
  */
-export function parseMarkdownAttributes(
-  body: string,
-  linkPrefix: string = "",
-) {
+export function parseMarkdownAttributes(body: string, linkPrefix: string = "") {
+  // No carriage returns
+  const noCarriage = body.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+
   const [titleMatch, titleHead, icon, titleTail] =
-    body.match(new RegExp(`^# (.*?)(\\p{RGI_Emoji})?(.*)\\n?`, "mv")) ?? [];
+    noCarriage.match(new RegExp(`^# (.*?)(\\p{RGI_Emoji})?(.*)\\n?`, "mv")) ?? [];
   const title = ((titleHead || "") + (titleTail || "")).trim().replaceAll(/\s{+}/g, " ");
-  const summary = body.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
+  const summary = noCarriage.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
   const publicAssets = new Set<string>();
-  let outputBody = body
+  let outputBody = noCarriage
     .replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
       if (link.startsWith("//") || /^\w+:/.test(link)) {
         return match;
@@ -243,7 +249,7 @@ export function parseMarkdownAttributes(
   };
 }
 
-export function problemToMessage (problem: Problem): FuzzJudgeProblemMessage {
+export function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
   return {
     slug: problem.slug,
     doc: {

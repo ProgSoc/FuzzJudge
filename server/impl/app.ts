@@ -41,7 +41,6 @@ Backend
 
 import { HEADER } from "../version.ts";
 import { deleteFalsey, getCompetitionRoot } from "./util.ts";
-import { loadMarkdown } from "./markdown.ts";
 import { Auth } from "./auth.ts";
 import { createClock, type CompetitionClockMessage } from "./clock.ts";
 import { createCompetitionScoreboard, type CompetitionScoreboardMessage } from "./score.ts";
