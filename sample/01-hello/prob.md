@@ -16,11 +16,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 [fuzz]
-exec = ["/home/sebas/.deno/bin/deno", "run", "--allow-import" ,"fuzz.ts"]
+exec = ["deno", "run", "--allow-import" ,"fuzz.ts"]
 env = {}
 
 [judge]
-exec = ["/home/sebas/.deno/bin/deno", "run", "--allow-import", "judge.ts"]
+exec = ["deno", "run", "--allow-import", "judge.ts"]
 
 [problem]
 title = "Hello World"

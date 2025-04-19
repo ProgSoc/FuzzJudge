@@ -133,7 +133,7 @@ export async function fuzzProblem(root: string, slug: string, seed: string) {
     stdin: "pipe",
     stdout: "pipe",
     stderr: "pipe",
-    env: problem.fuzz.env,
+    env: {...problem.fuzz.env, ...process.env},
   });
   const out = new Response(proc.stdout);
   const err = new Response(proc.stderr);
@@ -179,6 +179,7 @@ export async function judgeProblem(root: string, slug: string, seed: string, inp
     stdin: new Response(input),
     stdout: "pipe",
     stderr: "pipe",
+    env: {...problem.judge.env, ...process.env},
   });
 
   const out = new Response(proc.stdout);
