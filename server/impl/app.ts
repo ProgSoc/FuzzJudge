@@ -82,6 +82,7 @@ import { authMiddleware, forbiddenResponse, unauthorizedResponse } from "./middl
 import { upgradeWebSocket } from "./websocket.ts";
 import { swaggerUI } from "@hono/swagger-ui";
 import { z } from "@hono/zod-openapi";
+import { logger} from "hono/logger";
 
 await initZstd();
 migrateDB();
@@ -398,6 +399,8 @@ app.doc("/docs.json", {
   //   "Basic": []
   // }],
 })
+
+app.use(logger())
 
 export default app;
 
