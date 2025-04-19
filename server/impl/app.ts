@@ -481,6 +481,9 @@ const compRouter = new Hono()
 const basePath = Bun.env["BASE_PATH"] ?? "/";
 const app = new Hono()
   .basePath(basePath as "/")
+  .route("/comp", compRouter)
+  .route("/user", userRouter)
+  .route("/team", teamRouter)
   .get("/", async (c) => {
     return c.text(HEADER);
   })
@@ -549,9 +552,7 @@ const app = new Hono()
     await manualJudge(parseInt(params.get("id")!), Boolean(parseInt(params.get("ok")!)));
     return c.body(null, { status: 204 });
   })
-  .route("/comp", compRouter)
-  .route("/user", userRouter)
-  .route("/team", teamRouter)
+  
   .get("/void", () => {
     return auth.reject();
   })
