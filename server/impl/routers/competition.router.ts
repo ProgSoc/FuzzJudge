@@ -1,6 +1,6 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { probRouter } from "./problem.router";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { authMiddleware, unauthorizedResponse } from "../middleware/auth.middleware";
 import { basicAuth } from "../services/auth.service";
 import { allMeta } from "../services/meta.service";
 import {
@@ -26,15 +26,34 @@ const competionData = await getCompetitionData(root);
 
 export const compRouter = new OpenAPIHono()
   .route("/prob", probRouter)
-  .get(
-    "/meta",
-    authMiddleware({
-      verifyUser: basicAuth,
-      roles: ["admin"],
+  .openapi(
+    createRoute({
+      method: "get",
+      path: "/meta",
+      responses: {
+        200: {
+          description: "Meta data",
+          content: {
+            "application/json": {
+              schema: z.record(z.string()),
+            },
+          },
+        },
+        401: unauthorizedResponse,
+      },
+      middleware: authMiddleware({
+        verifyUser: basicAuth,
+        roles: ["admin"],
+      }),
+      security: [{
+        Bearer: [],
+      }]
     }),
     async (c) => {
-      return c.json(allMeta(), {
+        const meta = await allMeta()
+      return c.json(meta, {
         headers: { "Content-Type": "application/json" },
+        status: 200
       });
     },
   )
