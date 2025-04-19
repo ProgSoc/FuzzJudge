@@ -15,11 +15,11 @@
 
 import { onDestroy } from "svelte";
 import { unreachable } from "./utils";
-import type { SocketMessage } from "server/impl/app.ts";
 import type { CompetitionClockMessage } from "server/impl/clock";
 import type { CompetitionScoreboardMessage } from "server/impl/score";
-import type { FuzzJudgeProblemMessage } from "server/impl/services/problems.service.ts";
+import type { FuzzJudgeProblemMessage } from "server/impl/services/problems.service";
 import { BACKEND_SERVER, client } from "./api.ts";
+import type { SocketMessage } from "server/impl/app";
 
 function makeSvelteSubscribable<T>() {
   const subscribers = new Set<(value: T) => void>();

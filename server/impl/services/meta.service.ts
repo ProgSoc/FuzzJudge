@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db/index.ts";
-import { compTable } from "impl/db/schema";
+import { db } from "../db";
+import { compTable } from "../db/schema";
 
 /**
  * Get or set a default meta value

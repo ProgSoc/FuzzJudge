@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "impl/db";
-import { userTable, type Team, type User, type UserRoles } from "impl/db/schema";
+import { db } from "../db";
+import { userTable, type Team, type User, type UserRoles } from "../db/schema";
 
 /**
  * Get a user by their id

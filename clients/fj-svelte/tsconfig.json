@@ -25,6 +25,8 @@
     "src/**/*.js",
     "src/**/*.svelte"
   ],
+  // "rootDir": ".",
+  "exclude": ["./dist"],
   "references": [
     {
       "path": "./tsconfig.node.json"

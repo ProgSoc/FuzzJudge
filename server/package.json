@@ -7,6 +7,14 @@
     "drizzle-kit": "^0.30.6"
   },
   "types": "./dist",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts"
+    }
+  },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },

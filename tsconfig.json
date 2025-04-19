@@ -8,6 +8,7 @@
     "jsx": "react-jsx",
     "allowJs": true,
     "composite": true,
+    "outDir": "dist/types",
 
     // Bundler mode
     "moduleResolution": "bundler",
@@ -24,9 +25,13 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
-    "baseUrl": ".",
+    "declarationMap": true,
+    // "baseUrl": ".",
     "paths": {
-      "server": ["./server"]
-    }
-  }
+      // "server": ["./server"],
+      // "server/*": ["./server/*"],
+    },
+    
+  },
+  "include": ["package.json"]
 }
