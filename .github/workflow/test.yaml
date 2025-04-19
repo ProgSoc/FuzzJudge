@@ -1,6 +1,6 @@
-name: my-workflow
+name: Test Bun
 jobs:
-  my-job:
+  test:
     name: Test Bun
     runs-on: ubuntu-latest
     steps:
