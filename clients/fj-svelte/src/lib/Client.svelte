@@ -34,8 +34,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import { initLiveState } from "../apiLive";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
-  import type { CompetitionScoreboardMessage } from "../../../../src/score";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+  import type { CompetitionScoreboardMessage } from "server/impl/score";
   import Icon from "./Icon.svelte";
   import icons from "../icons";
 
@@ -45,12 +45,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   getUsername().then((name) => {
     username = name;
+    console.log("username", username);
   });
 
   let compTimes: CompTimes | undefined = undefined;
   let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
   let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
   let solvedQuestions = new Set<string>();
+
+    console.log({questions})
 
   let liveState = initLiveState();
   liveState.listenClock((clock) => {
@@ -65,6 +68,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
   liveState.listenScoreboard((sb) => {
     scoreboard = sb;
+    console.log("scoreboard", sb);
   });
 
   getCompInfo().then((data) => {

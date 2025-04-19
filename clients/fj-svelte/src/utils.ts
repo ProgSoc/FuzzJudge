@@ -13,9 +13,9 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { CompetitionClockMessage } from "server/impl/clock";
 import { onDestroy } from "svelte";
 import { writable, type Writable } from "svelte/store";
-import type { MessageValue } from "../../../src/live/socketData";
 
 export const selectedQuestion: Writable<string> = writable("");
 
@@ -92,7 +92,7 @@ export const parseScoreboard = (data: string): ScoreboardUser[] => {
   return users;
 };
 
-export type CompTimes = MessageValue<"clock">;
+export type CompTimes = CompetitionClockMessage;
 
 export enum CompState {
   BEFORE,
@@ -199,7 +199,7 @@ export function unreachable(x: never): never {
 export function runRepeatedly(callback: () => void) {
   let animFrameRef: number;
   function update() {
-    requestAnimationFrame(update);
+    animFrameRef = requestAnimationFrame(update);
     callback();
   }
 

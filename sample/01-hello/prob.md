@@ -1,4 +1,4 @@
-```toml
+---toml
 # FuzzJudge - Randomised input judging server, designed for ProgComp.
 # Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
 #
@@ -16,16 +16,17 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 [fuzz]
-exec = ["deno", "run", "fuzz.ts"]
+exec = ["deno", "run", "--allow-import" ,"fuzz.ts"]
 env = {}
 
 [judge]
-exec = ["deno", "run", "judge.ts"]
+exec = ["deno", "run", "--allow-import", "judge.ts"]
 
 [problem]
+title = "Hello World"
 points = 20
 difficulty = 3
-```
+---
 
 # 👋 Hello Programmers!
 

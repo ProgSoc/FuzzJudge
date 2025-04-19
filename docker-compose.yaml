@@ -13,7 +13,8 @@ services:
       - "--entrypoints.websecure.address=:443"
   server:
     build: 
-      context: ./server
+      context: .
+      dockerfile: Dockerfile.server
       args:
         - BASE_PATH=/api
     volumes:
@@ -26,7 +27,8 @@ services:
       - "traefik.http.services.server.loadbalancer.server.port=1989"
   fj-svelte:
     build: 
-      context: ./clients/fj-svelte
+      context: .
+      dockerfile: Dockerfile.frontend
       args:
         - VITE_BACKEND_URL=http://localhost/api
     labels:

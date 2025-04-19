@@ -17,7 +17,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import SubmissionArea from "./SubmissionArea.svelte";
   import { selectedQuestion, difficultyName } from "../utils";
   import { onDestroy } from "svelte";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
   import SvelteMarkdown from "svelte-markdown";
 
   export let question: FuzzJudgeProblemMessage;

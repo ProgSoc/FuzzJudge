@@ -12,10 +12,12 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
+import { hc } from "hono/client";
+import type { AppType } from "server/mod";
 import { exists, parseScoreboard, questionOrder, type QuestionMeta, type ScoreboardUser } from "./utils";
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
+export const client = hc<AppType>(BACKEND_SERVER);
 
 console.log("Backend server URL:", BACKEND_SERVER);
 
@@ -23,7 +25,7 @@ export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
   let questions: Record<string, QuestionMeta> = {};
 
   try {
-    const res = await fetch(`${BACKEND_SERVER}/comp/prob`);
+    const res = await client.comp.prob.$get();
 
     if (!res.ok) {
       throw "Failed to fetch questions";
@@ -37,7 +39,12 @@ export let getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
     }
 
     for (const slug of arr) {
-      questions[slug] = await getQuestion(slug);
+      try {
+        questions[slug] = await getQuestion(slug);
+      } catch (e) {
+        console.error("Error fetching question", slug, e);
+      }
+     
     }
 
     const sorted = Object.values(questions).sort(questionOrder);
@@ -56,26 +63,26 @@ export interface ScoreboardEvent {
   new_scoreboard: ScoreboardUser[];
 }
 
-export const subscribeToScoreboard =  (callback: (data: ScoreboardEvent) => void): () => void => {
+export const subscribeToScoreboard = (callback: (data: ScoreboardEvent) => void): (() => void) => {
   try {
-  const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}/comp/scoreboard`;
-  
-  console.log("Connecting to scoreboard websocket at", wsURL);
+    const wsURL = `${client.comp.scoreboard.$url().toString().replace(/^http/, "ws")}`;
 
-  const socket = new WebSocket(wsURL);
+    console.log("Connecting to scoreboard websocket at", wsURL);
 
-  socket.addEventListener("message", (event) => {
-    callback({ new_scoreboard: parseScoreboard(event.data) });
-  });
+    const socket = new WebSocket(wsURL);
 
-  return () => {
-    socket.close();
-  };
-} catch (error) {
+    socket.addEventListener("message", (event) => {
+      callback({ new_scoreboard: parseScoreboard(event.data) });
+    });
+
+    return () => {
+      socket.close();
+    };
+  } catch (error) {
     console.error("Error subscribing to scoreboard:", error);
 
-    return () => {}
-}
+    return () => {};
+  }
 };
 
 export const getCompInfo = async (): Promise<{ title: string; instructions: string }> => {
@@ -96,13 +103,13 @@ const getQuestion = async (slug: string) => {
   const data: QuestionMeta = {
     slug,
     num: -1,
-    name: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/name`)).text(),
-    icon: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/icon`)).text(),
-    instructions: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/instructions`)).text(),
-    solved: (await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`)).text()) === "OK",
-    points: parseInt(await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/points`)).text()),
-    difficulty: parseInt(await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/difficulty`)).text()),
-    brief: await (await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/brief`)).text(),
+    name: await client.comp.prob[":id"].name.$get({ param: { id: slug } }).then((r) => r.text()),
+    icon: await client.comp.prob[":id"].icon.$get({ param: { id: slug } }).then((r) => r.text()),
+    instructions: await client.comp.prob[":id"].instructions.$get({ param: { id: slug } }).then((r) => r.text()),
+    solved: (await client.comp.prob[":id"].judge.$get({ param: { id: slug } }).then((r) => r.text()).catch(() => "NO")) === "OK",
+    points: parseInt(await client.comp.prob[":id"].points.$get({ param: { id: slug } }).then((r) => r.text())),
+    difficulty: parseInt(await client.comp.prob[":id"].difficulty.$get({ param: { id: slug } }).then((r) => r.text())),
+    brief: await client.comp.prob[":id"].brief.$get({ param: { id: slug } }).then((r) => r.text()),
   };
 
   data.instructions = data.instructions.replace(/(<img\s+[^>]*src=")(?!https:\/\/)([^"]+)"/g, (match, p1, p2) => {

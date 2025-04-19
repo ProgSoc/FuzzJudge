@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
   import type { QuestionMeta } from "../utils";
   import QuestionButton from "./QuestionButton.svelte";
 

@@ -17,9 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { onDestroy, onMount } from "svelte";
   import { type QuestionMeta, truncateUsername, type ScoreboardUser } from "../utils";
 
-  import { getScoreboard, subscribeToScoreboard, type ScoreboardEvent } from "../api";
-  import type { CompetitionScoreboardMessage } from "../../../../src/score";
-  import type { FuzzJudgeProblemMessage } from "../../../../src/comp";
+  import type { CompetitionScoreboardMessage } from "server/impl/score";
+  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
 
   export let questions: Record<string, FuzzJudgeProblemMessage>;
   export let scoreboard: CompetitionScoreboardMessage;
@@ -34,6 +33,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <h1>Scoreboard</h1>
 <table>
+  <thead>
   <tr>
     <th> Position </th>
     <th> Team </th>
@@ -42,6 +42,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <th class="question-num">{question.doc.icon}</th>
     {/each}
   </tr>
+  </thead>
+  <tbody>
   {#each filteredTeams as team, i}
     <tr>
       <td class="position">
@@ -62,6 +64,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       {/each}
     </tr>
   {/each}
+  </tbody>
 </table>
 
 {#if errors.length > 0}

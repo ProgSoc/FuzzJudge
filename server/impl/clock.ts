@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CompetitionDB } from "./db.ts";
-import { Subscribable } from "./subscribable.ts";
+import { ee } from "./ee.ts";
+import { getOrSetDefaultMeta, setMeta } from "./services/meta.service.ts";
 
 export type ClockState =
   | "live"
@@ -31,27 +31,25 @@ export type CompetitionClockMessage = {
   hold: Date | null,
 };
 
-export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
-  #db: CompetitionDB;
-  #state: ClockState = "hold";
-  #start: Date;
-  #finish: Date;
-  #hold: Date | null;
 
-  constructor(opts: { db: CompetitionDB, plannedStart: Date, plannedFinish: Date }) {
-    super(() => this.now());
-    this.#db = opts.db;
-    this.#start = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/start", opts.plannedStart.toJSON()));
-    if (opts.plannedFinish < opts.plannedStart) opts.plannedFinish = opts.plannedStart;
-    this.#finish = new Date(this.#db.getOrSetDefaultMeta("/comp/clock/finish", opts.plannedFinish.toJSON()));
-    this.#hold = null;
-  }
 
-  protect(allowWhen: Iterable<ClockState>): void | never {
+export async function createClock (plannedStart: Date, plannedFinish: Date) {
+  let state: ClockState = "hold";
+  let start: Date;
+  let finish: Date;
+  let holdDate: Date | null;
+  start = new Date(await getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()));
+  if (plannedFinish < plannedStart) plannedFinish = plannedStart;
+  finish = new Date(await getOrSetDefaultMeta("/comp/clock/finish", plannedFinish.toJSON()));
+  holdDate = null;
+
+
+
+  function protect(allowWhen: Iterable<ClockState>): void | never {
     const allowedStates = new Set(allowWhen);
-    if (!allowedStates.has(this.#state)) {
+    if (!allowedStates.has(state)) {
       let message = "";
-      switch (this.#state) {
+      switch (state) {
         case "hold": message = "Clock on hold.\n"; break;
         case "live": message = "Clock is live.\n"; break;
         case "stop": message = "Clock is stopped.\n"; break;
@@ -60,44 +58,55 @@ export class CompetitionClock extends Subscribable<CompetitionClockMessage> {
     }
   }
 
-  now() {
+  function now() {
     return {
-      start: this.#start,
-      finish: this.#finish,
-      hold: this.#hold,
+      start: start,
+      finish: finish,
+      hold: holdDate,
     };
   }
 
-  adjustStart(time: Date, { keepDuration = false }) {
-    const delta = this.#start.getTime() - time.getTime();
-    this.#start = new Date(this.#db.setMeta("/comp/clock/start", time.toJSON()));
-    if (keepDuration) this.#finish = new Date(this.#db.setMeta("/comp/clock/finish", new Date(this.#finish.getTime() - delta).toJSON()));
-    this.notify(this.now());
+  async function adjustStart(time: Date, { keepDuration = false }) {
+    const delta = start.getTime() - time.getTime();
+    start = new Date(await setMeta("/comp/clock/start", time.toJSON()));
+    if (keepDuration) finish = new Date(await setMeta("/comp/clock/finish", new Date(finish.getTime() - delta).toJSON()));
+    ee.emit("clock", now())
   }
 
-  adjustFinish(timeOrMinutesDuration: Date | number) {
+  async function adjustFinish(timeOrMinutesDuration: Date | number) {
     let newFinish: Date;
     if (typeof timeOrMinutesDuration === "number") {
       const duration = timeOrMinutesDuration;
-      newFinish = new Date(this.#start.getTime() + duration * 60_000);
+      newFinish = new Date(start.getTime() + duration * 60_000);
     } else {
       newFinish = timeOrMinutesDuration;
     }
-    if (newFinish < this.#start) throw new RangeError("Finish time must be after start.");
-    this.#finish = new Date(this.#db.setMeta("/comp/clock/finish", newFinish.toJSON()));
-    this.notify(this.now());
+    if (newFinish < start) throw new RangeError("Finish time must be after start.");
+    finish = new Date(await setMeta("/comp/clock/finish", newFinish.toJSON()));
+    ee.emit("clock", now());
   }
 
-  hold() {
-    this.#hold = new Date();
-    this.notify(this.now());
+  function hold() {
+    holdDate = new Date();
+    ee.emit("clock", now());
   }
 
-  release({ extendDuration = false }) {
-    if (this.#hold === null) return;
-    const delta = this.#hold.getTime() - Date.now();
-    if (extendDuration) this.#finish = new Date(this.#finish.getTime() - delta);
-    this.#hold = null;
-    this.notify(this.now());
+  function release({ extendDuration = false }) {
+    if (holdDate === null) return;
+    const delta = holdDate.getTime() - Date.now();
+    if (extendDuration) finish = new Date(finish.getTime() - delta);
+    holdDate = null;
+    ee.emit("clock", now());
+  }
+
+  return {
+    now,
+    adjustStart,
+    adjustFinish,
+    hold,
+    release,
+    protect,
   }
 }
+
+export type CompetitionClock = Awaited<ReturnType<typeof createClock>>;
