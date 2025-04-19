@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { userTable, type User } from "../db/schema";
 
-export async function basicAuth({ logn, pass }: { logn: string; pass: Uint8Array }): Promise<User | null> {
+export async function basicAuth(logn: string, password: string): Promise<User | null> {
+  const pass = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password)));
   // const user = db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn", { logn })[0] ?? null;
   const user = await db.query.userTable.findFirst({
     where: (table) => eq(table.logn, logn),

@@ -1,6 +1,6 @@
 import { TOML } from "bun";
 import matter from "gray-matter";
-import { z } from "zod";
+import { z } from '@hono/zod-openapi'
 import path from "path";
 import { parseMarkdownAttributes } from "./problems.service";
 

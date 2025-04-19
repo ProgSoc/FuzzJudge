@@ -1,7 +1,7 @@
 import path from "path";
 import matter from "gray-matter";
 import { TOML } from "bun";
-import { z } from "zod";
+import { z } from '@hono/zod-openapi'
 import fs from "fs/promises";
 import { HTTPException } from "hono/http-exception";
 

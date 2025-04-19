@@ -84,7 +84,7 @@ export function createCompetitionScoreboard(clock: CompetitionClock, problems: P
     if (frozen) {
       return JSON.parse(await getOrSetDefaultMeta("/comp/scoreboard.frozen") ?? undefined!);
     }
-    const rankings = [];
+    const rankings: CompetitionScoreboardMessage = [];
     for (const team of await allTeams()) {
       rankings.push({
         rank: 0,
