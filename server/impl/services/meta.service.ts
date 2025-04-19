@@ -53,3 +53,28 @@ export async function allMeta() {
 
   return Object.fromEntries(allCompetitions.map((comp) => [comp.key, comp.val] as [string, string]));
 }
+
+/**
+ * Delete a meta value
+ * @param key - The key to delete
+ * @returns the deleted value
+ */
+export async function deleteMeta(key: string): Promise<string | null> {
+  const value = await db.query.compTable.findFirst({
+    where: (table) => eq(table.key, key),
+  });
+
+  if (value === undefined) return null;
+
+  await db.delete(compTable).where(eq(compTable.key, key));
+
+  return value.val;
+}
+
+/**
+ * Delete all meta values
+ * @returns the deleted values
+ */
+export async function deleteAllMeta(): Promise<void> {
+  await db.delete(compTable);
+}

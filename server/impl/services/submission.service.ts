@@ -1,10 +1,9 @@
 import { compress } from "@bokuweb/zstd-wasm";
 import { and, eq, isNotNull } from "drizzle-orm";
-import { db } from "impl/db";
-import { submissionTable, type Submission } from "impl/db/schema";
-import { ee } from "impl/ee";
+import { db } from "../db";
+import { submissionTable, type Submission } from "../db/schema";
+import { ee } from "../ee";
 import { getProblemData } from "./problems.service";
-import { getCompetitionRoot } from "impl/util";
 
 interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
   out: string;
@@ -46,11 +45,10 @@ export async function solvedSet(params: { team: number }): Promise<Set<string>> 
   return new Set(solved.filter(Boolean).map((v) => v.prob as string));
 }
 
-export async function score(params: { team: number }): Promise<number> {
-  const competitionRoot = getCompetitionRoot();
+export async function score(root: string, teamId: number): Promise<number> {
   let total = 0;
-  for (const slug of await solvedSet(params)) {
-    const problemMeta = await getProblemData(competitionRoot, slug)
+  for (const slug of await solvedSet({ team: teamId})) {
+    const problemMeta = await getProblemData(root, slug)
     total +=  problemMeta.problem.points
   }
   return total;

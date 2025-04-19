@@ -1,15 +1,21 @@
 import { describe, expect, test } from "bun:test";
-import { getProblemData, fuzzProblem, judgeProblem } from "./problems.service.ts";
+import { getProblemData, fuzzProblem, judgeProblem, getProblems, Problem, problemToMessage } from "./problems.service.ts";
 import { fileURLToPath } from "node:url";
 
 const sampleRoot = fileURLToPath(import.meta.resolve("../../../sample"));
 const problemSlug = "01-hello";
 
+let testProblem: Problem
+
 describe("problem fuzzing and judging", () => {
   test("getProblemData", async () => {
-    const problemData = await getProblemData(sampleRoot, problemSlug);
-    expect(problemData).toBeDefined();
+    testProblem = await getProblemData(sampleRoot, problemSlug);
+    expect(testProblem).toBeDefined();
   });
+
+  test("problem to message", async () => {
+    expect(problemToMessage(testProblem)).toBeDefined();
+  })
 
   test("getProblemData with invalid slug", () => {
     const problemDataPromise = getProblemData(sampleRoot, "invalid-slug");
@@ -66,5 +72,12 @@ describe("problem fuzzing and judging", () => {
 
     expect(judgeResult.correct).toEqual(false);
   });
+
+  test("get list of problems", async () =>
+    {
+      const problems = await getProblems(sampleRoot);
+      expect(problems).toBeDefined();
+      expect(problems.length).toBeGreaterThan(0);
+    })
 });
 

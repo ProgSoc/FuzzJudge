@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "impl/db";
-import { teamTable, type Team } from "impl/db/schema";
+import { db } from "../db";
+import { teamTable, userTable, type Team } from "../db/schema";
 
 /**
  * Get a user's team by their id
@@ -54,4 +54,16 @@ export async function deleteTeam(id: number) {
 
 export async function allTeams(): Promise<Team[]> {
     return db.query.teamTable.findMany();
+  }
+
+  export async function assignUserTeam({ user = null as number | null, team = null as number | null }) {
+    // db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
+
+    if (user === null) throw new Error("User ID is required");
+
+    const [updatedUser] = await db.update(userTable).set({ team }).where(eq(userTable.id, user)).returning();
+
+    if (!updatedUser) throw new Error("Failed to update user");
+
+    return updatedUser;
   }

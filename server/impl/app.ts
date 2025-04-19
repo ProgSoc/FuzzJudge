@@ -40,7 +40,7 @@ Backend
 */
 
 import { HEADER } from "../version.ts";
-import { deleteFalsey, getCompetitionRoot } from "./util.ts";
+import { deleteFalsey } from "./util.ts";
 import { Auth } from "./auth.ts";
 import { createClock, type CompetitionClockMessage } from "./clock.ts";
 import { createCompetitionScoreboard, type CompetitionScoreboardMessage } from "./score.ts";
@@ -73,14 +73,14 @@ export const { websocket, upgradeWebSocket } = createBunWebSocket<ServerWebSocke
 await initZstd();
 migrateDB();
 
-const root = getCompetitionRoot();
+if (!Bun.env.COMPETITION_PATH) {
+  throw new Error("COMPETITION_PATH env not set");
+}
+
+const root = path.resolve(Bun.env.COMPETITION_PATH)
 
 const problems = await getProblems(root);
 const competionData = await getCompetitionData(root);
-
-// const problems = createFuzzJudgeProblemSet(root);
-
-// const db = createCompetitionDB(path.join(root, "comp.db"), problems);
 
 resetUser({ logn: "admin", role: "admin" }, false);
 
@@ -438,7 +438,7 @@ const compRouter = new Hono()
   })
   .get("/scoreboard", async (c) => {
     // clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
-    return c.body(await oldScoreboard(), {
+    return c.body(await oldScoreboard(root), {
       headers: { "Content-Type": "text/csv" },
     });
   })

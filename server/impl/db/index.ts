@@ -20,26 +20,18 @@
 import {drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "./schema.ts";
+import { Database} from "bun:sqlite";
 import path from "path";
-import { parseArgs } from "util";
-
-
-const { positionals } = parseArgs({
-  args: Bun.argv,
-  allowPositionals: true,
-});
-
-const pathPositional = positionals[2] ?? "./";
 
 /**
- * The path to the competition folder.
+ * The database connection.
  */
-const root = path.resolve(pathPositional);
+const database = new Database(Bun.env.DATABASE_URL ?? ":memory:");
 
 /**
- * The database connection and query builder.
+ * The database query builder.
  */
-export const db = drizzle(path.join(root, "comp.db"), { schema });
+export const db = drizzle(database, { schema });
 
 /**
  * Performs any pending migrations.

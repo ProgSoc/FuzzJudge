@@ -79,11 +79,3 @@ export async function deleteUser(id: number) {
 
   return deletedUser;
 }
-
-export async function assignUserTeam({ user = null as number | null, team = null as number | null }) {
-    // db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
-
-    if (user === null) return;
-
-    db.update(userTable).set({ team }).where(eq(userTable.id, user)).returning();
-  }

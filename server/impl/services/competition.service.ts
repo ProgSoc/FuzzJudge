@@ -5,15 +5,15 @@ import path from "path";
 import { parseMarkdownAttributes } from "./problems.service";
 
 const competitionSpec = z.object({
-    times: z.object({
-        start: z.coerce.date().optional(),
-        finish: z.coerce.date().optional(),
-        freeze: z.number()
-    }),
-})
+  times: z.object({
+    start: z.coerce.date().optional(),
+    finish: z.coerce.date().optional(),
+    freeze: z.number(),
+  }),
+});
 
 export async function getCompetitionData(root: string) {
-    const filePath = path.join(root, "comp.md");
+  const filePath = path.join(root, "comp.md");
   const problemFile = Bun.file(filePath);
 
   if (!problemFile.exists()) {

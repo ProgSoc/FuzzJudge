@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "impl/db";
-import { userTable, type User } from "impl/db/schema";
+import { db } from "../db";
+import { userTable, type User } from "../db/schema";
 
 export async function basicAuth({ logn, pass }: { logn: string; pass: Uint8Array }): Promise<User | null> {
   // const user = db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn", { logn })[0] ?? null;

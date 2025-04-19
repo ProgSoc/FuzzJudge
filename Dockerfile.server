@@ -52,6 +52,8 @@ COPY --from=prerelease /app/server/package.json .
 ARG BASE_PATH
 # Set the environment variable for the backend URL
 ENV BASE_PATH=$BASE_PATH
+ENV NODE_ENV=production
+ENV DATABASE_URL=/competition/comp.db
 
 USER bun
 
