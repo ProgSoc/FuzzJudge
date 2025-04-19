@@ -18,7 +18,7 @@ import { unreachable } from "./utils";
 import type { SocketMessage } from "server/impl/app.ts";
 import type { CompetitionClockMessage } from "server/impl/clock";
 import type { CompetitionScoreboardMessage } from "server/impl/score";
-import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import type { FuzzJudgeProblemMessage } from "server/impl/services/problems.service.ts";
 import { BACKEND_SERVER, client } from "./api.ts";
 
 function makeSvelteSubscribable<T>() {
