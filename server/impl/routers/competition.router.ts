@@ -45,15 +45,17 @@ export const compRouter = new OpenAPIHono()
         verifyUser: basicAuth,
         roles: ["admin"],
       }),
-      security: [{
-        Bearer: [],
-      }]
+      security: [
+        {
+          Bearer: [],
+        },
+      ],
     }),
     async (c) => {
-        const meta = await allMeta()
+      const meta = await allMeta();
       return c.json(meta, {
         headers: { "Content-Type": "application/json" },
-        status: 200
+        status: 200,
       });
     },
   )
