@@ -4,6 +4,7 @@ import { db } from "../db";
 import { submissionTable, type Submission } from "../db/schema";
 import { ee } from "../ee";
 import { getProblemData } from "./problems.service";
+import { z} from "@hono/zod-openapi"
 
 interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
   out: string;
@@ -104,6 +105,14 @@ export async function postSubmission(
   ee.emit("scoreboardUpdate"); // trigger a scoreboard update
   return id;
 }
+
+export const SubmissionSkeletonSchema = z.object({
+  id: z.number(),
+  team: z.number(),
+  prob: z.string(),
+  time: z.date(),
+  ok: z.boolean().nullable(),
+});
 
 export async function getSubmissionSkeletons(teamId: number, problemId: string) {
   const submissions = await db.query.submissionTable.findMany({

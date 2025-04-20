@@ -1,6 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { probRouter } from "./problem.router";
-import { authMiddleware, unauthorizedResponse } from "../middleware/auth.middleware";
+import { authMiddleware, forbiddenResponse, unauthorizedResponse } from "../middleware/auth.middleware";
 import { basicAuth } from "../services/auth.service";
 import { allMeta } from "../services/meta.service";
 import {
@@ -8,6 +8,7 @@ import {
   getSubmissionOut,
   getSubmissionSkeletons,
   getSubmissionVler,
+  SubmissionSkeletonSchema,
 } from "../services/submission.service";
 import { CompetitionClockMessage } from "../clock";
 import { clock } from "../app";
@@ -59,16 +60,51 @@ export const compRouter = new OpenAPIHono()
       });
     },
   )
-  .get(
-    "/submissions",
-    authMiddleware({
-      verifyUser: basicAuth,
-      roles: ["admin"],
+  .openapi(
+    createRoute({
+      path: "/submissions",
+      method: "get",
+      middleware: authMiddleware({
+        verifyUser: basicAuth,
+        roles: ["admin"],
+      }),
+      responses: {
+        200: {
+          content: {
+            "application/json": {
+              schema: z.array(SubmissionSkeletonSchema),
+            },
+          },
+          description: "Submission skeletons",
+        },
+        401: unauthorizedResponse,
+        403: forbiddenResponse,
+      },
+      request: {
+        query: z.object({
+          team: z.coerce.number().openapi({
+            param: {
+              in: "query",
+              name: "team",
+              required: true
+            },
+          }),
+          slug: z.string().openapi({
+            param: {
+              in: "query",
+              name: "slug",
+              required: true
+            },
+          }),
+        }),
+      },
     }),
     async (c) => {
-      const params = new URL(c.req.url).searchParams;
-      return c.json(getSubmissionSkeletons(parseInt(params.get("team")!), params.get("slug")!), {
+      const {slug, team} = c.req.valid("query")
+      const submissionSkeletons = await getSubmissionSkeletons(team, slug);
+      return c.json(submissionSkeletons, {
         headers: { "Content-Type": "application/json" },
+        status: 200,
       });
     },
   )
