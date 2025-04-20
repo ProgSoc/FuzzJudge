@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { userTable, type Team, type User, type UserRoles } from "../db/schema";
+import {z} from "@hono/zod-openapi"
 
 /**
  * Get a user by their id
@@ -24,6 +25,28 @@ export async function allUsers(): Promise<User[]> {
 
   return users;
 }
+
+/**
+ * UserSchema
+ * {
+    id: number;
+    team: number | null;
+    name: string | null;
+    logn: string;
+    salt: Buffer<ArrayBufferLike>;
+    hash: unknown;
+    role: "admin" | "competitor" | null;
+}
+ */
+export const UserSchema = z.object({
+  id: z.number(),
+  team: z.number().nullable(),
+  name: z.string().nullable(),
+  logn: z.string(),
+  salt: z.unknown(),
+  hash: z.unknown(),
+  role: z.enum(["admin", "competitor"]).nullable()
+})
 
 /**
  * Reset a user's login
