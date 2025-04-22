@@ -14,22 +14,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import Icon from "./Icon.svelte";
-  import icons from "../icons";
+import icons from "../icons";
+import Icon from "./Icon.svelte";
 
-  export let shown = false;
-  export let close = () => {};
+export const shown = false;
+export const close = () => {};
 
-  let maximized = false;
-  let onMaximiseToggle = () => {
-    maximized = !maximized;
-  };
+let maximized = false;
+const onMaximiseToggle = () => {
+	maximized = !maximized;
+};
 
-  document.addEventListener("keydown", (e) => {
-    if (!shown || e.key !== "Escape") return;
+document.addEventListener("keydown", (e) => {
+	if (!shown || e.key !== "Escape") return;
 
-    close();
-  });
+	close();
+});
 </script>
 
 {#if shown}

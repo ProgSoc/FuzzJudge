@@ -24,95 +24,107 @@ import { getSubmissionSkeletons } from "./services/submission.service.ts";
 import { allTeams } from "./services/team.service.ts";
 
 export type ProblemScore = {
-  points: number,
-  penalty: number,
-  tries: number,
-  solved: boolean,
+	points: number;
+	penalty: number;
+	tries: number;
+	solved: boolean;
 };
 
 export type TeamScore = {
-  total: { points: number, penalty: number },
-  problems: Record<string, ProblemScore>,
+	total: { points: number; penalty: number };
+	problems: Record<string, ProblemScore>;
 };
 
 export type CompetitionScoreboardMessage = {
-  rank: number,
-  name: string,
-  score: TeamScore,
+	rank: number;
+	name: string;
+	score: TeamScore;
 }[];
 
-export function createCompetitionScoreboard(clock: CompetitionClock, problems: Problem[]) {
-  
-  let frozen = false;
+export function createCompetitionScoreboard(
+	clock: CompetitionClock,
+	problems: Problem[],
+) {
+	let frozen = false;
 
-  ee.on("scoreboardUpdate", async () => {
-    ee.emit("scoreboard", await fullScoreboard());
-  })
+	ee.on("scoreboardUpdate", async () => {
+		ee.emit("scoreboard", await fullScoreboard());
+	});
 
-  async function teamScoreboard(team: number) {
-    // return sorted by score (then penalty score)
-    const teamScore: TeamScore = { total: { points: 0, penalty: 0 }, problems: {} };
-    for (const problem of problems) {
-      const submissions = await getSubmissionSkeletons(team, problem.slug);
-      const score: ProblemScore = {
-        points: 0,
-        penalty: 0,
-        tries: submissions.length,
-        solved: false,
-      };
-      let nPenalties = 0;
-      let latest = -Infinity;
-      for (const { ok, time } of submissions) {
-        if (ok) {
-          score.points = problem.problem.points;
-          score.solved = true;
-        } else {
-          ++nPenalties;
-        }
-        if (time.getTime() > latest) latest = time.getTime();
-      }
-      // minutesSinceStart + 20 * failedTries
-      score.penalty = Math.max(0, (latest - clock.now().start.getTime()) / 60_000) + 20 * nPenalties;
-      teamScore.total.points += score.points;
-      teamScore.total.penalty += score.penalty;
-      teamScore.problems[problem.slug] = score;
-    }
-    return teamScore;
-  }
+	async function teamScoreboard(team: number) {
+		// return sorted by score (then penalty score)
+		const teamScore: TeamScore = {
+			total: { points: 0, penalty: 0 },
+			problems: {},
+		};
+		for (const problem of problems) {
+			const submissions = await getSubmissionSkeletons(team, problem.slug);
+			const score: ProblemScore = {
+				points: 0,
+				penalty: 0,
+				tries: submissions.length,
+				solved: false,
+			};
+			let nPenalties = 0;
+			let latest = Number.NEGATIVE_INFINITY;
+			for (const { ok, time } of submissions) {
+				if (ok) {
+					score.points = problem.problem.points;
+					score.solved = true;
+				} else {
+					++nPenalties;
+				}
+				if (time.getTime() > latest) latest = time.getTime();
+			}
+			// minutesSinceStart + 20 * failedTries
+			score.penalty =
+				Math.max(0, (latest - clock.now().start.getTime()) / 60_000) +
+				20 * nPenalties;
+			teamScore.total.points += score.points;
+			teamScore.total.penalty += score.penalty;
+			teamScore.problems[problem.slug] = score;
+		}
+		return teamScore;
+	}
 
-  async function fullScoreboard(): Promise<CompetitionScoreboardMessage> {
-    if (frozen) {
-      return JSON.parse(await getOrSetDefaultMeta("/comp/scoreboard.frozen") ?? undefined!);
-    }
-    const rankings: CompetitionScoreboardMessage = [];
-    for (const team of await allTeams()) {
-      rankings.push({
-        rank: 0,
-        name: team.name,
-        score: await teamScoreboard(team.id),
-      });
-    }
-    rankings.sort((a, b) => {
-      const pointsDelta = b.score.total.points - a.score.total.points;
-      const penaltyDelta = a.score.total.penalty - b.score.total.penalty;
-      return pointsDelta || penaltyDelta;
-    });
-    return rankings;
-  }
+	async function fullScoreboard(): Promise<CompetitionScoreboardMessage> {
+		if (frozen) {
+			return JSON.parse(
+				(await getOrSetDefaultMeta("/comp/scoreboard.frozen")) ?? undefined!,
+			);
+		}
+		const rankings: CompetitionScoreboardMessage = [];
+		for (const team of await allTeams()) {
+			rankings.push({
+				rank: 0,
+				name: team.name,
+				score: await teamScoreboard(team.id),
+			});
+		}
+		rankings.sort((a, b) => {
+			const pointsDelta = b.score.total.points - a.score.total.points;
+			const penaltyDelta = a.score.total.penalty - b.score.total.penalty;
+			return pointsDelta || penaltyDelta;
+		});
+		return rankings;
+	}
 
-  function freeze() {
-    getOrSetDefaultMeta("/comp/scoreboard.frozen", JSON.stringify(fullScoreboard()));
-    frozen = true;
-  }
+	function freeze() {
+		getOrSetDefaultMeta(
+			"/comp/scoreboard.frozen",
+			JSON.stringify(fullScoreboard()),
+		);
+		frozen = true;
+	}
 
-  function unfreeze() {
-    frozen = false;
-  }
+	function unfreeze() {
+		frozen = false;
+	}
 
-  return {
-    teamScoreboard,
-    fullScoreboard,
-    freeze,
-    unfreeze,
-  };
+	return {
+		teamScoreboard,
+		fullScoreboard,
+		freeze,
+		unfreeze,
+	};
 }

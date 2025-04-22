@@ -13,84 +13,88 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { onDestroy } from "svelte";
-import { unreachable } from "./utils";
+import type { SocketMessage } from "server/impl/app";
 import type { CompetitionClockMessage } from "server/impl/clock";
 import type { CompetitionScoreboardMessage } from "server/impl/score";
 import type { FuzzJudgeProblemMessage } from "server/impl/services/problems.service";
+import { onDestroy } from "svelte";
 import { BACKEND_SERVER, client } from "./api.ts";
-import type { SocketMessage } from "server/impl/app";
+import { unreachable } from "./utils";
 
 function makeSvelteSubscribable<T>() {
-  const subscribers = new Set<(value: T) => void>();
+	const subscribers = new Set<(value: T) => void>();
 
-  return {
-    subscribe: (callback: (value: T) => void) => {
-      subscribers.add(callback);
+	return {
+		subscribe: (callback: (value: T) => void) => {
+			subscribers.add(callback);
 
-      const unsubscribe = () => {
-        subscribers.delete(callback);
-      };
+			const unsubscribe = () => {
+				subscribers.delete(callback);
+			};
 
-      // Unsubscribe if the component is destroyed
-      onDestroy(unsubscribe);
+			// Unsubscribe if the component is destroyed
+			onDestroy(unsubscribe);
 
-      // Return unsubscribe function if the client wants to manually unsubscribe
-      return unsubscribe;
-    },
-    notify: (value: T) => {
-      for (const callback of subscribers) {
-        callback(value);
-      }
-    },
-  };
+			// Return unsubscribe function if the client wants to manually unsubscribe
+			return unsubscribe;
+		},
+		notify: (value: T) => {
+			for (const callback of subscribers) {
+				callback(value);
+			}
+		},
+	};
 }
 
 export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
-  const wsUrl = client.ws.$url().toString().replace(/^http/, "ws")
+	const wsUrl = client.ws.$url().toString().replace(/^http/, "ws");
 
-
-  const ws = new WebSocket(wsUrl);
-  ws.addEventListener("message", ({ data }) => {
-    callback(JSON.parse(data));
-  });
-  ws.addEventListener("close", () => setTimeout(() => listenOnWebsocket(callback), 1000));
+	const ws = new WebSocket(wsUrl);
+	ws.addEventListener("message", ({ data }) => {
+		callback(JSON.parse(data));
+	});
+	ws.addEventListener("close", () =>
+		setTimeout(() => listenOnWebsocket(callback), 1000),
+	);
 }
 
 export function initLiveState() {
-  const clockSubscribable = makeSvelteSubscribable<CompetitionClockMessage>();
-  const questionsSubscribable = makeSvelteSubscribable<FuzzJudgeProblemMessage[]>();
-  const scoreboardSubscribable = makeSvelteSubscribable<CompetitionScoreboardMessage>();
+	const clockSubscribable = makeSvelteSubscribable<CompetitionClockMessage>();
+	const questionsSubscribable =
+		makeSvelteSubscribable<FuzzJudgeProblemMessage[]>();
+	const scoreboardSubscribable =
+		makeSvelteSubscribable<CompetitionScoreboardMessage>();
 
-  listenOnWebsocket((data) => {
-    console.log("Received data:", data);
-    switch (data.kind) {
-      case "clock":
-        const value = data.value;
+	listenOnWebsocket((data) => {
+		console.log("Received data:", data);
+		switch (data.kind) {
+			case "clock": {
+				const value = data.value;
 
-        // Fix dates
-        clockSubscribable.notify({
-          finish: new Date(value.finish),
-          hold: value.hold && new Date(value.hold),
-          start: new Date(value.start),
-        });
-        break;
-      case "problems":
-        questionsSubscribable.notify(data.value);
-        break;
-      case "scoreboard":
-        scoreboardSubscribable.notify(data.value);
-        break;
-      default:
-        unreachable(data);
-    }
-  });
+				// Fix dates
+				clockSubscribable.notify({
+					finish: new Date(value.finish),
+					hold: value.hold && new Date(value.hold),
+					start: new Date(value.start),
+				});
+				break;
+			}
+			case "problems":
+				questionsSubscribable.notify(data.value);
+				break;
+			case "scoreboard":
+				scoreboardSubscribable.notify(data.value);
+				break;
+			default:
+				unreachable(data);
+		}
+	});
 
-  return {
-    listenClock: clockSubscribable.subscribe,
-    listenQuestions: questionsSubscribable.subscribe,
-    listenScoreboard: scoreboardSubscribable.subscribe,
-  };
+	return {
+		listenClock: clockSubscribable.subscribe,
+		listenQuestions: questionsSubscribable.subscribe,
+		listenScoreboard: scoreboardSubscribable.subscribe,
+	};
 }
 
 export type LiveState = ReturnType<typeof initLiveState>;

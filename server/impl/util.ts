@@ -17,16 +17,20 @@
  */
 
 export function undent(text: string): string {
-  const trimmed = text.replace(/^\s*\n(?=\s*[^\s])/, "").replace(/(?<=\n)\s*$/, "");
-  const indent = trimmed.match(/^\s*/)?.[0].replaceAll("\t", "\\t") ?? "";
-  return trimmed.replaceAll(new RegExp("^" + indent, "gm"), "");
+	const trimmed = text
+		.replace(/^\s*\n(?=\s*[^\s])/, "")
+		.replace(/(?<=\n)\s*$/, "");
+	const indent = trimmed.match(/^\s*/)?.[0].replaceAll("\t", "\\t") ?? "";
+	return trimmed.replaceAll(new RegExp(`^${indent}`, "gm"), "");
 }
 
 export function indent(pre: string, text: string): string {
-  return text.replaceAll(/^/gm, pre);
+	return text.replaceAll(/^/gm, pre);
 }
 
-export function deleteFalsey(obj: Record<string, unknown>): Record<string, unknown> {
-  for (const k in obj) if (!obj[k]) delete obj[k];
-  return obj;
+export function deleteFalsey(
+	obj: Record<string, unknown>,
+): Record<string, unknown> {
+	for (const k in obj) if (!obj[k]) delete obj[k];
+	return obj;
 }

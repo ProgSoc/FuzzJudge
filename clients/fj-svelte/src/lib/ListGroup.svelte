@@ -14,22 +14,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
-  import type { QuestionMeta } from "../utils";
-  import QuestionButton from "./QuestionButton.svelte";
+import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import type { QuestionMeta } from "../utils";
+import QuestionButton from "./QuestionButton.svelte";
 
-  export let name: string = "";
-  export let questions: Record<string, FuzzJudgeProblemMessage>;
-  export let solvedQuestions: Set<string>;
-  export let includes: number | ((difficulty: number) => boolean) = 0;
+export const name = "";
+export let questions: Record<string, FuzzJudgeProblemMessage>;
+export let solvedQuestions: Set<string>;
+export const includes: number | ((difficulty: number) => boolean) = 0;
 
-  $: list = Object.values(questions).filter((q) => {
-    if (typeof includes === "function") {
-      return includes(q.difficulty);
-    }
+$: list = Object.values(questions).filter((q) => {
+	if (typeof includes === "function") {
+		return includes(q.difficulty);
+	}
 
-    return q.difficulty === includes;
-  });
+	return q.difficulty === includes;
+});
 </script>
 
 {#if list.length > 0}

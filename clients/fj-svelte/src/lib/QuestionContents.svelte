@@ -14,30 +14,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import SubmissionArea from "./SubmissionArea.svelte";
-  import { selectedQuestion, difficultyName } from "../utils";
-  import { onDestroy } from "svelte";
-  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
-  import SvelteMarkdown from "svelte-markdown";
+import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import { onDestroy } from "svelte";
+import SvelteMarkdown from "svelte-markdown";
+import { difficultyName, selectedQuestion } from "../utils";
+import SubmissionArea from "./SubmissionArea.svelte";
 
-  export let question: FuzzJudgeProblemMessage;
-  export let solved: boolean;
-  export let setSolved: (slug: string) => void;
+export let question: FuzzJudgeProblemMessage;
+export let solved: boolean;
+export let setSolved: (slug: string) => void;
 
-  let questionInstructions: any;
+let questionInstructions: any;
 
-  // Reset scroll to top when a new question is selected
-  const unsubScrollUp = selectedQuestion.subscribe((slug) => {
-    if (slug === undefined) return;
+// Reset scroll to top when a new question is selected
+const unsubScrollUp = selectedQuestion.subscribe((slug) => {
+	if (slug === undefined) return;
 
-    if (questionInstructions !== undefined) {
-      questionInstructions.scrollTop = 0;
-    }
-  });
+	if (questionInstructions !== undefined) {
+		questionInstructions.scrollTop = 0;
+	}
+});
 
-  onDestroy(() => {
-    unsubScrollUp();
-  });
+onDestroy(() => {
+	unsubScrollUp();
+});
 </script>
 
 <div class="question" bind:this={questionInstructions}>

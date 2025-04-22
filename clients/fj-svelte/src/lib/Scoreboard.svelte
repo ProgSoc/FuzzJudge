@@ -14,21 +14,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { type QuestionMeta, truncateUsername, type ScoreboardUser } from "../utils";
+import { onDestroy, onMount } from "svelte";
+import {
+	type QuestionMeta,
+	type ScoreboardUser,
+	truncateUsername,
+} from "../utils";
 
-  import type { CompetitionScoreboardMessage } from "server/impl/score";
-  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import type { CompetitionScoreboardMessage } from "server/impl/score";
 
-  export let questions: Record<string, FuzzJudgeProblemMessage>;
-  export let scoreboard: CompetitionScoreboardMessage;
+export let questions: Record<string, FuzzJudgeProblemMessage>;
+export let scoreboard: CompetitionScoreboardMessage;
 
-  let errors: string[] = [];
+const errors: string[] = [];
 
-  // Hack for the day
-  $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
+// Hack for the day
+$: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
 
-  $: sortedQuestions = Object.values(questions).sort((a, b) => a.points - b.points);
+$: sortedQuestions = Object.values(questions).sort(
+	(a, b) => a.points - b.points,
+);
 </script>
 
 <h1>Scoreboard</h1>

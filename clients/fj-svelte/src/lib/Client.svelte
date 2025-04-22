@@ -14,86 +14,86 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import {
-    CompState,
-    type CompTimes,
-    selectedQuestion,
-    type TimeStateData,
-    getCurrentTimeStateData,
-    runRepeatedly,
-  } from "../utils";
-  import { getCompInfo, getQuestionSolvedSet } from "../api";
-  import CompInfo from "./CompInfo.svelte";
-  import Popout from "./Popout.svelte";
-  import Sidebar from "./Sidebar.svelte";
-  import Scoreboard from "./Scoreboard.svelte";
-  import QuestionContents from "./QuestionContents.svelte";
-  import Loading from "./Loading.svelte";
+import { getCompInfo, getQuestionSolvedSet } from "../api";
+import {
+	CompState,
+	type CompTimes,
+	type TimeStateData,
+	getCurrentTimeStateData,
+	runRepeatedly,
+	selectedQuestion,
+} from "../utils";
+import CompInfo from "./CompInfo.svelte";
+import Loading from "./Loading.svelte";
+import Popout from "./Popout.svelte";
+import QuestionContents from "./QuestionContents.svelte";
+import Scoreboard from "./Scoreboard.svelte";
+import Sidebar from "./Sidebar.svelte";
 
-  import { getUsername } from "../api";
-  import InlineCountdown from "./counters/InlineCountdown.svelte";
-  import PageCountdown from "./counters/PageCountdown.svelte";
-  import { initLiveState } from "../apiLive";
-  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
-  import type { CompetitionScoreboardMessage } from "server/impl/score";
-  import Icon from "./Icon.svelte";
-  import icons from "../icons";
+import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import type { CompetitionScoreboardMessage } from "server/impl/score";
+import { getUsername } from "../api";
+import { initLiveState } from "../apiLive";
+import icons from "../icons";
+import Icon from "./Icon.svelte";
+import InlineCountdown from "./counters/InlineCountdown.svelte";
+import PageCountdown from "./counters/PageCountdown.svelte";
 
-  export let scoreboardMode: boolean = false;
+export const scoreboardMode = false;
 
-  let username = "Loading...";
+let username = "Loading...";
 
-  getUsername().then((name) => {
-    username = name;
-    console.log("username", username);
-  });
+getUsername().then((name) => {
+	username = name;
+	console.log("username", username);
+});
 
-  let compTimes: CompTimes | undefined = undefined;
-  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
-  let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
-  let solvedQuestions = new Set<string>();
+let compTimes: CompTimes | undefined = undefined;
+let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
+let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
+let solvedQuestions = new Set<string>();
 
-    console.log({questions})
+console.log({ questions });
 
-  let liveState = initLiveState();
-  liveState.listenClock((clock) => {
-    compTimes = clock;
-  });
-  liveState.listenQuestions(async (qs) => {
-    questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
-    solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
-    if ($selectedQuestion === "" && questions) {
-      selectedQuestion.set(Object.keys(questions)[0] ?? "");
-    }
-  });
-  liveState.listenScoreboard((sb) => {
-    scoreboard = sb;
-    console.log("scoreboard", sb);
-  });
+const liveState = initLiveState();
+liveState.listenClock((clock) => {
+	compTimes = clock;
+});
+liveState.listenQuestions(async (qs) => {
+	questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
+	solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
+	if ($selectedQuestion === "" && questions) {
+		selectedQuestion.set(Object.keys(questions)[0] ?? "");
+	}
+});
+liveState.listenScoreboard((sb) => {
+	scoreboard = sb;
+	console.log("scoreboard", sb);
+});
 
-  getCompInfo().then((data) => {
-    window.document.title = data.title;
-  });
+getCompInfo().then((data) => {
+	window.document.title = data.title;
+});
 
-  let timeStateData: TimeStateData | undefined = undefined;
-  runRepeatedly(() => {
-    if (compTimes !== undefined) {
-      timeStateData = getCurrentTimeStateData(compTimes);
-    }
-  });
+let timeStateData: TimeStateData | undefined = undefined;
+runRepeatedly(() => {
+	if (compTimes !== undefined) {
+		timeStateData = getCurrentTimeStateData(compTimes);
+	}
+});
 
-  const setSolved = (slug: string) => {
-    solvedQuestions.add(slug);
-    solvedQuestions = solvedQuestions;
-  };
+const setSolved = (slug: string) => {
+	solvedQuestions.add(slug);
+	solvedQuestions = solvedQuestions;
+};
 
-  enum ShowingPopout {
-    None,
-    Scoreboard,
-    CompInfo,
-  }
+enum ShowingPopout {
+	None = 0,
+	Scoreboard = 1,
+	CompInfo = 2,
+}
 
-  let showingPopout: ShowingPopout = ShowingPopout.None;
+const showingPopout: ShowingPopout = ShowingPopout.None;
 </script>
 
 {#if scoreboardMode}

@@ -18,15 +18,25 @@
 
 import { makeSeededGenerators } from "https://deno.land/x/vegas@v1.3.0/mod.ts";
 
-const names = ["Linus", "Theo", "Guido", "Graydon", "Jake", "Ada", "Margaret", "Lisa", "Justine"];
+const names = [
+	"Linus",
+	"Theo",
+	"Guido",
+	"Graydon",
+	"Jake",
+	"Ada",
+	"Margaret",
+	"Lisa",
+	"Justine",
+];
 
 export function fuzz(seed: string): string[] {
-  const rand = makeSeededGenerators(seed);
-  return rand.randomSample(names, 5);
+	const rand = makeSeededGenerators(seed);
+	return rand.randomSample(names, 5);
 }
 
 if (import.meta.main) {
-  for (const sample of fuzz(Deno.args[0] ?? "")) {
-    console.log(sample);
-  }
+	for (const sample of fuzz(Deno.args[0] ?? "")) {
+		console.log(sample);
+	}
 }

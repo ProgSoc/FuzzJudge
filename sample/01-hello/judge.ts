@@ -21,26 +21,28 @@ import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod.ts";
 import { fuzz } from "./fuzz.ts";
 
 if (import.meta.main) {
-  let names = fuzz(Deno.args[0] ?? "");
+	const names = fuzz(Deno.args[0] ?? "");
 
-  for await (const line of Deno.stdin.readable.pipeThrough(new TextDecoderStream()).pipeThrough(new TextLineStream())) {
-    if (names.length === 0) {
-      console.error(`Received too many lines`);
-      Deno.exit(1);
-    }
+	for await (const line of Deno.stdin.readable
+		.pipeThrough(new TextDecoderStream())
+		.pipeThrough(new TextLineStream())) {
+		if (names.length === 0) {
+			console.error("Received too many lines");
+			Deno.exit(1);
+		}
 
-    const expected = `Hello, ${names.shift()}!`;
+		const expected = `Hello, ${names.shift()}!`;
 
-    if (line !== expected) {
-      console.error(`Expected "${expected}", got "${line}"`);
-      Deno.exit(1);
-    }
-  }
+		if (line !== expected) {
+			console.error(`Expected "${expected}", got "${line}"`);
+			Deno.exit(1);
+		}
+	}
 
-  if (names.length > 0) {
-    console.error(`Expected more lines, got ${names.length} less`);
-    Deno.exit(1);
-  }
+	if (names.length > 0) {
+		console.error(`Expected more lines, got ${names.length} less`);
+		Deno.exit(1);
+	}
 
-  Deno.exit(0);
+	Deno.exit(0);
 }

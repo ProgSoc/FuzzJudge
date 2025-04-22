@@ -14,21 +14,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { type Icon } from "../types";
+import type { Icon } from "../types";
 
-  export let icon: Icon;
+export let icon: Icon;
 
-  const styles: any = {
-    width: icon.width,
-  };
+const styles: any = {
+	width: icon.width,
+};
 
-  if (icon.height !== undefined) {
-    styles.height = icon.height;
-  }
+if (icon.height !== undefined) {
+	styles.height = icon.height;
+}
 
-  const css = Object.entries(styles)
-    .map(([key, value]) => `${key}:${value}`)
-    .join(";");
+const css = Object.entries(styles)
+	.map(([key, value]) => `${key}:${value}`)
+	.join(";");
 </script>
 
 <span class:darken-on-hover={icon.darkenOnHover === true}>

@@ -16,25 +16,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-import {drizzle } from "drizzle-orm/bun-sqlite";
+import { Database } from "bun:sqlite";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "./schema.ts";
-import { Database} from "bun:sqlite";
-import path from "path";
-import { fileURLToPath } from "url";
+
+const databaseUrl = Bun.env.DATABASE_URL ?? ":memory:";
+
+if (databaseUrl === ":memory:") {
+	console.warn(
+		"Using in-memory database. This will not persist across restarts.",
+	);
+}
 
 /**
  * The database connection.
  */
-const database = new Database(Bun.env.DATABASE_URL ?? ":memory:");
+const database = new Database(databaseUrl);
 
 /**
  * The database query builder.
  */
 export const db = drizzle(database, { schema });
 
-const relativePath = import.meta.resolve("../../migrations")
+const relativePath = import.meta.resolve("../../migrations");
 
 // Meta resolve
 
@@ -42,7 +49,7 @@ const relativePath = import.meta.resolve("../../migrations")
  * Performs any pending migrations.
  */
 export function migrateDB() {
-    migrate(db, {
-    migrationsFolder: fileURLToPath(relativePath),
-  });
+	migrate(db, {
+		migrationsFolder: fileURLToPath(relativePath),
+	});
 }

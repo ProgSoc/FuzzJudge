@@ -14,15 +14,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "server/impl/comp";
-  import { type QuestionMeta, selectedQuestion } from "../utils";
+import type { FuzzJudgeProblemMessage } from "server/impl/comp";
+import { type QuestionMeta, selectedQuestion } from "../utils";
 
-  export let question: FuzzJudgeProblemMessage;
-  export let solved: boolean;
+export let question: FuzzJudgeProblemMessage;
+export let solved: boolean;
 
-  const select = () => {
-    selectedQuestion.set(question?.slug ?? "");
-  };
+const select = () => {
+	selectedQuestion.set(question?.slug ?? "");
+};
 </script>
 
 <div

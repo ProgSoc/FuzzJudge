@@ -16,48 +16,56 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { HTTPException
-} from 'hono/http-exception'
+import { HTTPException } from "hono/http-exception";
 
 export interface AuthSchemes<UserDetails> {
-  basic: (options: { username: string; password: string }) => UserDetails | null | Promise<UserDetails | null>;
+	basic: (options: { username: string; password: string }) =>
+		| UserDetails
+		| null
+		| Promise<UserDetails | null>;
 }
 
 export class Auth<UserDetails> {
-  #schemes: AuthSchemes<UserDetails>;
+	#schemes: AuthSchemes<UserDetails>;
 
-  constructor(schemes: AuthSchemes<UserDetails>) {
-    this.#schemes = schemes;
-  }
+	constructor(schemes: AuthSchemes<UserDetails>) {
+		this.#schemes = schemes;
+	}
 
-  async protect(ctx: Request): Promise<UserDetails> {
-    const header = ctx.headers.get("Authorization");
-    if (header) {
-      if (header.startsWith("Basic ")) {
-        try {
-          const [username, password] = atob(header.slice(6)).split(/:(.*)/);
-          if (username == "") this.reject();
-          const details = await this.#schemes.basic({ username, password });
-          if (details !== null) return details;
-        } catch (e) {
-          if (e instanceof DOMException && e.message === "InvalidCharacterError") {
-            throw new HTTPException(400, { message: "400 Bad Request ('Basic' Header not base64)\n"});
-          } else {
-            throw e;
-          }
-        }
-      }
-    }
-    this.reject();
-  }
+	async protect(ctx: Request): Promise<UserDetails> {
+		const header = ctx.headers.get("Authorization");
+		if (header) {
+			if (header.startsWith("Basic ")) {
+				try {
+					const [username, password] = atob(header.slice(6)).split(/:(.*)/);
+					if (username === "") this.reject();
+					const details = await this.#schemes.basic({ username, password });
+					if (details !== null) return details;
+				} catch (e) {
+					if (
+						e instanceof DOMException &&
+						e.message === "InvalidCharacterError"
+					) {
+						throw new HTTPException(400, {
+							message: "400 Bad Request ('Basic' Header not base64)\n",
+						});
+					}
+					throw e;
+				}
+			}
+		}
+		this.reject();
+	}
 
-  reject(): never {
-    const res = new Response("401 Unauthorized\n", {
-      status: 401,
-      headers: { "WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"` },
-    });
-    throw new HTTPException(401, {
-    res
-    })
-  }
+	reject(): never {
+		const res = new Response("401 Unauthorized\n", {
+			status: 401,
+			headers: {
+				"WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"`,
+			},
+		});
+		throw new HTTPException(401, {
+			res,
+		});
+	}
 }

@@ -1,1 +1,1 @@
-export type { AppType } from './impl/app.ts'
+export type { AppType } from "./impl/app.ts";

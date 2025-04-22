@@ -1,7 +1,7 @@
+import type { ResponseConfig } from "@asteasolutions/zod-to-openapi";
+import { z } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { auth } from "hono/utils/basic-auth";
-import { ResponseConfig } from "@asteasolutions/zod-to-openapi";
-import { z } from "@hono/zod-openapi";
 
 /**
  * export async function basicAuth({ logn, pass }: { logn: string; pass: Uint8Array }): Promise<User | null> {
@@ -75,64 +75,70 @@ import { z } from "@hono/zod-openapi";
  */
 
 import { Hono } from "hono";
-import { User } from "../db/schema";
 import { HTTPException } from "hono/http-exception";
+import type { User } from "../db/schema";
 
 interface CustomBasicAuthOptions<T extends User> {
-  verifyUser: (username: string, password: string) => Promise<T | null>;
-  roles?: T["role"][];
+	verifyUser: (username: string, password: string) => Promise<T | null>;
+	roles?: T["role"][];
 }
 
-export const authMiddleware = <T extends User>(options: CustomBasicAuthOptions<T>) =>
-  createMiddleware<{
-    Variables: {
-      user: T;
-    };
-  }>(async (c, next) => {
-    const basicCredentials = auth(c.req.raw);
+export const authMiddleware = <T extends User>(
+	options: CustomBasicAuthOptions<T>,
+) =>
+	createMiddleware<{
+		Variables: {
+			user: T;
+		};
+	}>(async (c, next) => {
+		const basicCredentials = auth(c.req.raw);
 
-    if (!basicCredentials) {
-      return c.body("401 Unauthorized", {
-        status: 401,
-        headers: { "WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"` },
-      });
-    }
+		if (!basicCredentials) {
+			return c.body("401 Unauthorized", {
+				status: 401,
+				headers: {
+					"WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"`,
+				},
+			});
+		}
 
-    const { username, password } = basicCredentials;
-    const user = await options.verifyUser(username, password);
+		const { username, password } = basicCredentials;
+		const user = await options.verifyUser(username, password);
 
-    if (!user) {
-      return c.body("401 Unauthorized", {
-        status: 401,
-        headers: { "WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"` },
-      });
-    }
+		if (!user) {
+			return c.body("401 Unauthorized", {
+				status: 401,
+				headers: {
+					"WWW-Authenticate": `Basic realm="FuzzJudge" charset="utf-8"`,
+				},
+			});
+		}
 
-    if (options.roles?.length && !options.roles.includes(user.role)) {
-      return c.body("403 Forbidden", {
-        status: 403,
-      });
-    }
+		if (options.roles?.length && !options.roles.includes(user.role)) {
+			return c.body("403 Forbidden", {
+				status: 403,
+			});
+		}
 
-    c.set("user", user);
+		c.set("user", user);
 
-    return next();
-  });
+		return next();
+	});
 
 export const forbiddenResponse = {
-  description: "Forbidden",
-  content: {
-    "text/plain": {
-      schema: z.string(),
-    },
-  },
+	description: "Forbidden",
+	content: {
+		"text/plain": {
+			schema: z.string(),
+		},
+	},
 } satisfies ResponseConfig;
 
 export const unauthorizedResponse = {
-  description: "Unauthorized",
-  content: {
-    "text/plain": {
-      schema: z.string(),
-    },
-  },
+	description: "Unauthorized",
+	content: {
+		"text/plain": {
+			schema: z.string(),
+		},
+	},
 } satisfies ResponseConfig;

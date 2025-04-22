@@ -8,20 +8,24 @@ import { compTable } from "../db/schema";
  * @returns the meta value
  */
 export async function getOrSetDefaultMeta<T extends string | undefined>(
-  key: string,
-  defaultValue?: T,
+	key: string,
+	defaultValue?: T,
 ): Promise<T extends undefined ? string | null : string> {
-  // const value = db.query("SELECT val FROM comp WHERE key = ?").(key)[0]?.[0];
-  const value = await db.query.compTable.findFirst({
-    where: (table) => eq(table.key, key),
-  });
+	// const value = db.query("SELECT val FROM comp WHERE key = ?").(key)[0]?.[0];
+	const value = await db.query.compTable.findFirst({
+		where: (table) => eq(table.key, key),
+	});
 
-  if (value === undefined && defaultValue !== undefined) {
-    // db.query("INSERT INTO comp VALUES (?, ?)", [key, defaultValue]);
-    const [defVal] = await db.insert(compTable).values({ key, val: defaultValue }).returning().onConflictDoNothing();
-    return defVal.val as T extends undefined ? string | null : string;
-  }
-  return value?.val as T extends undefined ? string | null : string;
+	if (value === undefined && defaultValue !== undefined) {
+		// db.query("INSERT INTO comp VALUES (?, ?)", [key, defaultValue]);
+		const [defVal] = await db
+			.insert(compTable)
+			.values({ key, val: defaultValue })
+			.returning()
+			.onConflictDoNothing();
+		return defVal.val as T extends undefined ? string | null : string;
+	}
+	return value?.val as T extends undefined ? string | null : string;
 }
 
 /**
@@ -31,17 +35,17 @@ export async function getOrSetDefaultMeta<T extends string | undefined>(
  * @returns the value
  */
 export async function setMeta(key: string, value: string): Promise<string> {
-  await db
-    .insert(compTable)
-    .values({ key, val: value })
-    .onConflictDoUpdate({
-      set: {
-        val: value,
-      },
-      target: [compTable.key],
-    });
+	await db
+		.insert(compTable)
+		.values({ key, val: value })
+		.onConflictDoUpdate({
+			set: {
+				val: value,
+			},
+			target: [compTable.key],
+		});
 
-  return value;
+	return value;
 }
 
 /**
@@ -49,9 +53,11 @@ export async function setMeta(key: string, value: string): Promise<string> {
  * @returns all meta values
  */
 export async function allMeta() {
-  const allCompetitions = await db.query.compTable.findMany();
+	const allCompetitions = await db.query.compTable.findMany();
 
-  return Object.fromEntries(allCompetitions.map((comp) => [comp.key, comp.val] as [string, string]));
+	return Object.fromEntries(
+		allCompetitions.map((comp) => [comp.key, comp.val] as [string, string]),
+	);
 }
 
 /**
@@ -60,15 +66,15 @@ export async function allMeta() {
  * @returns the deleted value
  */
 export async function deleteMeta(key: string): Promise<string | null> {
-  const value = await db.query.compTable.findFirst({
-    where: (table) => eq(table.key, key),
-  });
+	const value = await db.query.compTable.findFirst({
+		where: (table) => eq(table.key, key),
+	});
 
-  if (value === undefined) return null;
+	if (value === undefined) return null;
 
-  await db.delete(compTable).where(eq(compTable.key, key));
+	await db.delete(compTable).where(eq(compTable.key, key));
 
-  return value.val;
+	return value.val;
 }
 
 /**
@@ -76,5 +82,5 @@ export async function deleteMeta(key: string): Promise<string | null> {
  * @returns the deleted values
  */
 export async function deleteAllMeta(): Promise<void> {
-  await db.delete(compTable);
+	await db.delete(compTable);
 }

@@ -14,44 +14,46 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { selectedQuestion } from "../utils";
-  import { submitSolution, openFuzz } from "../api";
+import { openFuzz, submitSolution } from "../api";
+import { selectedQuestion } from "../utils";
 
-  export let setSolved: (slug: string) => void;
+export let setSolved: (slug: string) => void;
 
-  let waitingOnServer = false;
+let waitingOnServer = false;
 
-  let errorMessage: string | undefined = undefined;
+let errorMessage: string | undefined = undefined;
 
-  let submissionValue = "";
-  let sourceValue = "";
+let submissionValue = "";
+let sourceValue = "";
 
-  selectedQuestion.subscribe((_) => {
-    submissionValue = "";
-    sourceValue = "";
-    waitingOnServer = false;
-    errorMessage = undefined;
-  });
+selectedQuestion.subscribe((_) => {
+	submissionValue = "";
+	sourceValue = "";
+	waitingOnServer = false;
+	errorMessage = undefined;
+});
 
-  const submit = (slug: string) => {
-    if (waitingOnServer === true) return;
+const submit = (slug: string) => {
+	if (waitingOnServer === true) return;
 
-    errorMessage = undefined;
+	errorMessage = undefined;
 
-    waitingOnServer = true;
+	waitingOnServer = true;
 
-    submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
-      waitingOnServer = false;
+	submitSolution(slug, submissionValue, sourceValue).then(
+		({ correct, message }) => {
+			waitingOnServer = false;
 
-      if (slug === $selectedQuestion) {
-        errorMessage = message;
-      }
+			if (slug === $selectedQuestion) {
+				errorMessage = message;
+			}
 
-      if (correct && setSolved !== undefined) {
-        setSolved(slug);
-      }
-    });
-  };
+			if (correct && setSolved !== undefined) {
+				setSolved(slug);
+			}
+		},
+	);
+};
 </script>
 
 <div class="question-submission">

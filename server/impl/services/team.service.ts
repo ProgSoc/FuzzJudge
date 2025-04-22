@@ -1,7 +1,7 @@
+import { z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { teamTable, userTable, type Team } from "../db/schema";
-import { z} from "@hono/zod-openapi"
+import { type Team, teamTable, userTable } from "../db/schema";
 
 /**
  * Get a user's team by their id
@@ -9,15 +9,15 @@ import { z} from "@hono/zod-openapi"
  * @returns the team of the user
  */
 export async function getUserTeam(id: number): Promise<Team | undefined> {
-  const user = await db.query.userTable.findFirst({
-    where: (table) => eq(table.id, id),
-  });
-  const teamId = user?.team;
-  if (!teamId) return undefined;
-  const team = await db.query.teamTable.findFirst({
-    where: (table) => eq(table.id, teamId),
-  });
-  return team;
+	const user = await db.query.userTable.findFirst({
+		where: (table) => eq(table.id, id),
+	});
+	const teamId = user?.team;
+	if (!teamId) return undefined;
+	const team = await db.query.teamTable.findFirst({
+		where: (table) => eq(table.id, teamId),
+	});
+	return team;
 }
 
 /**
@@ -26,13 +26,19 @@ export async function getUserTeam(id: number): Promise<Team | undefined> {
  * @returns The created team
  */
 export async function createTeam({ name }: { name: string }): Promise<Team> {
-  const seed = [...crypto.getRandomValues(new Uint8Array(8))].map((v) => v.toString(16).padStart(2, "0")).join("");
+	const seed = [...crypto.getRandomValues(new Uint8Array(8))]
+		.map((v) => v.toString(16).padStart(2, "0"))
+		.join("");
 
-  const [team] = await db.insert(teamTable).values({ seed, name }).returning().onConflictDoNothing();
+	const [team] = await db
+		.insert(teamTable)
+		.values({ seed, name })
+		.returning()
+		.onConflictDoNothing();
 
-  if (!team) throw new Error("Failed to create team");
+	if (!team) throw new Error("Failed to create team");
 
-  return team;
+	return team;
 }
 
 /**
@@ -41,36 +47,50 @@ export async function createTeam({ name }: { name: string }): Promise<Team> {
  * @param param1 The team edit parameters
  * @returns The edited team
  */
-export async function patchTeam(id: number, { name }: { name: string }): Promise<Team> {
-  const [team] = await db.update(teamTable).set({ name }).where(eq(teamTable.id, id)).returning();
+export async function patchTeam(
+	id: number,
+	{ name }: { name: string },
+): Promise<Team> {
+	const [team] = await db
+		.update(teamTable)
+		.set({ name })
+		.where(eq(teamTable.id, id))
+		.returning();
 
-  if (!team) throw new Error("Failed to update team");
+	if (!team) throw new Error("Failed to update team");
 
-  return team;
+	return team;
 }
 
 export async function deleteTeam(id: number) {
-  await db.delete(teamTable).where(eq(teamTable.id, id));
+	await db.delete(teamTable).where(eq(teamTable.id, id));
 }
 
 export const TeamSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  seed: z.string(),
-})
+	id: z.number(),
+	name: z.string(),
+	seed: z.string(),
+});
 
 export async function allTeams(): Promise<Team[]> {
-    return db.query.teamTable.findMany();
-  }
+	return db.query.teamTable.findMany();
+}
 
-  export async function assignUserTeam({ user = null as number | null, team = null as number | null }) {
-    // db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
+export async function assignUserTeam({
+	user = null as number | null,
+	team = null as number | null,
+}) {
+	// db.query("UPDATE user SET team = :team WHERE id = :user", { team, user });
 
-    if (user === null) throw new Error("User ID is required");
+	if (user === null) throw new Error("User ID is required");
 
-    const [updatedUser] = await db.update(userTable).set({ team }).where(eq(userTable.id, user)).returning();
+	const [updatedUser] = await db
+		.update(userTable)
+		.set({ team })
+		.where(eq(userTable.id, user))
+		.returning();
 
-    if (!updatedUser) throw new Error("Failed to update user");
+	if (!updatedUser) throw new Error("Failed to update user");
 
-    return updatedUser;
-  }
+	return updatedUser;
+}
