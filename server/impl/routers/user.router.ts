@@ -42,6 +42,7 @@ export const userRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "getAllUsers",
 		}),
 		async (c) => {
 			const allUsersList = await allUsers();
@@ -88,6 +89,7 @@ export const userRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "createUser",
 		}),
 		async (c) => {
 			const formData = await c.req.valid("form");
@@ -143,6 +145,7 @@ export const userRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "updateUser",
 		}),
 		async (c) => {
 			const formData = await c.req.valid("form");
@@ -182,6 +185,7 @@ export const userRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "deleteUser",
 		}),
 		async (c) => {
 			await deleteUser(Number.parseInt(c.req.param("id")));

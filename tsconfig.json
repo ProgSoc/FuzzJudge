@@ -32,5 +32,13 @@
 			// "server/*": ["./server/*"],
 		}
 	},
-	"include": ["package.json"]
+	"include": ["package.json"],
+	"references": [
+		{
+			"path": "./server/tsconfig.json"
+		},
+		{
+			"path": "./clients/fj-svelte/tsconfig.json"
+		}
+	]
 }

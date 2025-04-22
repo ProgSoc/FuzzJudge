@@ -41,6 +41,7 @@ export const teamRouter = new OpenAPIHono()
 				},
 			],
 			tags: ["Team"],
+			operationId: "getAllTeams",
 		}),
 		async (c) => {
 			const allteamList = await allTeams();
@@ -86,6 +87,7 @@ export const teamRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "createTeam",
 		}),
 		async (c) => {
 			const formData = await c.req.valid("form");
@@ -140,6 +142,7 @@ export const teamRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "updateTeam",
 		}),
 		async (c) => {
 			const { id } = c.req.valid("param");
@@ -180,6 +183,7 @@ export const teamRouter = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "deleteTeam",
 		}),
 		async (c) => {
 			const { id } = c.req.valid("param");

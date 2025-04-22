@@ -147,6 +147,7 @@ const app = new OpenAPIHono()
 			middleware: Scalar({
 				url: "/docs.json",
 			}),
+			operationId: "getOpenAPI",
 		}),
 		(c) => c.text("dummy response"),
 	)
@@ -169,6 +170,7 @@ const app = new OpenAPIHono()
 				url: "/docs.json",
 				title: "FuzzJudge API",
 			}),
+			operationId: "getSwaggerUI",
 		}),
 		async (c) => {
 			return c.text("dummy response");
@@ -188,6 +190,7 @@ const app = new OpenAPIHono()
 					},
 				},
 			},
+			operationId: "getHeader",
 		}),
 		async (c) => {
 			return c.text(HEADER);
@@ -203,6 +206,7 @@ const app = new OpenAPIHono()
 				},
 			},
 			// middleware: ,
+			operationId: "getWebSocket",
 		}),
 		async (c, next) => {
 			const websocketUpgrade = await upgradeWebSocket(() => {
@@ -262,6 +266,7 @@ const app = new OpenAPIHono()
 					description: "I'm a teapot",
 				},
 			},
+			operationId: "brewTeapot",
 		}),
 		async (c) => {
 			return c.text("I'm a teapot", 418);
@@ -290,6 +295,7 @@ const app = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "getAuth",
 		}),
 		async (c) => {
 			const { logn } = c.var.user;
@@ -320,6 +326,7 @@ const app = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "getAdmin",
 		}),
 		async (c) => {
 			const fileContent = await Bun.file(
@@ -369,6 +376,7 @@ const app = new OpenAPIHono()
 					}),
 				}),
 			},
+			operationId: "manualJudge",
 		}),
 		async (c) => {
 			const { ok, id } = c.req.valid("query");
@@ -398,6 +406,7 @@ const app = new OpenAPIHono()
 				401: unauthorizedResponse,
 				403: forbiddenResponse,
 			},
+			operationId: "void",
 		}),
 		async (c) => {
 			return c.body(null, { status: 204 });
@@ -416,6 +425,7 @@ const app = new OpenAPIHono()
 			middleware: serveStatic({
 				root: path.join(root, "client"),
 			}),
+			operationId: "getClient",
 		}),
 		async (c) => {
 			return c.text("dummy response");

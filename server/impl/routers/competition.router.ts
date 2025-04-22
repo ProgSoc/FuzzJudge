@@ -35,6 +35,7 @@ export const compRouter = new OpenAPIHono()
 			tags: ["Competition"],
 			method: "get",
 			path: "/meta",
+			operationId: "getMeta",
 			responses: {
 				200: {
 					description: "Meta data",
@@ -69,6 +70,7 @@ export const compRouter = new OpenAPIHono()
 		createRoute({
 			tags: ["Competition"],
 			path: "/submissions",
+			operationId: "getSubmissions",
 			method: "get",
 			middleware: authMiddleware({
 				verifyUser: basicAuth,
@@ -166,6 +168,7 @@ export const compRouter = new OpenAPIHono()
 					}),
 				}),
 			},
+			operationId: "getSubmission",
 		}),
 		async (c) => {
 			const { kind, subm } = c.req.valid("query");
@@ -209,6 +212,7 @@ export const compRouter = new OpenAPIHono()
 					description: "Competition name",
 				},
 			},
+			operationId: "getName",
 		}),
 		(c) => {
 			return c.text(competionData.attributes.title ?? "FuzzJudge Competition");
@@ -229,6 +233,7 @@ export const compRouter = new OpenAPIHono()
 					description: "Competition brief",
 				},
 			},
+			operationId: "getBrief",
 		}),
 		(c) => {
 			return c.text(competionData.attributes.summary ?? "");
@@ -249,6 +254,7 @@ export const compRouter = new OpenAPIHono()
 					description: "The problem instructions",
 				},
 			},
+			operationId: "getInstructions",
 		}),
 		(c) => {
 			return c.body(competionData.attributes.body, {
@@ -271,6 +277,7 @@ export const compRouter = new OpenAPIHono()
 					description: "scoreboard csv",
 				},
 			},
+			operationId: "getScoreboard",
 		}),
 		async (c) => {
 			// clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
@@ -292,6 +299,7 @@ export const compRouter = new OpenAPIHono()
 					description: "Upgrade failed",
 				},
 			},
+			operationId: "getClock",
 		}),
 		async (c, next) => {
 			const wsUpgrade = await upgradeWebSocket((c) => {
@@ -371,6 +379,7 @@ export const compRouter = new OpenAPIHono()
 					},
 				},
 			},
+			operationId: "patchClock",
 		}),
 		async (c) => {
 			const { kind, time, keep } = c.req.valid("form");

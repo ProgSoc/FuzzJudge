@@ -48,6 +48,7 @@ export const probRouter = new OpenAPIHono()
 					description: "List of all problems slugs seperated by commas",
 				},
 			},
+			operationId: "getProblems",
 		}),
 		(c) => {
 			return c.text(problems.map((v) => `${v.slug}\n`).join(""));
@@ -74,6 +75,7 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
+			operationId: "getProblemIcon",
 		}),
 		(c) => {
 			const id = c.req.param("id");
@@ -108,6 +110,7 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
+			operationId: "getProblemName",
 		}),
 		(c) => {
 			const id = c.req.param("id");
@@ -141,6 +144,7 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
+			operationId: "getProblemBrief",
 		}),
 		(c) => {
 			const id = c.req.param("id");
@@ -175,6 +179,7 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
+			operationId: "getProblemDifficulty",
 		}),
 		(c) => {
 			const id = c.req.param("id");
@@ -206,6 +211,7 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
+			operationId: "getProblemPoints",
 		}),
 		(c) => {
 			const id = c.req.param("id");
@@ -234,6 +240,7 @@ export const probRouter = new OpenAPIHono()
 					},
 				},
 			},
+			operationId: "getProblemSolution",
 		}),
 		(c) => {
 			return c.text("451 Unavailable For Legal Reasons", { status: 451 });
@@ -271,6 +278,7 @@ export const probRouter = new OpenAPIHono()
 					verifyUser: basicAuth,
 				}),
 			],
+			operationId: "getProblemInstructions",
 		}),
 
 		async (c) => {
@@ -325,6 +333,7 @@ export const probRouter = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "getProblemFuzz",
 		}),
 
 		async (c) => {
@@ -388,6 +397,7 @@ export const probRouter = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "getProblemJudge",
 		}),
 		async (c) => {
 			// clock.protect();
@@ -489,6 +499,7 @@ export const probRouter = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "postProblemJudge",
 		}),
 
 		async (c) => {
@@ -616,6 +627,7 @@ export const probRouter = new OpenAPIHono()
 					Basic: [],
 				},
 			],
+			operationId: "getProblemAssets",
 		}),
 		async (c, next) => {
 			// clock.protect();
