@@ -281,7 +281,17 @@ export const compRouter = new OpenAPIHono()
       tags: ["Competition"],
       method: "get",
       path: "/clock",
-      middleware: upgradeWebSocket((c) => {
+      responses: {
+        101: {
+          description: "Websocket upgrade",
+        },
+        500: {
+          description: "Upgrade failed",
+        },
+      },
+    }),
+    async (c, next) => {
+      const wsUpgrade = await upgradeWebSocket((c) => {
         let handler: (data: CompetitionClockMessage) => void;
         return {
           onOpen: (_, ws) => {
@@ -297,14 +307,14 @@ export const compRouter = new OpenAPIHono()
             ee.off("clock", handler);
           },
         };
-      }),
-      responses: {
-        101: {
-          description: "Websocket upgrade",
-        },
-      },
-    }),
-    (c) => c.text("dummy"),
+      })(c, next);
+
+      if (wsUpgrade) {
+        return wsUpgrade;
+      }
+
+      return c.body("Upgrade failed", { status: 500 });
+    }
   )
   .openapi(
     createRoute({

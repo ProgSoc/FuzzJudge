@@ -185,7 +185,10 @@ const app = new OpenAPIHono()
           description: "WebSocket connection",
         },
       },
-      middleware: upgradeWebSocket(() => {
+      // middleware: ,
+    }),
+    async (c, next) => {
+      const websocketUpgrade = await upgradeWebSocket(() => {
         let clockHandler: (data: CompetitionClockMessage) => void;
         let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
 
@@ -219,9 +222,12 @@ const app = new OpenAPIHono()
             ee.off("scoreboard", scoreboardHandler);
           },
         };
-      }),
-    }),
-    async (c) => {
+      })(c, next);
+
+      if (websocketUpgrade) {
+        return websocketUpgrade;
+      }
+
       return c.text("dummy response");
     },
   )
