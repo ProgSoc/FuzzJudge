@@ -22,6 +22,7 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "./schema.ts";
 import { Database} from "bun:sqlite";
 import path from "path";
+import { fileURLToPath } from "url";
 
 /**
  * The database connection.
@@ -33,11 +34,15 @@ const database = new Database(Bun.env.DATABASE_URL ?? ":memory:");
  */
 export const db = drizzle(database, { schema });
 
+const relativePath = import.meta.resolve("../../migrations")
+
+// Meta resolve
+
 /**
  * Performs any pending migrations.
  */
 export function migrateDB() {
     migrate(db, {
-    migrationsFolder: "./migrations",
+    migrationsFolder: fileURLToPath(relativePath),
   });
 }

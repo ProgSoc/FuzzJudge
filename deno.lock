@@ -72,9 +72,13 @@
       "server": {
         "packageJson": {
           "dependencies": [
+            "npm:@asteasolutions/zod-to-openapi@^7.3.0",
             "npm:@bokuweb/zstd-wasm@^0.0.27",
+            "npm:@hono/swagger-ui@~0.5.1",
+            "npm:@hono/zod-openapi@~0.19.5",
             "npm:@jsr/std__toml@*",
             "npm:@jsr/std__yaml@*",
+            "npm:@scalar/hono-api-reference@~0.8.2",
             "npm:@types/bun@^1.2.9",
             "npm:drizzle-kit@~0.30.6",
             "npm:drizzle-orm@0.41",
