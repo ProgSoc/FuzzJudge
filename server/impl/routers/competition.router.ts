@@ -327,16 +327,43 @@ export const compRouter = new OpenAPIHono()
         401: unauthorizedResponse,
         403: forbiddenResponse,
       },
+      request: {
+        body: {
+          content: {
+            "application/x-www-form-urlencoded": {
+              schema: z.object({
+                kind: z.enum(["start", "finish"]).openapi({
+                  param: {
+                    required: true,
+                    name: "kind",
+                  }
+                }),
+                time: z.coerce.date().openapi({
+                  param: {
+                    required: true,
+                    name: "time",
+                  },
+                }),
+                keep: z.coerce.boolean().optional().openapi({
+                  param: {
+                    name: "keep",
+                    required: false,
+                  },
+                }),
+              })
+            }
+          }
+        }
+      }
     }),
     async (c) => {
-      const { kind, time, keep } = deleteFalsey(Object.fromEntries((await c.req.formData()).entries()));
-      console.log({ kind, time, keep });
+      const { kind, time, keep } = c.req.valid("form");
       if (kind === "start") {
-        await clock.adjustStart(new Date(time as string), {
+        await clock.adjustStart(time, {
           keepDuration: !!keep,
         });
       } else {
-        await clock.adjustFinish(new Date(time as string));
+        await clock.adjustFinish(time);
       }
       return c.body(null, { status: 204 });
     },
