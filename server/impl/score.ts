@@ -89,9 +89,10 @@ export function createCompetitionScoreboard(
 
 	async function fullScoreboard(): Promise<CompetitionScoreboardMessage> {
 		if (frozen) {
-			return JSON.parse(
-				(await getOrSetDefaultMeta("/comp/scoreboard.frozen")) ?? undefined!,
-			);
+			const frozenMeta = await getOrSetDefaultMeta("/comp/scoreboard.frozen");
+			if (frozenMeta) {
+				return JSON.parse(frozenMeta) as CompetitionScoreboardMessage;
+			}
 		}
 		const rankings: CompetitionScoreboardMessage = [];
 		for (const team of await allTeams()) {

@@ -17,6 +17,7 @@ import "./app.css";
 import App from "./App.svelte";
 
 const app = new App({
+	// biome-ignore lint/style/noNonNullAssertion: app mount target is always present
 	target: document.getElementById("app")!,
 });
 

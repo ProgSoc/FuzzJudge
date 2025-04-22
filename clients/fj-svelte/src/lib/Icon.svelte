@@ -18,13 +18,10 @@ import type { Icon } from "../types";
 
 export let icon: Icon;
 
-const styles: any = {
+const styles = {
 	width: icon.width,
+	height: icon.height !== undefined ? icon.height : undefined,
 };
-
-if (icon.height !== undefined) {
-	styles.height = icon.height;
-}
 
 const css = Object.entries(styles)
 	.map(([key, value]) => `${key}:${value}`)

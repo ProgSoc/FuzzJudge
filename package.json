@@ -4,10 +4,12 @@
 	"type": "module",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"lefthook": "^1.11.11"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	},
+	"trustedDependencies": ["lefthook", "@biomejs/biome"],
 	"workspaces": ["clients/*", "server"]
 }

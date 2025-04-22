@@ -399,10 +399,10 @@ export const probRouter = new OpenAPIHono()
 				});
 			}
 
+			const { id } = c.req.valid("param");
+
 			return c.text(
-				(await solved({ team: user.team, prob: c.req.param("id")! }))
-					? "OK"
-					: "Not Solved",
+				(await solved({ team: user.team, prob: id })) ? "OK" : "Not Solved",
 			);
 		},
 	)
@@ -494,7 +494,7 @@ export const probRouter = new OpenAPIHono()
 		async (c) => {
 			// clock.protect();
 			const user = c.var.user;
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 
 			if (!user.team) {
 				return c.body("403 Forbidden\n\nUser not in a team.\n", {
@@ -502,7 +502,7 @@ export const probRouter = new OpenAPIHono()
 				});
 			}
 
-			if (await solved({ team: user.team, prob: c.req.param("id")! })) {
+			if (await solved({ team: user.team, prob: id })) {
 				return c.body("409 Conflict\n\nProblem already solved.\n", {
 					status: 409,
 				});
@@ -561,7 +561,7 @@ export const probRouter = new OpenAPIHono()
 			if (correct) {
 				await postSubmission({
 					team: user.team,
-					prob: c.req.param("id")!,
+					prob: id,
 					time: time.toString(),
 					out: submissionOutput,
 					code: submissionCode,
@@ -577,7 +577,7 @@ export const probRouter = new OpenAPIHono()
 
 			await postSubmission({
 				team: user.team,
-				prob: c.req.param("id")!,
+				prob: id,
 				time: time.toString(),
 				out: submissionOutput,
 				code: submissionCode,

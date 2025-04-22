@@ -14,7 +14,7 @@
 */
 
 html {
-	font-family: arial;
+	font-family: arial, sans-serif;
 	background-color: var(--bg-prim);
 	color: var(--text-prim);
 	overflow: hidden;

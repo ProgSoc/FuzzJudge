@@ -65,7 +65,9 @@ const loadIcon = async (metaPath: string): Promise<Icon> => {
 	const iconList: IconList = {};
 
 	for (const icon of icons) {
-		iconList[icon.name!] = icon;
+		if (icon.name) {
+			iconList[icon.name] = icon;
+		}
 	}
 
 	const json = JSON.stringify(iconList);

@@ -57,8 +57,11 @@ export const getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
 		for (let i = 0; i < sorted.length; i++) {
 			sorted[i].num = i + 1;
 		}
-	} catch (e: any) {
-		throw e.toString();
+	} catch (e: unknown) {
+		if (e instanceof Object) {
+			throw e.toString();
+		}
+		throw e;
 	}
 
 	return questions;

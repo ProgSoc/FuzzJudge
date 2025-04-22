@@ -17,7 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 import icons from "../icons";
 import Icon from "./Icon.svelte";
 
-export const shown = false;
+// biome-ignore lint/style/useConst: is assigned as a prop
+export let shown = false;
 export const close = () => {};
 
 let maximized = false;

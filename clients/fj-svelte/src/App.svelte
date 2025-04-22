@@ -16,7 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
 import Client from "./lib/Client.svelte";
 
-export const scoreboardMode = false;
+export const scoreboardMode: boolean = false;
 </script>
 
 <Client {scoreboardMode} />

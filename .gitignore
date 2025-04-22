@@ -1,4 +1,4 @@
-.vscode/
+# .vscode/
 *.db
 sample/client/
 competition/

@@ -35,9 +35,11 @@ export async function createClock(plannedStart: Date, plannedFinish: Date) {
 	start = new Date(
 		await getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()),
 	);
-	if (plannedFinish < plannedStart) plannedFinish = plannedStart;
+	// if (plannedFinish < plannedStart) plannedFinish = plannedStart;
+	const newFinish = plannedFinish < plannedStart ? plannedStart : plannedFinish;
+
 	finish = new Date(
-		await getOrSetDefaultMeta("/comp/clock/finish", plannedFinish.toJSON()),
+		await getOrSetDefaultMeta("/comp/clock/finish", newFinish.toJSON()),
 	);
 	holdDate = null;
 

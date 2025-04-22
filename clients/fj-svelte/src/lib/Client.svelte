@@ -84,7 +84,7 @@ runRepeatedly(() => {
 
 const setSolved = (slug: string) => {
 	solvedQuestions.add(slug);
-	solvedQuestions = solvedQuestions;
+	// solvedQuestions = solvedQuestions;
 };
 
 enum ShowingPopout {
@@ -93,7 +93,8 @@ enum ShowingPopout {
 	CompInfo = 2,
 }
 
-const showingPopout: ShowingPopout = ShowingPopout.None;
+// biome-ignore lint/style/useConst: is being assigned
+let showingPopout: ShowingPopout = ShowingPopout.None;
 </script>
 
 {#if scoreboardMode}

@@ -24,7 +24,8 @@ export let question: FuzzJudgeProblemMessage;
 export let solved: boolean;
 export let setSolved: (slug: string) => void;
 
-let questionInstructions: any;
+// biome-ignore lint/style/useConst: svelte
+let questionInstructions: HTMLDivElement | undefined = undefined;
 
 // Reset scroll to top when a new question is selected
 const unsubScrollUp = selectedQuestion.subscribe((slug) => {
