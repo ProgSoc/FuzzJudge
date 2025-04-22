@@ -41,7 +41,7 @@ export async function createTeam({ name }: { name: string }): Promise<Team> {
  * @param param1 The team edit parameters
  * @returns The edited team
  */
-export async function patchTeam(id: number, { name }: { name: string }): Promise<Team | undefined> {
+export async function patchTeam(id: number, { name }: { name: string }): Promise<Team> {
   const [team] = await db.update(teamTable).set({ name }).where(eq(teamTable.id, id)).returning();
 
   if (!team) throw new Error("Failed to update team");
