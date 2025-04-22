@@ -1,3 +1,11 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 name: Test Bun
 jobs:
   test:

@@ -14,7 +14,6 @@ import { CompetitionClockMessage } from "../clock";
 import { clock } from "../app";
 import { oldScoreboard } from "../services/scoreboard.service";
 import { ee } from "../ee";
-import { deleteFalsey } from "../util";
 import { getCompetitionData } from "../services/competition.service";
 import { upgradeWebSocket } from "../websocket";
 
