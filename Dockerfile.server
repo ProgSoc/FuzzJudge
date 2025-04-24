@@ -45,7 +45,7 @@ RUN apk add --no-cache go
 RUN apk add --no-cache ruby
 
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/server/dist/main.js .
+COPY --from=prerelease /app/server/dist/index.js .
 COPY --from=prerelease /app/server/drizzle .
 COPY --from=prerelease /app/server/package.json .
 
@@ -60,4 +60,4 @@ USER bun
 # Expose the port the app runs on
 EXPOSE 1989
 
-ENTRYPOINT [ "bun", "run", "main.js", "/competition" ]
+ENTRYPOINT [ "bun", "run", "index.js", "/competition" ]

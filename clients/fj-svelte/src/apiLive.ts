@@ -13,10 +13,10 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { SocketMessage } from "server/impl/app";
-import type { CompetitionClockMessage } from "server/impl/clock";
-import type { CompetitionScoreboardMessage } from "server/impl/score";
-import type { FuzzJudgeProblemMessage } from "server/impl/services/problems.service";
+import type { SocketMessage } from "server/app";
+import type { CompetitionClockMessage } from "server/clock";
+import type { CompetitionScoreboardMessage } from "server/score";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import { onDestroy } from "svelte";
 import { BACKEND_SERVER, client } from "./api.ts";
 import { unreachable } from "./utils";

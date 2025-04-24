@@ -48,7 +48,6 @@ import { Scalar } from "@scalar/hono-api-reference";
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket, serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
-import { HEADER } from "../version.ts";
 import { Auth } from "./auth.ts";
 import { type CompetitionClockMessage, createClock } from "./clock.ts";
 import { migrateDB } from "./db/index.ts";
@@ -100,6 +99,7 @@ import {
 	resetUser,
 } from "./services/user.service.ts";
 import { deleteFalsey } from "./util.ts";
+import { HEADER } from "./version.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
 await initZstd();
@@ -145,7 +145,7 @@ const app = new OpenAPIHono()
 				},
 			},
 			middleware: Scalar({
-				url: "/docs.json",
+				url: "/docs/docs.json",
 			}),
 			operationId: "getOpenAPI",
 		}),
@@ -154,7 +154,7 @@ const app = new OpenAPIHono()
 	.openapi(
 		createRoute({
 			method: "get",
-			path: "/swagger",
+			path: "/docs/docs.json",
 			hide: true,
 			responses: {
 				200: {
@@ -437,16 +437,31 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Basic", {
 	scheme: "basic",
 });
 
-app.doc("/docs.json", {
+app.doc("/docs/docs.json", {
 	info: {
 		title: "FuzzJudge API",
 		description: "FuzzJudge API",
 		version: "0.1.0",
 	},
 	openapi: "3.0.0",
-	// security: [{
-	//   "Basic": []
-	// }],
+	tags: [
+		{
+			name: "Problems",
+			description: "Problem related endpoints",
+		},
+		{
+			name: "Competition",
+			description: "Competition related endpoints",
+		},
+		{
+			name: "Users",
+			description: "User related endpoints",
+		},
+		{
+			name: "Team",
+			description: "Team related endpoints",
+		},
+	],
 });
 
 app.use(logger());

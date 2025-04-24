@@ -13,7 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { hc } from "hono/client";
-import type { AppType } from "server/mod";
+import type { AppType } from "server/app";
 import {
 	type QuestionMeta,
 	type ScoreboardUser,

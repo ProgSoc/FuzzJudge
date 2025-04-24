@@ -390,6 +390,6 @@ export const compRouter = new OpenAPIHono()
 			} else {
 				await clock.adjustFinish(time);
 			}
-			return c.body(null, { status: 204 });
+			return c.body(null, { status: 200 });
 		},
 	);

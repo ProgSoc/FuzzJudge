@@ -26,10 +26,11 @@
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
 		"declarationMap": true,
+		"declaration": true,
 		// "baseUrl": ".",
 		"paths": {
-			// "server": ["./server"],
-			// "server/*": ["./server/*"],
+			"server": ["./server/src"],
+			"server/*": ["./server/*"]
 		}
 	},
 	"include": ["package.json"],

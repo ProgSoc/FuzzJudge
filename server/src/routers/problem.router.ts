@@ -161,7 +161,7 @@ export const probRouter = new OpenAPIHono()
 	.openapi(
 		createRoute({
 			tags: ["Problems"],
-			path: "{id}/difficulty",
+			path: "/{id}/difficulty",
 			method: "get",
 			request: {
 				params: ProblemIdParamsSchema,

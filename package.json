@@ -5,6 +5,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bun": "latest",
+		"@typescript/analyze-trace": "^0.10.1",
 		"lefthook": "^1.11.11"
 	},
 	"peerDependencies": {

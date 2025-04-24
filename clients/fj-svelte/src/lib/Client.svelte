@@ -30,8 +30,8 @@ import QuestionContents from "./QuestionContents.svelte";
 import Scoreboard from "./Scoreboard.svelte";
 import Sidebar from "./Sidebar.svelte";
 
-import type { FuzzJudgeProblemMessage } from "server/impl/comp";
-import type { CompetitionScoreboardMessage } from "server/impl/score";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import type { CompetitionScoreboardMessage } from "server/score";
 import { getUsername } from "../api";
 import { initLiveState } from "../apiLive";
 import icons from "../icons";
