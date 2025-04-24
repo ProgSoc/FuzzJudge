@@ -41,7 +41,7 @@ const database = new Database(databaseUrl);
  */
 export const db = drizzle(database, { schema });
 
-const relativePath = import.meta.resolve("../../migrations");
+const cwdPath = path.join(process.cwd(), "./migrations");
 
 // Meta resolve
 
@@ -49,7 +49,8 @@ const relativePath = import.meta.resolve("../../migrations");
  * Performs any pending migrations.
  */
 export function migrateDB() {
+	// console.log("Running migrations...", cwdPath);
 	migrate(db, {
-		migrationsFolder: fileURLToPath(relativePath),
+		migrationsFolder: cwdPath,
 	});
 }
