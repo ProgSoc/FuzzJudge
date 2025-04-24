@@ -6,7 +6,7 @@
 		"useIgnoreFile": false
 	},
 	"files": {
-		"ignoreUnknown": false,
+		"ignoreUnknown": true,
 		"ignore": ["./clients/fj-svelte/dist", "./node_modules", "./server/dist"]
 	},
 	"formatter": {

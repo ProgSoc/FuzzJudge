@@ -14,6 +14,17 @@ import {
 	resetUser,
 } from "../services/user.service";
 
+const UserParamSchema = z
+	.object({
+		id: z.coerce.number().openapi({
+			param: {
+				in: "path",
+				name: "id",
+			},
+		}),
+	})
+	.openapi("UserParam");
+
 export const userRouter = new OpenAPIHono()
 	.openapi(
 		createRoute({
@@ -108,14 +119,7 @@ export const userRouter = new OpenAPIHono()
 			method: "patch",
 			path: "/{id}",
 			request: {
-				params: z.object({
-					id: z.coerce.number().openapi({
-						param: {
-							in: "path",
-							name: "id",
-						},
-					}),
-				}),
+				params: UserParamSchema,
 				body: {
 					content: {
 						"application/x-www-form-urlencoded": {
@@ -159,14 +163,7 @@ export const userRouter = new OpenAPIHono()
 			path: "/{id}",
 			method: "delete",
 			request: {
-				params: z.object({
-					id: z.coerce.number().openapi({
-						param: {
-							in: "path",
-							name: "id",
-						},
-					}),
-				}),
+				params: UserParamSchema,
 			},
 			tags: ["Users"],
 			middleware: authMiddleware({

@@ -22,15 +22,17 @@ if (!root) {
 
 const problems = await getProblems(root);
 
-const ProblemIdParamsSchema = z.object({
-	id: z.string().openapi({
-		param: {
-			name: "id",
-			in: "path",
-		},
-		example: "hello-world",
-	}),
-});
+const ProblemIdParamsSchema = z
+	.object({
+		id: z.string().openapi({
+			param: {
+				name: "id",
+				in: "path",
+			},
+			example: "hello-world",
+		}),
+	})
+	.openapi("ProblemIdParams");
 
 export const probRouter = new OpenAPIHono()
 	.openapi(
@@ -580,6 +582,8 @@ export const probRouter = new OpenAPIHono()
 					vlms: t1 - t0,
 				});
 
+				console.log(`✅ Problem ${id} solved by ${user.name}`);
+
 				return c.text("Approved! ✅\n");
 			}
 
@@ -595,6 +599,8 @@ export const probRouter = new OpenAPIHono()
 				vler: errors,
 				vlms: t1 - t0,
 			});
+
+			console.log(`❌ Problem ${id} rejected by ${user.name}`);
 
 			return c.body(
 				`422 Unprocessable Content\n\nSolution rejected.\n\n${errors}\n`,

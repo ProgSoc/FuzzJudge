@@ -100,6 +100,8 @@ export const clock = await createClock(
 
 export const scoreboard = createCompetitionScoreboard(clock, problems);
 
+let openWebSockets = 0;
+
 const basePath = Bun.env.BASE_PATH ?? "/";
 const app = new OpenAPIHono()
 	.basePath(basePath as "/")
@@ -108,7 +110,7 @@ const app = new OpenAPIHono()
 	.route("/team", teamRouter)
 	.openapi(
 		createRoute({
-			path: "/scalar",
+			path: "/docs/scalar",
 			hide: true,
 			method: "get",
 			responses: {
@@ -117,7 +119,7 @@ const app = new OpenAPIHono()
 				},
 			},
 			middleware: Scalar({
-				url: "/docs/docs.json",
+				url: "/docs.json",
 			}),
 			operationId: "getOpenAPI",
 		}),
@@ -126,7 +128,7 @@ const app = new OpenAPIHono()
 	.openapi(
 		createRoute({
 			method: "get",
-			path: "/docs/docs.json",
+			path: "/docs",
 			hide: true,
 			responses: {
 				200: {
@@ -187,6 +189,8 @@ const app = new OpenAPIHono()
 
 				return {
 					onOpen: async (e, ws) => {
+						openWebSockets++;
+
 						clockHandler = (msg) => {
 							ws.send(JSON.stringify({ kind: "clock", value: msg }));
 						};
@@ -213,11 +217,14 @@ const app = new OpenAPIHono()
 							);
 						}, 1000);
 
-						console.log("WebSocket connection opened");
+						console.log(`🔗 (${openWebSockets}) Connection Opened`);
 					},
 					onClose: () => {
+						openWebSockets--;
 						ee.off("clock", clockHandler);
 						ee.off("scoreboard", scoreboardHandler);
+
+						console.log(`⛓️‍💥 (${openWebSockets}) Connection Closed`);
 					},
 				};
 			})(c, next);
@@ -404,12 +411,7 @@ const app = new OpenAPIHono()
 		},
 	);
 
-app.openAPIRegistry.registerComponent("securitySchemes", "Basic", {
-	type: "http",
-	scheme: "basic",
-});
-
-app.doc("/docs/docs.json", (c) => ({
+app.doc("/docs.json", (c) => ({
 	info: {
 		title: "FuzzJudge API",
 		description: "FuzzJudge API",
@@ -441,6 +443,11 @@ app.doc("/docs/docs.json", (c) => ({
 		},
 	],
 }));
+
+app.openAPIRegistry.registerComponent("securitySchemes", "Basic", {
+	type: "http",
+	scheme: "basic",
+});
 
 app.use(logger());
 

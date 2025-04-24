@@ -38,15 +38,17 @@ export async function allUsers(): Promise<User[]> {
     role: "admin" | "competitor" | null;
 }
  */
-export const UserSchema = z.object({
-	id: z.number(),
-	team: z.number().nullable(),
-	name: z.string().nullable(),
-	logn: z.string(),
-	salt: z.unknown(),
-	hash: z.unknown(),
-	role: z.enum(["admin", "competitor"]).nullable(),
-});
+export const UserSchema = z
+	.object({
+		id: z.number(),
+		team: z.number().nullable(),
+		name: z.string().nullable(),
+		logn: z.string(),
+		salt: z.unknown(),
+		hash: z.unknown(),
+		role: z.enum(["admin", "competitor"]).nullable(),
+	})
+	.openapi("User");
 
 /**
  * Reset a user's login
