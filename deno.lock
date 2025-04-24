@@ -46,7 +46,9 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@types/bun@latest"
+        "npm:@biomejs/biome@1.9.4",
+        "npm:@types/bun@latest",
+        "npm:lefthook@^1.11.11"
       ]
     },
     "members": {

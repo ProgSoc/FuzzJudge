@@ -78,7 +78,7 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemIcon",
 		}),
 		(c) => {
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 
 			const problem = problems.find(({ slug }) => slug === id);
 
@@ -113,7 +113,7 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemName",
 		}),
 		(c) => {
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 			const problem = problems.find(({ slug }) => slug === id);
 
 			if (!problem) return c.notFound();
@@ -147,7 +147,7 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemBrief",
 		}),
 		(c) => {
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 
 			const problem = problems.find(({ slug }) => slug === id);
 
@@ -182,7 +182,7 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemDifficulty",
 		}),
 		(c) => {
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 			const problem = problems.find(({ slug }) => slug === id);
 
 			if (!problem) return c.notFound();
@@ -214,7 +214,7 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemPoints",
 		}),
 		(c) => {
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 			const problem = problems.find(({ slug }) => slug === id);
 
 			if (!problem) return c.notFound();
@@ -284,7 +284,7 @@ export const probRouter = new OpenAPIHono()
 		async (c) => {
 			// clock.protect();
 
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 			const problem = problems.find(({ slug }) => slug === id);
 			if (!problem) return c.notFound();
 
@@ -340,7 +340,7 @@ export const probRouter = new OpenAPIHono()
 			// clock.protect();
 			const user = c.var.user;
 			const userTeam = await getUserTeam(user.id);
-			const id = c.req.param("id");
+			const { id } = c.req.valid("param");
 
 			if (!userTeam) {
 				return c.body("403 Forbidden\n\nUser not in a team.\n", {
@@ -506,6 +506,8 @@ export const probRouter = new OpenAPIHono()
 			// clock.protect();
 			const user = c.var.user;
 			const { id } = c.req.valid("param");
+			const { output: submissionOutput, source: submissionCode } =
+				c.req.valid("form");
 
 			if (!user.team) {
 				return c.body("403 Forbidden\n\nUser not in a team.\n", {
@@ -525,8 +527,6 @@ export const probRouter = new OpenAPIHono()
 					{ status: 415 },
 				);
 			}
-			const body = await c.req.text();
-			const submissionOutput = new URLSearchParams(body).get("output");
 			if (submissionOutput === null) {
 				return c.body(
 					"400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n",
@@ -535,7 +535,6 @@ export const probRouter = new OpenAPIHono()
 					},
 				);
 			}
-			const submissionCode = new URLSearchParams(body).get("source");
 			if (submissionCode === null) {
 				return c.body(
 					"400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n",

@@ -13,7 +13,6 @@ import {
 	patchUser,
 	resetUser,
 } from "../services/user.service";
-import { deleteFalsey } from "../util";
 
 export const userRouter = new OpenAPIHono()
 	.openapi(
@@ -110,7 +109,7 @@ export const userRouter = new OpenAPIHono()
 			path: "/{id}",
 			request: {
 				params: z.object({
-					id: z.string().openapi({
+					id: z.coerce.number().openapi({
 						param: {
 							in: "path",
 							name: "id",
@@ -149,8 +148,9 @@ export const userRouter = new OpenAPIHono()
 		}),
 		async (c) => {
 			const formData = await c.req.valid("form");
+			const { id } = c.req.valid("param");
 
-			await patchUser(Number.parseInt(c.req.param("id")), formData);
+			await patchUser(id, formData);
 			return c.body(null, { status: 204 });
 		},
 	)
@@ -160,7 +160,7 @@ export const userRouter = new OpenAPIHono()
 			method: "delete",
 			request: {
 				params: z.object({
-					id: z.string().openapi({
+					id: z.coerce.number().openapi({
 						param: {
 							in: "path",
 							name: "id",
@@ -188,7 +188,8 @@ export const userRouter = new OpenAPIHono()
 			operationId: "deleteUser",
 		}),
 		async (c) => {
-			await deleteUser(Number.parseInt(c.req.param("id")));
+			const { id } = c.req.valid("param");
+			await deleteUser(id);
 			return c.body(null, { status: 204 });
 		},
 	);
