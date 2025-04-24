@@ -5,11 +5,11 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bun": "latest",
-		"@typescript/analyze-trace": "^0.10.1",
-		"lefthook": "^1.11.11"
+		"@typescript/analyze-trace": "0.10.1",
+		"lefthook": "1.11.11"
 	},
 	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"typescript": "5.8.3"
 	},
 	"trustedDependencies": ["lefthook", "@biomejs/biome"],
 	"workspaces": ["clients/*", "server"]

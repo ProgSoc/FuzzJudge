@@ -3,8 +3,8 @@
 	"module": "main.ts",
 	"type": "module",
 	"devDependencies": {
-		"@types/bun": "^1.2.9",
-		"drizzle-kit": "^0.30.6"
+		"@types/bun": "1.2.10",
+		"drizzle-kit": "0.30.6"
 	},
 	"types": "./dist",
 	"exports": {
@@ -16,21 +16,21 @@
 		}
 	},
 	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"typescript": "5.8.3"
 	},
 	"dependencies": {
-		"@asteasolutions/zod-to-openapi": "^7.3.0",
-		"@bokuweb/zstd-wasm": "^0.0.27",
-		"@hono/swagger-ui": "^0.5.1",
-		"@hono/zod-openapi": "^0.19.5",
-		"@scalar/hono-api-reference": "^0.8.2",
+		"@asteasolutions/zod-to-openapi": "7.3.0",
+		"@bokuweb/zstd-wasm": "0.0.27",
+		"@hono/swagger-ui": "0.5.1",
+		"@hono/zod-openapi": "0.19.5",
+		"@scalar/hono-api-reference": "0.8.5",
 		"@std/toml": "npm:@jsr/std__toml",
 		"@std/yaml": "npm:@jsr/std__yaml",
-		"drizzle-orm": "^0.41.0",
-		"gray-matter": "^4.0.3",
+		"drizzle-orm": "0.41.0",
+		"gray-matter": "4.0.3",
 		"remark": "15.0.1",
-		"toml": "^3.0.0",
-		"zod": "^3.24.2"
+		"toml": "3.0.0",
+		"zod": "3.24.3"
 	},
 	"scripts": {
 		"build": "bun build ./src/index.ts --outdir=./dist --minify --target bun --sourcemap",
