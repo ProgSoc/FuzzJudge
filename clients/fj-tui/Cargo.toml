@@ -17,7 +17,7 @@ futures-util = { version = "=0.3.31", default-features = false, features = ["sin
 futures-channel = "=0.3.30"
 serde = "=1.0.203"
 serde_json = "=1.0.118"
-chrono = "=0.4.38"
+chrono = "=0.4.40"
 url = "=2.5.2"
 async-recursion = "=1.1.1"
 
