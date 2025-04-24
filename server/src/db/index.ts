@@ -18,7 +18,6 @@
 
 import { Database } from "bun:sqlite";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "./schema.ts";

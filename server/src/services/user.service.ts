@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { type Team, type User, type UserRoles, userTable } from "../db/schema";
+import { type User, type UserRoles, userTable } from "../db/schema";
 
 /**
  * Get a user by their id

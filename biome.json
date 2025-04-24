@@ -26,5 +26,17 @@
 		"formatter": {
 			"quoteStyle": "double"
 		}
-	}
+	},
+	"overrides": [
+		{
+			"include": ["./server/**/*.ts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedImports": "error"
+					}
+				}
+			}
+		}
+	]
 }

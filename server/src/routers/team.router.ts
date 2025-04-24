@@ -12,7 +12,6 @@ import {
 	deleteTeam,
 	patchTeam,
 } from "../services/team.service";
-import { deleteFalsey } from "../util";
 
 export const teamRouter = new OpenAPIHono()
 	.openapi(

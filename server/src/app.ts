@@ -45,10 +45,8 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import type { ServerWebSocket } from "bun";
-import { createBunWebSocket, serveStatic } from "hono/bun";
+import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
-import { Auth } from "./auth.ts";
 import { type CompetitionClockMessage, createClock } from "./clock.ts";
 import { migrateDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
@@ -58,7 +56,6 @@ import {
 	unauthorizedResponse,
 } from "./middleware/auth.middleware.ts";
 import { compRouter } from "./routers/competition.router.ts";
-import { probRouter } from "./routers/problem.router.ts";
 import { teamRouter } from "./routers/team.router.ts";
 import { userRouter } from "./routers/user.router.ts";
 import {
@@ -67,38 +64,13 @@ import {
 } from "./score.ts";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
-import { allMeta } from "./services/meta.service.ts";
 import {
 	type FuzzJudgeProblemMessage,
-	fuzzProblem,
 	getProblems,
-	judgeProblem,
 	problemToMessage,
 } from "./services/problems.service.ts";
-import { oldScoreboard } from "./services/scoreboard.service.ts";
-import {
-	getSubmissionCode,
-	getSubmissionOut,
-	getSubmissionSkeletons,
-	getSubmissionVler,
-	manualJudge,
-	postSubmission,
-	solved,
-} from "./services/submission.service.ts";
-import {
-	allTeams,
-	createTeam,
-	deleteTeam,
-	getUserTeam,
-	patchTeam,
-} from "./services/team.service.ts";
-import {
-	allUsers,
-	deleteUser,
-	patchUser,
-	resetUser,
-} from "./services/user.service.ts";
-import { deleteFalsey } from "./util.ts";
+import { manualJudge } from "./services/submission.service.ts";
+import { resetUser } from "./services/user.service.ts";
 import { HEADER } from "./version.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
@@ -437,7 +409,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Basic", {
 	scheme: "basic",
 });
 
-app.doc("/docs/docs.json", {
+app.doc("/docs/docs.json", (c) => ({
 	info: {
 		title: "FuzzJudge API",
 		description: "FuzzJudge API",
@@ -462,7 +434,13 @@ app.doc("/docs/docs.json", {
 			description: "Team related endpoints",
 		},
 	],
-});
+	servers: [
+		{
+			url: new URL(c.req.url).origin,
+			description: "Current environment",
+		},
+	],
+}));
 
 app.use(logger());
 

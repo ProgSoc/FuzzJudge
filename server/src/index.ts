@@ -1,4 +1,3 @@
-import { hc } from "hono/client";
 import app from "./app.ts";
 import { websocket } from "./websocket.ts";
 
