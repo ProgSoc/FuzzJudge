@@ -33,6 +33,15 @@ function App() {
 				</AppShell.Section>
 				<ProblemSection />
 				{/* Admin */}
+				<AppShell.Section>
+					<MantineNavLink
+						to="/admin"
+						activeProps={{
+							active: true,
+						}}
+						label={"Admin"}
+					/>
+				</AppShell.Section>
 			</AppShell.Navbar>
 
 			<AppShell.Main>

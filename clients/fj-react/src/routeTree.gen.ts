@@ -12,7 +12,10 @@
 
 import { Route as rootRoute } from "./routes/__root";
 import { Route as AuthenticatedImport } from "./routes/_authenticated";
-import { Route as AuthenticatedIndexImport } from "./routes/_authenticated.index";
+import { Route as AuthenticatedAdminImport } from "./routes/_authenticated/admin";
+import { Route as AuthenticatedAdminIndexImport } from "./routes/_authenticated/admin/index";
+import { Route as AuthenticatedAdminUsersImport } from "./routes/_authenticated/admin/users";
+import { Route as AuthenticatedIndexImport } from "./routes/_authenticated/index";
 import { Route as AuthenticatedProblemsProblemIdImport } from "./routes/_authenticated/problems/$problemId";
 import { Route as AuthenticatedScoreboardImport } from "./routes/_authenticated/scoreboard";
 
@@ -35,12 +38,30 @@ const AuthenticatedScoreboardRoute = AuthenticatedScoreboardImport.update({
 	getParentRoute: () => AuthenticatedRoute,
 } as any);
 
+const AuthenticatedAdminRoute = AuthenticatedAdminImport.update({
+	id: "/admin",
+	path: "/admin",
+	getParentRoute: () => AuthenticatedRoute,
+} as any);
+
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexImport.update({
+	id: "/",
+	path: "/",
+	getParentRoute: () => AuthenticatedAdminRoute,
+} as any);
+
 const AuthenticatedProblemsProblemIdRoute =
 	AuthenticatedProblemsProblemIdImport.update({
 		id: "/problems/$problemId",
 		path: "/problems/$problemId",
 		getParentRoute: () => AuthenticatedRoute,
 	} as any);
+
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersImport.update({
+	id: "/users",
+	path: "/users",
+	getParentRoute: () => AuthenticatedAdminRoute,
+} as any);
 
 // Populate the FileRoutesByPath interface
 
@@ -52,6 +73,13 @@ declare module "@tanstack/react-router" {
 			fullPath: "";
 			preLoaderRoute: typeof AuthenticatedImport;
 			parentRoute: typeof rootRoute;
+		};
+		"/_authenticated/admin": {
+			id: "/_authenticated/admin";
+			path: "/admin";
+			fullPath: "/admin";
+			preLoaderRoute: typeof AuthenticatedAdminImport;
+			parentRoute: typeof AuthenticatedImport;
 		};
 		"/_authenticated/scoreboard": {
 			id: "/_authenticated/scoreboard";
@@ -67,6 +95,13 @@ declare module "@tanstack/react-router" {
 			preLoaderRoute: typeof AuthenticatedIndexImport;
 			parentRoute: typeof AuthenticatedImport;
 		};
+		"/_authenticated/admin/users": {
+			id: "/_authenticated/admin/users";
+			path: "/users";
+			fullPath: "/admin/users";
+			preLoaderRoute: typeof AuthenticatedAdminUsersImport;
+			parentRoute: typeof AuthenticatedAdminImport;
+		};
 		"/_authenticated/problems/$problemId": {
 			id: "/_authenticated/problems/$problemId";
 			path: "/problems/$problemId";
@@ -74,18 +109,40 @@ declare module "@tanstack/react-router" {
 			preLoaderRoute: typeof AuthenticatedProblemsProblemIdImport;
 			parentRoute: typeof AuthenticatedImport;
 		};
+		"/_authenticated/admin/": {
+			id: "/_authenticated/admin/";
+			path: "/";
+			fullPath: "/admin/";
+			preLoaderRoute: typeof AuthenticatedAdminIndexImport;
+			parentRoute: typeof AuthenticatedAdminImport;
+		};
 	}
 }
 
 // Create and export the route tree
 
+interface AuthenticatedAdminRouteChildren {
+	AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute;
+	AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute;
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+	AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+	AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+};
+
+const AuthenticatedAdminRouteWithChildren =
+	AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren);
+
 interface AuthenticatedRouteChildren {
+	AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren;
 	AuthenticatedScoreboardRoute: typeof AuthenticatedScoreboardRoute;
 	AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute;
 	AuthenticatedProblemsProblemIdRoute: typeof AuthenticatedProblemsProblemIdRoute;
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+	AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 	AuthenticatedScoreboardRoute: AuthenticatedScoreboardRoute,
 	AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 	AuthenticatedProblemsProblemIdRoute: AuthenticatedProblemsProblemIdRoute,
@@ -97,36 +154,54 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
 	"": typeof AuthenticatedRouteWithChildren;
+	"/admin": typeof AuthenticatedAdminRouteWithChildren;
 	"/scoreboard": typeof AuthenticatedScoreboardRoute;
 	"/": typeof AuthenticatedIndexRoute;
+	"/admin/users": typeof AuthenticatedAdminUsersRoute;
 	"/problems/$problemId": typeof AuthenticatedProblemsProblemIdRoute;
+	"/admin/": typeof AuthenticatedAdminIndexRoute;
 }
 
 export interface FileRoutesByTo {
 	"/scoreboard": typeof AuthenticatedScoreboardRoute;
 	"/": typeof AuthenticatedIndexRoute;
+	"/admin/users": typeof AuthenticatedAdminUsersRoute;
 	"/problems/$problemId": typeof AuthenticatedProblemsProblemIdRoute;
+	"/admin": typeof AuthenticatedAdminIndexRoute;
 }
 
 export interface FileRoutesById {
 	__root__: typeof rootRoute;
 	"/_authenticated": typeof AuthenticatedRouteWithChildren;
+	"/_authenticated/admin": typeof AuthenticatedAdminRouteWithChildren;
 	"/_authenticated/scoreboard": typeof AuthenticatedScoreboardRoute;
 	"/_authenticated/": typeof AuthenticatedIndexRoute;
+	"/_authenticated/admin/users": typeof AuthenticatedAdminUsersRoute;
 	"/_authenticated/problems/$problemId": typeof AuthenticatedProblemsProblemIdRoute;
+	"/_authenticated/admin/": typeof AuthenticatedAdminIndexRoute;
 }
 
 export interface FileRouteTypes {
 	fileRoutesByFullPath: FileRoutesByFullPath;
-	fullPaths: "" | "/scoreboard" | "/" | "/problems/$problemId";
+	fullPaths:
+		| ""
+		| "/admin"
+		| "/scoreboard"
+		| "/"
+		| "/admin/users"
+		| "/problems/$problemId"
+		| "/admin/";
 	fileRoutesByTo: FileRoutesByTo;
-	to: "/scoreboard" | "/" | "/problems/$problemId";
+	to: "/scoreboard" | "/" | "/admin/users" | "/problems/$problemId" | "/admin";
 	id:
 		| "__root__"
 		| "/_authenticated"
+		| "/_authenticated/admin"
 		| "/_authenticated/scoreboard"
 		| "/_authenticated/"
-		| "/_authenticated/problems/$problemId";
+		| "/_authenticated/admin/users"
+		| "/_authenticated/problems/$problemId"
+		| "/_authenticated/admin/";
 	fileRoutesById: FileRoutesById;
 }
 
@@ -154,9 +229,18 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
+        "/_authenticated/admin",
         "/_authenticated/scoreboard",
         "/_authenticated/",
         "/_authenticated/problems/$problemId"
+      ]
+    },
+    "/_authenticated/admin": {
+      "filePath": "_authenticated/admin.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/admin/users",
+        "/_authenticated/admin/"
       ]
     },
     "/_authenticated/scoreboard": {
@@ -164,12 +248,20 @@ export const routeTree = rootRoute
       "parent": "/_authenticated"
     },
     "/_authenticated/": {
-      "filePath": "_authenticated.index.tsx",
+      "filePath": "_authenticated/index.tsx",
       "parent": "/_authenticated"
+    },
+    "/_authenticated/admin/users": {
+      "filePath": "_authenticated/admin/users.tsx",
+      "parent": "/_authenticated/admin"
     },
     "/_authenticated/problems/$problemId": {
       "filePath": "_authenticated/problems/$problemId.tsx",
       "parent": "/_authenticated"
+    },
+    "/_authenticated/admin/": {
+      "filePath": "_authenticated/admin/index.tsx",
+      "parent": "/_authenticated/admin"
     }
   }
 }
