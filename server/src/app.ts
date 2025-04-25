@@ -128,7 +128,7 @@ const app = new OpenAPIHono()
 	.openapi(
 		createRoute({
 			method: "get",
-			path: "/docs",
+			path: "/docs/swagger",
 			hide: true,
 			responses: {
 				200: {
@@ -141,7 +141,7 @@ const app = new OpenAPIHono()
 				},
 			},
 			middleware: swaggerUI({
-				url: "/docs.json",
+				url: "/docs/json",
 				title: "FuzzJudge API",
 			}),
 			operationId: "getSwaggerUI",
@@ -411,13 +411,13 @@ const app = new OpenAPIHono()
 		},
 	);
 
-app.doc31("/docs.json", (c) => ({
+app.doc31("/docs/json", (c) => ({
 	info: {
 		title: "FuzzJudge API",
 		description: "FuzzJudge API",
 		version: "0.1.0",
 	},
-	openapi: "3.1",
+	openapi: "3.1.0",
 	tags: [
 		{
 			name: "Problems",
