@@ -21,6 +21,7 @@ export const competitionRouter = new OpenAPIHono().openapi(
 					"application/json": {
 						schema: z.object({
 							content: z.string(),
+							title: z.string(),
 							times: CompetitionTimesSchema,
 						}),
 					},
@@ -40,12 +41,13 @@ export const competitionRouter = new OpenAPIHono().openapi(
 			});
 		}
 
-		const { content, times } = await getCompetitionData(competitionPath);
+		const { content, times, title } = await getCompetitionData(competitionPath);
 
 		return c.json(
 			{
 				content,
 				times,
+				title,
 			},
 			200,
 		);

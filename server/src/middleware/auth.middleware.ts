@@ -9,7 +9,7 @@ interface CustomBasicAuthOptions<T extends User> {
 	roles?: T["role"][];
 }
 
-export const authMiddleware = <T extends User>(
+export const authMiddleware = <T extends User = User>(
 	options: CustomBasicAuthOptions<T>,
 ) =>
 	createMiddleware<{

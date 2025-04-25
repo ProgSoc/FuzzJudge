@@ -8,7 +8,13 @@ export const competitionQueryKeys = {
 
 export const competitionQueries = {
 	getCompetitionDetails: queryOptions({
-		queryFn: () => client.competition.$get().then((r) => r.json()),
+		queryFn: () =>
+			client.competition.$get().then((r) => {
+				if (!r.ok) {
+					throw r;
+				}
+				return r.json();
+			}),
 		queryKey: competitionQueryKeys.details(),
 	}),
 };

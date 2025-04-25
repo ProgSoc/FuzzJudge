@@ -10,6 +10,7 @@ const competitionSpec = z.object({
 		finish: z.coerce.date(),
 		freeze: z.number(),
 	}),
+	title: z.string(),
 });
 
 export async function getCompetitionData(root: string) {

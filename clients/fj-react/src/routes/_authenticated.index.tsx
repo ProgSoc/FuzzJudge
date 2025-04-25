@@ -1,15 +1,14 @@
 import { competitionQueries } from "@/queries/competition.queries";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import Markdown from "react-markdown";
 
-export const Route = createFileRoute("/")({
-	component: App,
+export const Route = createFileRoute("/_authenticated/")({
+	component: RouteComponent,
 });
 
-function App() {
+function RouteComponent() {
 	const { data } = useQuery(competitionQueries.getCompetitionDetails);
 
-	return (
-		<div className="text-center">{JSON.stringify(data, undefined, 2)}</div>
-	);
+	return <Markdown>{data?.content}</Markdown>;
 }

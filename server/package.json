@@ -36,7 +36,7 @@
 		"zod": "3.24.3"
 	},
 	"scripts": {
-		"build": "bun build ./src/index.ts ./src/v2/client.ts --outdir=./dist/src --minify --target bun --sourcemap",
+		"build": "bun build ./src/index.ts ./src/client.ts ./src/v2/client.ts --outdir=./dist/src --minify --target bun --sourcemap",
 		"dev": "bun run ./src/index.ts"
 	}
 }
