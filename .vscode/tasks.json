@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": ["bun", "tsc", "-b", "--watch"],
+			"problemMatcher": ["$tsc-watch"],
+			"group": "build",
+			"label": "tsc: watch - tsconfig.json"
+		}
+	]
+}
