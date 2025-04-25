@@ -31,7 +31,7 @@ import Scoreboard from "./Scoreboard.svelte";
 import Sidebar from "./Sidebar.svelte";
 
 import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import type { CompetitionScoreboardMessage } from "server/score";
+import type { CompetitionScoreboardMessage } from "server/v1/score";
 import { getUsername } from "../api";
 import { initLiveState } from "../apiLive";
 import icons from "../icons";

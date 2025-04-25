@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/comp";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import icons from "../icons";
 import Icon from "./Icon.svelte";
 import ListGroup from "./ListGroup.svelte";

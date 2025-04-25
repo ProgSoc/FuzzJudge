@@ -14,11 +14,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/comp";
 import { onDestroy } from "svelte";
 import SvelteMarkdown from "svelte-markdown";
 import { difficultyName, selectedQuestion } from "../utils";
 import SubmissionArea from "./SubmissionArea.svelte";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
 export let question: FuzzJudgeProblemMessage;
 export let solved: boolean;

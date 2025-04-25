@@ -1,18 +1,18 @@
 import path from "node:path";
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { serveStatic } from "hono/bun";
-import {
-	authMiddleware,
-	unauthorizedResponse,
-} from "../middleware/auth.middleware";
-import { basicAuth } from "../services/auth.service";
+import { basicAuth } from "../../services/auth.service";
 import {
 	fuzzProblem,
 	getProblems,
 	judgeProblem,
-} from "../services/problems.service";
-import { postSubmission, solved } from "../services/submission.service";
-import { getUserTeam } from "../services/team.service";
+} from "../../services/problems.service";
+import { postSubmission, solved } from "../../services/submission.service";
+import { getUserTeam } from "../../services/team.service";
+import {
+	authMiddleware,
+	unauthorizedResponse,
+} from "../middleware/auth.middleware";
 
 const root = Bun.env.COMPETITION_PATH;
 

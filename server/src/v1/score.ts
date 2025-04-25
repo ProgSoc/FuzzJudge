@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ee } from "../ee.ts";
+import { getOrSetDefaultMeta } from "../services/meta.service.ts";
+import type { Problem } from "../services/problems.service.ts";
+import { getSubmissionSkeletons } from "../services/submission.service.ts";
+import { allTeams } from "../services/team.service.ts";
 import type { CompetitionClock } from "./clock.ts";
-import { ee } from "./ee.ts";
-import { getOrSetDefaultMeta } from "./services/meta.service.ts";
-import type { Problem } from "./services/problems.service.ts";
-import { getSubmissionSkeletons } from "./services/submission.service.ts";
-import { allTeams } from "./services/team.service.ts";
 
 export type ProblemScore = {
 	points: number;

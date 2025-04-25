@@ -21,8 +21,8 @@ import {
 	truncateUsername,
 } from "../utils";
 
-import type { FuzzJudgeProblemMessage } from "server/comp";
-import type { CompetitionScoreboardMessage } from "server/score";
+import type { CompetitionScoreboardMessage } from "server/v1/score";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
 export let questions: Record<string, FuzzJudgeProblemMessage>;
 export let scoreboard: CompetitionScoreboardMessage;

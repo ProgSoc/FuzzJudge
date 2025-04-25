@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
-import type { CompetitionClockMessage } from "./clock";
-import type { CompetitionScoreboardMessage } from "./score";
+import type { CompetitionClockMessage } from "./v1/clock";
+import type { CompetitionScoreboardMessage } from "./v1/score";
 
 interface EventEmitterTypes {
 	clock: [CompetitionClockMessage];

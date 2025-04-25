@@ -14,16 +14,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/comp";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import type { QuestionMeta } from "../utils";
 import QuestionButton from "./QuestionButton.svelte";
 
-export const name = "";
+export let name = "";
 export let questions: Record<string, FuzzJudgeProblemMessage>;
 export let solvedQuestions: Set<string>;
-export const includes: number | ((difficulty: number) => boolean) = 0;
+export let includes: number | ((difficulty: number) => boolean) = 0;
 
-$: list = Object.values(questions).filter((q) => {
+$: list = Object.values(questions).filter((q, i, arr) => {
 	if (typeof includes === "function") {
 		return includes(q.difficulty);
 	}

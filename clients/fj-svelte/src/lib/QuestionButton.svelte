@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/comp";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import { type QuestionMeta, selectedQuestion } from "../utils";
 
 export let question: FuzzJudgeProblemMessage;

@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ee } from "./ee.ts";
-import { getOrSetDefaultMeta, setMeta } from "./services/meta.service.ts";
+import { ee } from "../ee.ts";
+import { getOrSetDefaultMeta, setMeta } from "../services/meta.service.ts";
 
 export type ClockState = "live" | "hold" | "stop";
 

@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import type { z } from "zod";
 import { db } from "../db";
 import { type User, type UserRoles, userTable } from "../db/schema";
-import type { UserRoleSchema } from "../schema/user.schema";
+import type { UserRoleSchema } from "../v1/schema/user.schema";
 
 /**
  * Get a user by their id

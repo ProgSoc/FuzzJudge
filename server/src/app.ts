@@ -47,21 +47,8 @@ import { z } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
-import { type CompetitionClockMessage, createClock } from "./clock.ts";
 import { migrateDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "./middleware/auth.middleware.ts";
-import { compRouter } from "./routers/competition.router.ts";
-import { teamRouter } from "./routers/team.router.ts";
-import { userRouter } from "./routers/user.router.ts";
-import {
-	type CompetitionScoreboardMessage,
-	createCompetitionScoreboard,
-} from "./score.ts";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
 import {
@@ -71,6 +58,19 @@ import {
 } from "./services/problems.service.ts";
 import { manualJudge } from "./services/submission.service.ts";
 import { resetUser } from "./services/user.service.ts";
+import { type CompetitionClockMessage, createClock } from "./v1/clock.ts";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "./v1/middleware/auth.middleware.ts";
+import { compRouter } from "./v1/routers/competition.router.ts";
+import { teamRouter } from "./v1/routers/team.router.ts";
+import { userRouter } from "./v1/routers/user.router.ts";
+import {
+	type CompetitionScoreboardMessage,
+	createCompetitionScoreboard,
+} from "./v1/score.ts";
 import { HEADER } from "./version.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 

@@ -13,7 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CompetitionClockMessage } from "server/clock";
+import type { CompetitionClockMessage } from "server/v1/clock";
 import { onDestroy } from "svelte";
 import { type Writable, writable } from "svelte/store";
 

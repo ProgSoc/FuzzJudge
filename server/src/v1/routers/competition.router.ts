@@ -1,24 +1,24 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import { clock } from "../app";
-import type { CompetitionClockMessage } from "../clock";
-import { ee } from "../ee";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "../middleware/auth.middleware";
-import { basicAuth } from "../services/auth.service";
-import { getCompetitionData } from "../services/competition.service";
-import { allMeta } from "../services/meta.service";
-import { oldScoreboard } from "../services/scoreboard.service";
+import { clock } from "../../app";
+import { ee } from "../../ee";
+import { basicAuth } from "../../services/auth.service";
+import { getCompetitionData } from "../../services/competition.service";
+import { allMeta } from "../../services/meta.service";
+import { oldScoreboard } from "../../services/scoreboard.service";
 import {
 	SubmissionSkeletonSchema,
 	getSubmissionCode,
 	getSubmissionOut,
 	getSubmissionSkeletons,
 	getSubmissionVler,
-} from "../services/submission.service";
-import { upgradeWebSocket } from "../websocket";
+} from "../../services/submission.service";
+import { upgradeWebSocket } from "../../websocket";
+import type { CompetitionClockMessage } from "../clock";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "../middleware/auth.middleware";
 import { probRouter } from "./problem.router";
 
 const root = Bun.env.COMPETITION_PATH;

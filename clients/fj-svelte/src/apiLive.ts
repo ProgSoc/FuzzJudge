@@ -14,9 +14,9 @@
  */
 
 import type { SocketMessage } from "server/app";
-import type { CompetitionClockMessage } from "server/clock";
-import type { CompetitionScoreboardMessage } from "server/score";
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import type { FuzzJudgeProblemMessage } from "server/dist/src/services/problems.service.ts";
+import type { CompetitionClockMessage } from "server/v1/clock";
+import type { CompetitionScoreboardMessage } from "server/v1/score";
 import { onDestroy } from "svelte";
 import { BACKEND_SERVER, client } from "./api.ts";
 import { unreachable } from "./utils";
