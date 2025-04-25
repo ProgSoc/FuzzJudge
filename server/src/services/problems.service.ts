@@ -130,6 +130,7 @@ export async function getProblems(root: string): Promise<Problem[]> {
 export async function fuzzProblem(root: string, slug: string, seed: string) {
 	const problem = await getProblemData(root, slug);
 	const configPath = path.join(root, slug);
+	console.log({ configPath });
 	const proc = Bun.spawn([...problem.fuzz.exec, seed], {
 		cwd: configPath,
 		stdin: "pipe",

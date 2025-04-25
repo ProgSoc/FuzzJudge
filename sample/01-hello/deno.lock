@@ -42,55 +42,5 @@
     "https://jspm.dev/npm:seedrandom@3.0.5/lib/xor4096.js!cjs": "e2792a8423247a660ff36e4686d19e338293d7adf3cd23d5eead032f2a204ade",
     "https://jspm.dev/npm:seedrandom@3.0.5/seedrandom!cjs": "90156324b6b69efad145fb802607a81c977e0633089758a388f28d2f72c72d91",
     "https://jspm.dev/seedrandom": "dce9ea596ca9b58319a2a159e24ccfae3d7400dd0b8b4d6aa896db98cc2d6896"
-  },
-  "workspace": {
-    "packageJson": {
-      "dependencies": [
-        "npm:@biomejs/biome@1.9.4",
-        "npm:@types/bun@latest",
-        "npm:lefthook@^1.11.11"
-      ]
-    },
-    "members": {
-      "clients/fj-svelte": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@sveltejs/vite-plugin-svelte@^3.0.2",
-            "npm:@tsconfig/svelte@^5.0.2",
-            "npm:datauri@^4.1.0",
-            "npm:hono@^4.7.6",
-            "npm:prettier-plugin-svelte@^3.2.4",
-            "npm:prettier@^3.3.2",
-            "npm:svelte-check@^3.6.7",
-            "npm:svelte-markdown@~0.4.1",
-            "npm:svelte@^4.2.12",
-            "npm:tslib@^2.8.1",
-            "npm:typescript@^5.8.3",
-            "npm:vite-tsconfig-paths@^5.1.4",
-            "npm:vite@^6.2.6"
-          ]
-        }
-      },
-      "server": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@asteasolutions/zod-to-openapi@^7.3.0",
-            "npm:@bokuweb/zstd-wasm@^0.0.27",
-            "npm:@hono/swagger-ui@~0.5.1",
-            "npm:@hono/zod-openapi@~0.19.5",
-            "npm:@jsr/std__toml@*",
-            "npm:@jsr/std__yaml@*",
-            "npm:@scalar/hono-api-reference@~0.8.2",
-            "npm:@types/bun@^1.2.9",
-            "npm:drizzle-kit@~0.30.6",
-            "npm:drizzle-orm@0.41",
-            "npm:gray-matter@^4.0.3",
-            "npm:remark@^15.0.1",
-            "npm:toml@3",
-            "npm:zod@^3.24.2"
-          ]
-        }
-      }
-    }
   }
 }
