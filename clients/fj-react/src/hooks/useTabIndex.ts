@@ -1,12 +1,23 @@
-import { type NavigateOptions, useChildMatches } from "@tanstack/react-router";
+import {
+	type AnyRouter,
+	type NavigateOptions,
+	type RegisteredRouter,
+	useChildMatches,
+} from "@tanstack/react-router";
 import { useMemo } from "react";
 
-export type TabItem = {
+export type TabItem<
+	TRouter extends AnyRouter = RegisteredRouter,
+	TFrom extends string = string,
+	TTo extends string | undefined = ".",
+	TMaskFrom extends string = TFrom,
+	TMaskTo extends string = ".",
+> = {
 	label: string;
 	icon?: React.ReactElement | string;
 	disabled?: boolean;
 	fuzzy?: boolean;
-} & NavigateOptions;
+} & NavigateOptions<TRouter, TFrom, TTo, TMaskFrom, TMaskTo>;
 
 interface TabIndexProps {
 	tabs: TabItem[];
