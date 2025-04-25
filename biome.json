@@ -20,13 +20,15 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true
-		}
+		},
+		"ignore": ["**/routeTree.gen.ts"]
 	},
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
 		}
 	},
+
 	"overrides": [
 		{
 			"include": ["./server/**/*.ts"],
