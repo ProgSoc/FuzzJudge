@@ -2,19 +2,21 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
-import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
-
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
+import "@mantine/core/styles.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import reportWebVitals from "./reportWebVitals.ts";
+
+const queryClient = new QueryClient();
 
 // Create a new router instance
 const router = createRouter({
 	routeTree,
 	context: {
-		...TanstackQuery.getContext(),
+		queryClient,
 	},
 	defaultPreload: "intent",
 	scrollRestoration: true,
@@ -35,9 +37,9 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<TanstackQuery.Provider>
+			<QueryClientProvider client={queryClient}>
 				<RouterProvider router={router} />
-			</TanstackQuery.Provider>
+			</QueryClientProvider>
 		</StrictMode>,
 	);
 }

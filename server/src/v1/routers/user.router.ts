@@ -1,5 +1,10 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "../../middleware/auth.middleware";
 import { basicAuth } from "../../services/auth.service";
 import {
 	allUsers,
@@ -7,11 +12,6 @@ import {
 	patchUser,
 	resetUser,
 } from "../../services/user.service";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "../middleware/auth.middleware";
 import { UserRoleSchema, UserSchema } from "../schema/user.schema";
 
 const UserParamSchema = z
