@@ -411,13 +411,13 @@ const app = new OpenAPIHono()
 		},
 	);
 
-app.doc("/docs.json", (c) => ({
+app.doc31("/docs.json", (c) => ({
 	info: {
 		title: "FuzzJudge API",
 		description: "FuzzJudge API",
 		version: "0.1.0",
 	},
-	openapi: "3.0.0",
+	openapi: "3.1",
 	tags: [
 		{
 			name: "Problems",

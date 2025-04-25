@@ -1,4 +1,3 @@
-import { z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { type Team, teamTable, userTable } from "../db/schema";
@@ -65,14 +64,6 @@ export async function patchTeam(
 export async function deleteTeam(id: number) {
 	await db.delete(teamTable).where(eq(teamTable.id, id));
 }
-
-export const TeamSchema = z
-	.object({
-		id: z.number(),
-		name: z.string(),
-		seed: z.string(),
-	})
-	.openapi("Team");
 
 export async function allTeams(): Promise<Team[]> {
 	return db.query.teamTable.findMany();

@@ -4,9 +4,9 @@ import {
 	forbiddenResponse,
 	unauthorizedResponse,
 } from "../middleware/auth.middleware";
+import { TeamSchema } from "../schema/team.schema";
 import { basicAuth } from "../services/auth.service";
 import {
-	TeamSchema,
 	allTeams,
 	createTeam,
 	deleteTeam,

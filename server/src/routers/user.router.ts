@@ -5,9 +5,9 @@ import {
 	forbiddenResponse,
 	unauthorizedResponse,
 } from "../middleware/auth.middleware";
+import { UserRoleSchema, UserSchema } from "../schema/user.schema";
 import { basicAuth } from "../services/auth.service";
 import {
-	UserSchema,
 	allUsers,
 	deleteUser,
 	patchUser,
@@ -81,7 +81,7 @@ export const userRouter = new OpenAPIHono()
 						"application/x-www-form-urlencoded": {
 							schema: z.object({
 								logn: z.string(),
-								role: z.enum(["admin", "competitor"]),
+								role: UserRoleSchema,
 							}),
 						},
 					},
@@ -125,7 +125,7 @@ export const userRouter = new OpenAPIHono()
 						"application/x-www-form-urlencoded": {
 							schema: z.object({
 								logn: z.string().optional(),
-								role: z.enum(["admin", "competitor"]).optional(),
+								role: UserRoleSchema.optional(),
 							}),
 						},
 					},

@@ -1,4 +1,3 @@
-import { z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { type User, type UserRoles, userTable } from "../db/schema";
@@ -38,17 +37,6 @@ export async function allUsers(): Promise<User[]> {
     role: "admin" | "competitor" | null;
 }
  */
-export const UserSchema = z
-	.object({
-		id: z.number(),
-		team: z.number().nullable(),
-		name: z.string().nullable(),
-		logn: z.string(),
-		salt: z.unknown(),
-		hash: z.unknown(),
-		role: z.enum(["admin", "competitor"]).nullable(),
-	})
-	.openapi("User");
 
 /**
  * Reset a user's login
