@@ -126,6 +126,8 @@ export const userRouter = new OpenAPIHono()
 							schema: z.object({
 								logn: z.string().optional(),
 								role: UserRoleSchema.optional(),
+								team: z.number().optional(),
+								name: z.string().optional(),
 							}),
 						},
 					},
@@ -152,6 +154,7 @@ export const userRouter = new OpenAPIHono()
 		}),
 		async (c) => {
 			const formData = await c.req.valid("form");
+			console.log({ formData });
 			const { id } = c.req.valid("param");
 
 			await patchUser(id, formData);

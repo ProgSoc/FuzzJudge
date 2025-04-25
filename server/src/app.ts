@@ -309,7 +309,7 @@ const app = new OpenAPIHono()
 		}),
 		async (c) => {
 			const fileContent = await Bun.file(
-				new URL(import.meta.resolve("./impl/admin.html")),
+				new URL(import.meta.resolve("./admin.html")),
 			).text();
 
 			return c.body(fileContent, {

@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
+import type { z } from "zod";
 import { db } from "../db";
 import { type User, type UserRoles, userTable } from "../db/schema";
+import type { UserRoleSchema } from "../schema/user.schema";
 
 /**
  * Get a user by their id
@@ -69,6 +71,13 @@ export async function resetUser(
 	return updatedUser;
 }
 
+interface UpdateUserParams {
+	logn?: string;
+	name?: string;
+	role?: z.infer<typeof UserRoleSchema>;
+	team?: number;
+}
+
 /**
  * Edit a user
  * @param id - The id of the user to edit
@@ -77,11 +86,16 @@ export async function resetUser(
  */
 export async function patchUser(
 	id: number,
-	params: Record<string, unknown>,
+	params: UpdateUserParams,
 ): Promise<User | undefined> {
 	const [updatedUser] = await db
 		.update(userTable)
-		.set(params)
+		.set({
+			logn: params.logn,
+			name: params.name,
+			role: params.role,
+			team: params.team,
+		})
 		.where(eq(userTable.id, id))
 		.returning();
 
