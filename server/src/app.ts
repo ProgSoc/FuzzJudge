@@ -119,7 +119,7 @@ const app = new OpenAPIHono()
 				},
 			},
 			middleware: Scalar({
-				url: "/docs.json",
+				url: "/docs/json",
 			}),
 			operationId: "getOpenAPI",
 		}),
