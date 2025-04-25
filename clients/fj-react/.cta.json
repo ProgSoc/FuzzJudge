@@ -1,0 +1,13 @@
+{
+	"framework": "react",
+	"typescript": true,
+	"projectName": "fj-react",
+	"mode": "file-router",
+	"tailwind": true,
+	"packageManager": "bun",
+	"toolchain": "none",
+	"variableValues": {},
+	"git": true,
+	"version": 1,
+	"existingAddOns": ["tanstack-query", "t3env"]
+}
