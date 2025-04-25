@@ -8,5 +8,3 @@ if (import.meta.main) {
 		port: 1989,
 	});
 }
-
-export type { AppType } from "./app.ts";

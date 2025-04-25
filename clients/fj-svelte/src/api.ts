@@ -12,8 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { hc } from "hono/client";
-import type { AppType } from "server";
+import { hc } from "server/client";
 import {
 	type QuestionMeta,
 	type ScoreboardUser,
@@ -23,7 +22,7 @@ import {
 } from "./utils";
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
-export const client = hc<AppType>(BACKEND_SERVER);
+export const client = hc(BACKEND_SERVER);
 
 console.log("Backend server URL:", BACKEND_SERVER);
 
