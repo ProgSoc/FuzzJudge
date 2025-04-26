@@ -9,7 +9,7 @@ tokio-macros = "=2.3.0"
 tokio = { version = "=1.38.0", features = ["full"] }
 base64 = "=0.22.1"
 reqwest = "=0.12.5"
-markdown = "=1.0.0-alpha.17"
+markdown = "=1.0.0"
 clap = { version = "=4.5.7", features = ["derive"] }
 clap_derive = "=4.5.5"
 tokio-tungstenite = "=0.23.1"
