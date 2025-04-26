@@ -13,5 +13,5 @@
 	],
 	"rangeStrategy": "pin",
 	"addLabels": ["renovate"],
-	"ignorePaths": ["./clients/fj-tui"]
+	"ignorePaths": ["clients/fj-tui/Cargo.toml", "clients/fj-tui/Cargo.lock"]
 }
