@@ -10,7 +10,7 @@ tokio = { version = "=1.38.0", features = ["full"] }
 base64 = "=0.22.1"
 reqwest = "=0.12.5"
 markdown = "=1.0.0-alpha.17"
-clap = { version = "=4.5.7", features = ["derive"] }
+clap = { version = "=4.5.37", features = ["derive"] }
 clap_derive = "=4.5.5"
 tokio-tungstenite = "=0.23.1"
 futures-util = { version = "=0.3.31", default-features = false, features = ["sink", "std"] }
