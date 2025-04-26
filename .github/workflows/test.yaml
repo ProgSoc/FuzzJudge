@@ -7,9 +7,9 @@ on:
       - main
   workflow_dispatch:
 
-name: Test Bun
+name: Test Code
 jobs:
-  test:
+  test-server:
     name: Test Bun
     runs-on: ubuntu-latest
     steps:
@@ -23,3 +23,15 @@ jobs:
       # run any `bun` or `bunx` command
       - run: bun install
       - run: cd server && bun test
+  test-svelte:
+    name: Test Svelte
+    runs-on: ubuntu-latest
+    steps:
+      # ...
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install Deps
+        run: bun install
+      - name: Check Svelte Types
+        run: bun run --filter fj-svelte check
+      
