@@ -143,8 +143,18 @@ export async function fuzzProblem(root: string, slug: string, seed: string) {
 
 	const errText = await err.text();
 	if (errText.length > 0) {
-		console.error(errText);
-		throw new Error(`Fuzzing error: ${errText}`);
+		// console.error(errText);
+		throw new Error(
+			`Fuzzing error: ${JSON.stringify(
+				{
+					error: errText,
+					exitCode: proc.exitCode,
+					stdout: await out.text(),
+				},
+				undefined,
+				2,
+			)}`,
+		);
 	}
 
 	const outText = await out.text();
