@@ -37,6 +37,6 @@
 	},
 	"scripts": {
 		"build": "bun build ./src/index.ts ./src/client.ts ./src/v2/client.ts --outdir=./dist/src --minify --target bun --sourcemap",
-		"dev": "bun run ./src/index.ts"
+		"dev": "bun run ./src/index.ts --watch"
 	}
 }
