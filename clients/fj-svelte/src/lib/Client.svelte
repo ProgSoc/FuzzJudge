@@ -38,6 +38,7 @@ import icons from "../icons";
 import Icon from "./Icon.svelte";
 import InlineCountdown from "./counters/InlineCountdown.svelte";
 import PageCountdown from "./counters/PageCountdown.svelte";
+    import Settings from "./Settings.svelte";
 
 export const scoreboardMode = false;
 
@@ -91,6 +92,7 @@ enum ShowingPopout {
 	None = 0,
 	Scoreboard = 1,
 	CompInfo = 2,
+	Settings = 3,
 }
 
 // biome-ignore lint/style/useConst: is being assigned
@@ -130,6 +132,7 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
         <a href="/void" title="Enter empty credentials">
 	  <Icon icon={icons.logout} />
 	</a>
+	<Icon icon={icons.cog} clickAction={() => showingPopout = ShowingPopout.Settings} />
       </div>
     </div>
 
@@ -165,7 +168,12 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     {/if}
   </div>
 
-  <Popout shown={showingPopout === ShowingPopout.Scoreboard} close={() => (showingPopout = ShowingPopout.None)}>
+  <Popout 
+    shown={showingPopout === ShowingPopout.Scoreboard}
+    close={() => (showingPopout = ShowingPopout.None)}
+    title="Scoreboard"
+    icon={icons.scoreboard}
+  >
     {#if questions === undefined || scoreboard === undefined}
       <Loading />
     {:else}
@@ -173,8 +181,20 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     {/if}
   </Popout>
 
-  <Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
+  <Popout 
+    shown={showingPopout === ShowingPopout.CompInfo}
+    close={() => (showingPopout = ShowingPopout.None)}
+  >
     <CompInfo />
+  </Popout>
+
+  <Popout 
+    shown={showingPopout === ShowingPopout.Settings}
+    close={() => (showingPopout = ShowingPopout.None)}
+    title="Settings"
+    icon={icons.cog}
+  >
+    <Settings />
   </Popout>
 {/if}
 
@@ -183,6 +203,7 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     height: 100%;
     width: 100%;
     position: absolute;
+    background-color: var(--bg-prim);
     top: 0px;
     left: 0px;
     display: grid;
@@ -200,7 +221,7 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.4em;
+    gap: 0.3em;
   }
 
   .top-bar {
@@ -211,6 +232,7 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     padding: 0.25rem;
     color: var(--text-sec);
     background-color: var(--bg-sec);
+    border-bottom: 1px solid var(--border);
   }
 
   .locked-message {

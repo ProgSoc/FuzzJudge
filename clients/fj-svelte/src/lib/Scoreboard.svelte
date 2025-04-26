@@ -23,6 +23,8 @@ import {
 
 import type { CompetitionScoreboardMessage } from "server/v1/score";
 import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import Icon from "./Icon.svelte";
+import icons from "../icons";
 
 export let questions: Record<string, FuzzJudgeProblemMessage>;
 export let scoreboard: CompetitionScoreboardMessage;
@@ -37,7 +39,6 @@ $: sortedQuestions = Object.values(questions).sort(
 );
 </script>
 
-<h1>Scoreboard</h1>
 <table>
   <thead>
   <tr>

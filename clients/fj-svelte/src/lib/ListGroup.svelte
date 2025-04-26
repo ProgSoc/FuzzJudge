@@ -15,7 +15,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
 import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import type { QuestionMeta } from "../utils";
 import QuestionButton from "./QuestionButton.svelte";
 
 export let name = "";
@@ -23,7 +22,7 @@ export let questions: Record<string, FuzzJudgeProblemMessage>;
 export let solvedQuestions: Set<string>;
 export let includes: number | ((difficulty: number) => boolean) = 0;
 
-$: list = Object.values(questions).filter((q, i, arr) => {
+$: list = Object.values(questions).filter((q) => {
 	if (typeof includes === "function") {
 		return includes(q.difficulty);
 	}
@@ -48,5 +47,6 @@ $: list = Object.values(questions).filter((q, i, arr) => {
     padding: 1rem;
     background-color: var(--bg-sec);
     max-width: fit-content;
+    font-weight: bold;
   }
 </style>

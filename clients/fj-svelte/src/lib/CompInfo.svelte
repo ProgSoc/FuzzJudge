@@ -31,5 +31,7 @@ getCompInfo().then((data) => {
   <Loading />
 {:else}
   <h1 style="margin-top: -0.2rem;">{title}</h1>
-  <SvelteMarkdown source={instructions} />
+  <span id="instructions-md">
+    <SvelteMarkdown source={instructions} />
+  </span>
 {/if}

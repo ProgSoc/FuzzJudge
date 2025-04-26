@@ -14,9 +14,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import Client from "./lib/Client.svelte";
+  import Client from "./lib/Client.svelte";
+  import { SETTINGS, Theme, themeClass } from "./settings";
 
-export const scoreboardMode: boolean = false;
+  export const scoreboardMode: boolean = false;
 </script>
 
-<Client {scoreboardMode} />
+<div id="theme-container" class={themeClass($SETTINGS.theme ?? Theme.Default)}>
+  <Client {scoreboardMode} />
+</div>
