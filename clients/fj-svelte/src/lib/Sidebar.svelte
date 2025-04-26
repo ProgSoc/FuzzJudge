@@ -34,7 +34,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <div class="question-list" class:closed={!open}>
   {#if open}
     <div class="list-title-div">
-      <h2 class="list-title">Questions</h2>
+      <h2 class="list-title">Problems</h2>
       <Icon icon={icons.arrowleft} clickAction={toggleOpen} />
     </div>
 
