@@ -13,8 +13,8 @@ This is a guide intended for future ProgSoc executives or anyone who wants to ho
 ## Design Overview
 The FuzzJudge server serves problem descriptions and inputs, validates problem solutions, tracks each team's score and runs a timer for competition start and finish times.
 
-A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is passed to the problem's generator (fuzz method) by the server as an argument and then the generator prints the problem input to stdout. 
-When the team then submits their solution, the problem's validator (judge method) is run with the team's solution piped in and the same seed as an argument. 
+A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator (fuzz method) by the server. 
+When the team then submits their solution, the problem's validator (judge method) is then given the submitted solution and the same seed that was used to generate that teams input. 
 This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution. The return code then indicates whether or not the submitted solution was valid.
 
 In addition to being agnostic to the language the problems are implemented in, the server has no one primary front-end and is designed such that competitors can connect however they want and building a custom client is straightforward.
