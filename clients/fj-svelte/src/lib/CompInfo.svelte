@@ -14,22 +14,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import SvelteMarkdown from "svelte-markdown";
-import { getCompInfo } from "../api";
-import Loading from "./Loading.svelte";
+  import SvelteMarkdown from "svelte-markdown";
+  import { getCompInfo } from "../api";
+  import Loading from "./Loading.svelte";
 
-let title: string | undefined = undefined;
-let instructions = "";
+  let title: string | undefined = undefined;
+  let instructions = "";
 
-getCompInfo().then((data) => {
-	title = data.title;
-	instructions = data.instructions;
-});
+  getCompInfo().then((data) => {
+    title = data.title;
+    instructions = data.instructions;
+  });
 </script>
 
 {#if title === undefined}
   <Loading />
 {:else}
   <h1 style="margin-top: -0.2rem;">{title}</h1>
-  <SvelteMarkdown source={instructions} />
+  <span id="instructions-md">
+    <SvelteMarkdown source={instructions} />
+  </span>
 {/if}

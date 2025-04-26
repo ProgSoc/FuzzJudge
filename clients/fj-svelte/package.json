@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"build-icons": "bun run scripts/icons-to-data-uris.ts",
+		"build-icons": "bun run scripts/icons-to-data-uris.ts; npx prettier --write src/icons.ts",
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"fmt": "npx prettier --write --plugin prettier-plugin-svelte ."

@@ -14,31 +14,31 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { onDestroy } from "svelte";
-import SvelteMarkdown from "svelte-markdown";
-import { difficultyName, selectedQuestion } from "../utils";
-import SubmissionArea from "./SubmissionArea.svelte";
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import { onDestroy } from "svelte";
+  import SvelteMarkdown from "svelte-markdown";
+  import { difficultyName, removeMdTitle, selectedQuestion } from "../utils";
+  import SubmissionArea from "./SubmissionArea.svelte";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
-export let question: FuzzJudgeProblemMessage;
-export let solved: boolean;
-export let setSolved: (slug: string) => void;
+  export let question: FuzzJudgeProblemMessage;
+  export let solved: boolean;
+  export let setSolved: (slug: string) => void;
 
-// biome-ignore lint/style/useConst: svelte
-let questionInstructions: HTMLDivElement | undefined = undefined;
+  // biome-ignore lint/style/useConst: svelte
+  let questionInstructions: HTMLDivElement | undefined = undefined;
 
-// Reset scroll to top when a new question is selected
-const unsubScrollUp = selectedQuestion.subscribe((slug) => {
-	if (slug === undefined) return;
+  // Reset scroll to top when a new question is selected
+  const unsubScrollUp = selectedQuestion.subscribe((slug) => {
+    if (slug === undefined) return;
 
-	if (questionInstructions !== undefined) {
-		questionInstructions.scrollTop = 0;
-	}
-});
+    if (questionInstructions !== undefined) {
+      questionInstructions.scrollTop = 0;
+    }
+  });
 
-onDestroy(() => {
-	unsubScrollUp();
-});
+  onDestroy(() => {
+    unsubScrollUp();
+  });
 </script>
 
 <div class="question" bind:this={questionInstructions}>
@@ -55,16 +55,16 @@ onDestroy(() => {
           {/if}
         </h1>
 
-        <div style="margin-left: 1rem;">
-          <span style="margin-right: 1rem; opacity:0.7;"
+        <div class="stats">
+          <span style="margin-right: 1rem;"
             ><b>Difficulty:</b>
             {difficultyName(question.difficulty)}</span
           >
-          <span style="opacity:0.7;"><b>Points:</b> {question.points}</span>
+          <span><b>Points:</b> {question.points}</span>
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={question.doc.body} />
+          <SvelteMarkdown source={removeMdTitle(question.doc.body)} />
         </div>
       {/if}
 
@@ -76,6 +76,9 @@ onDestroy(() => {
 <style>
   .question {
     overflow: scroll;
+    padding-left: 0.7rem;
+    padding-top: 0.5rem;
+    background-color: var(--bg-prim);
   }
 
   .question-instructions {
@@ -83,5 +86,12 @@ onDestroy(() => {
     grid-area: question-instructions;
     padding: 1rem;
     text-wrap: pretty;
+  }
+
+  .stats {
+    opacity: 0.7;
+    background-color: var(--accent);
+    padding: 0.5rem;
+    margin-top: -0.3rem;
   }
 </style>

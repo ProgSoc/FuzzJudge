@@ -14,63 +14,78 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import icons from "../icons";
-import Icon from "./Icon.svelte";
+  import icons from "../icons";
+  import type { IconDescriptor } from "../types";
+  import Icon from "./Icon.svelte";
 
-// biome-ignore lint/style/useConst: is assigned as a prop
-export let shown = false;
-export const close = () => {};
+  // biome-ignore lint/style/useConst: is assigned as a prop
+  export let shown = false;
+  export let close = () => {};
+  export let title: string | undefined = undefined;
+  export let icon: IconDescriptor | undefined = undefined;
 
-let maximized = false;
-const onMaximiseToggle = () => {
-	maximized = !maximized;
-};
+  $: console.log("shown", shown, title, icons);
 
-document.addEventListener("keydown", (e) => {
-	if (!shown || e.key !== "Escape") return;
+  let maximized = false;
+  const onMaximiseToggle = () => {
+    maximized = !maximized;
+  };
 
-	close();
-});
+  document.addEventListener("keydown", (e) => {
+    if (!shown || e.key !== "Escape") return;
+
+    close();
+  });
 </script>
 
 {#if shown}
-  <div class="content-centered" class:popout={!maximized} class:popout-fullscreen={maximized}>
-    <button class="close" on:click={close}>
-      <Icon icon={icons.cross} />
-    </button>
-    <button class="maximise" on:click={onMaximiseToggle}>
-      {#if maximized}
-        <Icon icon={icons.minimise} />
-      {:else}
-        <Icon icon={icons.maximise} />
-      {/if}
-    </button>
+  <div class:popout={!maximized} class:popout-fullscreen={maximized}>
+    <div class="close">
+      <Icon icon={icons.cross} clickAction={close} />
+    </div>
+    <div class="maximise">
+      <Icon icon={maximized ? icons.minimise : icons.maximise} clickAction={onMaximiseToggle} />
+    </div>
     <div class="contents">
+      {#if title !== undefined}
+        <h1 class="popout-header">
+          {#if icon !== undefined}
+            <Icon {icon} overrideWidth="1.8rem" />
+          {/if}
+          <span style="margin-top: -0.3rem;">
+            {title}
+          </span>
+        </h1>
+      {/if}
       <slot />
     </div>
   </div>
 {/if}
 
 <style>
-  .content-centered {
+  .popout-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-items: center;
+    gap: 0.5rem;
+    margin-top: -0.4rem;
+    padding-left: 0.7rem;
   }
 
   .popout {
     position: absolute;
-    overflow: auto;
+    overflow-y: auto;
     width: calc(100% - 60px);
     height: calc(100% - 60px);
     background-color: var(--bg-prim);
     color: var(--text-prim);
-    box-shadow: 0 0 50px 15px #000;
+    box-shadow: 0 0 28px 15px #0006;
     max-width: fit-content;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     min-width: 50vw;
+    border: solid 1px var(--border);
   }
 
   .popout-fullscreen {
@@ -93,7 +108,7 @@ document.addEventListener("keydown", (e) => {
     text-decoration: double;
     font-weight: bold;
     position: absolute;
-    top: 0px;
+    top: 10px;
     right: 10px;
   }
 
@@ -101,7 +116,7 @@ document.addEventListener("keydown", (e) => {
     text-decoration: double;
     font-weight: bold;
     position: absolute;
-    top: 0px;
+    top: 10px;
     right: 30px;
   }
 </style>

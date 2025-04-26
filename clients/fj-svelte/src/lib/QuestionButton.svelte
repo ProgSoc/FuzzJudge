@@ -14,15 +14,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import { type QuestionMeta, selectedQuestion } from "../utils";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import { type QuestionMeta, selectedQuestion } from "../utils";
 
-export let question: FuzzJudgeProblemMessage;
-export let solved: boolean;
+  export let question: FuzzJudgeProblemMessage;
+  export let solved: boolean;
 
-const select = () => {
-	selectedQuestion.set(question?.slug ?? "");
-};
+  const select = () => {
+    selectedQuestion.set(question?.slug ?? "");
+  };
 </script>
 
 <div
@@ -64,7 +64,12 @@ const select = () => {
     grid-template-areas: "icon name status";
     background-color: var(--bg-sec);
     border: solid 2px transparent;
-    border-bottom: solid 2px var(--accent);
+    border-bottom: solid 1.5px var(--accent);
+    transition: all 0.1s ease-in-out;
+  }
+
+  .option:hover {
+    background-color: var(--bg-prim);
   }
 
   .icon {
@@ -74,10 +79,17 @@ const select = () => {
     align-items: center;
     justify-content: center;
     font-family: "Noto Emoji", sans-serif;
+    transition: all 0.1s;
   }
+
+  .option:hover .icon {
+    transform: scale(1.1);
+  }
+
   .name {
     grid-area: name;
   }
+
   .status {
     grid-area: status;
     display: flex;
@@ -92,6 +104,6 @@ const select = () => {
   }
 
   .selected {
-    border: solid 2px white;
+    background-color: var(--accent) !important;
   }
 </style>
