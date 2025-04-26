@@ -27,11 +27,14 @@ jobs:
     name: Test Svelte
     runs-on: ubuntu-latest
     steps:
-      # ...
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - name: Install Deps
         run: bun install
+      - name: Build Types
+        run: bun run --filter server build
+      - name: Build Types
+        run: bun run tsc -b --verbose
       - name: Check Svelte Types
         run: bun run --filter fj-svelte check
       
