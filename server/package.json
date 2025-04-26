@@ -28,7 +28,7 @@
 		"@scalar/hono-api-reference": "0.8.5",
 		"@std/toml": "npm:@jsr/std__toml",
 		"@std/yaml": "npm:@jsr/std__yaml",
-		"drizzle-orm": "0.43.0",
+		"drizzle-orm": "0.43.1",
 		"gray-matter": "4.0.3",
 		"hono": "4.7.7",
 		"remark": "15.0.1",
