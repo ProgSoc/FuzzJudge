@@ -14,23 +14,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { IconDescriptor } from "../types";
+  import type { IconDescriptor } from "../types";
 
-export let icon: IconDescriptor;
-export let clickAction: (() => void) | undefined = undefined;
-export let overrideWidth: string | undefined = undefined;
+  export let icon: IconDescriptor;
+  export let clickAction: (() => void) | undefined = undefined;
+  export let overrideWidth: string | undefined = undefined;
 
-const width = overrideWidth ?? icon.width ?? "1.5rem";
+  const width = overrideWidth ?? icon.width ?? "1.5rem";
 
-const styles = {
-	width: width,
-	height: icon.height ?? width,
-	mask: `url(${icon.dataUri}) no-repeat center`,
-};
+  const styles = {
+    width: width,
+    height: icon.height ?? width,
+    mask: `url(${icon.dataUri}) no-repeat center`,
+  };
 
-const css = Object.entries(styles)
-	.map(([key, value]) => `${key}:${value}`)
-	.join(";");
+  const css = Object.entries(styles)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
 </script>
 
 <span class:darken-on-hover={icon.darkenOnHover === true || clickAction !== undefined}>
@@ -46,7 +46,8 @@ const css = Object.entries(styles)
     filter: brightness(0.6);
   }
 
-  div, button {
+  div,
+  button {
     display: block;
     background-color: var(--text-prim);
   }

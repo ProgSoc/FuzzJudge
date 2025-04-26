@@ -14,28 +14,28 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import icons from "../icons";
-import type { IconDescriptor } from "../types";
-import Icon from "./Icon.svelte";
+  import icons from "../icons";
+  import type { IconDescriptor } from "../types";
+  import Icon from "./Icon.svelte";
 
-// biome-ignore lint/style/useConst: is assigned as a prop
-export let shown = false;
-export let close = () => {};
-export let title: string | undefined = undefined;
-export let icon: IconDescriptor | undefined = undefined;
+  // biome-ignore lint/style/useConst: is assigned as a prop
+  export let shown = false;
+  export let close = () => {};
+  export let title: string | undefined = undefined;
+  export let icon: IconDescriptor | undefined = undefined;
 
-$: console.log("shown", shown, title, icons);
+  $: console.log("shown", shown, title, icons);
 
-let maximized = false;
-const onMaximiseToggle = () => {
-	maximized = !maximized;
-};
+  let maximized = false;
+  const onMaximiseToggle = () => {
+    maximized = !maximized;
+  };
 
-document.addEventListener("keydown", (e) => {
-	if (!shown || e.key !== "Escape") return;
+  document.addEventListener("keydown", (e) => {
+    if (!shown || e.key !== "Escape") return;
 
-	close();
-});
+    close();
+  });
 </script>
 
 {#if shown}
@@ -48,14 +48,14 @@ document.addEventListener("keydown", (e) => {
     </div>
     <div class="contents">
       {#if title !== undefined}
-	<h1 class="popout-header">
-	  {#if icon !== undefined}
-	    <Icon icon={icon} overrideWidth="1.8rem" />
-	  {/if}
-	  <span style="margin-top: -0.3rem;">
-	    {title}
-	  </span>
-	</h1>
+        <h1 class="popout-header">
+          {#if icon !== undefined}
+            <Icon {icon} overrideWidth="1.8rem" />
+          {/if}
+          <span style="margin-top: -0.3rem;">
+            {title}
+          </span>
+        </h1>
       {/if}
       <slot />
     </div>

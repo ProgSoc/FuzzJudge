@@ -14,18 +14,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import icons from "../icons";
-import Icon from "./Icon.svelte";
-import ListGroup from "./ListGroup.svelte";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import icons from "../icons";
+  import Icon from "./Icon.svelte";
+  import ListGroup from "./ListGroup.svelte";
 
-export let questions: Record<string, FuzzJudgeProblemMessage> = {};
-export let solvedQuestions: Set<string>;
-let open = true;
+  export let questions: Record<string, FuzzJudgeProblemMessage> = {};
+  export let solvedQuestions: Set<string>;
+  let open = true;
 
-function toggleOpen() {
-	open = !open;
-}
+  function toggleOpen() {
+    open = !open;
+  }
 </script>
 
 <!-- Navbar markup -->
@@ -35,10 +35,7 @@ function toggleOpen() {
   {#if open}
     <div class="list-title-div">
       <h2 class="list-title">Questions</h2>
-      <Icon 
-        icon={icons.arrowleft}
-        clickAction={toggleOpen}
-      />
+      <Icon icon={icons.arrowleft} clickAction={toggleOpen} />
     </div>
 
     <ListGroup name="Easy" {questions} {solvedQuestions} includes={1} />
@@ -46,10 +43,7 @@ function toggleOpen() {
     <ListGroup name="Hard" {questions} {solvedQuestions} includes={3} />
     <ListGroup name="Other" {questions} {solvedQuestions} includes={(d) => d < 1 || d > 3} />
   {:else}
-    <Icon 
-      icon={icons.arrowright}
-      clickAction={toggleOpen}
-    />
+    <Icon icon={icons.arrowright} clickAction={toggleOpen} />
   {/if}
 </div>
 

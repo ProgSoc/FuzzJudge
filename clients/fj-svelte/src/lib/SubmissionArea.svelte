@@ -14,46 +14,44 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { openFuzz, submitSolution } from "../api";
-import { selectedQuestion } from "../utils";
+  import { openFuzz, submitSolution } from "../api";
+  import { selectedQuestion } from "../utils";
 
-export let setSolved: (slug: string) => void;
+  export let setSolved: (slug: string) => void;
 
-let waitingOnServer = false;
+  let waitingOnServer = false;
 
-let errorMessage: string | undefined = undefined;
+  let errorMessage: string | undefined = undefined;
 
-let submissionValue = "";
-let sourceValue = "";
+  let submissionValue = "";
+  let sourceValue = "";
 
-selectedQuestion.subscribe((_) => {
-	submissionValue = "";
-	sourceValue = "";
-	waitingOnServer = false;
-	errorMessage = undefined;
-});
+  selectedQuestion.subscribe((_) => {
+    submissionValue = "";
+    sourceValue = "";
+    waitingOnServer = false;
+    errorMessage = undefined;
+  });
 
-const submit = (slug: string) => {
-	if (waitingOnServer === true) return;
+  const submit = (slug: string) => {
+    if (waitingOnServer === true) return;
 
-	errorMessage = undefined;
+    errorMessage = undefined;
 
-	waitingOnServer = true;
+    waitingOnServer = true;
 
-	submitSolution(slug, submissionValue, sourceValue).then(
-		({ correct, message }) => {
-			waitingOnServer = false;
+    submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
+      waitingOnServer = false;
 
-			if (slug === $selectedQuestion) {
-				errorMessage = message;
-			}
+      if (slug === $selectedQuestion) {
+        errorMessage = message;
+      }
 
-			if (correct && setSolved !== undefined) {
-				setSolved(slug);
-			}
-		},
-	);
-};
+      if (correct && setSolved !== undefined) {
+        setSolved(slug);
+      }
+    });
+  };
 </script>
 
 <div class="question-submission">
@@ -82,7 +80,8 @@ const submit = (slug: string) => {
       </div>
       <div class="source-submission">
         <h2>Solution source</h2>
-        <textarea bind:value={sourceValue} 
+        <textarea
+          bind:value={sourceValue}
           placeholder="Please include any of the source code used to solve the problem. This may be manually reviewed later."
         />
       </div>

@@ -14,15 +14,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import {
-	CompState,
-	type CompTimes,
-	type TimeStateData,
-	unreachable,
-} from "../../utils";
-import { dateToTimeString, secondsToString } from "./shared";
+  import { CompState, type CompTimes, type TimeStateData, unreachable } from "../../utils";
+  import { dateToTimeString, secondsToString } from "./shared";
 
-export let timeStateData: TimeStateData;
+  export let timeStateData: TimeStateData;
 </script>
 
 {#if timeStateData.phase === CompState.BEFORE}
