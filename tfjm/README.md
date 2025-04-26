@@ -15,7 +15,7 @@ The FuzzJudge server serves problem descriptions and inputs, validates problem s
 
 A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator (fuzz method) by the server. 
 When the team then submits their solution, the problem's validator (judge method) is then given the submitted solution and the same seed that was used to generate that teams input. 
-This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution. The return code then indicates whether or not the submitted solution was valid.
+This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution.
 
 In addition to being agnostic to the language the problems are implemented in, the server has no one primary front-end and is designed such that competitors can connect however they want and building a custom client is straightforward.
 The server has both a [static, JSON-less, HTML Basic Auth based API](#static-api) enabling super simple clients such as a CLI in languages and environments where JSON parsing and complex auth is non-trivial, and a [live WebSocket API](#live-api) for complex web clients that can receive scoreboard events and other live updates.
@@ -23,13 +23,52 @@ The server has both a [static, JSON-less, HTML Basic Auth based API](#static-api
 Problems and competition metadata is specified in code blocks within markdown files. 
 
 ## Competition Structure
+> For full examples, see [the sample competition](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
+
+All information for a competition including the problems is stored in a competition directory. A competition directory must contain a markdown document named `comp.md`. The following is an example of a `prob.md` file.
+
+
+### Clock
 
 TODO
 
 ## Problem Structure
-> For full examples, see [the sample questions](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
+> For full examples, see [the sample competition](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
 
-A problem directory should contain a markdown document `prob.md` and any other required files.
+Problems are stored in directories in the competition directory.
+A problem directory must contain a markdown document called `prob.md` and any other required files. The following is an example of a `prob.md` file:
+```md
+---toml
+[fuzz]
+exec = ["cargo", "run", "--release", "--", "generate"]
+env = {}
+
+[judge]
+exec = ["cargo", "run", "--release", "--quiet", "--", "validate"]
+
+[problem]
+points = 1
+difficulty = 1
+---
+
+# 👋 Hello Programmers!
+
+Say hello to your fellow programmers!
+
+In this problem we'll be greeting people.
+
+For example, `Linus` will be converted to `Hello Linus!`.
+
+## Input
+
+The first line contains a string `S` which is the name to be greeted.
+
+`S` is at least one character long, and contains only letters.
+
+## Output
+
+Output the greeting to the name.
+```
 
 ### Fuzz
 
