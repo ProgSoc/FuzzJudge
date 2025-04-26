@@ -14,22 +14,31 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { Icon } from "../types";
+  import type { IconDescriptor } from "../types";
 
-export let icon: Icon;
+  export let icon: IconDescriptor;
+  export let clickAction: (() => void) | undefined = undefined;
+  export let overrideWidth: string | undefined = undefined;
 
-const styles = {
-	width: icon.width,
-	height: icon.height !== undefined ? icon.height : undefined,
-};
+  const width = overrideWidth ?? icon.width ?? "1.5rem";
 
-const css = Object.entries(styles)
-	.map(([key, value]) => `${key}:${value}`)
-	.join(";");
+  const styles = {
+    width: width,
+    height: icon.height ?? width,
+    mask: `url(${icon.dataUri}) no-repeat center`,
+  };
+
+  const css = Object.entries(styles)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
 </script>
 
-<span class:darken-on-hover={icon.darkenOnHover === true}>
-  <img src={icon.dataUri} alt={icon.alt} style={css} aria-label={icon.ariaLabel} />
+<span class:darken-on-hover={icon.darkenOnHover === true || clickAction !== undefined}>
+  {#if !clickAction}
+    <div style={css} aria-label={icon.ariaLabel} />
+  {:else}
+    <button on:click={clickAction} style={css} aria-label={icon.ariaLabel} />
+  {/if}
 </span>
 
 <style>
@@ -37,9 +46,9 @@ const css = Object.entries(styles)
     filter: brightness(0.6);
   }
 
-  img {
+  div,
+  button {
     display: block;
-    -webkit-user-drag: none;
-    user-select: none;
+    background-color: var(--text-prim);
   }
 </style>

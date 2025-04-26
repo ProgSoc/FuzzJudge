@@ -240,3 +240,11 @@ export function createWsUrl(path: string) {
 	const url = `${proto}://${window.location.host}${port}${path}`;
 	return url;
 }
+
+export function removeMdTitle(md: string): string {
+	const lines = md.trim().split("\n");
+	if (lines[0].startsWith("# ")) {
+		lines.shift();
+	}
+	return lines.join("\n");
+}

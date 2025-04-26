@@ -14,62 +14,57 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { onDestroy, onMount } from "svelte";
-import {
-	type QuestionMeta,
-	type ScoreboardUser,
-	truncateUsername,
-} from "../utils";
+  import { onDestroy, onMount } from "svelte";
+  import { type QuestionMeta, type ScoreboardUser, truncateUsername } from "../utils";
 
-import type { CompetitionScoreboardMessage } from "server/v1/score";
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import type { CompetitionScoreboardMessage } from "server/v1/score";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import Icon from "./Icon.svelte";
+  import icons from "../icons";
 
-export let questions: Record<string, FuzzJudgeProblemMessage>;
-export let scoreboard: CompetitionScoreboardMessage;
+  export let questions: Record<string, FuzzJudgeProblemMessage>;
+  export let scoreboard: CompetitionScoreboardMessage;
 
-const errors: string[] = [];
+  const errors: string[] = [];
 
-// Hack for the day
-$: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
+  // Hack for the day
+  $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
 
-$: sortedQuestions = Object.values(questions).sort(
-	(a, b) => a.points - b.points,
-);
+  $: sortedQuestions = Object.values(questions).sort((a, b) => a.points - b.points);
 </script>
 
-<h1>Scoreboard</h1>
 <table>
   <thead>
-  <tr>
-    <th> Position </th>
-    <th> Team </th>
-    <th> Points </th>
-    {#each sortedQuestions as question}
-      <th class="question-num">{question.doc.icon}</th>
-    {/each}
-  </tr>
-  </thead>
-  <tbody>
-  {#each filteredTeams as team, i}
     <tr>
-      <td class="position">
-        {i + 1}
-      </td>
-      <td class="team-name">
-        {truncateUsername(team.name)}
-      </td>
-      <td class="points">
-        {team.score.total.points}
-      </td>
+      <th> Position </th>
+      <th> Team </th>
+      <th> Points </th>
       {#each sortedQuestions as question}
-        <td class={`result`} class:solved={team.score.problems[question.slug]?.solved}>
-          {#if team.score.problems[question.slug]?.solved}
-            ✓
-          {/if}
-        </td>
+        <th class="question-num">{question.doc.icon}</th>
       {/each}
     </tr>
-  {/each}
+  </thead>
+  <tbody>
+    {#each filteredTeams as team, i}
+      <tr>
+        <td class="position">
+          {i + 1}
+        </td>
+        <td class="team-name">
+          {truncateUsername(team.name)}
+        </td>
+        <td class="points">
+          {team.score.total.points}
+        </td>
+        {#each sortedQuestions as question}
+          <td class={`result`} class:solved={team.score.problems[question.slug]?.solved}>
+            {#if team.score.problems[question.slug]?.solved}
+              ✓
+            {/if}
+          </td>
+        {/each}
+      </tr>
+    {/each}
   </tbody>
 </table>
 

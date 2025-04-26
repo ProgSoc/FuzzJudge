@@ -14,96 +14,60 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import icons from "../icons";
-import Icon from "./Icon.svelte";
-import ListGroup from "./ListGroup.svelte";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import icons from "../icons";
+  import Icon from "./Icon.svelte";
+  import ListGroup from "./ListGroup.svelte";
 
-export const questions: Record<string, FuzzJudgeProblemMessage> = {};
-export let solvedQuestions: Set<string>;
-let open = true;
+  export let questions: Record<string, FuzzJudgeProblemMessage> = {};
+  export let solvedQuestions: Set<string>;
+  let open = true;
 
-function toggleOpen() {
-	open = !open;
-}
+  function toggleOpen() {
+    open = !open;
+  }
 </script>
 
 <!-- Navbar markup -->
 
 <!-- Main content -->
-{#if open}
-  <div class="question-list">
+<div class="question-list" class:closed={!open}>
+  {#if open}
     <div class="list-title-div">
-      <h2 class="list-title">Questions</h2>
-      <button class="toggle-button" on:click={toggleOpen}>
-        {#if open}
-          <Icon icon={icons.arrowleft} />
-        {:else}
-          <Icon icon={icons.arrowright} />
-        {/if}
-      </button>
+      <h2 class="list-title">Problems</h2>
+      <Icon icon={icons.arrowleft} clickAction={toggleOpen} />
     </div>
 
     <ListGroup name="Easy" {questions} {solvedQuestions} includes={1} />
     <ListGroup name="Medium" {questions} {solvedQuestions} includes={2} />
     <ListGroup name="Hard" {questions} {solvedQuestions} includes={3} />
     <ListGroup name="Other" {questions} {solvedQuestions} includes={(d) => d < 1 || d > 3} />
-  </div>
-{:else}
-  <div class="closed-question-list">
-    <button class="toggle-button" on:click={toggleOpen}>
-      {#if open}
-        <Icon icon={icons.arrowleft} />
-      {:else}
-        <Icon icon={icons.arrowright} />
-      {/if}
-    </button>
-  </div>
-{/if}
+  {:else}
+    <Icon icon={icons.arrowright} clickAction={toggleOpen} />
+  {/if}
+</div>
 
 <style>
-  .toggle-button {
-    color: var(--btn-text);
-    border: none;
-    padding: 0.5rem;
-    margin: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    background-color: var(--accent);
-    color: var(--text-sec);
-    border: none;
-    cursor: pointer;
-    border-radius: 0.5rem;
-    min-width: max-content;
-  }
   .question-list {
     grid-area: question-list;
-    color: var(--text-sec);
+    color: var(--text-prim);
     background-color: var(--bg-sec);
     overflow-y: scroll;
     overflow-x: hidden;
+    min-width: 16rem;
+    border-right: 1px solid var(--border);
   }
 
   .list-title {
     padding-left: 1rem;
-    width: 100%;
   }
 
-  @media (width >= 1250px) {
-    .question-list {
-      min-width: max-content;
-      overflow: scroll;
-    }
-  }
-
-  .closed-question-list {
+  .closed {
+    min-width: 2.5rem !important;
+    width: 2.5rem !important;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    background-color: var(--bg-sec);
-    color: var(--text-sec);
-    max-width: fit-content;
   }
 
   .list-title-div {
@@ -111,5 +75,7 @@ function toggleOpen() {
     justify-content: space-between;
     align-items: center;
     flex-direction: row;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
   }
 </style>

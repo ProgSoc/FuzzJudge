@@ -17,14 +17,14 @@ import fs from "node:fs/promises";
 import { basename, extname, join as joinPath } from "node:path";
 import { TOML } from "bun";
 import datauri from "datauri";
-import type { Icon, IconList } from "../src/types.ts";
+import type { IconDescriptor, IconList } from "../src/types.ts";
 
 const ICONS_DIR = "./icons";
 
 const files: string[] = [];
 
-const loadIcon = async (metaPath: string): Promise<Icon> => {
-	const icon: Icon = TOML.parse(
+const loadIcon = async (metaPath: string): Promise<IconDescriptor> => {
+	const icon: IconDescriptor = TOML.parse(
 		await Bun.file(joinPath(ICONS_DIR, metaPath)).text(),
 	);
 

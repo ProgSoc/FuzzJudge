@@ -1,4 +1,4 @@
-export interface Icon {
+export interface IconDescriptor {
 	name?: string;
 	dataUri?: string;
 	width?: string;
@@ -8,4 +8,4 @@ export interface Icon {
 	darkenOnHover?: boolean;
 }
 
-export type IconList = Record<string, Icon>;
+export type IconList = Record<string, IconDescriptor>;

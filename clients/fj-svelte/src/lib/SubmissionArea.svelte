@@ -14,46 +14,44 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { openFuzz, submitSolution } from "../api";
-import { selectedQuestion } from "../utils";
+  import { openFuzz, submitSolution } from "../api";
+  import { selectedQuestion } from "../utils";
 
-export let setSolved: (slug: string) => void;
+  export let setSolved: (slug: string) => void;
 
-let waitingOnServer = false;
+  let waitingOnServer = false;
 
-let errorMessage: string | undefined = undefined;
+  let errorMessage: string | undefined = undefined;
 
-let submissionValue = "";
-let sourceValue = "";
+  let submissionValue = "";
+  let sourceValue = "";
 
-selectedQuestion.subscribe((_) => {
-	submissionValue = "";
-	sourceValue = "";
-	waitingOnServer = false;
-	errorMessage = undefined;
-});
+  selectedQuestion.subscribe((_) => {
+    submissionValue = "";
+    sourceValue = "";
+    waitingOnServer = false;
+    errorMessage = undefined;
+  });
 
-const submit = (slug: string) => {
-	if (waitingOnServer === true) return;
+  const submit = (slug: string) => {
+    if (waitingOnServer === true) return;
 
-	errorMessage = undefined;
+    errorMessage = undefined;
 
-	waitingOnServer = true;
+    waitingOnServer = true;
 
-	submitSolution(slug, submissionValue, sourceValue).then(
-		({ correct, message }) => {
-			waitingOnServer = false;
+    submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
+      waitingOnServer = false;
 
-			if (slug === $selectedQuestion) {
-				errorMessage = message;
-			}
+      if (slug === $selectedQuestion) {
+        errorMessage = message;
+      }
 
-			if (correct && setSolved !== undefined) {
-				setSolved(slug);
-			}
-		},
-	);
-};
+      if (correct && setSolved !== undefined) {
+        setSolved(slug);
+      }
+    });
+  };
 </script>
 
 <div class="question-submission">
@@ -82,8 +80,10 @@ const submit = (slug: string) => {
       </div>
       <div class="source-submission">
         <h2>Solution source</h2>
-        <p>Please include any of the source code used to solve the problem. This may be manually reviewed later.</p>
-        <textarea bind:value={sourceValue} />
+        <textarea
+          bind:value={sourceValue}
+          placeholder="Please include any of the source code used to solve the problem. This may be manually reviewed later."
+        />
       </div>
     </div>
     <div class="text-area-buttons">
@@ -96,8 +96,8 @@ const submit = (slug: string) => {
 <div class="error-message-area">
   {#if errorMessage !== undefined}
     <pre class="error-message">
-        {errorMessage}
-      </pre>
+      {errorMessage}
+    </pre>
   {/if}
 </div>
 
@@ -111,25 +111,13 @@ const submit = (slug: string) => {
     min-height: 3rem;
   }
 
-  .source-submission {
-    max-width: 20rem;
-  }
-
   .submit {
     height: 3rem;
     width: 10rem;
-  }
-
-  button {
-    color: var(--text-sec);
-    background-color: var(--bg-sec);
-    margin: 0.25rem;
-    flex: 1; /* Make each button take up equal space */
-    width: 50%; /* Ensure each button takes up half the container's width */
-    box-sizing: border-box;
-    &:hover {
-      background-color: #121212;
-    } /* Include padding and border in the element's total width and height */
+    font-size: 1rem;
+    font-weight: bold;
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
   }
 
   .get-input {
@@ -138,7 +126,7 @@ const submit = (slug: string) => {
   }
 
   .input-span {
-    color: var(--accent-text);
+    color: var(--link);
     text-decoration: underline;
     &:hover {
       cursor: pointer;
@@ -150,14 +138,6 @@ const submit = (slug: string) => {
     align-items: center;
     justify-content: space-between;
     width: 100%; /* Ensure the container spans the full width */
-  }
-
-  textarea {
-    height: 8rem;
-    width: 15rem;
-    color: var(--text-sec);
-    background-color: var(--bg-sec);
-    margin: 0.25rem;
   }
 
   .question-submission {
