@@ -22,4 +22,4 @@ jobs:
           deno-version: v2.x
       # run any `bun` or `bunx` command
       - run: bun install
-      - run: bun test
+      - run: cd server && bun test
