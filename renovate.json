@@ -12,5 +12,6 @@
 		}
 	],
 	"rangeStrategy": "pin",
-	"addLabels": ["renovate"]
+	"addLabels": ["renovate"],
+	"ignorePaths": ["./clients/fj-tui"]
 }
