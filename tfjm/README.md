@@ -17,8 +17,8 @@ A problem can be implemented in any programming language as long as it supports 
 When the team then submits their solution, the problem's validator (judge method) is run with the team's solution piped in and the same seed as an argument. 
 This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution. The return code then indicates whether or not the submitted solution was valid.
 
-In addition to being agnostic to the language the problems are implemented in, the server has no one front-end and is designed such that competitors can connect however they want building a custom client is straightforward.
-The server has both a [static, JSON-less, HTML Basic Auth based API](#static-api) enabling super simple clients such as a CLI in languages and environments where JSON parsing and complex auth is non-trivial, and a [live WebSocket API](#live-api) for web clients that can receive scoreboard events and other live updates.
+In addition to being agnostic to the language the problems are implemented in, the server has no one primary front-end and is designed such that competitors can connect however they want and building a custom client is straightforward.
+The server has both a [static, JSON-less, HTML Basic Auth based API](#static-api) enabling super simple clients such as a CLI in languages and environments where JSON parsing and complex auth is non-trivial, and a [live WebSocket API](#live-api) for complex web clients that can receive scoreboard events and other live updates.
 
 Problems and competition metadata is specified in code blocks within markdown files. 
 
