@@ -123,9 +123,13 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
           <InlineCountdown {timeStateData} />
         {/if}
       </div>
-      <div>
-        Logged in as <b>{username}</b>
-        <a href="/void" title="Enter empty credentials"> Logout</a>
+      <div class="vertical-center">
+	<span>
+	  Logged in as <b>{username}</b>
+	</span>
+        <a href="/void" title="Enter empty credentials">
+	  <Icon icon={icons.logout} />
+	</a>
       </div>
     </div>
 
@@ -196,6 +200,7 @@ let showingPopout: ShowingPopout = ShowingPopout.None;
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 0.4em;
   }
 
   .top-bar {
