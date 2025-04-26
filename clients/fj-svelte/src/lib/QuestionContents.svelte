@@ -16,7 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
 import { onDestroy } from "svelte";
 import SvelteMarkdown from "svelte-markdown";
-import { difficultyName, selectedQuestion } from "../utils";
+import { difficultyName, removeMdTitle, selectedQuestion } from "../utils";
 import SubmissionArea from "./SubmissionArea.svelte";
 import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
@@ -64,7 +64,7 @@ onDestroy(() => {
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={question.doc.body} />
+          <SvelteMarkdown source={removeMdTitle(question.doc.body)} />
         </div>
       {/if}
 

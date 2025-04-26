@@ -19,7 +19,7 @@ import icons from "../icons";
 import Icon from "./Icon.svelte";
 import ListGroup from "./ListGroup.svelte";
 
-export const questions: Record<string, FuzzJudgeProblemMessage> = {};
+export let questions: Record<string, FuzzJudgeProblemMessage> = {};
 export let solvedQuestions: Set<string>;
 let open = true;
 

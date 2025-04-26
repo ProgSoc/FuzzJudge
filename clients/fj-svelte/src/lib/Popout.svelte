@@ -19,7 +19,7 @@ import Icon from "./Icon.svelte";
 
 // biome-ignore lint/style/useConst: is assigned as a prop
 export let shown = false;
-export const close = () => {};
+export let close = () => {};
 
 let maximized = false;
 const onMaximiseToggle = () => {
