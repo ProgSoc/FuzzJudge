@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { SETTINGS, Theme } from "../settings";
+  import { SETTINGS } from "../settings";
+  import { Theme } from "../themes/themes";
 
   let theme = $SETTINGS.theme ?? Theme.Default;
 
