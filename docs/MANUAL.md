@@ -167,8 +167,6 @@ Password:
 ```
 The panel allows you to:
 * Create and edit teams/users and assign users to teams.
-
-TODO
 * Edit [clock times](#times).
 * Check user submissions.
 
