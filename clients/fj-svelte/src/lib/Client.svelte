@@ -39,6 +39,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import Settings from "./Settings.svelte";
+    import Manual from "./admin/Manual.svelte";
 
   export const scoreboardMode = false;
 
@@ -93,6 +94,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     Scoreboard = 1,
     CompInfo = 2,
     Settings = 3,
+    Manual = 4,
   }
 
   // biome-ignore lint/style/useConst: is being assigned
@@ -183,6 +185,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   <Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
     <CompInfo />
+  </Popout>
+
+  <Popout shown={showingPopout === ShowingPopout.Manual} close={() => (showingPopout = ShowingPopout.None)}>
+    <Manual />
   </Popout>
 
   <Popout
