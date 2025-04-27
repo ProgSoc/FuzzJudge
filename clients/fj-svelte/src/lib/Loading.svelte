@@ -16,7 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import { onDestroy } from "svelte";
 
-  let dots = 0;
+  let dots = $state(0);
 
   const interval = setInterval(() => {
     dots = (dots + 1) % 4;

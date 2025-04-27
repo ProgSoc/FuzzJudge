@@ -19,16 +19,20 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { CompetitionScoreboardMessage } from "server/v1/score";
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
-  export let questions: Record<string, FuzzJudgeProblemMessage>;
-  export let scoreboard: CompetitionScoreboardMessage;
+  interface Props {
+    questions: Record<string, FuzzJudgeProblemMessage>;
+    scoreboard: CompetitionScoreboardMessage;
+  }
+
+  let { questions, scoreboard }: Props = $props();
 
   const errors: string[] = [];
 
   // Hack for the day
   // 2025-04-27 edit: hack forever
-  $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
+  let filteredTeams = $derived(scoreboard.filter((team) => team.name !== "Admin"));
 
-  $: sortedQuestions = Object.values(questions).sort((a, b) => a.points - b.points);
+  let sortedQuestions = $derived(Object.values(questions).sort((a, b) => a.points - b.points));
 </script>
 
 <table>

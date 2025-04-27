@@ -17,11 +17,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { CompState, dateToTimeString, secondsToBinary, secondsToString, type TimeStateData } from "../../clock";
   import { unreachable } from "../../utils";
 
-  export let timeStateData: TimeStateData;
+  interface Props {
+    timeStateData: TimeStateData;
+  }
+
+  let { timeStateData }: Props = $props();
 </script>
 
 <div class="countdown">
-  <!-- svelte-ignore empty-block -->
+  <!-- svelte-ignore block_empty -->
   {#if timeStateData.phase === CompState.BEFORE}
     <div class="small">Competition starts in...</div>
     <div class="time">

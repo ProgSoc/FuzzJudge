@@ -17,18 +17,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
   import QuestionButton from "./QuestionButton.svelte";
 
-  export let name = "";
-  export let questions: Record<string, FuzzJudgeProblemMessage>;
-  export let solvedQuestions: Set<string>;
-  export let includes: number | ((difficulty: number) => boolean) = 0;
+  interface Props {
+    name?: string;
+    questions: Record<string, FuzzJudgeProblemMessage>;
+    solvedQuestions: Set<string>;
+    includes?: number | ((difficulty: number) => boolean);
+  }
 
-  $: list = Object.values(questions).filter((q) => {
+  let {
+    name = "",
+    questions,
+    solvedQuestions,
+    includes = 0
+  }: Props = $props();
+
+  let list = $derived(Object.values(questions).filter((q) => {
     if (typeof includes === "function") {
       return includes(q.difficulty);
     }
 
     return q.difficulty === includes;
-  });
+  }));
 </script>
 
 {#if list.length > 0}
