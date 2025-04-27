@@ -8,7 +8,7 @@ import app from "./app";
 describe("indexHeader", async () => {
 	const client = testClient(app);
 
-	const res = await client.index.$get({});
+	const res = await client.void.$get();
 
-	expect(res.status).toBe(200);
+	expect(res.status).toBe(401);
 });
