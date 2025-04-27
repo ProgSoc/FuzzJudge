@@ -24,13 +24,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <!-- svelte-ignore empty-block -->
   {#if timeStateData.phase === CompState.BEFORE}
     <div class="small">Competition starts in...</div>
-    <div>
+    <div class="time">
       {secondsToString(timeStateData.secondsUntilCompetitionStart)}
     </div>
-    <div class="small subtitle">{secondsToBinary(timeStateData.secondsUntilCompetitionStart)}</div>
+    <div class="small subtitle binary">{secondsToBinary(timeStateData.secondsUntilCompetitionStart)}</div>
   {:else if timeStateData.phase === CompState.LIVE_UNFROZEN}
     <div class="small">Competition ends in...</div>
-    <div>
+    <div class="time">
       {secondsToString(timeStateData.secondsUntilCompetitionEnd)}
     </div>
     <div class="small subtitle">
@@ -38,7 +38,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
   {:else if timeStateData.phase === CompState.LIVE_FROZEN || timeStateData.phase === CompState.LIVE_UNFROZEN_NO_FREEZE}
     <div class="small">Competition ends in...</div>
-    <div>
+    <div class="time">
       {secondsToString(timeStateData.secondsUntilCompetitionEnd)}
     </div>
   {:else if timeStateData.phase === CompState.FINISHED}
@@ -59,6 +59,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     color: var(--text-sec);
   }
 
+  .time {
+    font-family: monospace;
+  }
+
   .small {
     font-size: 1rem;
   }
@@ -66,5 +70,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   .subtitle {
     opacity: 0.7;
     font-style: italic;
+  }
+
+  .binary {
+    font-family: monospace;
   }
 </style>

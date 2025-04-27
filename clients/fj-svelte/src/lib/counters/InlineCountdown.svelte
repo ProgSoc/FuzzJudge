@@ -22,13 +22,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 {#if timeStateData.phase === CompState.BEFORE}
   <span class="text">
-    >Competition starts in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionStart)}</span></span
-  >
+    Competition starts in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionStart)}</span>
+  </span>
 {:else if timeStateData.phase === CompState.LIVE_UNFROZEN}
   <span class="text">
-    Competition ends in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionEnd)}</span>. The
-    scoreboard will freeze at
-    <span class="time">{dateToTimeString(timeStateData.times.hold ?? timeStateData.times.finish)}</span>
+    Competition ends in 
+    <span class="time">
+      {secondsToString(timeStateData.secondsUntilCompetitionEnd)}
+    </span>. 
+    The scoreboard will freeze at
+    <span class="time">
+      {dateToTimeString(timeStateData.times.hold ?? timeStateData.times.finish)}
+    </span>
   </span>
 {:else if timeStateData.phase === CompState.LIVE_FROZEN || timeStateData.phase === CompState.LIVE_UNFROZEN_NO_FREEZE}
   <span class="text">
