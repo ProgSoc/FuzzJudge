@@ -9,7 +9,8 @@ Compiling code on the server machine is tricky, and we can't support everyone's 
 ## Debugging the Project
 
 ```sh
-$ deno run --watch -A src/main.ts sample/
+$ cd server/
+$ bun run dev
 ```
 
 ## Competition Format

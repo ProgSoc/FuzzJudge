@@ -3,18 +3,19 @@ This is a guide intended for future ProgSoc executives or anyone who wants to ho
 
 ## Contents
 1. [Design Overview](#design-overview)
-1. [Competition Structure](#running-a-competition)
+1. [Competition Structure](#competition-structure)
 1. [Problem Structure](#problem-structure)
 1. [Running a Comp](#running-a-comp)
+1. [Scoring System](#scoring-system)
 1. [Static API](#static-api)
 1. [Live API](#live-api)
 1. [Maintaining FuzzJudge](#maintaining-fuzzjudge)
 
 ## Design Overview
-The FuzzJudge server serves problem descriptions and inputs, validates problem solutions, tracks each team's score and runs a timer for competition start and finish times.
+The FuzzJudge server serves problem descriptions and randomised inputs, validates problem solutions, tracks each team's score and runs a timer for competition start and finish times.
 
-A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator (fuzz method) by the server. 
-When the team then submits their solution, the problem's validator (judge method) is then given the submitted solution and the same seed that was used to generate that team's input. 
+A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator ([fuzz method](#fuzz)) by the server. 
+When the team then submits their solution, the problem's validator ([judge method](#judge)) is then given the submitted solution and the same seed that was used to generate that team's input. 
 This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution.
 
 In addition to being agnostic to the language the problems are implemented in, the server has no one primary front-end and is designed such that competitors can connect however they want and building a custom client is straightforward.
@@ -25,7 +26,19 @@ Problems and competition metadata is specified in code blocks within markdown fi
 ## Competition Structure
 > For full examples, see [the sample competition](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
 
-All information for a competition including the problems is defined in a competition directory. A competition directory must contain a markdown document named `comp.md`. The following is an example of a `comp.md` file.
+All information for a competition including the problems is defined in a competition directory. A competition directory must contain a markdown document named `comp.md` which specifies details about the competition. The directory should look something like:
+```
+comp/
+  comd.md
+  some-problem/
+    prob.md 
+    program.sh
+  other-problem/
+    prob.md 
+    program.rs
+```
+
+The following is an example of a `comp.md` file.
 
 ```md
 ---toml
@@ -49,12 +62,12 @@ ProgSoc @ TechFest
 ```
 ### Times
 The `[times]` section contains the start and finish times of the competition. 
-* `start` is when the problem instructions become available and solutions can start being submitted.
-* `finish` is when solutions can no longer be submitted.
+* `start` is when the problem instructions become available and solutions can be submitted in RFC3339 format.
+* `finish` is when solutions can no longer be submitted in RFC3339 format.
 * `freeze` is the number of seconds before the `finish` where the scoreboard stops being updated. This is used to create suspense and uncertainty around who has won until it is announced.
 
 ### Competition Info
-* The first large header in the document must be the competition title. In the example above it is `ProgComp 2023`
+* The first large header in the document must be the competition title. In the example above it is `ProgComp 2023`.
 * The remainder of the document should specify other details about the event relevant to competitors. This is available on an endpoint and some clients may choose to display it.
 
 ## Problem Structure
@@ -146,11 +159,24 @@ difficulty = 3
 ## Running a Comp
 This section focussed on what you should do once you have your problems and `comp.md` set up.
 
-
 ### The Admin Panel
+There is an admin panel available at [/admin](#getadmin). The default login for the admin account is:
+```
+Username: admin
+Password:
+```
+The panel allows you to:
+* Create and edit teams/users and assign users to teams.
+
 TODO
+* Edit [clock times](#times).
+* Check user submissions.
+
+Updates performed in the admin panel will trigger events on the [live API](#live-api) and some clients will reflect the changes in real-time.
 
 ### Registering Teams and Users
+
+TODO
 
 ### Configuring a front-end
 Typically you will want to host a user-friendly web client such as fj-svelte.
@@ -159,6 +185,11 @@ TODO
 
 ### Recommended Hosting Setups
 
+TODO
+
+## Scoring System
+Each problem is [worth a certain amount of points](#problem-metadata) and when a team solves that problem they are awarded that number of points.
+Teams are first sorted by their points but if there is a tie the teams with the least penalty points is placed ahead. When the team solves a problem, they receive $t + 20f$ penalty points where $t$ is the number of minuets between the start of the competition and the moment the solution is accepted and $f$ is the number of previous failed attempts at that problem.
 
 ## Static API
 The static API is a simple set of mostly JSON-less, HTML Basic auth based endpoints. For simple clients, this is all you need.
@@ -941,20 +972,47 @@ Basic
 
 ## Live API
 
+> Version 1.0.0
+
 The live API allows complex clients to receive real-time updates from the server via a websocket.
 A Client can open a connection via a GET request to the [/ws](#getws) endpoint.
 The live API handles three types of events: problem updates, scoreboard updates and clock updates.
+Any of these events may be sent out at any time to enable things such as delays and problem hot-fixes.
 
-### Clock Updates
-Clock updates contain the start, and finish times defined in [comp.md](#competition-structure).
-
+### Scoreboard Updates
+The scoreboard API allows clients to have live scoreboards. These messages are resent when any team scores points.
 
 ```ts
-type Clock = {
-  start: Date,
-  finish: Date,
-  pause?: { hold: Date, release?: Date },
+export type CompetitionScoreboardMessage = {
+	rank: number;
+	name: string;
+	score: TeamScore;
+}[];
+
+export type TeamScore = {
+	total: { points: number; penalty: number };
+	problems: Record<string, ProblemScore>;
 };
+
+export type ProblemScore = {
+	points: number;
+	penalty: number;
+	tries: number;
+	solved: boolean;
+};
+```
+
+### Clock Updates
+Clock updates contain the start, and finish times defined in [comp.md](#competition-structure). These are resent if the event times are edited from the [admin panel](#the-admin-panel).
+
+```ts
+export type CompetitionClockMessage = {
+	start: Date;
+	finish: Date;
+	hold: Date | null;
+};
+
+export type ClockState = "live" | "hold" | "stop";
 ```
 
 ### Problem Updates
@@ -977,28 +1035,10 @@ type Document = {
 };
 ```
 
-### Scoreboard Updates
-
-```ts
-type Score = {
-  team: Team,
-};
-```
-
-```ts
-type Team = {
-  name: string,
-  org?: string,
-  members: User[],
-};
-```
-
-```ts
-type User = {
-  name: string,
-};
-```
-
 ## Maintaining FuzzJudge
-
+### Repository Structure
+TODO
+### API versioning
+TODO
+### Design Philosophy
 TODO
