@@ -17,8 +17,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
   import { type QuestionMeta, selectedQuestion } from "../utils";
 
-  export let question: FuzzJudgeProblemMessage;
-  export let solved: boolean;
+  interface Props {
+    question: FuzzJudgeProblemMessage;
+    solved: boolean;
+  }
+
+  let { question, solved }: Props = $props();
 
   const select = () => {
     selectedQuestion.set(question?.slug ?? "");
@@ -29,10 +33,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   aria-label={`Select ${question.doc.title}`}
   role="link"
   tabindex="0"
-  on:keyup={select}
+  onkeyup={select}
   class="option"
   class:selected={$selectedQuestion === question?.slug}
-  on:click={select}
+  onclick={select}
 >
   <div class="icon">
     {question.doc.icon}

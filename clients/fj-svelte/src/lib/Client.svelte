@@ -14,95 +14,98 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { getCompInfo, getQuestionSolvedSet } from "../api";
-  import {
-    selectedQuestion,
-  } from "../utils";
-  import {
-    CompState,
-    type CompTimes,
-    type TimeStateData,
-    getCurrentTimeStateData,
-    clockTick,
-    handleNotifications,
-  } from "../clock";
-  import CompInfo from "./CompInfo.svelte";
-  import Loading from "./Loading.svelte";
-  import Popout from "./Popout.svelte";
-  import QuestionContents from "./QuestionContents.svelte";
-  import Scoreboard from "./Scoreboard.svelte";
-  import Sidebar from "./Sidebar.svelte";
+import { getCompInfo, getQuestionSolvedSet } from "../api";
+import { selectedQuestion } from "../utils";
+import {
+	CompState,
+	type CompTimes,
+	type TimeStateData,
+	getCurrentTimeStateData,
+	clockTick,
+	handleNotifications,
+} from "../clock";
+import CompInfo from "./CompInfo.svelte";
+import Loading from "./Loading.svelte";
+import Popout from "./Popout.svelte";
+import QuestionContents from "./QuestionContents.svelte";
+import Scoreboard from "./Scoreboard.svelte";
+import Sidebar from "./Sidebar.svelte";
 
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import type { CompetitionScoreboardMessage } from "server/v1/score";
-  import { getUsername } from "../api";
-  import { initLiveState } from "../apiLive";
-  import icons from "../icons";
-  import Icon from "./Icon.svelte";
-  import InlineCountdown from "./counters/InlineCountdown.svelte";
-  import PageCountdown from "./counters/PageCountdown.svelte";
-  import Settings from "./Settings.svelte";
-  import Manual from "./admin/Manual.svelte";
-  import Notification from "./Notification.svelte";
-  import { NOTIFICATION } from "../notifications";
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import type { CompetitionScoreboardMessage } from "server/v1/score";
+import { getUsername } from "../api";
+import { initLiveState } from "../apiLive";
+import icons from "../icons";
+import Icon from "./Icon.svelte";
+import InlineCountdown from "./counters/InlineCountdown.svelte";
+import PageCountdown from "./counters/PageCountdown.svelte";
+import Settings from "./Settings.svelte";
+import Manual from "./admin/Manual.svelte";
+import Notification from "./Notification.svelte";
+import { NOTIFICATION } from "../notifications";
 
-  export const scoreboardMode = false;
+interface Props {
+	scoreboardMode: boolean;
+}
 
-  let username = "Loading...";
+let { scoreboardMode }: Props = $props();
 
-  getUsername().then((name) => {
-    username = name;
-    console.log("username", username);
-  });
+let username = $state("Loading...");
 
-  let compTimes: CompTimes | undefined = undefined;
-  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
-  let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
-  let solvedQuestions = new Set<string>();
+getUsername().then((name) => {
+	username = name;
+	console.log("username", username);
+});
 
-  const liveState = initLiveState();
-  liveState.listenClock((clock) => {
-    compTimes = clock;
-  });
-  liveState.listenQuestions(async (qs) => {
-    questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
-    solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
-    if ($selectedQuestion === "" && questions) {
-      selectedQuestion.set(Object.keys(questions)[0] ?? "");
-    }
-  });
-  liveState.listenScoreboard((sb) => {
-    scoreboard = sb;
-    console.log("scoreboard", sb);
-  });
+let compTimes: CompTimes | undefined = undefined;
+let questions: Record<string, FuzzJudgeProblemMessage> | undefined =
+	$state(undefined);
+let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
+let solvedQuestions = $state(new Set<string>());
 
-  getCompInfo().then((data) => {
-    window.document.title = data.title;
-  });
+const liveState = initLiveState();
+liveState.listenClock((clock) => {
+	compTimes = clock;
+});
+liveState.listenQuestions(async (qs) => {
+	questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
+	solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
+	if ($selectedQuestion === "" && questions) {
+		selectedQuestion.set(Object.keys(questions)[0] ?? "");
+	}
+});
+liveState.listenScoreboard((sb) => {
+	scoreboard = sb;
+	console.log("scoreboard", sb);
+});
 
-  let timeStateData: TimeStateData | undefined = undefined;
-  clockTick(() => {
-    if (compTimes !== undefined) {
-      timeStateData = getCurrentTimeStateData(compTimes);
-      handleNotifications(timeStateData); 
-    }
-  });
+getCompInfo().then((data) => {
+	window.document.title = data.title;
+});
 
-  const setSolved = (slug: string) => {
-    solvedQuestions.add(slug);
-    // solvedQuestions = solvedQuestions;
-  };
+let timeStateData: TimeStateData | undefined = $state(undefined);
+clockTick(() => {
+	if (compTimes !== undefined) {
+		timeStateData = getCurrentTimeStateData(compTimes);
+		handleNotifications(timeStateData);
+	}
+});
 
-  enum ShowingPopout {
-    None = 0,
-    Scoreboard = 1,
-    CompInfo = 2,
-    Settings = 3,
-    Manual = 4,
-  }
+const setSolved = (slug: string) => {
+	solvedQuestions.add(slug);
+	// solvedQuestions = solvedQuestions;
+};
 
-  // biome-ignore lint/style/useConst: is being assigned
-  let showingPopout: ShowingPopout = ShowingPopout.None;
+enum ShowingPopout {
+	None = 0,
+	Scoreboard = 1,
+	CompInfo = 2,
+	Settings = 3,
+	Manual = 4,
+}
+
+// biome-ignore lint/style/useConst: is being assigned
+let showingPopout: ShowingPopout = $state(ShowingPopout.None);
 </script>
 
 {#if scoreboardMode}
@@ -115,12 +118,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="layout">
     <div class="top-bar">
       <div>
-        <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>
+        <button onclick={() => (showingPopout = ShowingPopout.CompInfo)}>
           <span class="vertical-center">
             <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
           </span>
         </button>
-        <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>
+        <button onclick={() => (showingPopout = ShowingPopout.Scoreboard)}>
           <span class="vertical-center">
             <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
           </span>

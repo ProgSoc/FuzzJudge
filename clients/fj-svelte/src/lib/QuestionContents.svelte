@@ -20,12 +20,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import SubmissionArea from "./SubmissionArea.svelte";
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
-  export let question: FuzzJudgeProblemMessage;
-  export let solved: boolean;
-  export let setSolved: (slug: string) => void;
+  interface Props {
+    question: FuzzJudgeProblemMessage;
+    solved: boolean;
+    setSolved: (slug: string) => void;
+  }
+
+  let { question, solved, setSolved }: Props = $props();
 
   // biome-ignore lint/style/useConst: svelte
-  let questionInstructions: HTMLDivElement | undefined = undefined;
+  let questionInstructions: HTMLDivElement | undefined = $state(undefined);
 
   // Reset scroll to top when a new question is selected
   const unsubScrollUp = selectedQuestion.subscribe((slug) => {

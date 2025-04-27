@@ -16,9 +16,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import type { IconDescriptor } from "../types";
 
-  export let icon: IconDescriptor;
-  export let clickAction: (() => void) | undefined = undefined;
-  export let overrideWidth: string | undefined = undefined;
+  interface Props {
+    icon: IconDescriptor;
+    clickAction?: (() => void) | undefined;
+    overrideWidth?: string | undefined;
+  }
+
+  let { icon, clickAction = undefined, overrideWidth = undefined }: Props = $props();
 
   const width = overrideWidth ?? icon.width ?? "1.5rem";
 
@@ -35,9 +39,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <span class:darken-on-hover={icon.darkenOnHover === true || clickAction !== undefined}>
   {#if !clickAction}
-    <div style={css} aria-label={icon.ariaLabel} />
+    <div style={css} aria-label={icon.ariaLabel}></div>
   {:else}
-    <button on:click={clickAction} style={css} aria-label={icon.ariaLabel} />
+    <button onclick={clickAction} style={css} aria-label={icon.ariaLabel}></button>
   {/if}
 </span>
 

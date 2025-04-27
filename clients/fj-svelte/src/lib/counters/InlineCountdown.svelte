@@ -17,7 +17,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { CompState, dateToTimeString, secondsToString, type TimeStateData } from "../../clock";
   import { unreachable } from "../../utils";
 
-  export let timeStateData: TimeStateData;
+  interface Props {
+    timeStateData: TimeStateData;
+  }
+
+  let { timeStateData }: Props = $props();
 </script>
 
 {#if timeStateData.phase === CompState.BEFORE}

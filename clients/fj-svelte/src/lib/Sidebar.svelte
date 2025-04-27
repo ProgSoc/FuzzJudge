@@ -19,9 +19,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Icon from "./Icon.svelte";
   import ListGroup from "./ListGroup.svelte";
 
-  export let questions: Record<string, FuzzJudgeProblemMessage> = {};
-  export let solvedQuestions: Set<string>;
-  let open = true;
+  interface Props {
+    questions?: Record<string, FuzzJudgeProblemMessage>;
+    solvedQuestions: Set<string>;
+  }
+
+  let { questions = {}, solvedQuestions }: Props = $props();
+  let open = $state(true);
 
   function toggleOpen() {
     open = !open;

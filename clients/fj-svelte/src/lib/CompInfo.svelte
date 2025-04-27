@@ -18,8 +18,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { getCompInfo } from "../api";
   import Loading from "./Loading.svelte";
 
-  let title: string | undefined = undefined;
-  let instructions = "";
+  let title: string | undefined = $state(undefined);
+  let instructions = $state("");
 
   getCompInfo().then((data) => {
     title = data.title;

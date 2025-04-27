@@ -15,9 +15,10 @@
 
 import "./app.css";
 import "./themes/themes.css";
+import { mount } from "svelte";
 import App from "./App.svelte";
 
-const app = new App({
+const app = mount(App, {
 	// biome-ignore lint/style/noNonNullAssertion: app mount target is always present
 	target: document.getElementById("app")!,
 });

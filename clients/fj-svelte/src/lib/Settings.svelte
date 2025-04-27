@@ -14,15 +14,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { SETTINGS } from "../settings";
   import { Theme } from "../themes/themes";
   import { currentYear } from "../utils";
 
-  let theme = $SETTINGS.theme ?? Theme.Default;
+  let theme = $state($SETTINGS.theme ?? Theme.Default);
 
-  $: SETTINGS.update((settings) => {
-    settings.theme = theme;
-    return settings;
+  run(() => {
+    SETTINGS.update((settings) => {
+      settings.theme = theme;
+      return settings;
+    });
   });
 </script>
 
