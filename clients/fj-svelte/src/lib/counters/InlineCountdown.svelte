@@ -14,23 +14,25 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { CompState, type CompTimes, type TimeStateData, unreachable } from "../../utils";
-  import { dateToTimeString, secondsToString } from "./shared";
+  import { CompState, dateToTimeString, secondsToString, type TimeStateData } from "../../clock";
+  import { unreachable } from "../../utils";
 
   export let timeStateData: TimeStateData;
 </script>
 
 {#if timeStateData.phase === CompState.BEFORE}
-  <span>Competition starts in {secondsToString(timeStateData.secondsUntilCompetitionStart)}</span>
+  <span class="text">
+    >Competition starts in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionStart)}</span></span
+  >
 {:else if timeStateData.phase === CompState.LIVE_UNFROZEN}
-  <span>
-    Competition ends in {secondsToString(timeStateData.secondsUntilCompetitionEnd)}. The scoreboard will freeze at {dateToTimeString(
-      timeStateData.times.hold ?? timeStateData.times.finish,
-    )}
+  <span class="text">
+    Competition ends in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionEnd)}</span>. The
+    scoreboard will freeze at
+    <span class="time">{dateToTimeString(timeStateData.times.hold ?? timeStateData.times.finish)}</span>
   </span>
 {:else if timeStateData.phase === CompState.LIVE_FROZEN || timeStateData.phase === CompState.LIVE_UNFROZEN_NO_FREEZE}
-  <span>
-    Competition ends in {secondsToString(timeStateData.secondsUntilCompetitionEnd)}.
+  <span class="text">
+    Competition ends in <span class="time">{secondsToString(timeStateData.secondsUntilCompetitionEnd)}</span>
   </span>
 {:else if timeStateData.phase === CompState.FINISHED}
   <span>Competition finished! You can no longer submit solutions.</span>
@@ -39,4 +41,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 {/if}
 
 <style>
+  .text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .time {
+    font-family: monospace;
+  }
 </style>

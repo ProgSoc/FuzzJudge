@@ -14,8 +14,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { CompState, type CompTimes, type TimeStateData, unreachable } from "../../utils";
-  import { dateToTimeString, secondsToBinary, secondsToString } from "./shared";
+  import { CompState, dateToTimeString, secondsToBinary, secondsToString, type TimeStateData } from "../../clock";
+  import { unreachable } from "../../utils";
 
   export let timeStateData: TimeStateData;
 </script>
