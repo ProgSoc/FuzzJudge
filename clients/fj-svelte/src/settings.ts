@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import type { Theme } from "./themes/themes";
 
 export type UserSettings = {
 	theme?: Theme;
@@ -21,18 +22,4 @@ function loadSettings(): UserSettings {
 
 function saveSettings(settings: UserSettings): void {
 	localStorage.setItem("settings", JSON.stringify(settings));
-}
-
-export enum Theme {
-	Default = "Default",
-	Nord = "Nord",
-	Catppuccin = "Catppuccin",
-	GruvboxLight = "Gruvbox Light",
-	GruvboxDark = "Gruvbox Dark",
-	Wikipedia = "Wikipedia",
-	OGFuzzJudge = "OG FuzzJudge",
-}
-
-export function themeClass(theme: Theme): string {
-	return `theme-${theme.toLowerCase().replace(/ /g, "-")}`;
 }
