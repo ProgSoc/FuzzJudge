@@ -28,7 +28,6 @@ export interface MarkdownAttributes {
 	title: string;
 	summary: string | undefined;
 	icon: string;
-	publicAssets: Set<string>;
 	body: string;
 }
 
@@ -67,7 +66,7 @@ export async function getProblemData(root: string, slug: string) {
 		throw new Error(`Problem data validation failed: ${problemData.error}`);
 	}
 
-	const attributes = parseMarkdownAttributes(content, `/problems/${slug}/`);
+	const attributes = parseMarkdownAttributes(content);
 
 	return {
 		...problemData.data,
@@ -226,7 +225,7 @@ export async function judgeProblem(
  * @param linkPrefix The prefix to add to links
  * @returns The parsed attributes
  */
-export function parseMarkdownAttributes(body: string, linkPrefix = "") {
+export function parseMarkdownAttributes(body: string) {
 	// No carriage returns
 	const noCarriage = body.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
 
@@ -236,27 +235,12 @@ export function parseMarkdownAttributes(body: string, linkPrefix = "") {
 		.trim()
 		.replaceAll(/\s{+}/g, " ");
 	const summary = noCarriage.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
-	const publicAssets = new Set<string>();
-	let outputBody = noCarriage
-		.replaceAll(/!?\[.*?\]\((.+?)\)/g, (match, link) => {
-			if (link.startsWith("//") || /^\w+:/.test(link)) {
-				return match;
-			}
-			if (linkPrefix !== "") {
-				const newLink = path.normalize(`/${link}`);
-				publicAssets.add(newLink);
-				return match.replace(link, linkPrefix + newLink);
-			}
-			publicAssets.add(link);
-			return match;
-		})
-		.trim();
+	let outputBody = noCarriage.trim();
 	if (outputBody.length > 0) outputBody += "\n";
 	return {
 		title,
 		summary,
 		icon,
-		publicAssets,
 		body:
 			titleMatch === undefined
 				? outputBody

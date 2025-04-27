@@ -34,7 +34,7 @@ export async function getCompetitionData(root: string) {
 		throw new Error(`Problem data validation failed: ${problemData.error}`);
 	}
 
-	const attributes = parseMarkdownAttributes(content, "");
+	const attributes = parseMarkdownAttributes(content);
 
 	return {
 		...problemData.data,
