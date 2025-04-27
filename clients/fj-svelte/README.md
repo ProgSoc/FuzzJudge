@@ -16,7 +16,8 @@ Output will be in `./dist`. This is a fully static site.
 bun install
 bun run dev
 ```
-* To avoid CORS issues while debugging, by default the backend on `localhost:1989` is proxied to `/api`. You can configure the backend location in the `.env` file.
+* To avoid CORS issues while debugging, by default the backend on `localhost:1989` is proxied to `/api`. 
+* You can configure the backend location in the `.env` file.
 
 # Contributing
 Contributions are welcome.
