@@ -5,24 +5,22 @@ Single page FuzzJudge frontend with live scoreboard.
 ## Building
 
 ```sh
-npm install
-npm run build
+bun install
+bun run build
 ```
+Output will be in `./dist`. This is a fully static site.
 
-Output will be in `./dist`.
-If you have edited any of the icons, run `npm run build-icons` before building (requires Deno).
-
-## Starting dev server
+## Debugging
 
 ```sh
-npm install
-npm run dev <PATH TO COMP>
+bun install
+bun run dev
 ```
+* To avoid CORS issues while debugging, by default the backend on `localhost:1989` is proxied to `/api`. You can configure the backend location in the `.env` file.
 
-`<PATH TO COMP>` is optional, if not provided the sample questions will be used.
-Requires Deno.
-Note that ports 25566, 1989 and 8080 must be free and currently there is no good error handling for this.
-
-Main client at: `http://localhost:1989/client/`
-
-Standalone scoreboard page at: `http://localhost:1989/client/scoreboard/`
+# Contributing
+Contributions are welcome.
+* If you have edited any of the icons, run `bun run build-icons` before building.
+* To add a theme, add the colour variables to `themes/themes.css` and then add the definition to the `Theme` enum in `themes/themes.ts`.
+* If anyone wants to rewrite this for Svelte 5 that would be appreciated.
+* If anyone is good with Vite plugins moving the icons data URI script to a Vite plugin would be appreciated.
