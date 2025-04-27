@@ -413,9 +413,12 @@ export const probRouter = new OpenAPIHono()
 
 			const { id } = c.req.valid("param");
 
-			return c.text(
-				(await solved({ team: user.team, prob: id })) ? "OK" : "Not Solved",
-			);
+			const problemSolved = await solved({
+				team: user.team,
+				prob: id,
+			});
+
+			return c.text(problemSolved ? "OK" : "Not Solved");
 		},
 	)
 	.openapi(
@@ -511,40 +514,6 @@ export const probRouter = new OpenAPIHono()
 			const { output: submissionOutput, source: submissionCode } =
 				c.req.valid("form");
 
-			if (!user.team) {
-				return c.body("403 Forbidden\n\nUser not in a team.\n", {
-					status: 403,
-				});
-			}
-
-			if (await solved({ team: user.team, prob: id })) {
-				return c.body("409 Conflict\n\nProblem already solved.\n", {
-					status: 409,
-				});
-			}
-			const contentType = c.req.header("Content-Type");
-			if (contentType !== "application/x-www-form-urlencoded") {
-				return c.body(
-					"415 Unsupported Media Type (Expected application/x-www-form-urlencoded)",
-					{ status: 415 },
-				);
-			}
-			if (submissionOutput === null) {
-				return c.body(
-					"400 Bad Request\n\nMissing form field 'output';\nPlease include the output of your solution.\n",
-					{
-						status: 400,
-					},
-				);
-			}
-			if (submissionCode === null) {
-				return c.body(
-					"400 Bad Request\n\nMissing form field 'source';\nPlease include the source code of your solution for manual review.\n",
-					{ status: 400 },
-				);
-			}
-			const time = new Date();
-
 			const userTeam = await getUserTeam(user.id);
 
 			if (!userTeam) {
@@ -552,6 +521,14 @@ export const probRouter = new OpenAPIHono()
 					status: 403,
 				});
 			}
+
+			if (await solved({ team: userTeam.id, prob: id })) {
+				return c.body("409 Conflict\n\nProblem already solved.\n", {
+					status: 409,
+				});
+			}
+
+			const time = new Date();
 
 			const { seed } = userTeam;
 
@@ -572,7 +549,7 @@ export const probRouter = new OpenAPIHono()
 
 			if (correct) {
 				await postSubmission({
-					team: user.team,
+					team: userTeam.id,
 					prob: id,
 					time: time.toString(),
 					out: submissionOutput,
@@ -590,7 +567,7 @@ export const probRouter = new OpenAPIHono()
 			const { errors } = submission;
 
 			await postSubmission({
-				team: user.team,
+				team: userTeam.id,
 				prob: id,
 				time: time.toString(),
 				out: submissionOutput,
@@ -624,9 +601,11 @@ export const probRouter = new OpenAPIHono()
 					description: "Problem not found",
 				},
 			},
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-			}),
+			middleware: [
+				authMiddleware({
+					verifyUser: basicAuth,
+				}),
+			],
 			security: [
 				{
 					Basic: [],
@@ -635,11 +614,19 @@ export const probRouter = new OpenAPIHono()
 			operationId: "getProblemAssets",
 		}),
 		async (c, next) => {
-			// clock.protect();
-			const probId = c.req.param("id");
+			const { id } = c.req.valid("param");
+			const probPath = path.join(id, "assets");
+			const rootPath = path.join(root, probPath);
 
 			const serveStaticResponse = await serveStatic({
-				root: path.join(root, "problems", probId, "assets"),
+				root: rootPath,
+				rewriteRequestPath: (req) => {
+					const pathIndex = req.indexOf(probPath);
+					if (pathIndex === -1) {
+						return req;
+					}
+					return req.slice(pathIndex + probPath.length);
+				},
 			})(c, next);
 
 			if (serveStaticResponse instanceof Response) {

@@ -46,7 +46,7 @@ export async function solved(params: {
 			),
 	});
 
-	return solved !== null;
+	return solved !== undefined;
 }
 
 export async function solvedSet(params: { team: number }): Promise<
