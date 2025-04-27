@@ -16,13 +16,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import { getCompInfo, getQuestionSolvedSet } from "../api";
   import {
+    selectedQuestion,
+  } from "../utils";
+  import {
     CompState,
     type CompTimes,
     type TimeStateData,
     getCurrentTimeStateData,
-    runRepeatedly,
-    selectedQuestion,
-  } from "../utils";
+    clockTick,
+    handleNotifications,
+  } from "../clock";
   import CompInfo from "./CompInfo.svelte";
   import Loading from "./Loading.svelte";
   import Popout from "./Popout.svelte";
@@ -39,7 +42,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
   import Settings from "./Settings.svelte";
-    import Manual from "./admin/Manual.svelte";
+  import Manual from "./admin/Manual.svelte";
+  import Notification from "./Notification.svelte";
+  import { NOTIFICATION } from "../notifications";
 
   export const scoreboardMode = false;
 
@@ -54,8 +59,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
   let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
   let solvedQuestions = new Set<string>();
-
-  console.log({ questions });
 
   const liveState = initLiveState();
   liveState.listenClock((clock) => {
@@ -78,9 +81,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   let timeStateData: TimeStateData | undefined = undefined;
-  runRepeatedly(() => {
+  clockTick(() => {
     if (compTimes !== undefined) {
       timeStateData = getCurrentTimeStateData(compTimes);
+      handleNotifications(timeStateData); 
     }
   });
 
@@ -199,6 +203,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   >
     <Settings />
   </Popout>
+{/if}
+
+{#if $NOTIFICATION !== undefined}
+  <Notification message={$NOTIFICATION} close={() => NOTIFICATION.set(undefined)} />
 {/if}
 
 <style>

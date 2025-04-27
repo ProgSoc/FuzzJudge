@@ -1,7 +1,22 @@
+<!--
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by the
+Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+
 <script lang="ts">
   import { SETTINGS } from "../settings";
   import { Theme } from "../themes/themes";
-    import { currentYear } from "../utils";
+  import { currentYear } from "../utils";
 
   let theme = $SETTINGS.theme ?? Theme.Default;
 
@@ -10,6 +25,7 @@
     return settings;
   });
 </script>
+
 
 <h3>Theme</h3>
 <select bind:value={theme}>
@@ -20,14 +36,10 @@
 
 <footer>
   <span>
-  &copy; 2024-{currentYear()} ProgSoc. fj-svelte is provided under an LGPv3 licence.
+    &copy; 2024-{currentYear()} ProgSoc. fj-svelte is provided under an LGPv3 licence.
   </span>
-  <a href="https://github.com/ProgSoc/FuzzJudge/tree/main/clients/fj-svelte">
-    fj-svelte source
-  </a>
-  <a href="https://github.com/ProgSoc/FuzzJudge/">
-    FuzzJudge source
-  </a>
+  <a href="https://github.com/ProgSoc/FuzzJudge/tree/main/clients/fj-svelte"> fj-svelte source </a>
+  <a href="https://github.com/ProgSoc/FuzzJudge/"> FuzzJudge source </a>
 </footer>
 
 <style>
