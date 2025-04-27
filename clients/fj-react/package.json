@@ -9,9 +9,11 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
+		"@hookform/resolvers": "^5.0.1",
 		"@mantine/code-highlight": "^7.17.5",
 		"@mantine/core": "^7.17.5",
 		"@mantine/hooks": "^7.17.5",
+		"@mantine/notifications": "^7.17.5",
 		"@t3-oss/env-core": "^0.12.0",
 		"@tanstack/react-query": "^5.66.5",
 		"@tanstack/react-query-devtools": "^5.74.6",
@@ -20,9 +22,10 @@
 		"@tanstack/router-plugin": "^1.114.3",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
+		"react-hook-form": "^7.56.1",
 		"react-markdown": "^10.1.0",
 		"server": "workspace:*",
-		"zod": "^3.24.2"
+		"zod": "^3.24.3"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.0",
