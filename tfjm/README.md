@@ -14,7 +14,7 @@ This is a guide intended for future ProgSoc executives or anyone who wants to ho
 The FuzzJudge server serves problem descriptions and inputs, validates problem solutions, tracks each team's score and runs a timer for competition start and finish times.
 
 A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator (fuzz method) by the server. 
-When the team then submits their solution, the problem's validator (judge method) is then given the submitted solution and the same seed that was used to generate that teams input. 
+When the team then submits their solution, the problem's validator (judge method) is then given the submitted solution and the same seed that was used to generate that team's input. 
 This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution.
 
 In addition to being agnostic to the language the problems are implemented in, the server has no one primary front-end and is designed such that competitors can connect however they want and building a custom client is straightforward.
@@ -25,7 +25,7 @@ Problems and competition metadata is specified in code blocks within markdown fi
 ## Competition Structure
 > For full examples, see [the sample competition](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
 
-All information for a competition including the problems is stored in a competition directory. A competition directory must contain a markdown document named `comp.md`. The following is an example of a `prob.md` file.
+All information for a competition including the problems is defined in a competition directory. A competition directory must contain a markdown document named `comp.md`. The following is an example of a `comp.md` file.
 
 ```md
 ---toml
@@ -49,17 +49,18 @@ ProgSoc @ TechFest
 ```
 ### Times
 The `[times]` section contains the start and finish times of the competition. 
-* `start` is when the problem instructions become avalible and solutions can start being submitted.
+* `start` is when the problem instructions become available and solutions can start being submitted.
 * `finish` is when solutions can no longer be submitted.
-* `freeze` is the number of seconds before the `finish` where the scoreboard stops being updated. This is used to create suspense and uncertainy around who has won until it is announced.
+* `freeze` is the number of seconds before the `finish` where the scoreboard stops being updated. This is used to create suspense and uncertainty around who has won until it is announced.
 
 ### Competition Info
-The remainer of the document should specifiy other details about the event relevant to competators. This is avalible on an endpoint and some clients may choose to display it.
+* The first large header in the document must be the competition title. In the example above it is `ProgComp 2023`
+* The remainder of the document should specify other details about the event relevant to competitors. This is available on an endpoint and some clients may choose to display it.
 
 ## Problem Structure
 > For full examples, see [the sample competition](https://github.com/ProgSoc/FuzzJudge/tree/main/sample).
 
-Problems are stored in directories in the competition directory.
+Problems are defined in subdirectories of the competition directory.
 A problem directory must contain a markdown document called `prob.md` and any other required files. The following is an example of a `prob.md` file:
 ```md
 ---toml
@@ -220,7 +221,7 @@ The static API is a simple set of mostly JSON-less, HTML Basic auth based endpoi
 
 #### Responses
 
-- 200 List of all problems slugs seperated by commas `text/csv`
+- 200 List of all problems slugs separated by commas `text/csv`
 
 
 
@@ -940,10 +941,13 @@ Basic
 
 ## Live API
 
-Some specific details will need to be gated behind clock or admin authorisations,
-whether this should be transparent or specifically noted (e.g. `{ "@gated": "clock" }`) is to be decided.
+The live API allows complex clients to receive real-time updates from the server via a websocket.
+A Client can open a connection via a GET request to the [/ws](#getws) endpoint.
+The live API handles three types of events: problem updates, scoreboard updates and clock updates.
 
-### Clock
+### Clock Updates
+Clock updates contain the start, and finish times defined in [comp.md](#competition-structure).
+
 
 ```ts
 type Clock = {
@@ -953,20 +957,7 @@ type Clock = {
 };
 ```
 
-### Document
-
-* How to lock behind admin or clock functions?
-
-```ts
-type Document = {
-  title: string,
-  icon?: string | URL,
-  summary?: string,
-  body: string,
-};
-```
-
-### Problems
+### Problem Updates
 
 ```ts
 type Problem = {
@@ -977,15 +968,22 @@ type Problem = {
 };
 ```
 
-### Scoreboard
+```ts
+type Document = {
+  title: string,
+  icon?: string | URL,
+  summary?: string,
+  body: string,
+};
+```
+
+### Scoreboard Updates
 
 ```ts
 type Score = {
   team: Team,
 };
 ```
-
-### Teams
 
 ```ts
 type Team = {
@@ -994,8 +992,6 @@ type Team = {
   members: User[],
 };
 ```
-
-### Users
 
 ```ts
 type User = {
