@@ -23,5 +23,4 @@ bun run dev
 Contributions are welcome.
 * If you have edited any of the icons, run `bun run build-icons` before building.
 * To add a theme, add the colour variables to `themes/themes.css` and then add the definition to the `Theme` enum in `themes/themes.ts`.
-* If anyone wants to rewrite this for Svelte 5 that would be appreciated.
 * If anyone is good with Vite plugins moving the icons data URI script to a Vite plugin would be appreciated.
