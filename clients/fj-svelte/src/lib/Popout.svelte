@@ -24,8 +24,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   export let title: string | undefined = undefined;
   export let icon: IconDescriptor | undefined = undefined;
 
-  $: console.log("shown", shown, title, icons);
-
   let maximized = false;
   const onMaximiseToggle = () => {
     maximized = !maximized;

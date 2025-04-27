@@ -14,13 +14,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { type QuestionMeta, type ScoreboardUser, truncateUsername } from "../utils";
+  import { truncateUsername } from "../utils";
 
   import type { CompetitionScoreboardMessage } from "server/v1/score";
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import Icon from "./Icon.svelte";
-  import icons from "../icons";
 
   export let questions: Record<string, FuzzJudgeProblemMessage>;
   export let scoreboard: CompetitionScoreboardMessage;
@@ -28,6 +25,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   const errors: string[] = [];
 
   // Hack for the day
+  // 2025-04-27 edit: hack forever
   $: filteredTeams = scoreboard.filter((team) => team.name !== "Admin");
 
   $: sortedQuestions = Object.values(questions).sort((a, b) => a.points - b.points);
