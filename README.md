@@ -4,7 +4,7 @@ Randomised input judging server, designed for ProgComp.
 
 Compiling code on the server machine is tricky, and we can't support everyone's favourite niche languages - so let's make it about transforming the input into the correct output like Advent of Code.
 
-> Please refer to [the user manual](https://github.com/progsoc/fuzzjudge/tree/main/tfjm) for details on running a competition and the API.
+> Please refer to [the user manual](https://github.com/progsoc/fuzzjudge/tree/main/docs/MANUAL.md) for details on running a competition and the API.
 
 ## Debugging the Project
 
