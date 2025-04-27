@@ -19,6 +19,17 @@ bun run dev
 * To avoid CORS issues while debugging, by default the backend on `localhost:1989` is proxied to `/api`. 
 * You can configure the backend location in the `.env` file.
 
+# Shortcuts
+* `Esc` - Close popup
+* `Ctrl + I` - Open problem input
+* `Ctrl + D` - Download problem input
+* `Ctrl + Alt + C` - Copy problem input
+* `Ctrl + S` - Open scoreboard
+* `Ctrl + P` - Toggle question list
+* `Ctrl + M` - Open FuzzJudge manual
+* `Ctrl + Alt + Enter` - Submit solution
+* `Ctrl + Alt + V` - Paste clipboard into solution box
+
 # Contributing
 Contributions are welcome.
 * If you have edited any of the icons, run `bun run build-icons` before building.

@@ -13,6 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { hc } from "server/src/client";
+import { showNotification } from "./notifications";
 import {
 	type QuestionMeta,
 	type ScoreboardUser,
@@ -180,9 +181,37 @@ export const submitSolution = async (
 	};
 };
 
-export const openFuzz = (slug: string) => {
-	window.open(`${BACKEND_SERVER}/comp/prob/${slug}/fuzz`, "_blank");
-};
+function fuzzUrl(slug: string) {
+	return `${BACKEND_SERVER}/comp/prob/${slug}/fuzz`;
+}
+
+export function openFuzz(slug: string) {
+	window.open(fuzzUrl(slug), "_blank");
+}
+
+export function downloadFuzz(slug: string) {
+	const link = document.createElement("a");
+	link.style.display = "none";
+	link.href = fuzzUrl(slug);
+	link.download = `${slug}.txt`;
+	document.body.appendChild(link);
+	link.click();
+	setTimeout(() => {
+		URL.revokeObjectURL(link.href);
+		if (link.parentNode) {
+			link.parentNode.removeChild(link);
+		}
+	}, 0);
+}
+
+export function copyFuzz(slug: string) {
+	(async () => {
+		const url = fuzzUrl(slug);
+		const text = await (await fetch(url)).text();
+		await navigator.clipboard.writeText(text);
+		showNotification("Copied problem input to clipboard");
+	})();
+}
 
 export async function isQuestionSolved(slug: string) {
 	const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {

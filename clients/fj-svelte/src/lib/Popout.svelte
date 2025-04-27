@@ -41,11 +41,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     maximized = !maximized;
   };
 
-  document.addEventListener("keydown", (e) => {
+  const keydownHandler = (e: KeyboardEvent) => {
     if (!shown || e.key !== "Escape") return;
-
     close();
-  });
+  };
 </script>
 
 {#if shown}
@@ -71,6 +70,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
   </div>
 {/if}
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .popout-header {

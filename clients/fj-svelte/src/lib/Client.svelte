@@ -14,98 +14,130 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { getCompInfo, getQuestionSolvedSet } from "../api";
-import { selectedQuestion } from "../utils";
-import {
-	CompState,
-	type CompTimes,
-	type TimeStateData,
-	getCurrentTimeStateData,
-	clockTick,
-	handleNotifications,
-} from "../clock";
-import CompInfo from "./CompInfo.svelte";
-import Loading from "./Loading.svelte";
-import Popout from "./Popout.svelte";
-import QuestionContents from "./QuestionContents.svelte";
-import Scoreboard from "./Scoreboard.svelte";
-import Sidebar from "./Sidebar.svelte";
+  import { copyFuzz, downloadFuzz, getCompInfo, getQuestionSolvedSet, openFuzz } from "../api";
+  import { selectedQuestion } from "../utils";
+  import {
+    CompState,
+    type CompTimes,
+    type TimeStateData,
+    getCurrentTimeStateData,
+    clockTick,
+    handleNotifications,
+  } from "../clock";
+  import CompInfo from "./CompInfo.svelte";
+  import Loading from "./Loading.svelte";
+  import Popout from "./Popout.svelte";
+  import QuestionContents from "./QuestionContents.svelte";
+  import Scoreboard from "./Scoreboard.svelte";
+  import Sidebar from "./Sidebar.svelte";
 
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-import type { CompetitionScoreboardMessage } from "server/v1/score";
-import { getUsername } from "../api";
-import { initLiveState } from "../apiLive";
-import icons from "../icons";
-import Icon from "./Icon.svelte";
-import InlineCountdown from "./counters/InlineCountdown.svelte";
-import PageCountdown from "./counters/PageCountdown.svelte";
-import Settings from "./Settings.svelte";
-import Manual from "./admin/Manual.svelte";
-import Notification from "./Notification.svelte";
-import { NOTIFICATION } from "../notifications";
+  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+  import type { CompetitionScoreboardMessage } from "server/v1/score";
+  import { getUsername } from "../api";
+  import { initLiveState } from "../apiLive";
+  import icons from "../icons";
+  import Icon from "./Icon.svelte";
+  import InlineCountdown from "./counters/InlineCountdown.svelte";
+  import PageCountdown from "./counters/PageCountdown.svelte";
+  import Settings from "./Settings.svelte";
+  import Manual from "./admin/Manual.svelte";
+  import Notification from "./Notification.svelte";
+  import { NOTIFICATION } from "../notifications";
 
-interface Props {
-	scoreboardMode: boolean;
-}
+  interface Props {
+    scoreboardMode: boolean;
+  }
 
-let { scoreboardMode }: Props = $props();
+  let { scoreboardMode }: Props = $props();
 
-let username = $state("Loading...");
+  let username = $state("Loading...");
 
-getUsername().then((name) => {
-	username = name;
-	console.log("username", username);
-});
+  getUsername().then((name) => {
+    username = name;
+    console.log("username", username);
+  });
 
-let compTimes: CompTimes | undefined = undefined;
-let questions: Record<string, FuzzJudgeProblemMessage> | undefined =
-	$state(undefined);
-let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
-let solvedQuestions = $state(new Set<string>());
+  let compTimes: CompTimes | undefined = undefined;
+  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = $state(undefined);
+  let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
+  let solvedQuestions = $state(new Set<string>());
 
-const liveState = initLiveState();
-liveState.listenClock((clock) => {
-	compTimes = clock;
-});
-liveState.listenQuestions(async (qs) => {
-	questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
-	solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
-	if ($selectedQuestion === "" && questions) {
-		selectedQuestion.set(Object.keys(questions)[0] ?? "");
-	}
-});
-liveState.listenScoreboard((sb) => {
-	scoreboard = sb;
-	console.log("scoreboard", sb);
-});
+  const liveState = initLiveState();
+  liveState.listenClock((clock) => {
+    compTimes = clock;
+  });
+  liveState.listenQuestions(async (qs) => {
+    questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
+    solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
+    if ($selectedQuestion === "" && questions) {
+      selectedQuestion.set(Object.keys(questions)[0] ?? "");
+    }
+  });
+  liveState.listenScoreboard((sb) => {
+    scoreboard = sb;
+    console.log("scoreboard", sb);
+  });
 
-getCompInfo().then((data) => {
-	window.document.title = data.title;
-});
+  getCompInfo().then((data) => {
+    window.document.title = data.title;
+  });
 
-let timeStateData: TimeStateData | undefined = $state(undefined);
-clockTick(() => {
-	if (compTimes !== undefined) {
-		timeStateData = getCurrentTimeStateData(compTimes);
-		handleNotifications(timeStateData);
-	}
-});
+  let timeStateData: TimeStateData | undefined = $state(undefined);
+  clockTick(() => {
+    if (compTimes !== undefined) {
+      timeStateData = getCurrentTimeStateData(compTimes);
+      handleNotifications(timeStateData);
+    }
+  });
 
-const setSolved = (slug: string) => {
-	solvedQuestions.add(slug);
-	// solvedQuestions = solvedQuestions;
-};
+  const setSolved = (slug: string) => {
+    solvedQuestions.add(slug);
+    // solvedQuestions = solvedQuestions;
+  };
 
-enum ShowingPopout {
-	None = 0,
-	Scoreboard = 1,
-	CompInfo = 2,
-	Settings = 3,
-	Manual = 4,
-}
+  enum ShowingPopout {
+    None = 0,
+    Scoreboard = 1,
+    CompInfo = 2,
+    Settings = 3,
+    Manual = 4,
+  }
 
-// biome-ignore lint/style/useConst: is being assigned
-let showingPopout: ShowingPopout = $state(ShowingPopout.None);
+  // biome-ignore lint/style/useConst: is being assigned
+  let showingPopout: ShowingPopout = $state(ShowingPopout.None);
+
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
+
+      if (showingPopout === ShowingPopout.Scoreboard) {
+	showingPopout = ShowingPopout.None;
+	return;
+      }
+
+      showingPopout = ShowingPopout.Scoreboard;
+    }
+
+    if (e.ctrlKey && e.key === "m") {
+      e.preventDefault();
+      showingPopout = ShowingPopout.Manual;
+    }
+
+    if (e.ctrlKey && e.key === "i") {
+      e.preventDefault();
+      openFuzz($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.key === "d") {
+      e.preventDefault();
+      downloadFuzz($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "c") {
+      e.preventDefault();
+      copyFuzz($selectedQuestion);
+    }
+  };
 </script>
 
 {#if scoreboardMode}
@@ -211,6 +243,8 @@ let showingPopout: ShowingPopout = $state(ShowingPopout.None);
 {#if $NOTIFICATION !== undefined}
   <Notification message={$NOTIFICATION} close={() => NOTIFICATION.set(undefined)} />
 {/if}
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .layout {

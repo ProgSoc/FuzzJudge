@@ -30,11 +30,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   function toggleOpen() {
     open = !open;
   }
+
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "p") {
+      e.preventDefault();
+      open = !open;
+    }
+  };
 </script>
 
-<!-- Navbar markup -->
-
-<!-- Main content -->
 <div class="question-list" class:closed={!open}>
   {#if open}
     <div class="list-title-div">
@@ -50,6 +54,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <Icon icon={icons.arrowright} clickAction={toggleOpen} />
   {/if}
 </div>
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .question-list {

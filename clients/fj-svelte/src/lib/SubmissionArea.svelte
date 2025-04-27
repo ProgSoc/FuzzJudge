@@ -15,6 +15,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { openFuzz, submitSolution } from "../api";
+  import { showNotification } from "../notifications";
   import { selectedQuestion } from "../utils";
 
   interface Props {
@@ -56,6 +57,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       }
     });
   };
+
+  const keyHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.altKey && e.key === "Enter") {
+      e.preventDefault();
+
+      if (submissionValue.length === 0 || sourceValue.length === 0) {
+        showNotification("Please fill in all fields before submitting.");
+        return;
+      }
+
+      submit($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "v") {
+      e.preventDefault();
+      navigator.clipboard.readText().then((text) => {
+        submissionValue = text;
+      });
+    }
+  };
 </script>
 
 <div class="question-submission">
@@ -87,7 +108,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <textarea
           bind:value={sourceValue}
           placeholder="Please include any of the source code used to solve the problem. This may be manually reviewed later."
-></textarea>
+        ></textarea>
       </div>
     </div>
     <div class="text-area-buttons">
@@ -104,6 +125,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </pre>
   {/if}
 </div>
+
+<svelte:window onkeydown={keyHandler} />
 
 <style>
   .section {
