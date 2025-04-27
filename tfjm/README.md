@@ -926,9 +926,9 @@ Basic
 
 
 
-## References
+### References
 
-### #/components/securitySchemes/Basic
+#### #/components/securitySchemes/Basic
 
 ```ts
 {
