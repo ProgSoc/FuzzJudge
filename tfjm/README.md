@@ -53,7 +53,7 @@ The `[times]` section contains the start and finish times of the competition.
 * `finish` is when solutions can no longer be submitted.
 * `freeze` is the number of seconds before the `finish` where the scoreboard stops being updated. This is used to create suspense and uncertainy around who has won until it is announced.
 
-### Competition info
+### Competition Info
 The remainer of the document should specifiy other details about the event relevant to competators. This is avalible on an endpoint and some clients may choose to display it.
 
 ## Problem Structure
@@ -160,7 +160,7 @@ TODO
 
 
 ## Static API
-The static API is a simple set of JSON-less, HTML Basic auth based endpoints. For simple clients, this is all you need.
+The static API is a simple set of mostly JSON-less, HTML Basic auth based endpoints. For simple clients, this is all you need.
 
 
 > Version 0.1.0
@@ -431,9 +431,7 @@ Bearer
 
 #### Responses
 
-- 200 Meta data
-
-`application/json`
+- 200 Meta data `application/json`
 
 
 
@@ -464,9 +462,7 @@ slug: string
 
 #### Responses
 
-- 200 Submission skeletons
-
-`application/json`
+- 200 Submission skeletons `application/json`
 
 ```ts
 {
@@ -609,9 +605,7 @@ Bearer
 
 #### Responses
 
-- 200 All users
-
-`application/json`
+- 200 All users `application/json`
 
 ```ts
 {
@@ -651,9 +645,7 @@ Bearer
 
 #### Responses
 
-- 201 Successfully created user
-
-`application/json`
+- 201 Successfully created user `application/json`
 
 ```ts
 {
@@ -731,9 +723,7 @@ Bearer
 
 #### Responses
 
-- 200 All teams
-
-`application/json`
+- 200 All teams `application/json`
 
 ```ts
 {
@@ -770,9 +760,7 @@ Bearer
 
 #### Responses
 
-- 201 Created team
-
-`application/json`
+- 201 Created team `application/json`
 
 ```ts
 {
