@@ -248,3 +248,8 @@ export function removeMdTitle(md: string): string {
 	}
 	return lines.join("\n");
 }
+
+export function currentYear() {
+	const date = new Date();
+	return date.getFullYear();
+}

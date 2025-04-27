@@ -140,6 +140,24 @@ textarea:focus {
 	white-space: nowrap;
 }
 
+table {
+	border-collapse: collapse;
+}
+
+th, td {
+	border: 1px solid var(--border);
+	padding: 0.4rem;
+}
+
+td {
+	text-align: left;
+}
+
+th {
+	background-color: var(--bg-sec);
+	color: var(--text-sec);
+}
+
 @media (min-width: 768px) {
 	#instructions-md > pre {
 		overflow: hidden;
