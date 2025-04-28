@@ -2,6 +2,64 @@ import { z } from "@hono/zod-openapi";
 import { db } from "../db";
 import { getProblems } from "./problems.service";
 
+const ProblemScoreSchema = z
+	.object({
+		slug: z.string().openapi({
+			description: "Problem slug",
+		}),
+		points: z.number().openapi({
+			description: "Points for the problem",
+		}),
+		penalty: z.number().openapi({
+			description: "Penalty time in minutes",
+		}),
+		tries: z.number().openapi({
+			description: "Number of tries",
+		}),
+		solved: z.boolean().openapi({
+			description: "Whether the problem was solved or not",
+		}),
+	})
+	.openapi("ProblemScore");
+
+const TeamScoreSchema = z
+	.object({
+		name: z.string().openapi({
+			description: "Team name",
+		}),
+		points: z.number().openapi({
+			description: "Total points",
+		}),
+		penalty: z.number().openapi({
+			description: "Total penalty time in minutes",
+		}),
+		problems: z.array(ProblemScoreSchema).openapi({
+			description: "Problem score breakdown",
+		}),
+	})
+	.openapi("TeamScore");
+
+const RankedTeamScoreSchema = TeamScoreSchema.extend({
+	rank: z.number().openapi({
+		description: "Rank of the team",
+	}),
+}).openapi("RankedTeamScore");
+
+export const ScoreboardSchema = z
+	.array(RankedTeamScoreSchema)
+	.openapi("Scoreboard");
+
+export type Scoreboard = z.infer<typeof ScoreboardSchema>;
+export type TeamScore = z.infer<typeof TeamScoreSchema>;
+export type ProblemScore = z.infer<typeof ProblemScoreSchema>;
+export type RankedTeamScore = z.infer<typeof RankedTeamScoreSchema>;
+
+/**
+ * Generate the entire scoreboard
+ * @param root The competition root directory
+ * @param startTim The start time of the competition
+ * @return The scoreboard with all teams and their scores
+ */
 export async function calculateScoreboard(root: string, startTime: Date) {
 	// Load the problem set
 	const problemsData = await getProblems(root);
@@ -120,14 +178,8 @@ export async function calculateScoreboard(root: string, startTime: Date) {
 	 * Sort the teams by score
 	 * The teams are sorted by points, then by penalty
 	 */
-	const scoreboard: Scoreboard = teamScore
-		.sort((a, b) => {
-			if (a.points === b.points) {
-				return a.penalty - b.penalty; // Sort by penalty if points are equal
-			}
-			return b.points - a.points; // Sort by points
-		})
-		.map(({ points, penalty, problems, name }, index) => ({
+	const scoreboard: Scoreboard = teamScore.map(
+		({ points, penalty, problems, name }, index) => ({
 			/** Rank of the team */
 			rank: index + 1,
 			/** Team Name */
@@ -138,59 +190,119 @@ export async function calculateScoreboard(root: string, startTime: Date) {
 			penalty,
 			/** Problem Score Breakdown */
 			problems,
-		}));
+		}),
+	);
 
 	return scoreboard;
 }
 
-const ProblemScoreSchema = z
-	.object({
-		slug: z.string().openapi({
-			description: "Problem slug",
-		}),
-		points: z.number().openapi({
-			description: "Points for the problem",
-		}),
-		penalty: z.number().openapi({
-			description: "Penalty time in minutes",
-		}),
-		tries: z.number().openapi({
-			description: "Number of tries",
-		}),
-		solved: z.boolean().openapi({
-			description: "Whether the problem was solved or not",
-		}),
-	})
-	.openapi("ProblemScore");
+/**
+ * Calculate the score for a single team (used for incremental updates) of the scoreboard
+ * @param root The competition root directory
+ * @param startTime The start time of the competition
+ * @param teamId The id of the team to calculate the score for
+ * @returns The score for the team
+ */
+export async function calculateTeamScore(
+	root: string,
+	startTime: Date,
+	teamId: number,
+): Promise<TeamScore | null> {
+	// Load the problem set
+	const problemsData = await getProblems(root);
 
-const TeamScoreSchema = z
-	.object({
-		name: z.string().openapi({
-			description: "Team name",
-		}),
-		points: z.number().openapi({
-			description: "Total points",
-		}),
-		penalty: z.number().openapi({
-			description: "Total penalty time in minutes",
-		}),
-		problems: z.array(ProblemScoreSchema).openapi({
-			description: "Problem score breakdown",
-		}),
-	})
-	.openapi("TeamScore");
+	// Map the problems to a new object with only the slug and points
+	const problems = problemsData.map((problem) => ({
+		slug: problem.slug,
+		points: problem.problem.points,
+	}));
 
-const RankedTeamScoreSchema = TeamScoreSchema.extend({
-	rank: z.number().openapi({
-		description: "Rank of the team",
-	}),
-}).openapi("RankedTeamScore");
+	// for each team, get the submissions grouped by problem
+	const team = await db.query.teamTable.findFirst({
+		where: (team, { eq }) => eq(team.id, teamId),
+		columns: {
+			id: true,
+			name: true,
+		},
+		with: {
+			submissions: {
+				columns: {
+					prob: true,
+					time: true,
+					ok: true,
+				},
+			},
+		},
+	});
 
-export const ScoreboardSchema = z
-	.array(RankedTeamScoreSchema)
-	.openapi("Scoreboard");
+	if (!team) return null;
 
-export type Scoreboard = z.infer<typeof ScoreboardSchema>;
-export type TeamScore = z.infer<typeof TeamScoreSchema>;
-export type ProblemScore = z.infer<typeof ProblemScoreSchema>;
-export type RankedTeamScore = z.infer<typeof RankedTeamScoreSchema>;
+	if (team.submissions.length === 0) return null;
+
+	/**
+	 * For each team, we calculate the score for each problem
+	 * The score is calculated based on the submissions for each problem
+	 */
+	const problemScores = problems.map((problem): ProblemScore => {
+		let latest = Number.NEGATIVE_INFINITY;
+		let solved = false;
+
+		/** Filter the submissions for the current problem */
+		const currentProblemSubmissions = team.submissions.filter(
+			(submission) => submission.prob === problem.slug,
+		);
+
+		/** Calculate the number of tries */
+		const tries = currentProblemSubmissions.reduce((acc, submission) => {
+			latest = Math.max(latest, new Date(submission.time).getTime()); // Get the latest submission time
+			if (submission.ok) {
+				solved = true; // If the submission is correct, we mark it as solved
+				return acc; // If the submission is correct, we don't count it as a try
+			}
+			return acc + 1; // Count the try
+		}, 0);
+
+		/** Time since the start of the competition */
+		const timeSinceStart = Math.max(0, (latest - startTime.getTime()) / 60_000);
+
+		/** The problem penalty */
+		const penalty = Math.floor(timeSinceStart) + 20 * tries; // 20 minutes penalty for each wrong submission
+
+		return {
+			slug: problem.slug, // Problem slug
+			solved, // Whether the problem was solved or not
+			points: solved ? problem.points : 0, // Points are only awarded if the problem is solved
+			penalty: solved ? penalty : 0, // Penalty is only shown if the problem is solved
+			tries, // Number of tries
+		};
+	});
+
+	/**
+	 * Calculate the total score for the team
+	 * The total score is the sum of the points and penalties for each problem
+	 */
+	const totalScore = problemScores.reduce(
+		(acc, score) => {
+			acc.points += score.points;
+			acc.penalty += score.penalty;
+			return acc;
+		},
+		{
+			/** Total points */
+			points: 0,
+			/** Total penalty */
+			penalty: 0,
+		},
+	);
+
+	return {
+		/** Team Name */
+		name: team.name,
+		/**  Total points */
+		points: totalScore.points,
+		/** Total Penalty (Not Applied) */
+		penalty: totalScore.penalty,
+		/** Problem Score Breakdown */
+		problems: problemScores,
+	};
+}
