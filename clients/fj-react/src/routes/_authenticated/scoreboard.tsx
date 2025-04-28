@@ -1,5 +1,6 @@
 import { scoreboardQueries } from "@/queries/scoreboard.queries";
-import { useQuery } from "@tanstack/react-query";
+import { Table } from "@mantine/core";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/scoreboard")({
@@ -7,23 +8,44 @@ export const Route = createFileRoute("/_authenticated/scoreboard")({
 });
 
 function RouteComponent() {
-	const scoreboardQuery = useQuery(scoreboardQueries.getScoreboard());
+	const scoreboardQuery = useQuery({
+		...scoreboardQueries.getScoreboard(),
+		placeholderData: keepPreviousData,
+		initialData: [],
+	});
+
+	const rows = scoreboardQuery.data.map((team) => (
+		<Table.Tr key={team.name}>
+			<Table.Td>{team.rank}</Table.Td>
+			<Table.Td>{team.name}</Table.Td>
+			<Table.Td>
+				{team.problems
+					.map((problem) => (problem.solved ? "✔️" : "❌"))
+					.join(", ")}
+			</Table.Td>
+
+			<Table.Td>{team.points}</Table.Td>
+		</Table.Tr>
+	));
+
+	if (scoreboardQuery.isLoading) {
+		return <div>Loading...</div>;
+	}
+	if (scoreboardQuery.isError) {
+		return <div>Error: {scoreboardQuery.error.message}</div>;
+	}
 
 	return (
-		<div>
-			<h1>Scoreboard</h1>
-			{scoreboardQuery.isLoading && <p>Loading...</p>}
-			{scoreboardQuery.isError && <p>Error: {scoreboardQuery.error.message}</p>}
-			{scoreboardQuery.isSuccess && (
-				<ul>
-					{scoreboardQuery.data.map((team) => (
-						<li key={team.name}>
-							{team.rank} - {team.name} - {team.points} points - {team.penalty}{" "}
-							penalty
-						</li>
-					))}
-				</ul>
-			)}
-		</div>
+		<Table>
+			<Table.Thead>
+				<Table.Tr>
+					<Table.Th>Rank</Table.Th>
+					<Table.Th>Name</Table.Th>
+					<Table.Th>Problems</Table.Th>
+					<Table.Th>Points</Table.Th>
+				</Table.Tr>
+			</Table.Thead>
+			<Table.Tbody>{rows}</Table.Tbody>
+		</Table>
 	);
 }
