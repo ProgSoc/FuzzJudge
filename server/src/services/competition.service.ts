@@ -5,6 +5,12 @@ import matter from "gray-matter";
 import { parseMarkdownAttributes } from "./problems.service";
 
 const competitionSpec = z.object({
+	server: z
+		.object({
+			origins: z.array(z.string()).optional(),
+			public: z.array(z.string()).optional(),
+		})
+		.optional(),
 	times: z.object({
 		start: z.coerce.date().optional(),
 		finish: z.coerce.date().optional(),

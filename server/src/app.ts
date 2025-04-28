@@ -27,12 +27,12 @@ Backend
 - /instructions
 - /prob
   - /:name
-    - /icon : utf-8 (emoji, one extended grapheme)
-    - /name
-    - /brief
-    - /instructions
-    - /input
-    - /judge
+	- /icon : utf-8 (emoji, one extended grapheme)
+	- /name
+	- /brief
+	- /instructions
+	- /input
+	- /judge
 /auth
 - /login : Get Bearer Token
 - /logout : Expire token
@@ -364,7 +364,6 @@ const app = new OpenAPIHono()
 			return c.body(null, { status: 204 });
 		},
 	)
-
 	.openapi(
 		createRoute({
 			method: "get",
@@ -390,26 +389,19 @@ const app = new OpenAPIHono()
 		async (c) => {
 			return c.body(null, { status: 204 });
 		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/client/*",
-			hide: true,
-			responses: {
-				200: {
-					description: "Client",
-				},
-			},
-			middleware: serveStatic({
-				root: path.join(root, "client"),
-			}),
-			operationId: "getClient",
-		}),
-		async (c) => {
-			return c.text("dummy response");
-		},
 	);
+
+for (const dir of competionData.server?.public ?? []) {
+	const relativeDirPath = path.relative(process.cwd(), root);
+	app.get(
+		`/${dir}/*`,
+		serveStatic({
+			root: relativeDirPath,
+			onNotFound: (path, c) =>
+				console.error(`${path} is not found for ${c.req.path}`),
+		}),
+	);
+}
 
 app.doc31("/docs/json", (c) => ({
 	info: {
