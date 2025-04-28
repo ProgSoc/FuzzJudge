@@ -194,9 +194,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       {/if}
     {:else if timeStateData.phase !== CompState.FINISHED}
       <div class="locked-message">
-        <div class="lock-icon">
-          <Icon icon={icons.locked} />
-        </div>
+        {#if timeStateData.phase === CompState.BEFORE}
+          <div class="lock-icon">
+            <Icon icon={icons.locked} />
+          </div>
+        {/if}
         <PageCountdown {timeStateData} />
       </div>
     {:else}
