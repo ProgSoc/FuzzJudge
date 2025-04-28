@@ -15,7 +15,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { copyFuzz, downloadFuzz, getCompInfo, getQuestionSolvedSet, openFuzz } from "../api";
-  import { selectedQuestion } from "../utils";
+  import { nextUnsovledProblem, selectedQuestion } from "../utils";
   import {
     CompState,
     type CompTimes,
@@ -44,17 +44,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Notification from "./Notification.svelte";
   import { NOTIFICATION } from "../notifications";
 
-  interface Props {
-    scoreboardMode: boolean;
-  }
-
-  let { scoreboardMode }: Props = $props();
-
   let username = $state("Loading...");
 
   getUsername().then((name) => {
     username = name;
-    console.log("username", username);
   });
 
   let compTimes: CompTimes | undefined = undefined;
@@ -75,7 +68,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
   liveState.listenScoreboard((sb) => {
     scoreboard = sb;
-    console.log("scoreboard", sb);
   });
 
   getCompInfo().then((data) => {
@@ -92,7 +84,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
   const setSolved = (slug: string) => {
     solvedQuestions.add(slug);
-    // solvedQuestions = solvedQuestions;
   };
 
   enum ShowingPopout {
@@ -107,6 +98,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let showingPopout: ShowingPopout = $state(ShowingPopout.None);
 
   const keydownHandler = (e: KeyboardEvent) => {
+    if (e.target === document.body && e.key === "ArrowRight") {
+      e.preventDefault();
+      if (questions === undefined) return;
+      const slug = nextUnsovledProblem(questions, solvedQuestions, $selectedQuestion);
+      if (slug !== null) {
+        selectedQuestion.set(slug);
+      }
+    }
+
+    if (e.target === document.body && e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (questions === undefined) return;
+      const slug = nextUnsovledProblem(questions, solvedQuestions, $selectedQuestion, -1);
+      if (slug !== null) {
+        selectedQuestion.set(slug);
+      }
+    }
+
     if (e.ctrlKey && e.key === "s") {
       e.preventDefault();
 
@@ -140,107 +149,99 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
-{#if scoreboardMode}
-  {#if questions !== undefined && scoreboard !== undefined}
-    <Scoreboard {questions} {scoreboard} />
-  {:else}
-    <Loading />
-  {/if}
-{:else}
-  <div class="layout">
-    <div class="top-bar">
-      <div>
-        <button onclick={() => (showingPopout = ShowingPopout.CompInfo)}>
-          <span class="vertical-center">
-            <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
-          </span>
-        </button>
-        <button onclick={() => (showingPopout = ShowingPopout.Scoreboard)}>
-          <span class="vertical-center">
-            <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
-          </span>
-        </button>
-      </div>
-      <div class="countdown">
-        {#if timeStateData !== undefined}
-          <InlineCountdown {timeStateData} />
-        {/if}
-      </div>
-      <div class="vertical-center">
-        <span>
-          Logged in as <b>{username}</b>
+<div class="layout">
+  <div class="top-bar">
+    <div>
+      <button onclick={() => (showingPopout = ShowingPopout.CompInfo)}>
+        <span class="vertical-center">
+          <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
         </span>
-        <a href="/void" title="Enter empty credentials">
-          <Icon icon={icons.logout} />
-        </a>
-        <Icon icon={icons.cog} clickAction={() => (showingPopout = ShowingPopout.Settings)} />
-      </div>
+      </button>
+      <button onclick={() => (showingPopout = ShowingPopout.Scoreboard)}>
+        <span class="vertical-center">
+          <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
+        </span>
+      </button>
     </div>
-
-    <Sidebar {solvedQuestions} {questions} />
-
-    <!-- main content -->
-    {#if timeStateData === undefined}
-      <Loading />
-    {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
-      {#if questions === undefined}
-        <Loading />
-      {:else}
-        <QuestionContents
-          question={questions[$selectedQuestion]}
-          solved={solvedQuestions.has($selectedQuestion)}
-          {setSolved}
-        />
+    <div class="countdown">
+      {#if timeStateData !== undefined}
+        <InlineCountdown {timeStateData} />
       {/if}
-    {:else if timeStateData.phase !== CompState.FINISHED}
-      <div class="locked-message">
-        {#if timeStateData.phase === CompState.BEFORE}
-          <div class="lock-icon">
-            <Icon icon={icons.locked} />
-          </div>
-        {/if}
-        <PageCountdown {timeStateData} />
-      </div>
-    {:else}
-      <div class="locked-message">
-        <div class="finished-message">
-          <h1>Competition Finished</h1>
-          <p>You can no longer submit solutions.</p>
-        </div>
-      </div>
-    {/if}
+    </div>
+    <div class="vertical-center">
+      <span>
+        Logged in as <b>{username}</b>
+      </span>
+      <a href="/void" title="Enter empty credentials">
+        <Icon icon={icons.logout} />
+      </a>
+      <Icon icon={icons.cog} clickAction={() => (showingPopout = ShowingPopout.Settings)} />
+    </div>
   </div>
 
-  <Popout
-    shown={showingPopout === ShowingPopout.Scoreboard}
-    close={() => (showingPopout = ShowingPopout.None)}
-    title="Scoreboard"
-    icon={icons.scoreboard}
-  >
-    {#if questions === undefined || scoreboard === undefined}
+  <Sidebar {solvedQuestions} {questions} />
+
+  <!-- main content -->
+  {#if timeStateData === undefined}
+    <Loading />
+  {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
+    {#if questions === undefined}
       <Loading />
     {:else}
-      <Scoreboard {questions} {scoreboard} />
+      <QuestionContents
+        question={questions[$selectedQuestion]}
+        solved={solvedQuestions.has($selectedQuestion)}
+        {setSolved}
+      />
     {/if}
-  </Popout>
+  {:else if timeStateData.phase !== CompState.FINISHED}
+    <div class="locked-message">
+      {#if timeStateData.phase === CompState.BEFORE}
+        <div class="lock-icon">
+          <Icon icon={icons.locked} />
+        </div>
+      {/if}
+      <PageCountdown {timeStateData} />
+    </div>
+  {:else}
+    <div class="locked-message">
+      <div class="finished-message">
+        <h1>Competition Finished</h1>
+        <p>You can no longer submit solutions.</p>
+      </div>
+    </div>
+  {/if}
+</div>
 
-  <Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
-    <CompInfo />
-  </Popout>
+<Popout
+  shown={showingPopout === ShowingPopout.Scoreboard}
+  close={() => (showingPopout = ShowingPopout.None)}
+  title="Scoreboard"
+  icon={icons.scoreboard}
+>
+  {#if questions === undefined || scoreboard === undefined}
+    <Loading />
+  {:else}
+    <Scoreboard {questions} {scoreboard} />
+  {/if}
+</Popout>
 
-  <Popout shown={showingPopout === ShowingPopout.Manual} close={() => (showingPopout = ShowingPopout.None)}>
-    <Manual />
-  </Popout>
+<Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
+  <CompInfo />
+</Popout>
 
-  <Popout
-    shown={showingPopout === ShowingPopout.Settings}
-    close={() => (showingPopout = ShowingPopout.None)}
-    title="Settings"
-    icon={icons.cog}
-  >
-    <Settings />
-  </Popout>
-{/if}
+<Popout shown={showingPopout === ShowingPopout.Manual} close={() => (showingPopout = ShowingPopout.None)}>
+  <Manual />
+</Popout>
+
+<Popout
+  shown={showingPopout === ShowingPopout.Settings}
+  close={() => (showingPopout = ShowingPopout.None)}
+  title="Settings"
+  icon={icons.cog}
+>
+  <Settings />
+</Popout>
 
 {#if $NOTIFICATION !== undefined}
   <Notification message={$NOTIFICATION} close={() => NOTIFICATION.set(undefined)} />

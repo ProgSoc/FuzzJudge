@@ -14,58 +14,12 @@
  */
 import { hc } from "server/src/client";
 import { showNotification } from "./notifications";
-import {
-	type QuestionMeta,
-	type ScoreboardUser,
-	exists,
-	parseScoreboard,
-	questionOrder,
-} from "./utils";
+import { type ScoreboardUser, exists, parseScoreboard } from "./utils";
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
 export const client = hc(BACKEND_SERVER);
 
 console.log("Backend server URL:", BACKEND_SERVER);
-
-export const getQuestions = async (): Promise<Record<string, QuestionMeta>> => {
-	const questions: Record<string, QuestionMeta> = {};
-
-	try {
-		const res = await client.comp.prob.$get();
-
-		if (!res.ok) {
-			throw "Failed to fetch questions";
-		}
-
-		const text = await res.text();
-		const arr = text.split("\n").filter((x) => x !== "");
-
-		if (arr.length === 0) {
-			throw "No questions found";
-		}
-
-		for (const slug of arr) {
-			try {
-				questions[slug] = await getQuestion(slug);
-			} catch (e) {
-				console.error("Error fetching question", slug, e);
-			}
-		}
-
-		const sorted = Object.values(questions).sort(questionOrder);
-
-		for (let i = 0; i < sorted.length; i++) {
-			sorted[i].num = i + 1;
-		}
-	} catch (e: unknown) {
-		if (e instanceof Object) {
-			throw e.toString();
-		}
-		throw e;
-	}
-
-	return questions;
-};
 
 export interface ScoreboardEvent {
 	new_scoreboard: ScoreboardUser[];
@@ -114,49 +68,6 @@ export const getScoreboard = async (): Promise<ScoreboardUser[]> => {
 
 export const getUsername = async (): Promise<string> => {
 	return await fetch(`${BACKEND_SERVER}/auth`).then((r) => r.text());
-};
-
-const getQuestion = async (slug: string) => {
-	const data: QuestionMeta = {
-		slug,
-		num: -1,
-		name: await client.comp.prob[":id"].name
-			.$get({ param: { id: slug } })
-			.then((r) => r.text()),
-		icon: await client.comp.prob[":id"].icon
-			.$get({ param: { id: slug } })
-			.then((r) => r.text()),
-		instructions: await client.comp.prob[":id"].instructions
-			.$get({ param: { id: slug } })
-			.then((r) => r.text()),
-		solved:
-			(await client.comp.prob[":id"].judge
-				.$get({ param: { id: slug } })
-				.then((r) => r.text())
-				.catch(() => "NO")) === "OK",
-		points: Number.parseInt(
-			await client.comp.prob[":id"].points
-				.$get({ param: { id: slug } })
-				.then((r) => r.text()),
-		),
-		difficulty: Number.parseInt(
-			await client.comp.prob[":id"].difficulty
-				.$get({ param: { id: slug } })
-				.then((r) => r.text()),
-		),
-		brief: await client.comp.prob[":id"].brief
-			.$get({ param: { id: slug } })
-			.then((r) => r.text()),
-	};
-
-	data.instructions = data.instructions.replace(
-		/(<img\s+[^>]*src=")(?!https:\/\/)([^"]+)"/g,
-		(match, p1, p2) => {
-			return `${p1}${BACKEND_SERVER}/comp/prob/${slug}/assets/${p2}"`;
-		},
-	);
-
-	return data;
 };
 
 export const submitSolution = async (

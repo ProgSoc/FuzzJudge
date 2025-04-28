@@ -17,10 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Client from "./lib/Client.svelte";
   import { SETTINGS } from "./settings";
   import { Theme, themeClass } from "./themes/themes";
-
-  export const scoreboardMode: boolean = false;
 </script>
 
 <div id="theme-container" class={themeClass($SETTINGS.theme ?? Theme.Default)}>
-  <Client {scoreboardMode} />
+  <Client />
 </div>

@@ -16,6 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
   import QuestionButton from "./QuestionButton.svelte";
+  import { problemOrder } from "../utils";
 
   interface Props {
     name?: string;
@@ -24,20 +25,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     includes?: number | ((difficulty: number) => boolean);
   }
 
-  let {
-    name = "",
-    questions,
-    solvedQuestions,
-    includes = 0
-  }: Props = $props();
+  let { name = "", questions, solvedQuestions, includes = 0 }: Props = $props();
 
-  let list = $derived(Object.values(questions).filter((q) => {
-    if (typeof includes === "function") {
-      return includes(q.difficulty);
-    }
+  let list = $derived(
+    Object.values(questions)
+      .filter((q) => {
+        if (typeof includes === "function") {
+          return includes(q.difficulty);
+        }
 
-    return q.difficulty === includes;
-  }));
+        return q.difficulty === includes;
+      })
+      .sort(problemOrder),
+  );
 </script>
 
 {#if list.length > 0}

@@ -13,40 +13,10 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import { type Writable, writable } from "svelte/store";
 
 export const selectedQuestion: Writable<string> = writable("");
-
-export interface QuestionMeta {
-	slug: string;
-	num: number;
-	name: string;
-	icon: string;
-	instructions: string;
-	solved: boolean;
-	points: number;
-	difficulty: number;
-	brief: string;
-}
-
-export const questionOrder = (a: QuestionMeta, b: QuestionMeta): number => {
-	if (a.difficulty !== b.difficulty) {
-		return a.difficulty - b.difficulty;
-	}
-	if (a.points !== b.points) {
-		return a.points - b.points;
-	}
-
-	if (a.slug === b.slug) throw "Duplicate question.";
-
-	for (let i = 0; i < a.slug.length; i++) {
-		if (a.slug.charCodeAt(i) !== b.slug.charCodeAt(i)) {
-			return a.slug.charCodeAt(i) - b.slug.charCodeAt(i);
-		}
-	}
-
-	return 1;
-};
 
 export const difficultyName = (d: number) => {
 	switch (d) {
@@ -123,4 +93,49 @@ export function removeMdTitle(md: string): string {
 export function currentYear() {
 	const date = new Date();
 	return date.getFullYear();
+}
+
+export function problemOrder(
+	a: FuzzJudgeProblemMessage,
+	b: FuzzJudgeProblemMessage,
+) {
+	if (a.difficulty !== b.difficulty) {
+		return a.difficulty - b.difficulty;
+	}
+
+	if (a.points !== b.points) {
+		return a.points - b.points;
+	}
+
+	if (a.points !== b.points) {
+		return a.points - b.points;
+	}
+
+	return a.doc.title.localeCompare(b.doc.title);
+}
+
+/**
+ * Gets the slug of the next unsolved problem `offset` problems away from the
+ * selected problem.
+ */
+export function nextUnsovledProblem(
+	problems: Record<string, FuzzJudgeProblemMessage>,
+	solvedProblems: Set<string>,
+	selected: string,
+	offset = 1,
+): string | null {
+	const probs = Object.values(problems)
+		.filter((p) => !solvedProblems.has(p.slug))
+		.sort(problemOrder);
+
+	const selectedIndex = probs.findIndex((p) => p.slug === selected);
+
+	if (selectedIndex === -1) return null;
+
+	let newIndex = (selectedIndex + offset) % probs.length;
+	while (newIndex < 0) newIndex += probs.length;
+
+	if (newIndex === selectedIndex) return null;
+
+	return probs[newIndex].slug;
 }

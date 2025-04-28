@@ -21,6 +21,8 @@ bun run dev
 
 # Shortcuts
 * `Esc` - Close popup
+* `Left` - Previous unsolved problem
+* `Right` - Next unsolved problem
 * `Ctrl + I` - Open problem input
 * `Ctrl + D` - Download problem input
 * `Ctrl + Alt + C` - Copy problem input
