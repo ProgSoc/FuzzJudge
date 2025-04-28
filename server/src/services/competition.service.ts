@@ -7,7 +7,7 @@ import { parseMarkdownAttributes } from "./problems.service";
 const competitionSpec = z.object({
 	server: z
 		.object({
-			origins: z.array(z.string()).optional(),
+			// origins: z.array(z.string()).optional(),
 			public: z.array(z.string()).optional(),
 		})
 		.optional(),

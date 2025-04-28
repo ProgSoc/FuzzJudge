@@ -1,6 +1,5 @@
 ---toml
 [server]
-origins = ["*"]
 public = ["client"]
 
 [times]
