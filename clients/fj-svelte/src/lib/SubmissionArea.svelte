@@ -16,7 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import { openFuzz, submitSolution } from "../api";
   import { showNotification } from "../notifications";
-  import { selectedQuestion } from "../utils";
+  import { selectedProblem } from "../utils";
 
   interface Props {
     setSolved: (slug: string) => void;
@@ -31,7 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   let submissionValue = $state("");
   let sourceValue = $state("");
 
-  selectedQuestion.subscribe((_) => {
+  selectedProblem.subscribe((_) => {
     submissionValue = "";
     sourceValue = "";
     waitingOnServer = false;
@@ -48,7 +48,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
       waitingOnServer = false;
 
-      if (slug === $selectedQuestion) {
+      if (slug === $selectedProblem) {
         errorMessage = message;
       }
 
@@ -67,7 +67,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         return;
       }
 
-      submit($selectedQuestion);
+      submit($selectedProblem);
     }
 
     if (e.ctrlKey && e.altKey && e.key === "v") {
@@ -79,28 +79,28 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
-<div class="question-submission">
+<div class="problem-submission">
   <div class="section">
     <div class="text-area-buttons">
       <span class="get-input">
         To begin, <span
-          aria-label="question input"
+          aria-label="problem input"
           role="link"
           tabindex="0"
-          onclick={() => openFuzz($selectedQuestion)}
+          onclick={() => openFuzz($selectedProblem)}
           onkeyup={(e) => {
             if (e.key === "Enter") {
-              openFuzz($selectedQuestion);
+              openFuzz($selectedProblem);
             }
           }}
           class="input-span"
-          >grab your question input!
+          >grab your problem input!
         </span></span
       >
     </div>
     <div class="section submission-areas">
       <div class="solution-submission">
-        <h2>Question Solution</h2>
+        <h2>Problem Solution</h2>
         <textarea bind:value={submissionValue}></textarea>
       </div>
       <div class="source-submission">
@@ -112,7 +112,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       </div>
     </div>
     <div class="text-area-buttons">
-      <button class="submit" onclick={() => submit($selectedQuestion)}>
+      <button class="submit" onclick={() => submit($selectedProblem)}>
         {waitingOnServer ? "Processing..." : "Submit"}
       </button>
     </div>
@@ -167,10 +167,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     width: 100%; /* Ensure the container spans the full width */
   }
 
-  .question-submission {
+  .problem-submission {
     color: var(--text-prim);
     background-color: var(--bg-prim);
-    grid-area: question-submission;
+    grid-area: problem-submission;
     padding: 0.7rem;
     display: flex;
     justify-content: start;

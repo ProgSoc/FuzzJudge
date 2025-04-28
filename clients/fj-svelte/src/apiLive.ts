@@ -60,7 +60,7 @@ export function listenOnWebsocket(callback: (data: SocketMessage) => void) {
 
 export function initLiveState() {
 	const clockSubscribable = makeSvelteSubscribable<CompetitionClockMessage>();
-	const questionsSubscribable =
+	const problemsSubscribable =
 		makeSvelteSubscribable<FuzzJudgeProblemMessage[]>();
 	const scoreboardSubscribable =
 		makeSvelteSubscribable<CompetitionScoreboardMessage>();
@@ -80,7 +80,7 @@ export function initLiveState() {
 				break;
 			}
 			case "problems":
-				questionsSubscribable.notify(data.value);
+				problemsSubscribable.notify(data.value);
 				break;
 			case "scoreboard":
 				scoreboardSubscribable.notify(data.value);
@@ -92,7 +92,7 @@ export function initLiveState() {
 
 	return {
 		listenClock: clockSubscribable.subscribe,
-		listenQuestions: questionsSubscribable.subscribe,
+		listenProblems: problemsSubscribable.subscribe,
 		listenScoreboard: scoreboardSubscribable.subscribe,
 	};
 }

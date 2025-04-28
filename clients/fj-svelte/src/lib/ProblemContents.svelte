@@ -16,27 +16,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import { onDestroy } from "svelte";
   import SvelteMarkdown from "svelte-markdown";
-  import { difficultyName, removeMdTitle, selectedQuestion } from "../utils";
+  import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
   import SubmissionArea from "./SubmissionArea.svelte";
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
   interface Props {
-    question: FuzzJudgeProblemMessage;
+    problem: FuzzJudgeProblemMessage;
     solved: boolean;
     setSolved: (slug: string) => void;
   }
 
-  let { question, solved, setSolved }: Props = $props();
+  let { problem, solved, setSolved }: Props = $props();
 
   // biome-ignore lint/style/useConst: svelte
-  let questionInstructions: HTMLDivElement | undefined = $state(undefined);
+  let problemInstructions: HTMLDivElement | undefined = $state(undefined);
 
-  // Reset scroll to top when a new question is selected
-  const unsubScrollUp = selectedQuestion.subscribe((slug) => {
+  // Reset scroll to top when a new problem is selected
+  const unsubScrollUp = selectedProblem.subscribe((slug) => {
     if (slug === undefined) return;
 
-    if (questionInstructions !== undefined) {
-      questionInstructions.scrollTop = 0;
+    if (problemInstructions !== undefined) {
+      problemInstructions.scrollTop = 0;
     }
   });
 
@@ -45,13 +45,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 </script>
 
-<div class="question" bind:this={questionInstructions}>
-  <div id="question-instructions" class="question-instructions">
-    {#if $selectedQuestion !== undefined}
-      {#if question !== undefined}
+<div class="problem" bind:this={problemInstructions}>
+  <div id="problem-instructions" class="problem-instructions">
+    {#if $selectedProblem !== undefined}
+      {#if problem !== undefined}
         <h1 style="margin-top: 0px;">
           <span style={solved ? "text-decoration: line-through;" : ""}>
-            {question.doc.title}
+            {problem.doc.title}
           </span>
 
           {#if solved}
@@ -62,13 +62,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <div class="stats">
           <span style="margin-right: 1rem;"
             ><b>Difficulty:</b>
-            {difficultyName(question.difficulty)}</span
+            {difficultyName(problem.difficulty)}</span
           >
-          <span><b>Points:</b> {question.points}</span>
+          <span><b>Points:</b> {problem.points}</span>
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={removeMdTitle(question.doc.body)} />
+          <SvelteMarkdown source={removeMdTitle(problem.doc.body)} />
         </div>
       {/if}
 
@@ -78,16 +78,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 </div>
 
 <style>
-  .question {
+  .problem {
     overflow: scroll;
     padding-left: 0.7rem;
     padding-top: 0.5rem;
     background-color: var(--bg-prim);
   }
 
-  .question-instructions {
+  .problem-instructions {
     color: var(--text-prim);
-    grid-area: question-instructions;
+    grid-area: problem-instructions;
     padding: 1rem;
     text-wrap: pretty;
   }

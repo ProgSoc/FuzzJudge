@@ -20,11 +20,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import ListGroup from "./ListGroup.svelte";
 
   interface Props {
-    questions?: Record<string, FuzzJudgeProblemMessage>;
-    solvedQuestions: Set<string>;
+    problems?: Record<string, FuzzJudgeProblemMessage>;
+    solvedProblems: Set<string>;
   }
 
-  let { questions = {}, solvedQuestions }: Props = $props();
+  let { problems = {}, solvedProblems }: Props = $props();
   let open = $state(true);
 
   function toggleOpen() {
@@ -39,17 +39,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
-<div class="question-list" class:closed={!open}>
+<div class="problem-list" class:closed={!open}>
   {#if open}
     <div class="list-title-div">
       <h2 class="list-title">Problems</h2>
       <Icon icon={icons.arrowleft} clickAction={toggleOpen} />
     </div>
 
-    <ListGroup name="Easy" {questions} {solvedQuestions} includes={1} />
-    <ListGroup name="Medium" {questions} {solvedQuestions} includes={2} />
-    <ListGroup name="Hard" {questions} {solvedQuestions} includes={3} />
-    <ListGroup name="Other" {questions} {solvedQuestions} includes={(d) => d < 1 || d > 3} />
+    <ListGroup name="Easy" {problems} {solvedProblems} includes={1} />
+    <ListGroup name="Medium" {problems} {solvedProblems} includes={2} />
+    <ListGroup name="Hard" {problems} {solvedProblems} includes={3} />
+    <ListGroup name="Other" {problems} {solvedProblems} includes={(d) => d < 1 || d > 3} />
   {:else}
     <Icon icon={icons.arrowright} clickAction={toggleOpen} />
   {/if}
@@ -58,8 +58,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <svelte:window onkeydown={keydownHandler} />
 
 <style>
-  .question-list {
-    grid-area: question-list;
+  .problem-list {
+    grid-area: problem-list;
     color: var(--text-prim);
     background-color: var(--bg-sec);
     overflow-y: scroll;

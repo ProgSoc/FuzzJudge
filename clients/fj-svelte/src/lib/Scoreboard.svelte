@@ -20,11 +20,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 
   interface Props {
-    questions: Record<string, FuzzJudgeProblemMessage>;
+    problems: Record<string, FuzzJudgeProblemMessage>;
     scoreboard: CompetitionScoreboardMessage;
   }
 
-  let { questions, scoreboard }: Props = $props();
+  let { problems, scoreboard }: Props = $props();
 
   const errors: string[] = [];
 
@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   // 2025-04-27 edit: hack forever
   let filteredTeams = $derived(scoreboard.filter((team) => team.name !== "Admin"));
 
-  let sortedQuestions = $derived(Object.values(questions).sort((a, b) => a.points - b.points));
+  let sortedProblems = $derived(Object.values(problems).sort((a, b) => a.points - b.points));
 </script>
 
 <table>
@@ -41,8 +41,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       <th> Position </th>
       <th> Team </th>
       <th> Points </th>
-      {#each sortedQuestions as question}
-        <th class="question-num">{question.doc.icon}</th>
+      {#each sortedProblems as problem}
+        <th class="problem-num">{problem.doc.icon}</th>
       {/each}
     </tr>
   </thead>
@@ -58,9 +58,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <td class="points">
           {team.score.total.points}
         </td>
-        {#each sortedQuestions as question}
-          <td class={`result`} class:solved={team.score.problems[question.slug]?.solved}>
-            {#if team.score.problems[question.slug]?.solved}
+        {#each sortedProblems as problem}
+          <td class={`result`} class:solved={team.score.problems[problem.slug]?.solved}>
+            {#if team.score.problems[problem.slug]?.solved}
               ✓
             {/if}
           </td>
@@ -90,7 +90,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     font-weight: bold;
   }
 
-  .question-num {
+  .problem-num {
     min-width: 1.5rem;
   }
 

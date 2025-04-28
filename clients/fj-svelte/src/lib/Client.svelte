@@ -14,8 +14,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { copyFuzz, downloadFuzz, getCompInfo, getQuestionSolvedSet, openFuzz } from "../api";
-  import { nextUnsovledProblem, selectedQuestion } from "../utils";
+  import { copyFuzz, downloadFuzz, getCompInfo, getProblemSolvedSet, openFuzz } from "../api";
+  import { nextUnsovledProblem, selectedProblem } from "../utils";
   import {
     CompState,
     type CompTimes,
@@ -27,7 +27,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import CompInfo from "./CompInfo.svelte";
   import Loading from "./Loading.svelte";
   import Popout from "./Popout.svelte";
-  import QuestionContents from "./QuestionContents.svelte";
+  import ProblemContents from "./ProblemContents.svelte";
   import Scoreboard from "./Scoreboard.svelte";
   import Sidebar from "./Sidebar.svelte";
 
@@ -51,19 +51,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   let compTimes: CompTimes | undefined = undefined;
-  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = $state(undefined);
+  let problems: Record<string, FuzzJudgeProblemMessage> | undefined = $state(undefined);
   let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
-  let solvedQuestions = $state(new Set<string>());
+  let solvedProblems = $state(new Set<string>());
 
   const liveState = initLiveState();
   liveState.listenClock((clock) => {
     compTimes = clock;
   });
-  liveState.listenQuestions(async (qs) => {
-    questions = Object.fromEntries(qs.map((q) => [q.slug, q]));
-    solvedQuestions = await getQuestionSolvedSet(Object.keys(questions));
-    if ($selectedQuestion === "" && questions) {
-      selectedQuestion.set(Object.keys(questions)[0] ?? "");
+  liveState.listenProblems(async (qs) => {
+    problems = Object.fromEntries(qs.map((q) => [q.slug, q]));
+    solvedProblems = await getProblemSolvedSet(Object.keys(problems));
+    if ($selectedProblem === "" && problems) {
+      selectedProblem.set(Object.keys(problems)[0] ?? "");
     }
   });
   liveState.listenScoreboard((sb) => {
@@ -83,7 +83,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   const setSolved = (slug: string) => {
-    solvedQuestions.add(slug);
+    solvedProblems.add(slug);
   };
 
   enum ShowingPopout {
@@ -100,19 +100,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.target === document.body && e.key === "ArrowRight") {
       e.preventDefault();
-      if (questions === undefined) return;
-      const slug = nextUnsovledProblem(questions, solvedQuestions, $selectedQuestion);
+      if (problems === undefined) return;
+      const slug = nextUnsovledProblem(problems, solvedProblems, $selectedProblem);
       if (slug !== null) {
-        selectedQuestion.set(slug);
+        selectedProblem.set(slug);
       }
     }
 
     if (e.target === document.body && e.key === "ArrowLeft") {
       e.preventDefault();
-      if (questions === undefined) return;
-      const slug = nextUnsovledProblem(questions, solvedQuestions, $selectedQuestion, -1);
+      if (problems === undefined) return;
+      const slug = nextUnsovledProblem(problems, solvedProblems, $selectedProblem, -1);
       if (slug !== null) {
-        selectedQuestion.set(slug);
+        selectedProblem.set(slug);
       }
     }
 
@@ -134,17 +134,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
     if (e.ctrlKey && e.key === "i") {
       e.preventDefault();
-      openFuzz($selectedQuestion);
+      openFuzz($selectedProblem);
     }
 
     if (e.ctrlKey && e.key === "d") {
       e.preventDefault();
-      downloadFuzz($selectedQuestion);
+      downloadFuzz($selectedProblem);
     }
 
     if (e.ctrlKey && e.altKey && e.key === "c") {
       e.preventDefault();
-      copyFuzz($selectedQuestion);
+      copyFuzz($selectedProblem);
     }
   };
 </script>
@@ -179,18 +179,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </div>
   </div>
 
-  <Sidebar {solvedQuestions} {questions} />
+  <Sidebar {solvedProblems} {problems} />
 
   <!-- main content -->
   {#if timeStateData === undefined}
     <Loading />
-  {:else if timeStateData.questionsVisible && $selectedQuestion !== ""}
-    {#if questions === undefined}
+  {:else if timeStateData.problemsVisible && $selectedProblem !== ""}
+    {#if problems === undefined}
       <Loading />
     {:else}
-      <QuestionContents
-        question={questions[$selectedQuestion]}
-        solved={solvedQuestions.has($selectedQuestion)}
+      <ProblemContents
+        problem={problems[$selectedProblem]}
+        solved={solvedProblems.has($selectedProblem)}
         {setSolved}
       />
     {/if}
@@ -219,10 +219,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   title="Scoreboard"
   icon={icons.scoreboard}
 >
-  {#if questions === undefined || scoreboard === undefined}
+  {#if problems === undefined || scoreboard === undefined}
     <Loading />
   {:else}
-    <Scoreboard {questions} {scoreboard} />
+    <Scoreboard {problems} {scoreboard} />
   {/if}
 </Popout>
 
@@ -265,7 +265,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     grid-auto-flow: row;
     grid-template-areas:
       "top-bar top-bar"
-      "question-list question-instructions";
+      "problem-list problem-instructions";
   }
 
   .vertical-center {

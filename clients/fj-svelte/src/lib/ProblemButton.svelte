@@ -15,37 +15,37 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import { type QuestionMeta, selectedQuestion } from "../utils";
+  import { type ProblemMeta, selectedProblem } from "../utils";
 
   interface Props {
-    question: FuzzJudgeProblemMessage;
+    problem: FuzzJudgeProblemMessage;
     solved: boolean;
   }
 
-  let { question, solved }: Props = $props();
+  let { problem, solved }: Props = $props();
 
   const select = () => {
-    selectedQuestion.set(question?.slug ?? "");
+    selectedProblem.set(problem?.slug ?? "");
   };
 </script>
 
 <div
-  aria-label={`Select ${question.doc.title}`}
+  aria-label={`Select ${problem.doc.title}`}
   role="link"
   tabindex="0"
   onkeyup={select}
   class="option"
-  class:selected={$selectedQuestion === question?.slug}
+  class:selected={$selectedProblem === problem?.slug}
   onclick={select}
 >
   <div class="icon">
-    {question.doc.icon}
+    {problem.doc.icon}
   </div>
   <div class="name">
-    <span style={solved ? "text-decoration: line-through;" : ""}>{question.doc.title}</span>
+    <span style={solved ? "text-decoration: line-through;" : ""}>{problem.doc.title}</span>
     <br />
     <!-- <span class="subtext">{$q_.brief}</span> -->
-    <span class="subtext">{question.points} points</span>
+    <span class="subtext">{problem.points} points</span>
   </div>
   <div class="status">
     {#if solved}

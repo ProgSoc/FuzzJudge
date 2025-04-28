@@ -124,7 +124,7 @@ export function copyFuzz(slug: string) {
 	})();
 }
 
-export async function isQuestionSolved(slug: string) {
+export async function isProblemSolved(slug: string) {
 	const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
 		method: "GET",
 	});
@@ -133,10 +133,10 @@ export async function isQuestionSolved(slug: string) {
 	return text === "OK";
 }
 
-export async function getQuestionSolvedSet(questionSlugs: string[]) {
+export async function getProblemSolvedSet(problemSlugs: string[]) {
 	const remainingSolved = await Promise.all(
-		questionSlugs.map(async (slug) => {
-			if (await isQuestionSolved(slug)) {
+		problemSlugs.map(async (slug) => {
+			if (await isProblemSolved(slug)) {
 				return slug;
 			}
 			return null;

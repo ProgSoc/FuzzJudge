@@ -107,12 +107,12 @@ export function getCurrentTimeStateData(times: CompTimes) {
 			times.finish.getTime() - Math.max(times.hold.getTime(), now.getTime()),
 		);
 
-	const questionsVisiblePhases = [
+	const problemsVisiblePhases = [
 		CompState.LIVE_FROZEN,
 		CompState.LIVE_UNFROZEN_NO_FREEZE,
 		CompState.LIVE_UNFROZEN,
 	];
-	const questionsVisible = questionsVisiblePhases.includes(phase);
+	const problemsVisible = problemsVisiblePhases.includes(phase);
 
 	return {
 		times,
@@ -121,7 +121,7 @@ export function getCurrentTimeStateData(times: CompTimes) {
 		secondsUntilNextPhase,
 		nextPhaseStart,
 
-		questionsVisible,
+		problemsVisible,
 
 		secondsUntilScoreboardFreeze,
 		secondsUntilCompetitionEnd,

@@ -27,7 +27,7 @@ bun run dev
 * `Ctrl + D` - Download problem input
 * `Ctrl + Alt + C` - Copy problem input
 * `Ctrl + S` - Open scoreboard
-* `Ctrl + P` - Toggle question list
+* `Ctrl + P` - Toggle problem list
 * `Ctrl + M` - Open FuzzJudge manual
 * `Ctrl + Alt + Enter` - Submit solution
 * `Ctrl + Alt + V` - Paste clipboard into solution box

@@ -16,7 +16,7 @@
 import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
 import { type Writable, writable } from "svelte/store";
 
-export const selectedQuestion: Writable<string> = writable("");
+export const selectedProblem: Writable<string> = writable("");
 
 export const difficultyName = (d: number) => {
 	switch (d) {
