@@ -21,6 +21,8 @@ export default function ProblemSection() {
 					}}
 					label={problemItem.title}
 					leftSection={problemItem.icon}
+					rightSection={problemItem.solved ? "✓" : "✗"}
+					color={problemItem.solved ? "green" : undefined}
 					activeProps={{
 						active: true,
 					}}

@@ -3,7 +3,9 @@
 	"module": "main.ts",
 	"type": "module",
 	"devDependencies": {
+		"@libsql/client": "^0.15.4",
 		"@types/bun": "1.2.10",
+		"dotenv": "^16.5.0",
 		"drizzle-kit": "0.31.0"
 	},
 	"types": "./dist",
