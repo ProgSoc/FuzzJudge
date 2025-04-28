@@ -132,7 +132,7 @@ env = { KEY = 123 }
 
 The `exec` command is executed in the path of the problem directory with the team's seed appended to the end of the specified arguments list. For example, the command above would be executed as `deno run fuzz.ts someseed123`. 
 **The seed can be any string; not just a number.**
-The resulting problem input for that seed should then be printed to `stdout`.
+The command must print the generated problem input to `stdout`.
 
 ### Judge
 
@@ -143,8 +143,8 @@ The `[judge]` section takes the team's submitted solution and determines whether
 exec = ["deno", "run", "judge.ts"]
 ```
 
-The command is executed with the seed the same as the [fuzz method](#fuzz) but with the team's solution is piped to the command though `stdin`.
-If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the solution is incorrect, `stderr` will be sent to the client. 
+The command is executed with the seed the same as the [fuzz method](#fuzz) but with the team's solution piped though `stdin`.
+If the command exits with `0`, the submitted solution is correct. If the solution is incorrect, `stderr` will be sent to the client. 
 This is useful for displaying errors regarding incorrect formatting in submissions.
 
 ### Problem Metadata
