@@ -30,6 +30,8 @@ All information for a competition including the problems is defined in a competi
 ```
 comp/
   comd.md
+  client/
+    index.html
   some-problem/
     prob.md 
     program.sh
@@ -42,6 +44,9 @@ The following is an example of a `comp.md` file.
 
 ```md
 ---toml
+[server]
+public = ["client"]
+
 [times]
 start = "2024-06-24T11:30:00+1000"
 finish = "2025-06-24T03:30:00+1000"
@@ -60,8 +65,12 @@ ProgSoc @ TechFest
 - 3:00 - Scoreboard freeze
 - 4:00 - Competition end, scoreboard unfreeze, announcing winners
 ```
+### Server
+the `[server]` section allows for some basic customisation of the server.
+* `public` is a list of subdirectories of the competition directory that are served on endpoints of the same name. For example, `public = ["client"]` would serve the contents of `comp/client` on the `/client` endpoint.
+
 ### Times
-The `[times]` section contains the start and finish times of the competition. 
+The `[times]` section defines the start and finish times of the competition. 
 * `start` is when the problem instructions become available and solutions can be submitted in RFC3339 format.
 * `finish` is when solutions can no longer be submitted in RFC3339 format.
 * `freeze` is the number of seconds before the `finish` where the scoreboard stops being updated. This is used to create suspense and uncertainty around who has won until it is announced.
