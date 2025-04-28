@@ -15,7 +15,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { copyFuzz, downloadFuzz, getCompInfo, getProblemSolvedSet, openFuzz } from "../api";
-  import { nextUnsovledProblem, selectedProblem } from "../utils";
+  import { nextUnsolvedProblem, selectedProblem } from "../utils";
   import {
     CompState,
     type CompTimes,
@@ -101,7 +101,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     if (e.target === document.body && e.key === "ArrowRight") {
       e.preventDefault();
       if (problems === undefined) return;
-      const slug = nextUnsovledProblem(problems, solvedProblems, $selectedProblem);
+      const slug = nextUnsolvedProblem(problems, solvedProblems, $selectedProblem);
       if (slug !== null) {
         selectedProblem.set(slug);
       }
@@ -110,7 +110,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     if (e.target === document.body && e.key === "ArrowLeft") {
       e.preventDefault();
       if (problems === undefined) return;
-      const slug = nextUnsovledProblem(problems, solvedProblems, $selectedProblem, -1);
+      const slug = nextUnsolvedProblem(problems, solvedProblems, $selectedProblem, -1);
       if (slug !== null) {
         selectedProblem.set(slug);
       }

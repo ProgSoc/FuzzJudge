@@ -36,6 +36,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   onkeyup={select}
   class="option"
   class:selected={$selectedProblem === problem?.slug}
+  class:solved={solved}
   onclick={select}
 >
   <div class="icon">
@@ -76,6 +77,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     background-color: var(--bg-prim);
   }
 
+  .solved {
+    opacity: 0.6;
+    filter: brightness(0.9);
+  }
+
   .icon {
     grid-area: icon;
     font-size: 1rem;
@@ -99,7 +105,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     display: flex;
     align-items: center;
     justify-content: center;
-    color: lightgreen;
   }
 
   .subtext {

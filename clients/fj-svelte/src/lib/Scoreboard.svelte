@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { truncateUsername } from "../utils";
+  import { problemOrder, truncateUsername } from "../utils";
 
   import type { CompetitionScoreboardMessage } from "server/v1/score";
   import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   // 2025-04-27 edit: hack forever
   let filteredTeams = $derived(scoreboard.filter((team) => team.name !== "Admin"));
 
-  let sortedProblems = $derived(Object.values(problems).sort((a, b) => a.points - b.points));
+  let sortedProblems = $derived(Object.values(problems).sort(problemOrder));
 </script>
 
 <table>
@@ -95,8 +95,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 
   .solved {
-    background-color: #41df56;
-    color: #000000;
+    background-color: var(--solved);
+    color: var(--bg-sec);
     text-align: center;
   }
 

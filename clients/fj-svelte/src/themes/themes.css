@@ -8,6 +8,7 @@
 	--border: #666;
 	--code-bg: #0d131c;
 	--code-text: var(--text-prim);
+	--solved: #41df56;
 }
 
 .theme-wikipedia {
@@ -20,6 +21,7 @@
 	--border: #C8CCD1;
 	--code-bg: #F8F9FA;
 	--code-text: var(--text-prim);
+	--solved: #cef2e0;
 }
 
 .theme-nord {
@@ -32,6 +34,7 @@
 	--border: #4c566a;
 	--code-bg: #0d131c;
 	--code-text: var(--text-prim);
+	--solved: #a3be8c;
 }
 
 .theme-catppuccin {
@@ -44,6 +47,7 @@
 	--border: #363a4f;
 	--code-bg: #0d131c;
 	--code-text: var(--text-prim);
+	--solved: #a6da95;
 }
 
 .theme-gruvbox-light {
@@ -56,6 +60,7 @@
 	--border: #7C6F65;
 	--code-bg: var(--text-prim);
 	--code-text: var(--bg-prim);
+	--solved: #98971a;
 }
 
 
@@ -69,6 +74,7 @@
 	--border: #504945;
 	--code-bg: #0d131c;
 	--code-text: var(--text-prim);
+	--solved: #98971a;
 }
 
 .theme-og-fuzzjudge {
@@ -81,4 +87,5 @@
 	--border: transparent;
 	--code-bg: #0d131c;
 	--code-text: var(--text-prim);
+	--solved: #41df56;
 }

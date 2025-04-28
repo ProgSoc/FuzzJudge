@@ -118,7 +118,7 @@ export function problemOrder(
  * Gets the slug of the next unsolved problem `offset` problems away from the
  * selected problem.
  */
-export function nextUnsovledProblem(
+export function nextUnsolvedProblem(
 	problems: Record<string, FuzzJudgeProblemMessage>,
 	solvedProblems: Set<string>,
 	selected: string,
