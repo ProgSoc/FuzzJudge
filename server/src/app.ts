@@ -49,6 +49,11 @@ import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
 import { migrateDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "./middleware/auth.middleware.ts";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
 import {
@@ -59,11 +64,6 @@ import {
 import { manualJudge } from "./services/submission.service.ts";
 import { resetUser } from "./services/user.service.ts";
 import { type CompetitionClockMessage, createClock } from "./v1/clock.ts";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "./v1/middleware/auth.middleware.ts";
 import { compRouter } from "./v1/routers/competition.router.ts";
 import { teamRouter } from "./v1/routers/team.router.ts";
 import { userRouter } from "./v1/routers/user.router.ts";
@@ -71,6 +71,7 @@ import {
 	type CompetitionScoreboardMessage,
 	createCompetitionScoreboard,
 } from "./v1/score.ts";
+import { v2Router } from "./v2/routers/v2.router.ts";
 import { HEADER } from "./version.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
@@ -108,6 +109,7 @@ const app = new OpenAPIHono()
 	.route("/comp", compRouter)
 	.route("/user", userRouter)
 	.route("/team", teamRouter)
+	.route("/v2", v2Router)
 	.openapi(
 		createRoute({
 			path: "/docs/scalar",

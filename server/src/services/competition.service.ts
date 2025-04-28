@@ -6,10 +6,11 @@ import { parseMarkdownAttributes } from "./problems.service";
 
 const competitionSpec = z.object({
 	times: z.object({
-		start: z.coerce.date().optional(),
-		finish: z.coerce.date().optional(),
+		start: z.coerce.date(),
+		finish: z.coerce.date(),
 		freeze: z.number(),
 	}),
+	title: z.string(),
 });
 
 export async function getCompetitionData(root: string) {

@@ -2,14 +2,14 @@ import type { ResponseConfig } from "@asteasolutions/zod-to-openapi";
 import { z } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { auth } from "hono/utils/basic-auth";
-import type { User } from "../../db/schema";
+import type { User } from "../db/schema";
 
 interface CustomBasicAuthOptions<T extends User> {
 	verifyUser: (username: string, password: string) => Promise<T | null>;
 	roles?: T["role"][];
 }
 
-export const authMiddleware = <T extends User>(
+export const authMiddleware = <T extends User = User>(
 	options: CustomBasicAuthOptions<T>,
 ) =>
 	createMiddleware<{

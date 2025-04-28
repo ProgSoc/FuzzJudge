@@ -1,4 +1,9 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "../../middleware/auth.middleware";
 import { basicAuth } from "../../services/auth.service";
 import {
 	allTeams,
@@ -6,11 +11,6 @@ import {
 	deleteTeam,
 	patchTeam,
 } from "../../services/team.service";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "../middleware/auth.middleware";
 import { TeamSchema } from "../schema/team.schema";
 
 export const teamRouter = new OpenAPIHono()
