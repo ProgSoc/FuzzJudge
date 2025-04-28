@@ -14,7 +14,7 @@ This is a guide intended for future ProgSoc executives or anyone who wants to ho
 ## Design Overview
 The FuzzJudge server serves problem descriptions and randomised inputs, validates problem solutions, tracks each team's score and runs a timer for competition start and finish times.
 
-A problem can be implemented in any programming language as long as it supports stdin, stdout, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator ([fuzz method](#fuzz)) by the server. 
+A problem can be implemented in any programming language as long as it supports `stdin`, `stdout`, command-line arguments and return codes. Each team is assigned a seed which is given to the problem's generator ([fuzz method](#fuzz)) by the server. 
 When the team then submits their solution, the problem's validator ([judge method](#judge)) is then given the submitted solution and the same seed that was used to generate that team's input. 
 This way the only state that needs to be stored on the server is the team's seed! With the same seed, the same problem input can be regenerated and solved on the server to be compared with the submitted solution.
 
@@ -119,7 +119,7 @@ Output the greeting to the name.
 
 ### Fuzz
 
-The `[fuzz]` section in the code block front matter is used to generate a team's unique problem input based on that team's unique seed.
+The `[fuzz]` section is used to generate a team's unique problem input based on that team's unique seed.
 
 ```
 [fuzz]
@@ -127,25 +127,25 @@ exec = ["deno", "run", "fuzz.ts"]
 env = { KEY = 123 }
 ```
 
-- `exec` is the command to be run to generate the problem input.
-- `env` is any any environment variables to set for the command.
+- `exec` is the command that generates the problem input.
+- `env` sets environment variable for the command.
 
-The `exec` is executed in the path of the problem directory with the seed appended to the end of the specified arguments list (so for example, the command above would be executed as `deno run fuzz.ts someseed123`). 
-The seed can be any string. 
+The `exec` command is executed in the path of the problem directory with the team's seed appended to the end of the specified arguments list. For example, the command above would be executed as `deno run fuzz.ts someseed123`. 
+**The seed can be any string; not just a number.**
 The resulting problem input for that seed should then be printed to `stdout`.
 
 ### Judge
 
-The `[judge]` section in the code block front matter takes the team's submitted solution and determines whether or not it is valid.
+The `[judge]` section takes the team's submitted solution and determines whether or not it is valid.
 
 ```
 [judge]
 exec = ["deno", "run", "judge.ts"]
 ```
 
-The command is executed with the seed the same way it is in the [fuzz method](#fuzz) with the same seed for that team. As it is the same seed, it can be used to determine if the submission is valid for that user's puzzle input. 
-The team's solution is piped to the command though `stdin`. 
-If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the question is incorrect, `stderr` will be sent to the client. This is useful for displaying errors regarding incorrect formatting in submissions.
+The command is executed with the seed the same as the [fuzz method](#fuzz) but with the team's solution is piped to the command though `stdin`.
+If the command exits with an exit code of `0`, the submitted solution is correct and otherwise it is not. If the solution is incorrect, `stderr` will be sent to the client. 
+This is useful for displaying errors regarding incorrect formatting in submissions.
 
 ### Problem Metadata
 
