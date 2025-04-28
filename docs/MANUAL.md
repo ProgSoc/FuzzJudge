@@ -186,9 +186,16 @@ Updates performed in the admin panel will trigger events on the [live API](#live
 TODO
 
 ### Configuring a front-end
-Typically you will want to host a user-friendly web client such as fj-svelte.
+Typically you will want to host a user-friendly web client such as fj-svelte. There are two ways to do this:
+1. **Hosting through the FuzzJudge server:** If you have a static web client, you can put it into a subdirectory of the competition directory and add it to the `public` list in the `[server]` section of `comp.md` ([see here](#server)). Competitors should then connect to `https://<server>:1989/<client-endpoint>`.
+1. **Hosting independently:** If you want to host a client independently, you will need to allow CORS requests from the server. Currently doing this requires proxying all requests but in the future there may be a way to configure allowed origins in `comp.md`.
 
-TODO
+#### Hosting fj-svelte through the server
+1. `cd` into `clients/fj-svelte`.
+2. Run `bun install` and `bun build`.
+3. Copy the contents of `dist` into a subdirectory of your competition directory (e.g. `comp/client`).
+4. Add `client` to the `public` list in the `[server]` section of `comp.md`.
+5. Give competitors the URL `https://<server>:1989/client`.
 
 ### Recommended Hosting Setups
 
