@@ -15,16 +15,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { openFuzz, submitSolution } from "../api";
+  import { showNotification } from "../notifications";
   import { selectedQuestion } from "../utils";
 
-  export let setSolved: (slug: string) => void;
+  interface Props {
+    setSolved: (slug: string) => void;
+  }
 
-  let waitingOnServer = false;
+  let { setSolved }: Props = $props();
 
-  let errorMessage: string | undefined = undefined;
+  let waitingOnServer = $state(false);
 
-  let submissionValue = "";
-  let sourceValue = "";
+  let errorMessage: string | undefined = $state(undefined);
+
+  let submissionValue = $state("");
+  let sourceValue = $state("");
 
   selectedQuestion.subscribe((_) => {
     submissionValue = "";
@@ -52,6 +57,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
       }
     });
   };
+
+  const keyHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.altKey && e.key === "Enter") {
+      e.preventDefault();
+
+      if (submissionValue.length === 0 || sourceValue.length === 0) {
+        showNotification("Please fill in all fields before submitting.");
+        return;
+      }
+
+      submit($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "v") {
+      e.preventDefault();
+      navigator.clipboard.readText().then((text) => {
+        submissionValue = text;
+      });
+    }
+  };
 </script>
 
 <div class="question-submission">
@@ -62,8 +87,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
           aria-label="question input"
           role="link"
           tabindex="0"
-          on:click={() => openFuzz($selectedQuestion)}
-          on:keyup={(e) => {
+          onclick={() => openFuzz($selectedQuestion)}
+          onkeyup={(e) => {
             if (e.key === "Enter") {
               openFuzz($selectedQuestion);
             }
@@ -76,18 +101,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div class="section submission-areas">
       <div class="solution-submission">
         <h2>Question Solution</h2>
-        <textarea bind:value={submissionValue} />
+        <textarea bind:value={submissionValue}></textarea>
       </div>
       <div class="source-submission">
         <h2>Solution source</h2>
         <textarea
           bind:value={sourceValue}
           placeholder="Please include any of the source code used to solve the problem. This may be manually reviewed later."
-        />
+        ></textarea>
       </div>
     </div>
     <div class="text-area-buttons">
-      <button class="submit" on:click={() => submit($selectedQuestion)}>
+      <button class="submit" onclick={() => submit($selectedQuestion)}>
         {waitingOnServer ? "Processing..." : "Submit"}
       </button>
     </div>
@@ -100,6 +125,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     </pre>
   {/if}
 </div>
+
+<svelte:window onkeydown={keyHandler} />
 
 <style>
   .section {

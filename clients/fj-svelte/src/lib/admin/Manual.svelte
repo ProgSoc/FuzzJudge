@@ -17,7 +17,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import SvelteMarkdown from "svelte-markdown";
   import Loading from "../Loading.svelte";
 
-  let source: string | undefined = undefined;
+  let source: string | undefined = $state(undefined);
 
   fetch("https://raw.githubusercontent.com/ProgSoc/FuzzJudge/refs/heads/main/docs/MANUAL.md")
     .then((res) => res.text())

@@ -14,10 +14,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { getCompInfo, getQuestionSolvedSet } from "../api";
-  import {
-    selectedQuestion,
-  } from "../utils";
+  import { copyFuzz, downloadFuzz, getCompInfo, getQuestionSolvedSet, openFuzz } from "../api";
+  import { selectedQuestion } from "../utils";
   import {
     CompState,
     type CompTimes,
@@ -46,9 +44,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Notification from "./Notification.svelte";
   import { NOTIFICATION } from "../notifications";
 
-  export const scoreboardMode = false;
+  interface Props {
+    scoreboardMode: boolean;
+  }
 
-  let username = "Loading...";
+  let { scoreboardMode }: Props = $props();
+
+  let username = $state("Loading...");
 
   getUsername().then((name) => {
     username = name;
@@ -56,9 +58,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   });
 
   let compTimes: CompTimes | undefined = undefined;
-  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = undefined;
-  let scoreboard: CompetitionScoreboardMessage | undefined = undefined;
-  let solvedQuestions = new Set<string>();
+  let questions: Record<string, FuzzJudgeProblemMessage> | undefined = $state(undefined);
+  let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
+  let solvedQuestions = $state(new Set<string>());
 
   const liveState = initLiveState();
   liveState.listenClock((clock) => {
@@ -80,11 +82,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     window.document.title = data.title;
   });
 
-  let timeStateData: TimeStateData | undefined = undefined;
+  let timeStateData: TimeStateData | undefined = $state(undefined);
   clockTick(() => {
     if (compTimes !== undefined) {
       timeStateData = getCurrentTimeStateData(compTimes);
-      handleNotifications(timeStateData); 
+      handleNotifications(timeStateData);
     }
   });
 
@@ -102,7 +104,40 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   }
 
   // biome-ignore lint/style/useConst: is being assigned
-  let showingPopout: ShowingPopout = ShowingPopout.None;
+  let showingPopout: ShowingPopout = $state(ShowingPopout.None);
+
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
+
+      if (showingPopout === ShowingPopout.Scoreboard) {
+	showingPopout = ShowingPopout.None;
+	return;
+      }
+
+      showingPopout = ShowingPopout.Scoreboard;
+    }
+
+    if (e.ctrlKey && e.key === "m") {
+      e.preventDefault();
+      showingPopout = ShowingPopout.Manual;
+    }
+
+    if (e.ctrlKey && e.key === "i") {
+      e.preventDefault();
+      openFuzz($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.key === "d") {
+      e.preventDefault();
+      downloadFuzz($selectedQuestion);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "c") {
+      e.preventDefault();
+      copyFuzz($selectedQuestion);
+    }
+  };
 </script>
 
 {#if scoreboardMode}
@@ -115,12 +150,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="layout">
     <div class="top-bar">
       <div>
-        <button on:click={() => (showingPopout = ShowingPopout.CompInfo)}>
+        <button onclick={() => (showingPopout = ShowingPopout.CompInfo)}>
           <span class="vertical-center">
             <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
           </span>
         </button>
-        <button on:click={() => (showingPopout = ShowingPopout.Scoreboard)}>
+        <button onclick={() => (showingPopout = ShowingPopout.Scoreboard)}>
           <span class="vertical-center">
             <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
           </span>
@@ -208,6 +243,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 {#if $NOTIFICATION !== undefined}
   <Notification message={$NOTIFICATION} close={() => NOTIFICATION.set(undefined)} />
 {/if}
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .layout {

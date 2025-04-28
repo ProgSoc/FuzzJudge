@@ -19,18 +19,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Icon from "./Icon.svelte";
   import ListGroup from "./ListGroup.svelte";
 
-  export let questions: Record<string, FuzzJudgeProblemMessage> = {};
-  export let solvedQuestions: Set<string>;
-  let open = true;
+  interface Props {
+    questions?: Record<string, FuzzJudgeProblemMessage>;
+    solvedQuestions: Set<string>;
+  }
+
+  let { questions = {}, solvedQuestions }: Props = $props();
+  let open = $state(true);
 
   function toggleOpen() {
     open = !open;
   }
+
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "p") {
+      e.preventDefault();
+      open = !open;
+    }
+  };
 </script>
 
-<!-- Navbar markup -->
-
-<!-- Main content -->
 <div class="question-list" class:closed={!open}>
   {#if open}
     <div class="list-title-div">
@@ -46,6 +54,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <Icon icon={icons.arrowright} clickAction={toggleOpen} />
   {/if}
 </div>
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .question-list {

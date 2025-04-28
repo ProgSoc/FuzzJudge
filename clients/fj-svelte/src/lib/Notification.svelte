@@ -4,10 +4,14 @@
   import Icon from "./Icon.svelte";
   import { onDestroy } from "svelte";
 
-  export let message: string;
-  export let close: () => void;
+  interface Props {
+    message: string;
+    close: () => void;
+  }
 
-  let opacity = 0;
+  let { message, close }: Props = $props();
+
+  let opacity = $state(0);
 
   setTimeout(() => {
     opacity = 100;

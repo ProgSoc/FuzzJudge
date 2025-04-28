@@ -18,22 +18,33 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import type { IconDescriptor } from "../types";
   import Icon from "./Icon.svelte";
 
-  // biome-ignore lint/style/useConst: is assigned as a prop
-  export let shown = false;
-  export let close = () => {};
-  export let title: string | undefined = undefined;
-  export let icon: IconDescriptor | undefined = undefined;
+  
+  interface Props {
+    // biome-ignore lint/style/useConst: is assigned as a prop
+    shown?: boolean;
+    close?: any;
+    title?: string | undefined;
+    icon?: IconDescriptor | undefined;
+    children?: import('svelte').Snippet;
+  }
 
-  let maximized = false;
+  let {
+    shown = false,
+    close = () => {},
+    title = undefined,
+    icon = undefined,
+    children
+  }: Props = $props();
+
+  let maximized = $state(false);
   const onMaximiseToggle = () => {
     maximized = !maximized;
   };
 
-  document.addEventListener("keydown", (e) => {
+  const keydownHandler = (e: KeyboardEvent) => {
     if (!shown || e.key !== "Escape") return;
-
     close();
-  });
+  };
 </script>
 
 {#if shown}
@@ -55,10 +66,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
           </span>
         </h1>
       {/if}
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 {/if}
+
+<svelte:window onkeydown={keydownHandler} />
 
 <style>
   .popout-header {

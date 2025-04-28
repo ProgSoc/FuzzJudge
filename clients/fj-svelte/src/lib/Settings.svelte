@@ -14,15 +14,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { SETTINGS } from "../settings";
   import { Theme } from "../themes/themes";
   import { currentYear } from "../utils";
 
-  let theme = $SETTINGS.theme ?? Theme.Default;
+  let theme = $state($SETTINGS.theme ?? Theme.Default);
 
-  $: SETTINGS.update((settings) => {
-    settings.theme = theme;
-    return settings;
+  run(() => {
+    SETTINGS.update((settings) => {
+      settings.theme = theme;
+      return settings;
+    });
   });
 </script>
 
@@ -36,7 +40,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <footer>
   <span>
-    &copy; 2024-{currentYear()} ProgSoc. fj-svelte is provided under an LGPv3 licence.
+    &copy; 2024-{currentYear()} UTS ProgSoc. fj-svelte is provided under an LGPv3 licence.
   </span>
   <a href="https://github.com/ProgSoc/FuzzJudge/tree/main/clients/fj-svelte"> fj-svelte source </a>
   <a href="https://github.com/ProgSoc/FuzzJudge/"> FuzzJudge source </a>
