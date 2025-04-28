@@ -43,11 +43,12 @@
 	fetch("/comp/prob")
 		.then((response) => response.text())
 		.then((text) => {
-			for (const problem of text.split(",")) {
+			for (const problem of text.split("\n")) {
 				const problemElement = document.createElement("a");
 				problemElement.innerText = problem;
 				problemElement.onclick = () => showProblem(problem); 
 				problemElement.href = "#";
+				problemElement.style.margin = "5px";
 				problemList.appendChild(problemElement);
 			}
 		})
