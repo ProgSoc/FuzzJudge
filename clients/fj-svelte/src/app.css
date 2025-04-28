@@ -116,25 +116,23 @@ textarea:focus {
 	border: 2px solid var(--accent);
 }
 
-#instructions-md > p {
+#instructions-md p {
 	margin-left: 1rem;
 }
 
-#instructions-md > pre {
+#instructions-md pre {
 	background-color: var(--code-bg);
 	color: var(--code-text) !important;
 	border-radius: 0.5rem;
-	box-shadow: inset 0 0 0 2px #ffffff1a;
 	padding: 1rem;
 	max-width: max-content;
 	overflow: scroll;
 	margin-left: 1rem;
 }
 
-#instructions-md > p > code {
+#instructions-md :not(pre) > code {
 	background-color: var(--code-bg);
 	color: var(--code-text) !important;
-	box-shadow: inset 0 0 0 2px #ffffff1a;
 	width: 100%;
 	padding: 0.25rem;
 	white-space: nowrap;
