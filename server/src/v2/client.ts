@@ -7,4 +7,4 @@ export type Client = typeof untypedClient;
 export const hc = (...args: Parameters<typeof honoClient>): Client =>
 	honoClient<typeof v2Router>(...args);
 
-export type { InferResponseType } from "hono/client";
+export type { InferResponseType, InferRequestType } from "hono/client";
