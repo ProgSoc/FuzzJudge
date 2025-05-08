@@ -1,6 +1,6 @@
 {
 	"name": "@progsoc/fuzzjudge-server",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"module": "main.ts",
 	"type": "module",
 	"publishConfig": {
@@ -33,8 +33,6 @@
 		"@hono/swagger-ui": "0.5.1",
 		"@hono/zod-openapi": "0.19.6",
 		"@scalar/hono-api-reference": "0.8.5",
-		"@std/toml": "npm:@jsr/std__toml",
-		"@std/yaml": "npm:@jsr/std__yaml",
 		"drizzle-orm": "0.43.1",
 		"gray-matter": "4.0.3",
 		"hono": "4.7.8",
