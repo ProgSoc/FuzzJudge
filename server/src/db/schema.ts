@@ -42,10 +42,10 @@ export const submissionTable = sqliteTable("subm", {
 		.notNull(),
 	prob: text("prob").notNull(),
 	time: text("time").notNull(),
-	out: blob("out", { mode: "buffer" }).notNull(),
-	code: blob("code", { mode: "buffer" }),
+	out: text("out"),
+	code: text("code"),
 	ok: integer("ok", { mode: "boolean" }),
-	vler: blob("vler", { mode: "buffer" }),
+	vler: text("vler"),
 	vlms: real("vlms"),
 });
 

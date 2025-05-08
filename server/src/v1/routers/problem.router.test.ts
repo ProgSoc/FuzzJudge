@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { init } from "@bokuweb/zstd-wasm";
 import { testClient } from "hono/testing";
 import { migrateDB } from "../../db";
 import type { Team, User } from "../../db/schema.ts";
@@ -21,7 +20,6 @@ let fuzzInput: string;
 
 beforeAll(async () => {
 	migrateDB();
-	init();
 	// Create a test user
 	adminUser = await resetUser({
 		logn: "test-admin",

@@ -1,4 +1,3 @@
-import { compress } from "@bokuweb/zstd-wasm";
 import { z } from "@hono/zod-openapi";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "../db";
@@ -10,14 +9,6 @@ interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
 	out: string;
 	code: string;
 	vler: string;
-}
-
-function encStr(input: string) {
-	return Buffer.from(compress(new TextEncoder().encode(input)));
-}
-
-function decStr(input: Buffer) {
-	return new TextDecoder().decode(input);
 }
 
 export async function attempts(params: {
@@ -94,9 +85,9 @@ export async function postSubmission(
 		const [id] = await db
 			.update(submissionTable)
 			.set({
-				out: Buffer.from(encStr(out)),
-				code: Buffer.from(encStr(code)),
-				vler: Buffer.from(encStr(vler)),
+				out,
+				code,
+				vler,
 				vlms,
 			})
 			.where(
@@ -119,10 +110,10 @@ export async function postSubmission(
 			team,
 			prob,
 			time,
-			out: Buffer.from(encStr(out)),
-			code: Buffer.from(encStr(code)),
+			out,
+			code,
 			ok,
-			vler: Buffer.from(encStr(vler)),
+			vler,
 			vlms,
 		})
 		.returning()
@@ -173,7 +164,7 @@ export async function getSubmissionOut(
 	});
 	if (!data) return;
 
-	return decStr(data.out);
+	return data.out ?? "";
 }
 
 export async function getSubmissionCode(
@@ -184,7 +175,7 @@ export async function getSubmissionCode(
 		where: (table) => eq(table.id, id),
 	});
 	if (!data?.code) return;
-	return decStr(data.code);
+	return data.code;
 }
 
 export async function getSubmissionVler(
@@ -195,5 +186,5 @@ export async function getSubmissionVler(
 		where: (table) => eq(table.id, id),
 	});
 	if (!data?.vler) return;
-	return decStr(data.vler);
+	return data.vler;
 }

@@ -40,7 +40,6 @@ Backend
 */
 
 import path from "node:path";
-import { init as initZstd } from "@bokuweb/zstd-wasm";
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
@@ -75,7 +74,6 @@ import {
 import { HEADER } from "./version.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
-await initZstd();
 migrateDB();
 
 const root = competitionRoot;

@@ -29,7 +29,6 @@
 	},
 	"dependencies": {
 		"@asteasolutions/zod-to-openapi": "7.3.0",
-		"@bokuweb/zstd-wasm": "0.0.27",
 		"@hono/swagger-ui": "0.5.1",
 		"@hono/zod-openapi": "0.19.6",
 		"@scalar/hono-api-reference": "0.8.5",
