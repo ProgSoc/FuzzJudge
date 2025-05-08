@@ -32,7 +32,7 @@ jobs:
       - name: Install Deps
         run: bun install
       - name: Build Types
-        run: bun run --filter server build
+        run: bun run --filter @progsoc/fuzzjudge-server build
       - name: Build Types
         run: bun run tsc -b --verbose
       - name: Check Svelte Types
