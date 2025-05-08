@@ -37,4 +37,7 @@ jobs:
       - name: Build JS
         run: bun run --filter @progsoc/fuzzjudge-server build
       - run: cd server && bun publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
       
