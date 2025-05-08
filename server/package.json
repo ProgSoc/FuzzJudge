@@ -3,6 +3,9 @@
 	"version": "0.2.0",
 	"module": "main.ts",
 	"type": "module",
+	"publishConfig": {
+		"access": "public"
+	},
 	"devDependencies": {
 		"@types/bun": "1.2.12",
 		"drizzle-kit": "0.31.0"

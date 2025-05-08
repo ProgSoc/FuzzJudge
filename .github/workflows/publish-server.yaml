@@ -1,0 +1,37 @@
+on:
+  workflow_dispatch:
+
+name: Test Code
+jobs:
+  test-server:
+    name: Test Bun
+    runs-on: ubuntu-latest
+    steps:
+      # ...
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      # run any `bun` or `bunx` command
+      - run: bun install
+      - run: cd server && bun test
+  publish-server:
+    name: Publish Bun
+    needs: test-server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Setup NPM
+        uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org/'
+      # run any `bun` or `bunx` command
+      - run: bun install
+      - run: cd server && bun publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
