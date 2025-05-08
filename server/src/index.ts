@@ -1,3 +1,5 @@
+#!/usr/bin/env bun
+
 import app from "./app.ts";
 import { websocket } from "./websocket.ts";
 

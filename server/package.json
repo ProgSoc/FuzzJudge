@@ -1,8 +1,9 @@
 {
 	"name": "@progsoc/fuzzjudge-server",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"module": "main.ts",
 	"type": "module",
+	"bin": "dist/index.js",
 	"publishConfig": {
 		"access": "public"
 	},
