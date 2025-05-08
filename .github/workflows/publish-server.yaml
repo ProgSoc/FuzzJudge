@@ -28,6 +28,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           registry-url: 'https://registry.npmjs.org/'
+          always-auth: true
+          scope: '@progsoc'
+          token: ${{ secrets.NPM_TOKEN }}
       # run any `bun` or `bunx` command
       - run: bun install
       - name: Build Types
@@ -35,7 +38,4 @@ jobs:
       - name: Build JS
         run: bun run --filter @progsoc/fuzzjudge-server build
       - run: cd server && bun publish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
