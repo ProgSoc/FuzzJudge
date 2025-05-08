@@ -1,6 +1,6 @@
 {
 	"name": "@progsoc/fuzzjudge-server",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"module": "main.ts",
 	"type": "module",
 	"publishConfig": {
@@ -11,7 +11,9 @@
 		"drizzle-kit": "0.31.0"
 	},
 	"types": "./dist",
-	"bin": "./dist/index.js",
+	"bin": {
+		"fuzzjudge-server": "./dist/index.js"
+	},
 	"engines": {
 		"bun": ">=1.2.0"
 	},
