@@ -1,3 +1,4 @@
 {
-	"name": "01-hello"
+	"name": "01-hello",
+	"private": true
 }

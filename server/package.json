@@ -1,5 +1,6 @@
 {
-	"name": "server",
+	"name": "@progsoc/fuzzjudge-server",
+	"version": "0.2.0",
 	"module": "main.ts",
 	"type": "module",
 	"devDependencies": {

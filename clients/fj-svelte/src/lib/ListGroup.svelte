@@ -14,30 +14,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import ProblemButton from "./ProblemButton.svelte";
-  import { problemOrder } from "../utils";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import ProblemButton from "./ProblemButton.svelte";
+import { problemOrder } from "../utils";
 
-  interface Props {
-    name?: string;
-    problems: Record<string, FuzzJudgeProblemMessage>;
-    solvedProblems: Set<string>;
-    includes?: number | ((difficulty: number) => boolean);
-  }
+interface Props {
+	name?: string;
+	problems: Record<string, FuzzJudgeProblemMessage>;
+	solvedProblems: Set<string>;
+	includes?: number | ((difficulty: number) => boolean);
+}
 
-  let { name = "", problems, solvedProblems, includes = 0 }: Props = $props();
+let { name = "", problems, solvedProblems, includes = 0 }: Props = $props();
 
-  let list = $derived(
-    Object.values(problems)
-      .filter((q) => {
-        if (typeof includes === "function") {
-          return includes(q.difficulty);
-        }
+let list = $derived(
+	Object.values(problems)
+		.filter((q) => {
+			if (typeof includes === "function") {
+				return includes(q.difficulty);
+			}
 
-        return q.difficulty === includes;
-      })
-      .sort(problemOrder),
-  );
+			return q.difficulty === includes;
+		})
+		.sort(problemOrder),
+);
 </script>
 
 {#if list.length > 0}

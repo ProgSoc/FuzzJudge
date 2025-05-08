@@ -14,139 +14,155 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { copyFuzz, downloadFuzz, getCompInfo, getProblemSolvedSet, openFuzz } from "../api";
-  import { nextUnsolvedProblem, selectedProblem } from "../utils";
-  import {
-    CompState,
-    type CompTimes,
-    type TimeStateData,
-    getCurrentTimeStateData,
-    clockTick,
-    handleNotifications,
-  } from "../clock";
-  import CompInfo from "./CompInfo.svelte";
-  import Loading from "./Loading.svelte";
-  import Popout from "./Popout.svelte";
-  import ProblemContents from "./ProblemContents.svelte";
-  import Scoreboard from "./Scoreboard.svelte";
-  import Sidebar from "./Sidebar.svelte";
+import {
+	copyFuzz,
+	downloadFuzz,
+	getCompInfo,
+	getProblemSolvedSet,
+	openFuzz,
+} from "../api";
+import { nextUnsolvedProblem, selectedProblem } from "../utils";
+import {
+	CompState,
+	type CompTimes,
+	type TimeStateData,
+	getCurrentTimeStateData,
+	clockTick,
+	handleNotifications,
+} from "../clock";
+import CompInfo from "./CompInfo.svelte";
+import Loading from "./Loading.svelte";
+import Popout from "./Popout.svelte";
+import ProblemContents from "./ProblemContents.svelte";
+import Scoreboard from "./Scoreboard.svelte";
+import Sidebar from "./Sidebar.svelte";
 
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import type { CompetitionScoreboardMessage } from "server/v1/score";
-  import { getUsername } from "../api";
-  import { initLiveState } from "../apiLive";
-  import icons from "../icons";
-  import Icon from "./Icon.svelte";
-  import InlineCountdown from "./counters/InlineCountdown.svelte";
-  import PageCountdown from "./counters/PageCountdown.svelte";
-  import Settings from "./Settings.svelte";
-  import Manual from "./admin/Manual.svelte";
-  import Notification from "./Notification.svelte";
-  import { NOTIFICATION } from "../notifications";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import type { CompetitionScoreboardMessage } from "@progsoc/fuzzjudge-server/v1/score";
+import { getUsername } from "../api";
+import { initLiveState } from "../apiLive";
+import icons from "../icons";
+import Icon from "./Icon.svelte";
+import InlineCountdown from "./counters/InlineCountdown.svelte";
+import PageCountdown from "./counters/PageCountdown.svelte";
+import Settings from "./Settings.svelte";
+import Manual from "./admin/Manual.svelte";
+import Notification from "./Notification.svelte";
+import { NOTIFICATION } from "../notifications";
 
-  let username = $state("Loading...");
+let username = $state("Loading...");
 
-  getUsername().then((name) => {
-    username = name;
-  });
+getUsername().then((name) => {
+	username = name;
+});
 
-  let compTimes: CompTimes | undefined = undefined;
-  let problems: Record<string, FuzzJudgeProblemMessage> | undefined = $state(undefined);
-  let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
-  let solvedProblems = $state(new Set<string>());
+let compTimes: CompTimes | undefined = undefined;
+let problems: Record<string, FuzzJudgeProblemMessage> | undefined =
+	$state(undefined);
+let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
+let solvedProblems = $state(new Set<string>());
 
-  const liveState = initLiveState();
-  liveState.listenClock((clock) => {
-    compTimes = clock;
-  });
-  liveState.listenProblems(async (qs) => {
-    problems = Object.fromEntries(qs.map((q) => [q.slug, q]));
-    solvedProblems = await getProblemSolvedSet(Object.keys(problems));
-    if ($selectedProblem === "" && problems) {
-      selectedProblem.set(Object.keys(problems)[0] ?? "");
-    }
-  });
-  liveState.listenScoreboard((sb) => {
-    scoreboard = sb;
-  });
+const liveState = initLiveState();
+liveState.listenClock((clock) => {
+	compTimes = clock;
+});
+liveState.listenProblems(async (qs) => {
+	problems = Object.fromEntries(qs.map((q) => [q.slug, q]));
+	solvedProblems = await getProblemSolvedSet(Object.keys(problems));
+	if ($selectedProblem === "" && problems) {
+		selectedProblem.set(Object.keys(problems)[0] ?? "");
+	}
+});
+liveState.listenScoreboard((sb) => {
+	scoreboard = sb;
+});
 
-  getCompInfo().then((data) => {
-    window.document.title = data.title;
-  });
+getCompInfo().then((data) => {
+	window.document.title = data.title;
+});
 
-  let timeStateData: TimeStateData | undefined = $state(undefined);
-  clockTick(() => {
-    if (compTimes !== undefined) {
-      timeStateData = getCurrentTimeStateData(compTimes);
-      handleNotifications(timeStateData);
-    }
-  });
+let timeStateData: TimeStateData | undefined = $state(undefined);
+clockTick(() => {
+	if (compTimes !== undefined) {
+		timeStateData = getCurrentTimeStateData(compTimes);
+		handleNotifications(timeStateData);
+	}
+});
 
-  const setSolved = (slug: string) => {
-    solvedProblems.add(slug);
-  };
+const setSolved = (slug: string) => {
+	solvedProblems.add(slug);
+};
 
-  enum ShowingPopout {
-    None = 0,
-    Scoreboard = 1,
-    CompInfo = 2,
-    Settings = 3,
-    Manual = 4,
-  }
+enum ShowingPopout {
+	None = 0,
+	Scoreboard = 1,
+	CompInfo = 2,
+	Settings = 3,
+	Manual = 4,
+}
 
-  // biome-ignore lint/style/useConst: is being assigned
-  let showingPopout: ShowingPopout = $state(ShowingPopout.None);
+// biome-ignore lint/style/useConst: is being assigned
+let showingPopout: ShowingPopout = $state(ShowingPopout.None);
 
-  const keydownHandler = (e: KeyboardEvent) => {
-    if (e.target === document.body && e.key === "ArrowRight") {
-      e.preventDefault();
-      if (problems === undefined) return;
-      const slug = nextUnsolvedProblem(problems, solvedProblems, $selectedProblem);
-      if (slug !== null) {
-        selectedProblem.set(slug);
-      }
-    }
+const keydownHandler = (e: KeyboardEvent) => {
+	if (e.target === document.body && e.key === "ArrowRight") {
+		e.preventDefault();
+		if (problems === undefined) return;
+		const slug = nextUnsolvedProblem(
+			problems,
+			solvedProblems,
+			$selectedProblem,
+		);
+		if (slug !== null) {
+			selectedProblem.set(slug);
+		}
+	}
 
-    if (e.target === document.body && e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (problems === undefined) return;
-      const slug = nextUnsolvedProblem(problems, solvedProblems, $selectedProblem, -1);
-      if (slug !== null) {
-        selectedProblem.set(slug);
-      }
-    }
+	if (e.target === document.body && e.key === "ArrowLeft") {
+		e.preventDefault();
+		if (problems === undefined) return;
+		const slug = nextUnsolvedProblem(
+			problems,
+			solvedProblems,
+			$selectedProblem,
+			-1,
+		);
+		if (slug !== null) {
+			selectedProblem.set(slug);
+		}
+	}
 
-    if (e.ctrlKey && e.key === "s") {
-      e.preventDefault();
+	if (e.ctrlKey && e.key === "s") {
+		e.preventDefault();
 
-      if (showingPopout === ShowingPopout.Scoreboard) {
-	showingPopout = ShowingPopout.None;
-	return;
-      }
+		if (showingPopout === ShowingPopout.Scoreboard) {
+			showingPopout = ShowingPopout.None;
+			return;
+		}
 
-      showingPopout = ShowingPopout.Scoreboard;
-    }
+		showingPopout = ShowingPopout.Scoreboard;
+	}
 
-    if (e.ctrlKey && e.key === "m") {
-      e.preventDefault();
-      showingPopout = ShowingPopout.Manual;
-    }
+	if (e.ctrlKey && e.key === "m") {
+		e.preventDefault();
+		showingPopout = ShowingPopout.Manual;
+	}
 
-    if (e.ctrlKey && e.key === "i") {
-      e.preventDefault();
-      openFuzz($selectedProblem);
-    }
+	if (e.ctrlKey && e.key === "i") {
+		e.preventDefault();
+		openFuzz($selectedProblem);
+	}
 
-    if (e.ctrlKey && e.key === "d") {
-      e.preventDefault();
-      downloadFuzz($selectedProblem);
-    }
+	if (e.ctrlKey && e.key === "d") {
+		e.preventDefault();
+		downloadFuzz($selectedProblem);
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "c") {
-      e.preventDefault();
-      copyFuzz($selectedProblem);
-    }
-  };
+	if (e.ctrlKey && e.altKey && e.key === "c") {
+		e.preventDefault();
+		copyFuzz($selectedProblem);
+	}
+};
 </script>
 
 <div class="layout">

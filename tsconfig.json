@@ -29,8 +29,8 @@
 		"declaration": true,
 		// "baseUrl": ".",
 		"paths": {
-			"server": ["./server/src"],
-			"server/*": ["./server/*"]
+			"@progsoc/fuzzjudge-server": ["./server/src"],
+			"@progsoc/fuzzjudge-server/*": ["./server/*"]
 		}
 	},
 	"include": ["package.json"],

@@ -14,29 +14,29 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import icons from "../icons";
-  import Icon from "./Icon.svelte";
-  import ListGroup from "./ListGroup.svelte";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import icons from "../icons";
+import Icon from "./Icon.svelte";
+import ListGroup from "./ListGroup.svelte";
 
-  interface Props {
-    problems?: Record<string, FuzzJudgeProblemMessage>;
-    solvedProblems: Set<string>;
-  }
+interface Props {
+	problems?: Record<string, FuzzJudgeProblemMessage>;
+	solvedProblems: Set<string>;
+}
 
-  let { problems = {}, solvedProblems }: Props = $props();
-  let open = $state(true);
+let { problems = {}, solvedProblems }: Props = $props();
+let open = $state(true);
 
-  function toggleOpen() {
-    open = !open;
-  }
+function toggleOpen() {
+	open = !open;
+}
 
-  const keydownHandler = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === "p") {
-      e.preventDefault();
-      open = !open;
-    }
-  };
+const keydownHandler = (e: KeyboardEvent) => {
+	if (e.ctrlKey && e.key === "p") {
+		e.preventDefault();
+		open = !open;
+	}
+};
 </script>
 
 <div class="problem-list" class:closed={!open}>

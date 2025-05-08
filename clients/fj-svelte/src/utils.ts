@@ -13,7 +13,7 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
 import { type Writable, writable } from "svelte/store";
 
 export const selectedProblem: Writable<string> = writable("");

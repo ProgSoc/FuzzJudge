@@ -14,19 +14,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
-  import { selectedProblem } from "../utils";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import { selectedProblem } from "../utils";
 
-  interface Props {
-    problem: FuzzJudgeProblemMessage;
-    solved: boolean;
-  }
+interface Props {
+	problem: FuzzJudgeProblemMessage;
+	solved: boolean;
+}
 
-  let { problem, solved }: Props = $props();
+let { problem, solved }: Props = $props();
 
-  const select = () => {
-    selectedProblem.set(problem?.slug ?? "");
-  };
+const select = () => {
+	selectedProblem.set(problem?.slug ?? "");
+};
 </script>
 
 <div

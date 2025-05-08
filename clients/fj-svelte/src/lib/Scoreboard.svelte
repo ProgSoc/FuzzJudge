@@ -14,25 +14,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { problemOrder, truncateUsername } from "../utils";
+import { problemOrder, truncateUsername } from "../utils";
 
-  import type { CompetitionScoreboardMessage } from "server/v1/score";
-  import type { FuzzJudgeProblemMessage } from "server/services/problems.service";
+import type { CompetitionScoreboardMessage } from "@progsoc/fuzzjudge-server/v1/score";
+import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
 
-  interface Props {
-    problems: Record<string, FuzzJudgeProblemMessage>;
-    scoreboard: CompetitionScoreboardMessage;
-  }
+interface Props {
+	problems: Record<string, FuzzJudgeProblemMessage>;
+	scoreboard: CompetitionScoreboardMessage;
+}
 
-  let { problems, scoreboard }: Props = $props();
+let { problems, scoreboard }: Props = $props();
 
-  const errors: string[] = [];
+const errors: string[] = [];
 
-  // Hack for the day
-  // 2025-04-27 edit: hack forever
-  let filteredTeams = $derived(scoreboard.filter((team) => team.name !== "Admin"));
+// Hack for the day
+// 2025-04-27 edit: hack forever
+let filteredTeams = $derived(
+	scoreboard.filter((team) => team.name !== "Admin"),
+);
 
-  let sortedProblems = $derived(Object.values(problems).sort(problemOrder));
+let sortedProblems = $derived(Object.values(problems).sort(problemOrder));
 </script>
 
 <table>

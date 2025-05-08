@@ -16,7 +16,7 @@
 import { onDestroy } from "svelte";
 import { unreachable } from "./utils";
 
-import type { CompetitionClockMessage } from "server/v1/clock";
+import type { CompetitionClockMessage } from "@progsoc/fuzzjudge-server/v1/clock";
 import { showNotification } from "./notifications";
 
 export type CompTimes = CompetitionClockMessage;

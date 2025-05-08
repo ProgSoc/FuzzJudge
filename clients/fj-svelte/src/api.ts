@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { hc } from "server/src/client";
+import { hc } from "@progsoc/fuzzjudge-server/src/client";
 import { showNotification } from "./notifications";
 import { type ScoreboardUser, exists, parseScoreboard } from "./utils";
 
