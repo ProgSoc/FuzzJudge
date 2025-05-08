@@ -44,6 +44,7 @@
 	},
 	"scripts": {
 		"build": "bun build ./src/index.ts ./src/client.ts --outdir=./dist --minify --target bun --sourcemap",
+		"build:types": "bun tsc -b",
 		"dev": "bun run --watch ./src/index.ts ../sample"
 	}
 }

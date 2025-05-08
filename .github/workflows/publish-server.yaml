@@ -30,6 +30,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
       # run any `bun` or `bunx` command
       - run: bun install
+      - name: Build Types
+        run: bun run --filter @progsoc/fuzzjudge-server build:types
+      - name: Build JS
+        run: bun run --filter @progsoc/fuzzjudge-server build
       - run: cd server && bun publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
