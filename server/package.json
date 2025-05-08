@@ -7,6 +7,11 @@
 		"drizzle-kit": "0.31.0"
 	},
 	"types": "./dist",
+	"bin": "./dist/index.js",
+	"engines": {
+		"bun": ">=1.2.0"
+	},
+	"files": ["dist", "migrations", "README.md", "LICENSE"],
 	"exports": {
 		".": {
 			"types": "./dist/src/index.d.ts"

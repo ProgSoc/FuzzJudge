@@ -20,9 +20,8 @@ import { Database } from "bun:sqlite";
 import path from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { databaseUrl } from "../config.ts";
 import * as schema from "./schema.ts";
-
-const databaseUrl = Bun.env.DATABASE_URL ?? ":memory:";
 
 if (databaseUrl === ":memory:") {
 	console.warn(
@@ -40,9 +39,8 @@ const database = new Database(databaseUrl);
  */
 export const db = drizzle(database, { schema });
 
-const cwdPath = path.join(process.cwd(), "./migrations");
-
 // Meta resolve
+const migrationFolder = path.resolve("migrations");
 
 /**
  * Performs any pending migrations.
@@ -50,6 +48,6 @@ const cwdPath = path.join(process.cwd(), "./migrations");
 export function migrateDB() {
 	// console.log("Running migrations...", cwdPath);
 	migrate(db, {
-		migrationsFolder: cwdPath,
+		migrationsFolder: migrationFolder,
 	});
 }

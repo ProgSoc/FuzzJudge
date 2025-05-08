@@ -47,6 +47,7 @@ import { z } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
+import { competitionRoot } from "./config.ts";
 import { migrateDB } from "./db/index.ts";
 import { ee } from "./ee.ts";
 import { basicAuth } from "./services/auth.service.ts";
@@ -77,11 +78,7 @@ import { upgradeWebSocket } from "./websocket.ts";
 await initZstd();
 migrateDB();
 
-if (!Bun.env.COMPETITION_PATH) {
-	throw new Error("COMPETITION_PATH env not set");
-}
-
-const root = path.resolve(Bun.env.COMPETITION_PATH);
+const root = competitionRoot;
 
 const problems = await getProblems(root);
 const competionData = await getCompetitionData(root);

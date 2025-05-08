@@ -1,6 +1,7 @@
 import path from "node:path";
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { serveStatic } from "hono/bun";
+import { competitionRoot } from "../../config";
 import { basicAuth } from "../../services/auth.service";
 import {
 	fuzzProblem,
@@ -14,11 +15,7 @@ import {
 	unauthorizedResponse,
 } from "../middleware/auth.middleware";
 
-const root = Bun.env.COMPETITION_PATH;
-
-if (!root) {
-	throw new Error("COMPETITION_PATH env not set");
-}
+const root = competitionRoot;
 
 const problems = await getProblems(root);
 

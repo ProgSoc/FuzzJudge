@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { clock } from "../../app";
+import { competitionRoot } from "../../config";
 import { ee } from "../../ee";
 import { basicAuth } from "../../services/auth.service";
 import { getCompetitionData } from "../../services/competition.service";
@@ -21,12 +22,7 @@ import {
 } from "../middleware/auth.middleware";
 import { probRouter } from "./problem.router";
 
-const root = Bun.env.COMPETITION_PATH;
-if (!root) {
-	throw new Error("COMPETITION_PATH env not set");
-}
-
-const competionData = await getCompetitionData(root);
+const competionData = await getCompetitionData(competitionRoot);
 
 export const compRouter = new OpenAPIHono()
 	.route("/prob", probRouter)
@@ -281,7 +277,7 @@ export const compRouter = new OpenAPIHono()
 		}),
 		async (c) => {
 			// clock.protect([CompState.BEFORE, CompState.LIVE_WITH_SCORES]);
-			return c.body(await oldScoreboard(root), {
+			return c.body(await oldScoreboard(competitionRoot), {
 				headers: { "Content-Type": "text/csv" },
 			});
 		},
