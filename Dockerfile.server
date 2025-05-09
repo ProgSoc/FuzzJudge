@@ -7,14 +7,14 @@ FROM base AS install
 RUN mkdir -p /temp/dev
 COPY package.json bun.lockb /temp/dev/
 COPY server/package.json /temp/dev/server/package.json
-RUN cd /temp/dev && bun install --filter "./server"
+RUN cd /temp/dev && bun install --filter @progsoc/fuzzjudge-server
 
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
 COPY package.json bun.lockb /temp/prod/
 COPY server/package.json /temp/prod/server/package.json
-RUN cd /temp/prod && bun install --filter "./server"
+RUN cd /temp/prod && bun install --filter @progsoc/fuzzjudge-server
 
 
 # copy node_modules from temp directory
@@ -23,7 +23,7 @@ FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
-RUN bun run --filter "./server" build 
+RUN bun run --filter @progsoc/fuzzjudge-server build 
 
 
 

@@ -5,13 +5,13 @@ WORKDIR /app
 # Copy the necessary files
 COPY . .
 # Install dependencies
-RUN bun install --frozen-lockfile --filter fj-svelte
+RUN bun install --frozen-lockfile --filter @progsoc/fj-svelte
 
 ARG VITE_BACKEND_URL
 # Set the environment variable for the backend URL
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 # Build the application
-RUN bun run --filter fj-svelte build
+RUN bun run --filter @progsoc/fj-svelte build
 
 
 FROM nginx

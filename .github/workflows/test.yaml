@@ -36,5 +36,5 @@ jobs:
       - name: Build Types
         run: bun run tsc -b --verbose
       - name: Check Svelte Types
-        run: bun run --filter fj-svelte check
+        run: bun run --filter @progsoc/fj-svelte check
       
