@@ -1,4 +1,5 @@
 import { watch } from "node:fs/promises";
+import fs from "node:fs/promises";
 import { HEADER } from "./src/version";
 
 let ab = new AbortController();
@@ -22,6 +23,17 @@ const requestRestart = async () => {
 	}
 
 	ab = new AbortController();
+
+	// Copy migrations
+	await fs.cp(
+		`${import.meta.dir}/migrations`,
+		`${import.meta.dir}/dist/migrations`,
+		{
+			recursive: true,
+			force: true,
+			errorOnExist: false,
+		},
+	);
 
 	await Bun.build({
 		entrypoints: buildEntryPoints,
