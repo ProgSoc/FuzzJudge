@@ -2,7 +2,7 @@ export const VERSION = "0.2.6";
 
 export const HEADER = `\
 FuzzJudge v${VERSION} - Randomised input judging server, designed for ProgComp.
-Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
+Copyright (C) ${new Date().getFullYear()} UTS Programmers' Society (ProgSoc)
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU Affero General Public License as published

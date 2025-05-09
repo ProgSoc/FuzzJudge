@@ -40,8 +40,8 @@
 		"zod": "3.24.4"
 	},
 	"scripts": {
-		"build": "bun build ./src/index.ts ./src/client.ts --outdir=./dist --minify --target bun --sourcemap",
 		"build:types": "bun tsc -b",
-		"dev": "bun run --watch ./src/index.ts ../sample"
+		"build": "bun run build.ts",
+		"dev": "bun run dev.ts ../sample"
 	}
 }
