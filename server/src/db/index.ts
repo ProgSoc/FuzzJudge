@@ -47,6 +47,8 @@ const migrationFolder = topMigrationFolderExists
 	? "./migrations"
 	: path.join(import.meta.dirname, "../migrations");
 
+console.log(`Using migrations folder: ${migrationFolder} `);
+
 /**
  * Performs any pending migrations.
  */
