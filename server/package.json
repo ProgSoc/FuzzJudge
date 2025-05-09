@@ -16,7 +16,7 @@
 	"engines": {
 		"bun": ">=1.2.0"
 	},
-	"files": ["dist", "README.md", "LICENSE"],
+	"files": ["dist", "migrations", "README.md", "LICENSE"],
 	"exports": {
 		".": {
 			"types": "./dist/src/index.d.ts"
