@@ -9,7 +9,7 @@
 	},
 	"devDependencies": {
 		"@types/bun": "1.2.12",
-		"drizzle-kit": "0.31.0",
+		"drizzle-kit": "0.31.1",
 		"typescript": "5.8.3"
 	},
 	"types": "./dist",
