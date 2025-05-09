@@ -40,8 +40,9 @@ const database = new Database(databaseUrl);
 export const db = drizzle(database, { schema });
 
 // Meta resolve
-const migrationFolder = path.resolve("migrations");
+const migrationFolder = path.join(import.meta.dirname, "../migrations");
 
+// console.log("Migration folder:", migrationFolder);
 /**
  * Performs any pending migrations.
  */
