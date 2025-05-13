@@ -2,6 +2,11 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { clock } from "../../app";
 import { competitionRoot } from "../../config";
 import { ee } from "../../ee";
+import {
+	authMiddleware,
+	forbiddenResponse,
+	unauthorizedResponse,
+} from "../../middleware/auth.middleware";
 import { basicAuth } from "../../services/auth.service";
 import { getCompetitionData } from "../../services/competition.service";
 import { allMeta } from "../../services/meta.service";
@@ -15,11 +20,6 @@ import {
 } from "../../services/submission.service";
 import { upgradeWebSocket } from "../../websocket";
 import type { CompetitionClockMessage } from "../clock";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "../middleware/auth.middleware";
 import { probRouter } from "./problem.router";
 
 const competionData = await getCompetitionData(competitionRoot);
