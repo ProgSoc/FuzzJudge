@@ -3,16 +3,9 @@ type Mutation
 type Subscription
 
 scalar DateTime
-
-extend type Mutation {
-    testMutation: String
-}
+scalar File
 
 extend type Query {
     version: String!
     header: String!
-}
-
-extend type Subscription {
-    countdown(from: Int!): Int!
 }

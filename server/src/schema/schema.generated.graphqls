@@ -1,20 +1,56 @@
+type AlreadySolvedError {
+  message: String!
+}
+
 type Clock {
   finish: DateTime!
   hold: DateTime
   start: DateTime!
 }
 
-type CompetitionQuery {
+type Competition {
   brief: String!
   instructions: String!
   name: String!
-  submissions(slug: String!, teamId: Int!): [Submission!]!
 }
 
 scalar DateTime
 
+scalar File
+
+union JudgeOutput = AlreadySolvedError | JudgeOutputSuccess | JudgingError | NotInTeamError
+
+type JudgeOutputSuccess {
+  message: String!
+}
+
+type JudgingError {
+  errors: [String!]!
+  message: String!
+}
+
 type Mutation {
-  testMutation: String
+  adjustFinishTime(finishTime: DateTime!): Clock!
+  adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
+  holdClock: Clock!
+  judge(code: File!, output: String!, slug: ID!): JudgeOutput!
+  releaseClock(extendDuration: Boolean): Clock!
+}
+
+type NotInTeamError {
+  message: String!
+}
+
+type Problem {
+  brief: String!
+  difficulty: Int!
+  fuzz: String!
+  icon: String!
+  instructions: String!
+  name: String!
+  points: Int!
+  slug: ID!
+  solved: Boolean!
 }
 
 type ProblemScore {
@@ -25,8 +61,12 @@ type ProblemScore {
 }
 
 type Query {
-  competition: CompetitionQuery
+  competition: Competition!
   header: String!
+  problem(slug: String!): Problem!
+  problems: [Problem!]!
+  submission(id: ID!): Submission
+  submissions: Submission
   version: String!
 }
 
@@ -37,16 +77,19 @@ type ScoreboardTeam {
 }
 
 type Submission {
-  id: Int!
-  ok: Boolean
-  prob: String!
-  team: Int!
+  code: String
+  id: ID!
+  ok: Boolean!
+  out: String
+  problemId: ID!
+  teamId: ID!
   time: DateTime!
+  vler: String
+  vlms: Float
 }
 
 type Subscription {
   clock: Clock!
-  countdown(from: Int!): Int!
   scoreboard: [ScoreboardTeam!]!
 }
 

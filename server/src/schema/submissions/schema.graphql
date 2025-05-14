@@ -1,0 +1,16 @@
+extend type Query {
+    submissions: Submission
+    submission(id: ID!): Submission
+}
+
+type Submission {
+    id: ID!
+	teamId: ID!
+	problemId: ID!
+	time: DateTime!
+	out: String
+	code: String
+	ok: Boolean!
+	vler: String
+	vlms: Float
+}

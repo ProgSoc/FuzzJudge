@@ -1,0 +1,39 @@
+extend type Query {
+    problems: [Problem!]!
+    problem(slug: String!): Problem!
+}
+
+extend type Mutation {
+    judge(slug: ID!, code: File!, output: String!): JudgeOutput!
+}
+
+union JudgeOutput = NotInTeamError | AlreadySolvedError | JudgingError | JudgeOutputSuccess
+
+type NotInTeamError {
+    message: String!
+}
+
+type AlreadySolvedError {
+    message: String!
+}
+
+type JudgingError {
+    message: String!
+    errors: [String!]!
+}
+
+type JudgeOutputSuccess {
+    message: String!
+}
+
+type Problem {
+    slug: ID!
+    icon: String!
+    name: String!
+    brief: String!
+    difficulty: Int! # 1-3
+    points: Int!
+    instructions: String!
+    fuzz: String!
+    solved: Boolean!
+}

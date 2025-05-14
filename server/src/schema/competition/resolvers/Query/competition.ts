@@ -1,8 +1,16 @@
+import { competitionRoot } from "@/config";
+import { getCompetitionData } from "@/services/competition.service";
 import type { QueryResolvers } from "./../../../types.generated";
 export const competition: NonNullable<QueryResolvers["competition"]> = async (
 	_parent,
 	_arg,
 	_ctx,
 ) => {
-	/* Implement Query.competition resolver logic here */
+	const competitionData = await getCompetitionData(competitionRoot);
+
+	return {
+		brief: competitionData.attributes.summary ?? "",
+		instructions: competitionData.attributes.body,
+		name: competitionData.attributes.title,
+	};
 };

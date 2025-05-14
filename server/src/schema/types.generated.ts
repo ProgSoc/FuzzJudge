@@ -10,12 +10,18 @@ export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' |
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
+  ID: { input: string; output: string | number; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: Date | string; output: Date | string; }
+  File: { input: File; output: File; }
+};
+
+export type AlreadySolvedError = {
+  __typename?: 'AlreadySolvedError';
+  message: Scalars['String']['output'];
 };
 
 export type Clock = {
@@ -25,23 +31,74 @@ export type Clock = {
   start: Scalars['DateTime']['output'];
 };
 
-export type CompetitionQuery = {
-  __typename?: 'CompetitionQuery';
+export type Competition = {
+  __typename?: 'Competition';
   brief: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
-  submissions: Array<Submission>;
 };
 
+export type JudgeOutput = AlreadySolvedError | JudgeOutputSuccess | JudgingError | NotInTeamError;
 
-export type CompetitionQuerysubmissionsArgs = {
-  slug: Scalars['String']['input'];
-  teamId: Scalars['Int']['input'];
+export type JudgeOutputSuccess = {
+  __typename?: 'JudgeOutputSuccess';
+  message: Scalars['String']['output'];
+};
+
+export type JudgingError = {
+  __typename?: 'JudgingError';
+  errors: Array<Scalars['String']['output']>;
+  message: Scalars['String']['output'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  testMutation?: Maybe<Scalars['String']['output']>;
+  adjustFinishTime: Clock;
+  adjustStartTime: Clock;
+  holdClock: Clock;
+  judge: JudgeOutput;
+  releaseClock: Clock;
+};
+
+
+export type MutationadjustFinishTimeArgs = {
+  finishTime: Scalars['DateTime']['input'];
+};
+
+
+export type MutationadjustStartTimeArgs = {
+  keepDuration?: InputMaybe<Scalars['Boolean']['input']>;
+  startTime: Scalars['DateTime']['input'];
+};
+
+
+export type MutationjudgeArgs = {
+  code: Scalars['File']['input'];
+  output: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
+};
+
+
+export type MutationreleaseClockArgs = {
+  extendDuration?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type NotInTeamError = {
+  __typename?: 'NotInTeamError';
+  message: Scalars['String']['output'];
+};
+
+export type Problem = {
+  __typename?: 'Problem';
+  brief: Scalars['String']['output'];
+  difficulty: Scalars['Int']['output'];
+  fuzz: Scalars['String']['output'];
+  icon: Scalars['String']['output'];
+  instructions: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  points: Scalars['Int']['output'];
+  slug: Scalars['ID']['output'];
+  solved: Scalars['Boolean']['output'];
 };
 
 export type ProblemScore = {
@@ -54,9 +111,23 @@ export type ProblemScore = {
 
 export type Query = {
   __typename?: 'Query';
-  competition?: Maybe<CompetitionQuery>;
+  competition: Competition;
   header: Scalars['String']['output'];
+  problem: Problem;
+  problems: Array<Problem>;
+  submission?: Maybe<Submission>;
+  submissions?: Maybe<Submission>;
   version: Scalars['String']['output'];
+};
+
+
+export type QueryproblemArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
+export type QuerysubmissionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type ScoreboardTeam = {
@@ -68,23 +139,21 @@ export type ScoreboardTeam = {
 
 export type Submission = {
   __typename?: 'Submission';
-  id: Scalars['Int']['output'];
-  ok?: Maybe<Scalars['Boolean']['output']>;
-  prob: Scalars['String']['output'];
-  team: Scalars['Int']['output'];
+  code?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  ok: Scalars['Boolean']['output'];
+  out?: Maybe<Scalars['String']['output']>;
+  problemId: Scalars['ID']['output'];
+  teamId: Scalars['ID']['output'];
   time: Scalars['DateTime']['output'];
+  vler?: Maybe<Scalars['String']['output']>;
+  vlms?: Maybe<Scalars['Float']['output']>;
 };
 
 export type Subscription = {
   __typename?: 'Subscription';
   clock: Clock;
-  countdown: Scalars['Int']['output'];
   scoreboard: Array<ScoreboardTeam>;
-};
-
-
-export type SubscriptioncountdownArgs = {
-  from: Scalars['Int']['input'];
 };
 
 export type TeamScore = {
@@ -166,19 +235,31 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+/** Mapping of union types */
+export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
+  JudgeOutput: ( AlreadySolvedError & { __typename: 'AlreadySolvedError' } ) | ( JudgeOutputSuccess & { __typename: 'JudgeOutputSuccess' } ) | ( JudgingError & { __typename: 'JudgingError' } ) | ( NotInTeamError & { __typename: 'NotInTeamError' } );
+};
 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Clock: ResolverTypeWrapper<Clock>;
-  CompetitionQuery: ResolverTypeWrapper<CompetitionQuery>;
+  AlreadySolvedError: ResolverTypeWrapper<AlreadySolvedError>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Clock: ResolverTypeWrapper<Clock>;
+  Competition: ResolverTypeWrapper<Competition>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  File: ResolverTypeWrapper<Scalars['File']['output']>;
+  JudgeOutput: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['JudgeOutput']>;
+  JudgeOutputSuccess: ResolverTypeWrapper<JudgeOutputSuccess>;
+  JudgingError: ResolverTypeWrapper<JudgingError>;
   Mutation: ResolverTypeWrapper<{}>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  NotInTeamError: ResolverTypeWrapper<NotInTeamError>;
+  Problem: ResolverTypeWrapper<Problem>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ProblemScore: ResolverTypeWrapper<ProblemScore>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Query: ResolverTypeWrapper<{}>;
   ScoreboardTeam: ResolverTypeWrapper<ScoreboardTeam>;
   Submission: ResolverTypeWrapper<Submission>;
@@ -189,21 +270,34 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Clock: Clock;
-  CompetitionQuery: CompetitionQuery;
+  AlreadySolvedError: AlreadySolvedError;
   String: Scalars['String']['output'];
-  Int: Scalars['Int']['output'];
+  Clock: Clock;
+  Competition: Competition;
   DateTime: Scalars['DateTime']['output'];
+  File: Scalars['File']['output'];
+  JudgeOutput: ResolversUnionTypes<ResolversParentTypes>['JudgeOutput'];
+  JudgeOutputSuccess: JudgeOutputSuccess;
+  JudgingError: JudgingError;
   Mutation: {};
+  Boolean: Scalars['Boolean']['output'];
+  ID: Scalars['ID']['output'];
+  NotInTeamError: NotInTeamError;
+  Problem: Problem;
+  Int: Scalars['Int']['output'];
   ProblemScore: ProblemScore;
   Float: Scalars['Float']['output'];
-  Boolean: Scalars['Boolean']['output'];
   Query: {};
   ScoreboardTeam: ScoreboardTeam;
   Submission: Submission;
   Subscription: {};
   TeamScore: TeamScore;
   TeamTotal: TeamTotal;
+};
+
+export type AlreadySolvedErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AlreadySolvedError'] = ResolversParentTypes['AlreadySolvedError']> = {
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ClockResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Clock'] = ResolversParentTypes['Clock']> = {
@@ -213,11 +307,10 @@ export type ClockResolvers<ContextType = GraphQLContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CompetitionQueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompetitionQuery'] = ResolversParentTypes['CompetitionQuery']> = {
+export type CompetitionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Competition'] = ResolversParentTypes['Competition']> = {
   brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  submissions?: Resolver<Array<ResolversTypes['Submission']>, ParentType, ContextType, RequireFields<CompetitionQuerysubmissionsArgs, 'slug' | 'teamId'>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -225,8 +318,49 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
+export interface FileScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['File'], any> {
+  name: 'File';
+}
+
+export type JudgeOutputResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['JudgeOutput'] = ResolversParentTypes['JudgeOutput']> = {
+  __resolveType?: TypeResolveFn<'AlreadySolvedError' | 'JudgeOutputSuccess' | 'JudgingError' | 'NotInTeamError', ParentType, ContextType>;
+};
+
+export type JudgeOutputSuccessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['JudgeOutputSuccess'] = ResolversParentTypes['JudgeOutputSuccess']> = {
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type JudgingErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['JudgingError'] = ResolversParentTypes['JudgingError']> = {
+  errors?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  testMutation?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, RequireFields<MutationadjustFinishTimeArgs, 'finishTime'>>;
+  adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, RequireFields<MutationadjustStartTimeArgs, 'startTime'>>;
+  holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
+  judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, ContextType, RequireFields<MutationjudgeArgs, 'code' | 'output' | 'slug'>>;
+  releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, Partial<MutationreleaseClockArgs>>;
+};
+
+export type NotInTeamErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['NotInTeamError'] = ResolversParentTypes['NotInTeamError']> = {
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Problem'] = ResolversParentTypes['Problem']> = {
+  brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  difficulty?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  fuzz?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  icon?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  solved?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProblemScore'] = ResolversParentTypes['ProblemScore']> = {
@@ -238,8 +372,12 @@ export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType exten
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  competition?: Resolver<Maybe<ResolversTypes['CompetitionQuery']>, ParentType, ContextType>;
+  competition?: Resolver<ResolversTypes['Competition'], ParentType, ContextType>;
   header?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  problem?: Resolver<ResolversTypes['Problem'], ParentType, ContextType, RequireFields<QueryproblemArgs, 'slug'>>;
+  problems?: Resolver<Array<ResolversTypes['Problem']>, ParentType, ContextType>;
+  submission?: Resolver<Maybe<ResolversTypes['Submission']>, ParentType, ContextType, RequireFields<QuerysubmissionArgs, 'id'>>;
+  submissions?: Resolver<Maybe<ResolversTypes['Submission']>, ParentType, ContextType>;
   version?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
@@ -251,17 +389,20 @@ export type ScoreboardTeamResolvers<ContextType = GraphQLContext, ParentType ext
 };
 
 export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Submission'] = ResolversParentTypes['Submission']> = {
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  prob?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  team?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  out?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  problemId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  teamId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  vler?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  vlms?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   clock?: SubscriptionResolver<ResolversTypes['Clock'], "clock", ParentType, ContextType>;
-  countdown?: SubscriptionResolver<ResolversTypes['Int'], "countdown", ParentType, ContextType, RequireFields<SubscriptioncountdownArgs, 'from'>>;
   scoreboard?: SubscriptionResolver<Array<ResolversTypes['ScoreboardTeam']>, "scoreboard", ParentType, ContextType>;
 };
 
@@ -278,10 +419,17 @@ export type TeamTotalResolvers<ContextType = GraphQLContext, ParentType extends 
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {
+  AlreadySolvedError?: AlreadySolvedErrorResolvers<ContextType>;
   Clock?: ClockResolvers<ContextType>;
-  CompetitionQuery?: CompetitionQueryResolvers<ContextType>;
+  Competition?: CompetitionResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
+  File?: GraphQLScalarType;
+  JudgeOutput?: JudgeOutputResolvers<ContextType>;
+  JudgeOutputSuccess?: JudgeOutputSuccessResolvers<ContextType>;
+  JudgingError?: JudgingErrorResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  NotInTeamError?: NotInTeamErrorResolvers<ContextType>;
+  Problem?: ProblemResolvers<ContextType>;
   ProblemScore?: ProblemScoreResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   ScoreboardTeam?: ScoreboardTeamResolvers<ContextType>;
