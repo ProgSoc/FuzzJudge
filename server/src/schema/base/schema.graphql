@@ -1,0 +1,17 @@
+type Query
+type Mutation
+type Subscription
+
+scalar DateTime
+
+extend type Mutation {
+    testMutation: String
+}
+
+extend type Query {
+    testQuery: String
+}
+
+extend type Subscription {
+    countdown(from: Int!): Int!
+}

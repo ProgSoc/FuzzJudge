@@ -44,6 +44,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { createSchema, createYoga } from "graphql-yoga";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
 import { competitionRoot } from "./config.ts";
@@ -55,6 +56,8 @@ import {
 	unauthorizedResponse,
 } from "./middleware/auth.middleware.ts";
 import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware.ts";
+import { resolvers } from "./schema/resolvers.generated";
+import { typeDefs } from "./schema/typeDefs.generated";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
 import {
@@ -96,8 +99,21 @@ export const clock = await createClock(
 
 export const scoreboard = createCompetitionScoreboard(clock, problems);
 
+const schema = createSchema({ typeDefs, resolvers });
+
 const graphqlWsMiddleware = makeWebsocketGraphQLMiddleware({
 	upgradeWebSocket,
+	schema,
+	context: ({ extra: { c } }) => ({
+		c,
+	}),
+});
+
+const yoga = createYoga({
+	schema,
+	graphiql: {
+		subscriptionsProtocol: "WS",
+	},
 });
 
 let openWebSockets = 0;
@@ -389,7 +405,10 @@ app.openapi(
 		return c.body(null, { status: 204 });
 	},
 );
-app.on(["*"], "/graphql", graphqlWsMiddleware);
+
+app.on(["GET", "POST"], yoga.graphqlEndpoint, graphqlWsMiddleware, (c) =>
+	yoga.fetch(c.req.raw, { c }),
+);
 
 for (const dir of competionData.server?.public ?? []) {
 	const relativeDirPath = path.relative(process.cwd(), root);

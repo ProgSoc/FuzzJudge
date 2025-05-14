@@ -1,0 +1,9 @@
+extend type Subscription {
+    clock: Clock!
+}
+
+type Clock {
+    start: DateTime!
+	finish: DateTime!
+	hold: DateTime
+}

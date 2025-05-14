@@ -1,0 +1,19 @@
+extend type Query {
+    competition: CompetitionQuery
+}
+
+type CompetitionQuery {
+    name: String!
+    brief: String!
+    instructions: String!
+    submissions(teamId: Int!, slug: String!): [Submission!]!
+}
+
+type Submission {
+    id: Int!
+	team: Int!
+	prob: String!
+	time: DateTime!
+	ok: Boolean
+}
+

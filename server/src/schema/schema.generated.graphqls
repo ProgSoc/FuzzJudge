@@ -1,0 +1,60 @@
+type Clock {
+  finish: DateTime!
+  hold: DateTime
+  start: DateTime!
+}
+
+type CompetitionQuery {
+  brief: String!
+  instructions: String!
+  name: String!
+  submissions(slug: String!, teamId: Int!): [Submission!]!
+}
+
+scalar DateTime
+
+type Mutation {
+  testMutation: String
+}
+
+type ProblemScore {
+  penalty: Float!
+  points: Int!
+  solved: Boolean!
+  tries: Int!
+}
+
+type Query {
+  competition: CompetitionQuery
+  testQuery: String
+}
+
+type ScoreboardTeam {
+  name: String!
+  rank: Int!
+  score: TeamScore!
+}
+
+type Submission {
+  id: Int!
+  ok: Boolean
+  prob: String!
+  team: Int!
+  time: DateTime!
+}
+
+type Subscription {
+  clock: Clock!
+  countdown(from: Int!): Int!
+  scoreboard: [ScoreboardTeam!]!
+}
+
+type TeamScore {
+  problems: [ProblemScore!]!
+  total: TeamTotal!
+}
+
+type TeamTotal {
+  penalty: Float!
+  points: Int!
+}
