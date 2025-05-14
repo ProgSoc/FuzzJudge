@@ -54,6 +54,7 @@ import {
 	forbiddenResponse,
 	unauthorizedResponse,
 } from "./middleware/auth.middleware.ts";
+import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware.ts";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
 import {
@@ -95,297 +96,300 @@ export const clock = await createClock(
 
 export const scoreboard = createCompetitionScoreboard(clock, problems);
 
+const graphqlWsMiddleware = makeWebsocketGraphQLMiddleware({
+	upgradeWebSocket,
+});
+
 let openWebSockets = 0;
 
 const basePath = Bun.env.BASE_PATH ?? "/";
-const app = new OpenAPIHono()
-	.basePath(basePath as "/")
-	.route("/comp", compRouter)
-	.route("/user", userRouter)
-	.route("/team", teamRouter)
-	.openapi(
-		createRoute({
-			path: "/docs/scalar",
-			hide: true,
-			method: "get",
-			responses: {
-				200: {
-					description: "OpenAPI JSON",
-				},
+const app = new OpenAPIHono().basePath(basePath as "/");
+app.route("/comp", compRouter);
+app.route("/user", userRouter);
+app.route("/team", teamRouter);
+app.openapi(
+	createRoute({
+		path: "/docs/scalar",
+		hide: true,
+		method: "get",
+		responses: {
+			200: {
+				description: "OpenAPI JSON",
 			},
-			middleware: Scalar({
-				url: "/docs/json",
-			}),
-			operationId: "getOpenAPI",
+		},
+		middleware: Scalar({
+			url: "/docs/json",
 		}),
-		(c) => c.text("dummy response"),
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/docs/swagger",
-			hide: true,
-			responses: {
-				200: {
-					description: "Swagger UI",
-					content: {
-						"text/html": {
-							schema: z.string(),
-						},
+		operationId: "getOpenAPI",
+	}),
+	(c) => c.text("dummy response"),
+);
+app.openapi(
+	createRoute({
+		method: "get",
+		path: "/docs/swagger",
+		hide: true,
+		responses: {
+			200: {
+				description: "Swagger UI",
+				content: {
+					"text/html": {
+						schema: z.string(),
 					},
 				},
 			},
-			middleware: swaggerUI({
-				url: "/docs/json",
-				title: "FuzzJudge API",
-			}),
-			operationId: "getSwaggerUI",
-		}),
-		async (c) => {
-			return c.text("dummy response");
 		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/",
-			responses: {
-				200: {
-					description: "FuzzJudge API",
-					content: {
-						"text/plain": {
-							schema: z.string(),
-						},
+		middleware: swaggerUI({
+			url: "/docs/json",
+			title: "FuzzJudge API",
+		}),
+		operationId: "getSwaggerUI",
+	}),
+	async (c) => {
+		return c.text("dummy response");
+	},
+);
+app.openapi(
+	createRoute({
+		method: "get",
+		path: "/",
+		responses: {
+			200: {
+				description: "FuzzJudge API",
+				content: {
+					"text/plain": {
+						schema: z.string(),
 					},
 				},
 			},
-			operationId: "getHeader",
-		}),
-		async (c) => {
-			return c.text(HEADER);
 		},
-	)
-	.openapi(
-		createRoute({
-			path: "/ws",
-			method: "get",
-			responses: {
-				101: {
-					description: "WebSocket connection",
-				},
+		operationId: "getHeader",
+	}),
+	async (c) => {
+		return c.text(HEADER);
+	},
+);
+app.openapi(
+	createRoute({
+		path: "/ws",
+		method: "get",
+		responses: {
+			101: {
+				description: "WebSocket connection",
 			},
-			// middleware: ,
-			operationId: "getWebSocket",
-		}),
-		async (c, next) => {
-			const websocketUpgrade = await upgradeWebSocket(() => {
-				let clockHandler: (data: CompetitionClockMessage) => void;
-				let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
-
-				return {
-					onOpen: async (e, ws) => {
-						openWebSockets++;
-
-						clockHandler = (msg) => {
-							ws.send(JSON.stringify({ kind: "clock", value: msg }));
-						};
-						scoreboardHandler = (msg) => {
-							ws.send(JSON.stringify({ kind: "scoreboard", value: msg }));
-						};
-
-						ee.on("clock", clockHandler);
-						ee.on("scoreboard", scoreboardHandler);
-
-						setTimeout(async () => {
-							ws.send(
-								JSON.stringify({
-									kind: "problems",
-									value: problems.map(problemToMessage),
-								}),
-							);
-							ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
-							ws.send(
-								JSON.stringify({
-									kind: "scoreboard",
-									value: await scoreboard.fullScoreboard(),
-								}),
-							);
-						}, 1000);
-
-						console.log(`🔗 (${openWebSockets}) Connection Opened`);
-					},
-					onClose: () => {
-						openWebSockets--;
-						ee.off("clock", clockHandler);
-						ee.off("scoreboard", scoreboardHandler);
-
-						console.log(`⛓️‍💥 (${openWebSockets}) Connection Closed`);
-					},
-				};
-			})(c, next);
-
-			if (websocketUpgrade) {
-				return websocketUpgrade;
-			}
-
-			return c.text("dummy response");
 		},
-	)
-	.openapi(
-		createRoute({
-			method: "brew" as "get", // Nobody likes brew
-			path: "/",
-			responses: {
-				418: {
-					description: "I'm a teapot",
+		// middleware: ,
+		operationId: "getWebSocket",
+	}),
+	async (c, next) => {
+		const websocketUpgrade = await upgradeWebSocket(() => {
+			let clockHandler: (data: CompetitionClockMessage) => void;
+			let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
+
+			return {
+				onOpen: async (e, ws) => {
+					openWebSockets++;
+
+					clockHandler = (msg) => {
+						ws.send(JSON.stringify({ kind: "clock", value: msg }));
+					};
+					scoreboardHandler = (msg) => {
+						ws.send(JSON.stringify({ kind: "scoreboard", value: msg }));
+					};
+
+					ee.on("clock", clockHandler);
+					ee.on("scoreboard", scoreboardHandler);
+
+					setTimeout(async () => {
+						ws.send(
+							JSON.stringify({
+								kind: "problems",
+								value: problems.map(problemToMessage),
+							}),
+						);
+						ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
+						ws.send(
+							JSON.stringify({
+								kind: "scoreboard",
+								value: await scoreboard.fullScoreboard(),
+							}),
+						);
+					}, 1000);
+
+					console.log(`🔗 (${openWebSockets}) Connection Opened`);
 				},
+				onClose: () => {
+					openWebSockets--;
+					ee.off("clock", clockHandler);
+					ee.off("scoreboard", scoreboardHandler);
+
+					console.log(`⛓️‍💥 (${openWebSockets}) Connection Closed`);
+				},
+			};
+		})(c, next);
+
+		if (websocketUpgrade) {
+			return websocketUpgrade;
+		}
+
+		return c.text("dummy response");
+	},
+);
+app.openapi(
+	createRoute({
+		method: "brew" as "get", // Nobody likes brew
+		path: "/",
+		responses: {
+			418: {
+				description: "I'm a teapot",
 			},
-			operationId: "brewTeapot",
-		}),
-		async (c) => {
-			return c.text("I'm a teapot", 418);
 		},
-	)
-	.openapi(
-		createRoute({
-			path: "/auth",
-			method: "get",
-			responses: {
-				200: {
-					description: "Auth",
-					content: {
-						"text/plain": {
-							schema: z.string(),
-						},
-					},
-				},
-				401: unauthorizedResponse,
-			},
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			operationId: "getAuth",
-		}),
-		async (c) => {
-			const { logn } = c.var.user;
-			return c.text(logn);
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/admin",
-			responses: {
-				200: {
-					description: "Admin",
-					content: {
-						"text/html": {
-							schema: z.string(),
-						},
+		operationId: "brewTeapot",
+	}),
+	async (c) => {
+		return c.text("I'm a teapot", 418);
+	},
+);
+app.openapi(
+	createRoute({
+		path: "/auth",
+		method: "get",
+		responses: {
+			200: {
+				description: "Auth",
+				content: {
+					"text/plain": {
+						schema: z.string(),
 					},
 				},
-				401: unauthorizedResponse,
 			},
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: ["admin"],
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			operationId: "getAdmin",
-		}),
-		async (c) => {
-			const fileContent = await Bun.file(
-				new URL(import.meta.resolve("./admin.html")),
-			).text();
-
-			return c.body(fileContent, {
-				headers: {
-					"Content-Type": "text/html",
-				},
-			});
+			401: unauthorizedResponse,
 		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/mark",
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: ["admin"],
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			responses: {
-				204: {
-					description: "OK",
+		middleware: authMiddleware({
+			verifyUser: basicAuth,
+		}),
+		security: [
+			{
+				Basic: [],
+			},
+		],
+		operationId: "getAuth",
+	}),
+	async (c) => {
+		const { logn } = c.var.user;
+		return c.text(logn);
+	},
+);
+app.openapi(
+	createRoute({
+		method: "get",
+		path: "/admin",
+		responses: {
+			200: {
+				description: "Admin",
+				content: {
+					"text/html": {
+						schema: z.string(),
+					},
 				},
 			},
-			request: {
-				query: z.object({
-					id: z.coerce.number().openapi({
-						param: {
-							name: "id",
-							in: "query",
-							required: true,
-						},
-					}),
-					ok: z.coerce.boolean().openapi({
-						param: {
-							name: "ok",
-							in: "query",
-							required: true,
-						},
-					}),
+			401: unauthorizedResponse,
+		},
+		middleware: authMiddleware({
+			verifyUser: basicAuth,
+			roles: ["admin"],
+		}),
+		security: [
+			{
+				Basic: [],
+			},
+		],
+		operationId: "getAdmin",
+	}),
+	async (c) => {
+		const fileContent = await Bun.file(
+			new URL(import.meta.resolve("./admin.html")),
+		).text();
+
+		return c.body(fileContent, {
+			headers: {
+				"Content-Type": "text/html",
+			},
+		});
+	},
+);
+app.openapi(
+	createRoute({
+		method: "get",
+		path: "/mark",
+		middleware: authMiddleware({
+			verifyUser: basicAuth,
+			roles: ["admin"],
+		}),
+		security: [
+			{
+				Basic: [],
+			},
+		],
+		responses: {
+			204: {
+				description: "OK",
+			},
+		},
+		request: {
+			query: z.object({
+				id: z.coerce.number().openapi({
+					param: {
+						name: "id",
+						in: "query",
+						required: true,
+					},
 				}),
-			},
-			operationId: "manualJudge",
-		}),
-		async (c) => {
-			const { ok, id } = c.req.valid("query");
-
-			await manualJudge(id, ok);
-			return c.body(null, { status: 204 });
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/void",
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: [null],
+				ok: z.coerce.boolean().openapi({
+					param: {
+						name: "ok",
+						in: "query",
+						required: true,
+					},
+				}),
 			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			responses: {
-				204: {
-					description: "OK",
-				},
-				401: unauthorizedResponse,
-				403: forbiddenResponse,
-			},
-			operationId: "void",
-		}),
-		async (c) => {
-			return c.body(null, { status: 204 });
 		},
-	)
-	.on(["*"], "/graphql");
+		operationId: "manualJudge",
+	}),
+	async (c) => {
+		const { ok, id } = c.req.valid("query");
+
+		await manualJudge(id, ok);
+		return c.body(null, { status: 204 });
+	},
+);
+app.openapi(
+	createRoute({
+		method: "get",
+		path: "/void",
+		middleware: authMiddleware({
+			verifyUser: basicAuth,
+			roles: [null],
+		}),
+		security: [
+			{
+				Basic: [],
+			},
+		],
+		responses: {
+			204: {
+				description: "OK",
+			},
+			401: unauthorizedResponse,
+			403: forbiddenResponse,
+		},
+		operationId: "void",
+	}),
+	async (c) => {
+		return c.body(null, { status: 204 });
+	},
+);
+app.on(["*"], "/graphql", graphqlWsMiddleware);
 
 for (const dir of competionData.server?.public ?? []) {
 	const relativeDirPath = path.relative(process.cwd(), root);
