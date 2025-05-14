@@ -9,7 +9,8 @@ extend type Mutation {
 }
 
 extend type Query {
-    testQuery: String
+    version: String!
+    header: String!
 }
 
 extend type Subscription {

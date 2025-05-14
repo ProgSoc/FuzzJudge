@@ -55,7 +55,8 @@ export type ProblemScore = {
 export type Query = {
   __typename?: 'Query';
   competition?: Maybe<CompetitionQuery>;
-  testQuery?: Maybe<Scalars['String']['output']>;
+  header: Scalars['String']['output'];
+  version: Scalars['String']['output'];
 };
 
 export type ScoreboardTeam = {
@@ -238,7 +239,8 @@ export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType exten
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   competition?: Resolver<Maybe<ResolversTypes['CompetitionQuery']>, ParentType, ContextType>;
-  testQuery?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  header?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  version?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type ScoreboardTeamResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ScoreboardTeam'] = ResolversParentTypes['ScoreboardTeam']> = {

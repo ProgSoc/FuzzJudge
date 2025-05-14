@@ -1,7 +1,8 @@
 /* This file was automatically generated. DO NOT UPDATE MANUALLY. */
     import type   { Resolvers } from './types.generated';
     import    { competition as Query_competition } from './competition/resolvers/Query/competition';
-import    { testQuery as Query_testQuery } from './base/resolvers/Query/testQuery';
+import    { header as Query_header } from './base/resolvers/Query/header';
+import    { version as Query_version } from './base/resolvers/Query/version';
 import    { testMutation as Mutation_testMutation } from './base/resolvers/Mutation/testMutation';
 import    { clock as Subscription_clock } from './clock/resolvers/Subscription/clock';
 import    { countdown as Subscription_countdown } from './base/resolvers/Subscription/countdown';
@@ -15,7 +16,7 @@ import    { TeamScore } from './scoreboard/resolvers/TeamScore';
 import    { TeamTotal } from './scoreboard/resolvers/TeamTotal';
 import    { DateTimeResolver } from 'graphql-scalars';
     export const resolvers: Resolvers = {
-      Query: { competition: Query_competition,testQuery: Query_testQuery },
+      Query: { competition: Query_competition,header: Query_header,version: Query_version },
       Mutation: { testMutation: Mutation_testMutation },
       Subscription: { clock: Subscription_clock,countdown: Subscription_countdown,scoreboard: Subscription_scoreboard },
       Clock: Clock,

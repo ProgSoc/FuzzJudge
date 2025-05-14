@@ -26,7 +26,8 @@ type ProblemScore {
 
 type Query {
   competition: CompetitionQuery
-  testQuery: String
+  header: String!
+  version: String!
 }
 
 type ScoreboardTeam {
