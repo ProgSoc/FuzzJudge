@@ -3,6 +3,9 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
 	schema: "**/schema.graphql",
+	hooks: {
+		afterAllFileWrite: ["cd ../ && bun run biome check --write ./server/"],
+	},
 	generates: {
 		"src/schema": defineConfig({
 			// The following config is designed to work with GraphQL Yoga's File uploads feature
@@ -16,7 +19,6 @@ const config: CodegenConfig = {
 					enumValues: "change-case-all#lowerCase",
 				},
 			},
-
 			resolverGeneration: {
 				query: "*",
 				mutation: "*",
