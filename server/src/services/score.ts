@@ -158,7 +158,7 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
  * @param teamId The id of the team to calculate the score for
  * @returns The score for the team
  */
-export async function calculateTeamScore(
+async function calculateTeamScore(
 	teamId: number,
 ): Promise<Omit<ScoreboardRowMapper, "rank"> | null> {
 	// Load the problem set

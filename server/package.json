@@ -20,7 +20,6 @@
 		"bun": ">=1.2.0"
 	},
 	"files": ["dist", "migrations", "README.md", "LICENSE"],
-
 	"dependencies": {
 		"@hono/zod-openapi": "0.19.6",
 		"drizzle-orm": "0.43.1",

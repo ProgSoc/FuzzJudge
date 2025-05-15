@@ -129,10 +129,7 @@ const SubmissionSkeletonSchema = z.object({
 	ok: z.boolean().nullable(),
 });
 
-export async function getSubmissionSkeletons(
-	teamId: number,
-	problemId: string,
-) {
+async function getSubmissionSkeletons(teamId: number, problemId: string) {
 	const submissions = await db.query.submissionTable.findMany({
 		where: (table, { and }) =>
 			and(eq(table.team, teamId), eq(table.prob, problemId)),

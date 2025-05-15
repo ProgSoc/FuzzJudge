@@ -34,7 +34,6 @@ import { getCompetitionData } from "./services/competition.service.ts";
 import { getProblems } from "./services/problems.service.ts";
 import { resetUser } from "./services/user.service.ts";
 import { createClock } from "./v1/clock.ts";
-import { createCompetitionScoreboard } from "./v1/score.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
 migrateDB();
@@ -50,8 +49,6 @@ export const clock = await createClock(
 	competionData.times.start ?? new Date(),
 	competionData.times.finish ?? new Date(Date.now() + 180 * 60 * 1000), // 3 hrs
 );
-
-export const scoreboard = createCompetitionScoreboard(clock, problems);
 
 const schema = createSchema({ typeDefs, resolvers });
 

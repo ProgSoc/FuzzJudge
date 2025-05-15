@@ -2,7 +2,7 @@ import { getOrSetDefaultMeta, setMeta } from "../services/meta.service.ts";
 
 type ClockState = "live" | "hold" | "stop";
 
-export type CompetitionClockMessage = {
+type CompetitionClockMessage = {
 	start: Date;
 	finish: Date;
 	hold: Date | null;
@@ -105,4 +105,4 @@ export async function createClock(plannedStart: Date, plannedFinish: Date) {
 	};
 }
 
-export type CompetitionClock = Awaited<ReturnType<typeof createClock>>;
+type CompetitionClock = Awaited<ReturnType<typeof createClock>>;
