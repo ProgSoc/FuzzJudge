@@ -6,7 +6,8 @@
 		"baseUrl": "./",
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"verbatimModuleSyntax": false
 	},
 	"exclude": ["node_modules", "dist", "build"],
 	"include": ["./src/**/*.ts"]

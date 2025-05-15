@@ -1,7 +1,3 @@
-type AlreadySolvedError {
-  message: String!
-}
-
 type Clock {
   finish: DateTime!
   hold: DateTime
@@ -18,27 +14,29 @@ scalar DateTime
 
 scalar File
 
-union JudgeOutput = AlreadySolvedError | JudgeOutputSuccess | JudgingError | NotInTeamError
-
-type JudgeOutputSuccess {
+type JudgeErrorOutput {
+  errors: String!
   message: String!
 }
 
-type JudgingError {
-  errors: [String!]!
+union JudgeOutput = JudgeErrorOutput | JudgeSuccessOutput
+
+type JudgeSuccessOutput {
   message: String!
 }
 
 type Mutation {
   adjustFinishTime(finishTime: DateTime!): Clock!
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
+  createTeam(name: String!): Team!
+  createUser(logn: String!, role: UserRole!, teamId: Int): User!
+  deleteTeam(id: Int!): Team!
+  deleteUser(id: Int!): User!
   holdClock: Clock!
-  judge(code: File!, output: String!, slug: ID!): JudgeOutput!
+  judge(code: String!, output: String!, slug: ID!): JudgeOutput!
   releaseClock(extendDuration: Boolean): Clock!
-}
-
-type NotInTeamError {
-  message: String!
+  updateTeam(id: Int!, name: String!): Team!
+  updateUser(id: Int!, role: UserRole, teamId: Int): User!
 }
 
 type Problem {
@@ -63,10 +61,15 @@ type ProblemScore {
 type Query {
   competition: Competition!
   header: String!
+  me: User!
   problem(slug: String!): Problem!
   problems: [Problem!]!
-  submission(id: ID!): Submission
-  submissions: Submission
+  submission(id: Int!): Submission
+  submissions(problemSlug: String, teamId: Int): [Submission!]!
+  team(id: Int!): Team!
+  teams: [Team!]!
+  user(id: Int!): User!
+  users: [User!]!
   version: String!
 }
 
@@ -78,11 +81,12 @@ type ScoreboardTeam {
 
 type Submission {
   code: String
-  id: ID!
-  ok: Boolean!
+  id: Int!
+  ok: Boolean
   out: String
-  problemId: ID!
-  teamId: ID!
+  problemSlug: String!
+  team: Team!
+  teamId: Int!
   time: DateTime!
   vler: String
   vlms: Float
@@ -93,6 +97,13 @@ type Subscription {
   scoreboard: [ScoreboardTeam!]!
 }
 
+type Team {
+  id: Int!
+  members: [User!]!
+  name: String!
+  submissions(problemSlug: String): [Submission!]!
+}
+
 type TeamScore {
   problems: [ProblemScore!]!
   total: TeamTotal!
@@ -101,4 +112,17 @@ type TeamScore {
 type TeamTotal {
   penalty: Float!
   points: Int!
+}
+
+type User {
+  id: Int!
+  logn: String!
+  role: UserRole!
+  team: Team
+  teamId: Int
+}
+
+enum UserRole {
+  ADMIN
+  COMPETITOR
 }

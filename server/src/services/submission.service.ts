@@ -2,7 +2,6 @@ import { z } from "@hono/zod-openapi";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "../db";
 import { type Submission, submissionTable } from "../db/schema";
-import { ee } from "../ee";
 import { getProblemData } from "./problems.service";
 
 interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
@@ -78,11 +77,11 @@ export async function manualJudge(id: number, ok: boolean) {
 export async function postSubmission(
 	{ code, ok, out, prob, team, time, vler, vlms }: Omit<SubmissionParams, "id">,
 	resubmit = false,
-): Promise<number> {
+): Promise<Submission> {
 	if (resubmit && ok) {
 		if (!prob || !team) throw new Error("Missing prob or team for resubmit");
 
-		const [id] = await db
+		const [submission] = await db
 			.update(submissionTable)
 			.set({
 				out,
@@ -99,9 +98,9 @@ export async function postSubmission(
 			)
 			.returning();
 
-		if (!id) throw new Error("Failed to update submission");
+		if (!submission) throw new Error("Failed to update submission");
 
-		return id.id;
+		return submission;
 	}
 
 	const [newSub] = await db
@@ -121,10 +120,7 @@ export async function postSubmission(
 
 	if (!newSub) throw new Error("Failed to insert submission");
 
-	const id = newSub.id;
-
-	ee.emit("scoreboardUpdate"); // trigger a scoreboard update
-	return id;
+	return newSub;
 }
 
 export const SubmissionSkeletonSchema = z.object({

@@ -11,8 +11,10 @@
 		"@eddeee888/gcg-typescript-resolver-files": "^0.12.0",
 		"@graphql-codegen/cli": "^5.0.6",
 		"@types/bun": "1.2.13",
+		"@types/node": "^22.15.18",
 		"drizzle-kit": "0.31.0",
-		"typescript": "5.8.3"
+		"knip": "^5.56.0",
+		"typescript": "^5.8.3"
 	},
 	"types": "./dist",
 	"engines": {
@@ -46,6 +48,7 @@
 	"scripts": {
 		"build:types": "bun tsc -b",
 		"build": "bun run build.ts",
-		"dev": "bun run dev.ts ../sample"
+		"dev": "bun run dev.ts ../sample",
+		"knip": "knip"
 	}
 }

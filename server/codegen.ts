@@ -12,7 +12,11 @@ const config: CodegenConfig = {
 			},
 			typesPluginsConfig: {
 				contextType: "@/context#GraphQLContext",
+				namingConvention: {
+					enumValues: "change-case-all#lowerCase",
+				},
 			},
+
 			resolverGeneration: {
 				query: "*",
 				mutation: "*",

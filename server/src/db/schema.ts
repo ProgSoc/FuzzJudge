@@ -25,7 +25,7 @@ export const userTable = sqliteTable("user", {
 	salt: blob("salt", { mode: "buffer" }).notNull(),
 	hash: blob("hash"),
 	name: text("name"),
-	role: text("role", { enum: ["admin", "competitor"] }),
+	role: text("role", { enum: ["admin", "competitor"] }).notNull(),
 });
 
 export const userTableRelations = relations(userTable, ({ one }) => ({

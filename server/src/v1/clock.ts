@@ -1,6 +1,6 @@
 import { getOrSetDefaultMeta, setMeta } from "../services/meta.service.ts";
 
-export type ClockState = "live" | "hold" | "stop";
+type ClockState = "live" | "hold" | "stop";
 
 export type CompetitionClockMessage = {
 	start: Date;

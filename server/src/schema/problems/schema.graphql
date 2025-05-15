@@ -4,26 +4,18 @@ extend type Query {
 }
 
 extend type Mutation {
-    judge(slug: ID!, code: File!, output: String!): JudgeOutput!
+    judge(slug: ID!, code: String!, output: String!): JudgeOutput!
 }
 
-union JudgeOutput = NotInTeamError | AlreadySolvedError | JudgingError | JudgeOutputSuccess
+union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
 
-type NotInTeamError {
+type JudgeSuccessOutput {
     message: String!
 }
 
-type AlreadySolvedError {
+type JudgeErrorOutput {
     message: String!
-}
-
-type JudgingError {
-    message: String!
-    errors: [String!]!
-}
-
-type JudgeOutputSuccess {
-    message: String!
+    errors: String!
 }
 
 type Problem {

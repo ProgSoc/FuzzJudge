@@ -24,14 +24,14 @@ const problemSpec = z.object({
 
 type ProblemSpec = z.infer<typeof problemSpec>;
 
-export interface MarkdownAttributes {
+interface MarkdownAttributes {
 	title: string;
 	summary: string | undefined;
 	icon: string;
 	body: string;
 }
 
-export type FuzzJudgeProblemMessage = {
+type FuzzJudgeProblemMessage = {
 	slug: string;
 	doc: {
 		title: string;

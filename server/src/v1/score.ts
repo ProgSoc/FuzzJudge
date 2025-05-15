@@ -23,14 +23,14 @@ import { getSubmissionSkeletons } from "../services/submission.service.ts";
 import { allTeams } from "../services/team.service.ts";
 import type { CompetitionClock } from "./clock.ts";
 
-export type ProblemScore = {
+type ProblemScore = {
 	points: number;
 	penalty: number;
 	tries: number;
 	solved: boolean;
 };
 
-export type TeamScore = {
+type TeamScore = {
 	total: { points: number; penalty: number };
 	problems: Record<string, ProblemScore>;
 };
