@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { z } from "@hono/zod-openapi";
 import { TOML } from "bun";
 import matter from "gray-matter";
 import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 
 const problemSpec = z.object({
 	fuzz: z.object({
