@@ -5,6 +5,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	optimizeDeps: {
+		exclude: ["svelte-markdown"],
+	},
 	base: "",
 	plugins: [svelte(), tsconfigPaths()],
 	build: {
@@ -14,6 +17,7 @@ export default defineConfig({
 				main: resolve(__dirname, "index.html"),
 				scoreboard: resolve(__dirname, "scoreboard/index.html"),
 			},
+			external: ["svelte-markdown"],
 		},
 	},
 	server: {

@@ -12,5 +12,8 @@
 		"typescript": "5.8.3"
 	},
 	"trustedDependencies": ["lefthook", "@biomejs/biome"],
-	"workspaces": ["clients/*", "server"]
+	"workspaces": ["clients/*", "server"],
+	"patchedDependencies": {
+		"svelte-markdown@0.4.1": "patches/svelte-markdown@0.4.1.patch"
+	}
 }

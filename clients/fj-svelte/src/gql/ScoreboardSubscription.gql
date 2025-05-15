@@ -1,0 +1,15 @@
+subscription ScoreboardSubscription {
+	scoreboard {
+		rank
+		team {
+			name
+		}
+		points
+		penalty
+		problems {
+			points
+			penalty
+			tries
+		}
+	}
+}
