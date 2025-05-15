@@ -34,6 +34,7 @@ type Mutation {
   deleteUser(id: Int!): User!
   holdClock: Clock!
   judge(code: String!, output: String!, slug: ID!): JudgeOutput!
+  overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
   releaseClock(extendDuration: Boolean): Clock!
   updateTeam(id: Int!, name: String!): Team!
   updateUser(id: Int!, role: UserRole, teamId: Int): User!
@@ -54,6 +55,8 @@ type Problem {
 type ProblemScore {
   penalty: Float!
   points: Int!
+  problem: Problem!
+  slug: String!
   solved: Boolean!
   tries: Int!
 }
@@ -73,10 +76,13 @@ type Query {
   version: String!
 }
 
-type ScoreboardTeam {
-  name: String!
+type ScoreboardRow {
+  penalty: Float!
+  points: Int!
+  problems: [ProblemScore!]!
   rank: Int!
-  score: TeamScore!
+  team: Team!
+  teamId: Int!
 }
 
 type Submission {
@@ -94,7 +100,7 @@ type Submission {
 
 type Subscription {
   clock: Clock!
-  scoreboard: [ScoreboardTeam!]!
+  scoreboard: [ScoreboardRow!]!
 }
 
 type Team {
@@ -102,16 +108,6 @@ type Team {
   members: [User!]!
   name: String!
   submissions(problemSlug: String): [Submission!]!
-}
-
-type TeamScore {
-  problems: [ProblemScore!]!
-  total: TeamTotal!
-}
-
-type TeamTotal {
-  penalty: Float!
-  points: Int!
 }
 
 type User {

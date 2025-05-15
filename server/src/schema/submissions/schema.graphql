@@ -1,14 +1,14 @@
 extend type Query {
-    submissions(teamId: Int, problemSlug: String): [Submission!]!
-    submission(id: Int!): Submission
+	submissions(teamId: Int, problemSlug: String): [Submission!]!
+	submission(id: Int!): Submission
 }
 
 extend type Mutation {
-	overrideJudge(submissionId: Int!, solved: Boolean!) : Submission!
+	overrideJudge(submissionId: Int!, solved: Boolean!): Submission!
 }
 
 type Submission {
-    id: Int!
+	id: Int!
 	teamId: Int!
 	problemSlug: String!
 	time: DateTime!

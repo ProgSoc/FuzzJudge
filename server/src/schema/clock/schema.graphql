@@ -1,16 +1,16 @@
 extend type Subscription {
-    clock: Clock!
+	clock: Clock!
 }
 
 extend type Mutation {
-    holdClock: Clock!
-    releaseClock(extendDuration: Boolean): Clock!
-    adjustStartTime(startTime: DateTime!, keepDuration: Boolean): Clock!
-    adjustFinishTime(finishTime: DateTime!): Clock!
+	holdClock: Clock!
+	releaseClock(extendDuration: Boolean): Clock!
+	adjustStartTime(startTime: DateTime!, keepDuration: Boolean): Clock!
+	adjustFinishTime(finishTime: DateTime!): Clock!
 }
 
 type Clock {
-    start: DateTime!
+	start: DateTime!
 	finish: DateTime!
-    hold: DateTime
+	hold: DateTime
 }

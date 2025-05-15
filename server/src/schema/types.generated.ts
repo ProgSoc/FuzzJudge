@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { ProblemMapper } from './problems/schema.mappers';
+import { ProblemScoreMapper, ScoreboardRowMapper } from './scoreboard/schema.mappers';
 import { SubmissionMapper } from './submissions/schema.mappers';
 import { TeamMapper } from './teams/schema.mappers';
 import { UserMapper } from './users/schema.mappers';
@@ -61,6 +62,7 @@ export type Mutation = {
   deleteUser: User;
   holdClock: Clock;
   judge: JudgeOutput;
+  overrideJudge: Submission;
   releaseClock: Clock;
   updateTeam: Team;
   updateUser: User;
@@ -107,6 +109,12 @@ export type MutationJudgeArgs = {
 };
 
 
+export type MutationOverrideJudgeArgs = {
+  solved: Scalars['Boolean']['input'];
+  submissionId: Scalars['Int']['input'];
+};
+
+
 export type MutationReleaseClockArgs = {
   extendDuration?: InputMaybe<Scalars['Boolean']['input']>;
 };
@@ -141,6 +149,8 @@ export type ProblemScore = {
   __typename?: 'ProblemScore';
   penalty: Scalars['Float']['output'];
   points: Scalars['Int']['output'];
+  problem: Problem;
+  slug: Scalars['String']['output'];
   solved: Scalars['Boolean']['output'];
   tries: Scalars['Int']['output'];
 };
@@ -187,11 +197,14 @@ export type QueryUserArgs = {
   id: Scalars['Int']['input'];
 };
 
-export type ScoreboardTeam = {
-  __typename?: 'ScoreboardTeam';
-  name: Scalars['String']['output'];
+export type ScoreboardRow = {
+  __typename?: 'ScoreboardRow';
+  penalty: Scalars['Float']['output'];
+  points: Scalars['Int']['output'];
+  problems: Array<ProblemScore>;
   rank: Scalars['Int']['output'];
-  score: TeamScore;
+  team: Team;
+  teamId: Scalars['Int']['output'];
 };
 
 export type Submission = {
@@ -211,7 +224,7 @@ export type Submission = {
 export type Subscription = {
   __typename?: 'Subscription';
   clock: Clock;
-  scoreboard: Array<ScoreboardTeam>;
+  scoreboard: Array<ScoreboardRow>;
 };
 
 export type Team = {
@@ -225,18 +238,6 @@ export type Team = {
 
 export type TeamSubmissionsArgs = {
   problemSlug?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type TeamScore = {
-  __typename?: 'TeamScore';
-  problems: Array<ProblemScore>;
-  total: TeamTotal;
-};
-
-export type TeamTotal = {
-  __typename?: 'TeamTotal';
-  penalty: Scalars['Float']['output'];
-  points: Scalars['Int']['output'];
 };
 
 export type User = {
@@ -340,15 +341,13 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Problem: ResolverTypeWrapper<ProblemMapper>;
-  ProblemScore: ResolverTypeWrapper<ProblemScore>;
+  ProblemScore: ResolverTypeWrapper<ProblemScoreMapper>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Query: ResolverTypeWrapper<{}>;
-  ScoreboardTeam: ResolverTypeWrapper<ScoreboardTeam>;
+  ScoreboardRow: ResolverTypeWrapper<ScoreboardRowMapper>;
   Submission: ResolverTypeWrapper<SubmissionMapper>;
   Subscription: ResolverTypeWrapper<{}>;
   Team: ResolverTypeWrapper<TeamMapper>;
-  TeamScore: ResolverTypeWrapper<TeamScore>;
-  TeamTotal: ResolverTypeWrapper<TeamTotal>;
   User: ResolverTypeWrapper<UserMapper>;
   UserRole: ResolverTypeWrapper<'COMPETITOR' | 'ADMIN'>;
 };
@@ -368,15 +367,13 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   ID: Scalars['ID']['output'];
   Problem: ProblemMapper;
-  ProblemScore: ProblemScore;
+  ProblemScore: ProblemScoreMapper;
   Float: Scalars['Float']['output'];
   Query: {};
-  ScoreboardTeam: ScoreboardTeam;
+  ScoreboardRow: ScoreboardRowMapper;
   Submission: SubmissionMapper;
   Subscription: {};
   Team: TeamMapper;
-  TeamScore: TeamScore;
-  TeamTotal: TeamTotal;
   User: UserMapper;
 };
 
@@ -426,6 +423,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, ContextType, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
+  overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, ContextType, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
   releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, Partial<MutationReleaseClockArgs>>;
   updateTeam?: Resolver<ResolversTypes['Team'], ParentType, ContextType, RequireFields<MutationUpdateTeamArgs, 'id' | 'name'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
@@ -447,6 +445,8 @@ export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends Re
 export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProblemScore'] = ResolversParentTypes['ProblemScore']> = {
   penalty?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  problem?: Resolver<ResolversTypes['Problem'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   solved?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   tries?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -467,10 +467,13 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   version?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
-export type ScoreboardTeamResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ScoreboardTeam'] = ResolversParentTypes['ScoreboardTeam']> = {
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+export type ScoreboardRowResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ScoreboardRow'] = ResolversParentTypes['ScoreboardRow']> = {
+  penalty?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  problems?: Resolver<Array<ResolversTypes['ProblemScore']>, ParentType, ContextType>;
   rank?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  score?: Resolver<ResolversTypes['TeamScore'], ParentType, ContextType>;
+  team?: Resolver<ResolversTypes['Team'], ParentType, ContextType>;
+  teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -490,7 +493,7 @@ export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends
 
 export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   clock?: SubscriptionResolver<ResolversTypes['Clock'], "clock", ParentType, ContextType>;
-  scoreboard?: SubscriptionResolver<Array<ResolversTypes['ScoreboardTeam']>, "scoreboard", ParentType, ContextType>;
+  scoreboard?: SubscriptionResolver<Array<ResolversTypes['ScoreboardRow']>, "scoreboard", ParentType, ContextType>;
 };
 
 export type TeamResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Team'] = ResolversParentTypes['Team']> = {
@@ -498,18 +501,6 @@ export type TeamResolvers<ContextType = GraphQLContext, ParentType extends Resol
   members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   submissions?: Resolver<Array<ResolversTypes['Submission']>, ParentType, ContextType, Partial<TeamSubmissionsArgs>>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type TeamScoreResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TeamScore'] = ResolversParentTypes['TeamScore']> = {
-  problems?: Resolver<Array<ResolversTypes['ProblemScore']>, ParentType, ContextType>;
-  total?: Resolver<ResolversTypes['TeamTotal'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type TeamTotalResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TeamTotal'] = ResolversParentTypes['TeamTotal']> = {
-  penalty?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -536,12 +527,10 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Problem?: ProblemResolvers<ContextType>;
   ProblemScore?: ProblemScoreResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  ScoreboardTeam?: ScoreboardTeamResolvers<ContextType>;
+  ScoreboardRow?: ScoreboardRowResolvers<ContextType>;
   Submission?: SubmissionResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   Team?: TeamResolvers<ContextType>;
-  TeamScore?: TeamScoreResolvers<ContextType>;
-  TeamTotal?: TeamTotalResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserRole?: UserRoleResolvers;
 };

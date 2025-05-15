@@ -1,9 +1,9 @@
 extend type Query {
-    competition: Competition!
+	competition: Competition!
 }
 
 type Competition {
-    name: String!
-    brief: String!
-    instructions: String!
+	name: String!
+	brief: String!
+	instructions: String!
 }

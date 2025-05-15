@@ -6,6 +6,6 @@ scalar DateTime
 scalar File
 
 extend type Query {
-    version: String!
-    header: String!
+	version: String!
+	header: String!
 }

@@ -20,6 +20,7 @@ import    { deleteTeam as Mutation_deleteTeam } from './teams/resolvers/Mutation
 import    { deleteUser as Mutation_deleteUser } from './users/resolvers/Mutation/deleteUser';
 import    { holdClock as Mutation_holdClock } from './clock/resolvers/Mutation/holdClock';
 import    { judge as Mutation_judge } from './problems/resolvers/Mutation/judge';
+import    { overrideJudge as Mutation_overrideJudge } from './submissions/resolvers/Mutation/overrideJudge';
 import    { releaseClock as Mutation_releaseClock } from './clock/resolvers/Mutation/releaseClock';
 import    { updateTeam as Mutation_updateTeam } from './teams/resolvers/Mutation/updateTeam';
 import    { updateUser as Mutation_updateUser } from './users/resolvers/Mutation/updateUser';
@@ -31,17 +32,15 @@ import    { JudgeErrorOutput } from './problems/resolvers/JudgeErrorOutput';
 import    { JudgeSuccessOutput } from './problems/resolvers/JudgeSuccessOutput';
 import    { Problem } from './problems/resolvers/Problem';
 import    { ProblemScore } from './scoreboard/resolvers/ProblemScore';
-import    { ScoreboardTeam } from './scoreboard/resolvers/ScoreboardTeam';
+import    { ScoreboardRow } from './scoreboard/resolvers/ScoreboardRow';
 import    { Submission } from './submissions/resolvers/Submission';
 import    { Team } from './teams/resolvers/Team';
-import    { TeamScore } from './scoreboard/resolvers/TeamScore';
-import    { TeamTotal } from './scoreboard/resolvers/TeamTotal';
 import    { User } from './users/resolvers/User';
 import    { JudgeOutput } from './problems/resolvers/JudgeOutput';
 import    { DateTimeResolver } from 'graphql-scalars';
     export const resolvers: Resolvers = {
       Query: { competition: Query_competition,header: Query_header,me: Query_me,problem: Query_problem,problems: Query_problems,submission: Query_submission,submissions: Query_submissions,team: Query_team,teams: Query_teams,user: Query_user,users: Query_users,version: Query_version },
-      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,holdClock: Mutation_holdClock,judge: Mutation_judge,releaseClock: Mutation_releaseClock,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
+      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,holdClock: Mutation_holdClock,judge: Mutation_judge,overrideJudge: Mutation_overrideJudge,releaseClock: Mutation_releaseClock,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
       Subscription: { clock: Subscription_clock,scoreboard: Subscription_scoreboard },
       Clock: Clock,
 Competition: Competition,
@@ -49,11 +48,9 @@ JudgeErrorOutput: JudgeErrorOutput,
 JudgeSuccessOutput: JudgeSuccessOutput,
 Problem: Problem,
 ProblemScore: ProblemScore,
-ScoreboardTeam: ScoreboardTeam,
+ScoreboardRow: ScoreboardRow,
 Submission: Submission,
 Team: Team,
-TeamScore: TeamScore,
-TeamTotal: TeamTotal,
 User: User,
 JudgeOutput: JudgeOutput,
 DateTime: DateTimeResolver

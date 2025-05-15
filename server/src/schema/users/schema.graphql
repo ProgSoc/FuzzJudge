@@ -1,24 +1,24 @@
 extend type Query {
-    users: [User!]!
-    user(id: Int!): User!
-    me: User!
+	users: [User!]!
+	user(id: Int!): User!
+	me: User!
 }
 
 extend type Mutation {
-    createUser(logn: String!, role: UserRole!, teamId: Int): User!
-    updateUser(id: Int!, role: UserRole, teamId: Int): User!
-    deleteUser(id: Int!): User!
+	createUser(logn: String!, role: UserRole!, teamId: Int): User!
+	updateUser(id: Int!, role: UserRole, teamId: Int): User!
+	deleteUser(id: Int!): User!
 }
 
 enum UserRole {
-    COMPETITOR
-    ADMIN
+	COMPETITOR
+	ADMIN
 }
 
 type User {
-    id: Int!
-    role: UserRole!
-    teamId: Int
-    team: Team
-    logn: String!
+	id: Int!
+	role: UserRole!
+	teamId: Int
+	team: Team
+	logn: String!
 }

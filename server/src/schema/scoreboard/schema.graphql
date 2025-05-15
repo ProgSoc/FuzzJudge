@@ -1,26 +1,21 @@
 extend type Subscription {
-    scoreboard: [ScoreboardTeam!]!
+	scoreboard: [ScoreboardRow!]!
 }
 
-type ScoreboardTeam {
-    rank: Int!
-    name: String!
-    score: TeamScore!
-}
-
-type TeamScore {
-    total: TeamTotal!
-    problems: [ProblemScore!]!
+type ScoreboardRow {
+	rank: Int!
+	teamId: Int!
+	team: Team!
+	points: Int!
+	penalty: Float!
+	problems: [ProblemScore!]!
 }
 
 type ProblemScore {
-    points: Int!
-    penalty: Float!
-    tries: Int!
-    solved: Boolean!
-}
-
-type TeamTotal {
-    points: Int!
-    penalty: Float!
+	slug: String!
+	problem: Problem!
+	solved: Boolean!
+	points: Int!
+	penalty: Float!
+	tries: Int!
 }

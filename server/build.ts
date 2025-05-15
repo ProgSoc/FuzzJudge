@@ -1,6 +1,6 @@
 import { HEADER } from "./src/version";
 
-const buildEntryPoints = ["./src/index.ts", "./src/client.ts"];
+const buildEntryPoints = ["./src/index.ts"];
 
 await Bun.build({
 	entrypoints: buildEntryPoints,

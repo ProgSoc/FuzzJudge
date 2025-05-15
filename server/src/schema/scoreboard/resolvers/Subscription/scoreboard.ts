@@ -1,13 +1,10 @@
-import { scoreboard as compScoreboard } from "@/app";
-
 import { pubSub } from "@/pubsub";
-import type {
-	ResolversTypes,
-	SubscriptionResolvers,
-} from "./../../../types.generated";
+import { calculateScoreboard } from "@/services/score";
+import type { ScoreboardRowMapper } from "../../schema.mappers";
+import type { SubscriptionResolvers } from "./../../../types.generated";
 export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 	subscribe: async function* (_parent, _arg, _ctx) {
-		yield compScoreboard.fullScoreboard();
+		yield calculateScoreboard();
 
 		const scoreboardSub = pubSub.subscribe("scoreboard");
 
@@ -15,5 +12,5 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 			yield scoreboardUpdate;
 		}
 	},
-	resolve: (payload: Awaited<ResolversTypes["ScoreboardTeam"]>[]) => payload,
+	resolve: (payload: ScoreboardRowMapper[]) => payload,
 };
