@@ -1,5 +1,5 @@
-import type { GraphQLClient, RequestOptions } from "graphql-request";
 import type { GraphQLError } from "graphql";
+import type { GraphQLClient, RequestOptions } from "graphql-request";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {

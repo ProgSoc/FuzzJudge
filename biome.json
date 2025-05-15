@@ -11,7 +11,8 @@
 			"./clients/fj-svelte/dist",
 			"./node_modules",
 			"./server/dist",
-			"./server/**/*.generated.ts"
+			"./server/**/*.generated.ts",
+			"./clients/fj-svelte/src/gql/index.ts"
 		]
 	},
 	"formatter": {
