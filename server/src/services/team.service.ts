@@ -7,7 +7,7 @@ import { type Team, teamTable, userTable } from "../db/schema";
  * @param id - The id of the user whose team to get
  * @returns the team of the user
  */
-export async function getUserTeam(id: number): Promise<Team | undefined> {
+async function getUserTeam(id: number): Promise<Team | undefined> {
 	const user = await db.query.userTable.findFirst({
 		where: (table) => eq(table.id, id),
 	});
@@ -24,7 +24,7 @@ export async function getUserTeam(id: number): Promise<Team | undefined> {
  * @param param0 - The team creation parameters
  * @returns The created team
  */
-export async function createTeam({ name }: { name: string }): Promise<Team> {
+async function createTeam({ name }: { name: string }): Promise<Team> {
 	const seed = [...crypto.getRandomValues(new Uint8Array(8))]
 		.map((v) => v.toString(16).padStart(2, "0"))
 		.join("");
@@ -46,7 +46,7 @@ export async function createTeam({ name }: { name: string }): Promise<Team> {
  * @param param1 The team edit parameters
  * @returns The edited team
  */
-export async function patchTeam(
+async function patchTeam(
 	id: number,
 	{ name }: { name: string },
 ): Promise<Team> {
@@ -61,7 +61,7 @@ export async function patchTeam(
 	return team;
 }
 
-export async function deleteTeam(id: number) {
+async function deleteTeam(id: number) {
 	await db.delete(teamTable).where(eq(teamTable.id, id));
 }
 
@@ -69,7 +69,7 @@ export async function allTeams(): Promise<Team[]> {
 	return db.query.teamTable.findMany();
 }
 
-export async function assignUserTeam({
+async function assignUserTeam({
 	user = null as number | null,
 	team = null as number | null,
 }) {

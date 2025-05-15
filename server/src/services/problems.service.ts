@@ -248,7 +248,7 @@ export function parseMarkdownAttributes(body: string) {
 	};
 }
 
-export function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
+function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
 	return {
 		slug: problem.slug,
 		doc: {

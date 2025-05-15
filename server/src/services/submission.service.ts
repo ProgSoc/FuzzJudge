@@ -10,7 +10,7 @@ interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
 	vler: string;
 }
 
-export async function attempts(params: {
+async function attempts(params: {
 	team: number;
 	prob: string;
 }): Promise<number> {
@@ -39,9 +39,7 @@ export async function solved(params: {
 	return solved !== undefined;
 }
 
-export async function solvedSet(params: { team: number }): Promise<
-	Set<string>
-> {
+async function solvedSet(params: { team: number }): Promise<Set<string>> {
 	const solved = await db
 		.selectDistinct({ prob: submissionTable.prob })
 		.from(submissionTable)
@@ -56,7 +54,7 @@ export async function solvedSet(params: { team: number }): Promise<
 	return new Set(solved.filter(Boolean).map((v) => v.prob as string));
 }
 
-export async function score(root: string, teamId: number): Promise<number> {
+async function score(root: string, teamId: number): Promise<number> {
 	let total = 0;
 	for (const slug of await solvedSet({ team: teamId })) {
 		const problemMeta = await getProblemData(root, slug);
@@ -65,7 +63,7 @@ export async function score(root: string, teamId: number): Promise<number> {
 	return total;
 }
 
-export async function manualJudge(id: number, ok: boolean) {
+async function manualJudge(id: number, ok: boolean) {
 	// db.query("UPDATE subm SET ok = :ok WHERE id = :id", {id, ok});
 	return await db
 		.update(submissionTable)
@@ -123,7 +121,7 @@ export async function postSubmission(
 	return newSub;
 }
 
-export const SubmissionSkeletonSchema = z.object({
+const SubmissionSkeletonSchema = z.object({
 	id: z.number(),
 	team: z.number(),
 	prob: z.string(),
@@ -151,9 +149,7 @@ export async function getSubmissionSkeletons(
 	});
 }
 
-export async function getSubmissionOut(
-	id: number,
-): Promise<string | undefined> {
+async function getSubmissionOut(id: number): Promise<string | undefined> {
 	// const data = db.query<[Uint8Array]>("SELECT out FROM subm WHERE id = :id", { id })[0]?.[0];
 	const data = await db.query.submissionTable.findFirst({
 		where: (table) => eq(table.id, id),
@@ -163,9 +159,7 @@ export async function getSubmissionOut(
 	return data.out ?? "";
 }
 
-export async function getSubmissionCode(
-	id: number,
-): Promise<string | undefined> {
+async function getSubmissionCode(id: number): Promise<string | undefined> {
 	// const data = db.query<[Uint8Array]>("SELECT code FROM subm WHERE id = :id", { id })[0]?.[0];
 	const data = await db.query.submissionTable.findFirst({
 		where: (table) => eq(table.id, id),
@@ -174,9 +168,7 @@ export async function getSubmissionCode(
 	return data.code;
 }
 
-export async function getSubmissionVler(
-	id: number,
-): Promise<string | undefined> {
+async function getSubmissionVler(id: number): Promise<string | undefined> {
 	// const data = db.query<[Uint8Array]>("SELECT vler FROM subm WHERE id = :id", { id })[0]?.[0];
 	const data = await db.query.submissionTable.findFirst({
 		where: (table) => eq(table.id, id),
