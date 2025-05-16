@@ -21,55 +21,6 @@ export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
 
 console.log("Backend server URL:", BACKEND_SERVER);
 
-export interface ScoreboardEvent {
-	new_scoreboard: ScoreboardUser[];
-}
-
-export const subscribeToScoreboard = (
-	callback: (data: ScoreboardEvent) => void,
-): (() => void) => {
-	try {
-		const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}`;
-
-		console.log("Connecting to scoreboard websocket at", wsURL);
-
-		const socket = new WebSocket(wsURL);
-
-		socket.addEventListener("message", (event) => {
-			callback({ new_scoreboard: parseScoreboard(event.data) });
-		});
-
-		return () => {
-			socket.close();
-		};
-	} catch (error) {
-		console.error("Error subscribing to scoreboard:", error);
-
-		return () => {};
-	}
-};
-
-export const getCompInfo = async (): Promise<{
-	title: string;
-	instructions: string;
-}> => {
-	const title = await (await fetch(`${BACKEND_SERVER}/comp/name`)).text();
-	const instructions = await (
-		await fetch(`${BACKEND_SERVER}/comp/instructions`)
-	).text();
-	return { title, instructions };
-};
-
-export const getScoreboard = async (): Promise<ScoreboardUser[]> => {
-	return parseScoreboard(
-		await (await fetch(`${BACKEND_SERVER}/comp/scoreboard`)).text(),
-	);
-};
-
-export const getUsername = async (): Promise<string> => {
-	return await fetch(`${BACKEND_SERVER}/auth`).then((r) => r.text());
-};
-
 export const submitSolution = async (
 	slug: string,
 	output: string,
@@ -122,26 +73,4 @@ export function copyFuzz(slug: string) {
 		await navigator.clipboard.writeText(text);
 		showNotification("Copied problem input to clipboard");
 	})();
-}
-
-export async function isProblemSolved(slug: string) {
-	const res = await fetch(`${BACKEND_SERVER}/comp/prob/${slug}/judge`, {
-		method: "GET",
-	});
-
-	const text = await res.text();
-	return text === "OK";
-}
-
-export async function getProblemSolvedSet(problemSlugs: string[]) {
-	const remainingSolved = await Promise.all(
-		problemSlugs.map(async (slug) => {
-			if (await isProblemSolved(slug)) {
-				return slug;
-			}
-			return null;
-		}),
-	);
-
-	return new Set(remainingSolved.filter(exists));
 }

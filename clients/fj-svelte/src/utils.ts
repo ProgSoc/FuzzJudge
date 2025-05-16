@@ -13,8 +13,8 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
 import { type Writable, writable } from "svelte/store";
+import type { ProblemsListQueryQuery } from "./gql";
 
 export const selectedProblem: Writable<string> = writable("");
 
@@ -74,18 +74,6 @@ export function exists<T>(val: T | null | undefined): val is T {
 	return val !== null && val !== undefined;
 }
 
-/**
- * Creates a WebSocket URL from a given path.
- * @param path The path to the WebSocket server
- * @returns The WebSocket URL
- */
-export function createWsUrl(path: string) {
-	const proto = window.location.protocol === "https:" ? "wss" : "ws";
-	const port = window.location.port ? `:${window.location.port}` : "";
-	const url = `${proto}://${window.location.host}${port}${path}`;
-	return url;
-}
-
 export function removeMdTitle(md: string): string {
 	const lines = md.trim().split("\n");
 	if (lines[0].startsWith("# ")) {
@@ -126,14 +114,11 @@ export function problemOrder(a: GenericProblem, b: GenericProblem) {
  * selected problem.
  */
 export function nextUnsolvedProblem(
-	problems: Record<string, FuzzJudgeProblemMessage>,
-	solvedProblems: Set<string>,
+	problems: ProblemsListQueryQuery["problems"],
 	selected: string,
 	offset = 1,
 ): string | null {
-	const probs = Object.values(problems)
-		.filter((p) => !solvedProblems.has(p.slug))
-		.sort(problemOrder);
+	const probs = problems.filter((p) => !p.solved).sort(problemOrder);
 
 	const selectedIndex = probs.findIndex((p) => p.slug === selected);
 

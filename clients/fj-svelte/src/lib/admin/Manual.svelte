@@ -16,17 +16,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 <script lang="ts">
   import SvelteMarkdown from "svelte-markdown";
   import Loading from "../Loading.svelte";
+  import { createQuery } from "@tanstack/svelte-query";
 
-  let source: string | undefined = $state(undefined);
-
-  fetch("https://raw.githubusercontent.com/ProgSoc/FuzzJudge/refs/heads/main/docs/MANUAL.md")
-    .then((res) => res.text())
-    .then((body) => (source = body));
+  const manualQuery = createQuery({
+    queryKey: ["manual"],
+    queryFn: () =>
+      fetch("https://raw.githubusercontent.com/ProgSoc/FuzzJudge/refs/heads/main/docs/MANUAL.md")
+        .then((res) => res.text())
+        .catch((err) => {
+          console.error("Error fetching manual", err);
+          return "Error fetching manual";
+        }),
+  });
 </script>
 
-{#if source !== undefined}
+{#if $manualQuery.data}
   <div id="instructions-md">
-    <SvelteMarkdown {source} />
+    <SvelteMarkdown source={$manualQuery.data} />
   </div>
 {:else}
   <Loading />

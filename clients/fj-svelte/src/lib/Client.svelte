@@ -14,8 +14,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { copyFuzz, downloadFuzz, getCompInfo, getProblemSolvedSet, openFuzz } from "../api";
-  import { nextUnsolvedProblem, selectedProblem } from "../utils";
+  import { copyFuzz, downloadFuzz, openFuzz } from "../api";
+  import { selectedProblem } from "../utils";
   import {
     CompState,
     type CompTimes,
@@ -30,9 +30,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import ProblemContents from "./ProblemContents.svelte";
   import Scoreboard from "./Scoreboard.svelte";
   import Sidebar from "./Sidebar.svelte";
-
-  import { getUsername } from "../api";
-  // import { initLiveState } from "../apiLive";
   import icons from "../icons";
   import Icon from "./Icon.svelte";
   import InlineCountdown from "./counters/InlineCountdown.svelte";

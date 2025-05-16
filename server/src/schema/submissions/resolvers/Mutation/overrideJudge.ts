@@ -1,6 +1,32 @@
+import { db } from "@/db";
+import { submissionTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 export const overrideJudge: NonNullable<
 	MutationResolvers["overrideJudge"]
-> = async (_parent, _arg, _ctx) => {
-	/* Implement Mutation.overrideJudge resolver logic here */
+> = async (_parent, { solved, submissionId }, _ctx) => {
+	const [updated] = await db
+		.update(submissionTable)
+		.set({
+			ok: solved,
+		})
+		.where(eq(submissionTable.id, submissionId))
+		.returning();
+
+	if (!updated) {
+		throw new GraphQLError("Submission not found");
+	}
+
+	return {
+		id: updated.id,
+		ok: updated.ok ?? undefined,
+		problemSlug: updated.prob,
+		teamId: updated.team,
+		time: updated.time,
+		code: updated.code ?? undefined,
+		out: updated.out ?? undefined,
+		vler: updated.vler ?? undefined,
+		vlms: updated.vlms ?? undefined,
+	};
 };
