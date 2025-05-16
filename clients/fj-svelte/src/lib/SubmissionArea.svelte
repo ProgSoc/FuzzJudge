@@ -15,11 +15,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
-  import { openFuzz } from "../api";
   import { showNotification } from "../notifications";
   import { selectedProblem } from "../utils";
   import { client } from "../gql/sdk";
   import type { JudgeSubmissionMutationVariables } from "../gql";
+  import { downloadFuzz } from "../api";
 
   let submissionValue = $state("");
   let sourceValue = $state("");
@@ -51,10 +51,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     },
   });
 
-  const fuzzQuery = createQuery({
-    queryKey: ["problem", $selectedProblem, "fuzz"],
-    queryFn: () => client.ProblemFuzzQuery({ problemSlug: $selectedProblem }),
-    select: (data) => data.data.problem.fuzz,
+  const getFuzz = createMutation({
+    mutationFn: (slug: string) => client.GetProblemFuzz({ problemId: slug }),
+    onSuccess: (data) => {
+      if (data.errors?.length) {
+        const errorMessage = data.errors.map((error) => error.message).join(", ");
+        showNotification(`Failed to get fuzz input: ${errorMessage}`);
+      }
+    },
+    onError: (error) => {
+      showNotification("Failed to get fuzz input. Server error.");
+    },
   });
 
   const submit = (slug: string) => {
@@ -65,7 +72,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     });
   };
 
-  const keyHandler = (e: KeyboardEvent) => {
+  const handleDownload = async () => {
+    const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
+    downloadFuzz($selectedProblem, fuzzData.data.getFuzz);
+  };
+
+  const handleCopy = async () => {
+    const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
+    await navigator.clipboard.writeText(fuzzData.data.getFuzz);
+    showNotification("Fuzz input copied to clipboard!");
+  };
+
+  const windowKeyHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.altKey && e.key === "Enter") {
       e.preventDefault();
 
@@ -74,6 +92,25 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         return;
       }
 
+      submit($selectedProblem);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "c") {
+      e.preventDefault();
+      handleCopy();
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "d") {
+      e.preventDefault();
+      handleDownload();
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "s") {
+      e.preventDefault();
+      if (submissionValue.length === 0 || sourceValue.length === 0) {
+        showNotification("Please fill in all fields before submitting.");
+        return;
+      }
       submit($selectedProblem);
     }
 
@@ -86,15 +123,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 </script>
 
+<svelte:window onkeydown={windowKeyHandler} />
+
 <div class="problem-submission">
   <div class="section">
     <div class="section submission-areas">
-      {#if $fuzzQuery.data}
-        <div class="solution-submission">
-          <h2>Problem Input</h2>
-          <textarea bind:value={$fuzzQuery.data}></textarea>
-        </div>
-      {/if}
+      <div class="solution-submission">
+        <h2>Problem Input</h2>
+        {#if $getFuzz.isPending}
+          <textarea value={"Loading"} readonly></textarea>
+        {:else if $getFuzz.isError}
+          <textarea value={"Error loading input"} readonly></textarea>
+        {:else if $getFuzz.data?.data.getFuzz === null}
+          <textarea value={"No Input"} readonly></textarea>
+        {:else}
+          <textarea value={$getFuzz.data?.data.getFuzz} readonly></textarea>
+        {/if}
+      </div>
+      <button class="get-input" onclick={() => $getFuzz.mutate($selectedProblem)}> Get Fuzz Input </button>
+      <button class="get-input" onclick={handleDownload}> Download Input </button>
+      <button class="get-input" onclick={handleCopy}> Copy Input </button>
       <div class="solution-submission">
         <h2>Problem Solution</h2>
         <textarea bind:value={submissionValue}></textarea>
@@ -127,8 +175,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   {/if}
 </div>
 
-<svelte:window onkeydown={keyHandler} />
-
 <style>
   .section {
     flex-direction: column;
@@ -153,13 +199,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     margin-left: 0.25rem;
   }
 
-  .input-span {
+  /* .input-span {
     color: var(--link);
     text-decoration: underline;
     &:hover {
       cursor: pointer;
-    }
-  }
+    } */
+  /* } */
 
   .text-area-buttons {
     display: flex;

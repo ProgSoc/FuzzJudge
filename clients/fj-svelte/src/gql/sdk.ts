@@ -1,7 +1,8 @@
 import { GraphQLClient } from "graphql-request";
 import { createClient } from "graphql-ws";
 import { getSdk } from ".";
-import { BACKEND_SERVER } from "../api";
+
+const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
 
 const graphQLClient = new GraphQLClient(BACKEND_SERVER);
 

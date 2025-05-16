@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { copyFuzz, downloadFuzz, openFuzz } from "../api";
+  import { copyFuzz, downloadFuzz } from "../api";
   import { selectedProblem } from "../utils";
   import {
     CompState,
@@ -147,16 +147,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     if (e.ctrlKey && e.key === "m") {
       e.preventDefault();
       showingPopout = "Manual";
-    }
-
-    if (e.ctrlKey && e.key === "i") {
-      e.preventDefault();
-      openFuzz($selectedProblem);
-    }
-
-    if (e.ctrlKey && e.key === "d") {
-      e.preventDefault();
-      downloadFuzz($selectedProblem);
     }
 
     if (e.ctrlKey && e.altKey && e.key === "c") {

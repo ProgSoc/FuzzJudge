@@ -60,6 +60,7 @@ export type Mutation = {
   createUser: User;
   deleteTeam: Team;
   deleteUser: User;
+  getFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
   overrideJudge: Submission;
@@ -102,6 +103,11 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationGetFuzzArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
@@ -136,7 +142,6 @@ export type Problem = {
   __typename?: 'Problem';
   brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
-  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -419,6 +424,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'logn' | 'role'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, ContextType, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  getFuzz?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationGetFuzzArgs, 'slug'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, ContextType, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
   overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, ContextType, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
@@ -430,7 +436,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Problem'] = ResolversParentTypes['Problem']> = {
   brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   difficulty?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  fuzz?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   icon?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

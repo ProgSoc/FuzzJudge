@@ -54,6 +54,7 @@ export type Mutation = {
   createUser: User;
   deleteTeam: Team;
   deleteUser: User;
+  getFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
   overrideJudge: Submission;
@@ -96,6 +97,11 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationGetFuzzArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
@@ -130,7 +136,6 @@ export type Problem = {
   __typename?: 'Problem';
   brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
-  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -279,12 +284,12 @@ export type ProblemDataQueryVariables = Exact<{
 
 export type ProblemDataQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', solved: boolean, name: string, difficulty: number, points: number, instructions: string } };
 
-export type ProblemFuzzQueryQueryVariables = Exact<{
-  problemSlug: Scalars['String']['input'];
+export type GetProblemFuzzMutationVariables = Exact<{
+  problemId: Scalars['String']['input'];
 }>;
 
 
-export type ProblemFuzzQueryQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz: string }, me: { __typename?: 'User', logn: string } };
+export type GetProblemFuzzMutation = { __typename?: 'Mutation', getFuzz: string };
 
 export type ProblemsListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -346,14 +351,9 @@ export const ProblemDataDocument = `
   }
 }
     `;
-export const ProblemFuzzQueryDocument = `
-    query ProblemFuzzQuery($problemSlug: String!) {
-  problem(slug: $problemSlug) {
-    fuzz
-  }
-  me {
-    logn
-  }
+export const GetProblemFuzzDocument = `
+    mutation GetProblemFuzz($problemId: String!) {
+  getFuzz(slug: $problemId)
 }
     `;
 export const ProblemsListQueryDocument = `
@@ -409,8 +409,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     ProblemData(variables: ProblemDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemDataQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemDataQuery>(ProblemDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemData', 'query', variables);
     },
-    ProblemFuzzQuery(variables: ProblemFuzzQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemFuzzQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
-        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemFuzzQueryQuery>(ProblemFuzzQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemFuzzQuery', 'query', variables);
+    GetProblemFuzz(variables: GetProblemFuzzMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProblemFuzzMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProblemFuzzMutation>(GetProblemFuzzDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetProblemFuzz', 'mutation', variables);
     },
     ProblemsListQuery(variables?: ProblemsListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemsListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemsListQueryQuery>(ProblemsListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemsListQuery', 'query', variables);

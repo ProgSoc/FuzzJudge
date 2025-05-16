@@ -1,8 +1,3 @@
-query ProblemFuzzQuery($problemSlug: String!) {
-	problem(slug: $problemSlug) {
-		fuzz
-	}
-	me {
-		logn
-	}
+mutation GetProblemFuzz($problemId: String!) {
+	getFuzz(slug: $problemId)
 }

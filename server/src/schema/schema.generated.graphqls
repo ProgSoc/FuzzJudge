@@ -32,6 +32,7 @@ type Mutation {
   createUser(logn: String!, role: UserRole!, teamId: Int): User!
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!
+  getFuzz(slug: String!): String!
   holdClock: Clock!
   judge(code: String!, output: String!, slug: String!): JudgeOutput!
   overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
@@ -43,7 +44,6 @@ type Mutation {
 type Problem {
   brief: String!
   difficulty: Int!
-  fuzz: String!
   icon: String!
   instructions: String!
   name: String!

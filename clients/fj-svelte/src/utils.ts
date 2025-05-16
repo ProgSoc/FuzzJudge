@@ -43,35 +43,8 @@ export const truncateUsername = (username: string) => {
 		: username;
 };
 
-export interface ScoreboardUser {
-	name: string;
-	points: number;
-	solved: string[];
-}
-
-/** @deprecated */
-export const parseScoreboard = (data: string): ScoreboardUser[] => {
-	const lines = data.split("\n");
-	const users: ScoreboardUser[] = [];
-
-	for (let i = 1; i < lines.length; i++) {
-		const cells = lines[i].split(",").map((x) => x.trim());
-
-		if (cells.length < 2) continue;
-
-		const [name, points, ...solved] = cells;
-		users.push({ name, points: Number.parseInt(points), solved });
-	}
-
-	return users;
-};
-
 export function unreachable(x: never): never {
 	throw new Error(`Unreachable code reached: ${x}`);
-}
-
-export function exists<T>(val: T | null | undefined): val is T {
-	return val !== null && val !== undefined;
 }
 
 export function removeMdTitle(md: string): string {

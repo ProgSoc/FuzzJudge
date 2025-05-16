@@ -5,6 +5,7 @@ extend type Query {
 
 extend type Mutation {
 	judge(slug: String!, code: String!, output: String!): JudgeOutput!
+	getFuzz(slug: String!): String!
 }
 
 union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
@@ -26,6 +27,5 @@ type Problem {
 	difficulty: Int! # 1-3
 	points: Int!
 	instructions: String!
-	fuzz: String!
 	solved: Boolean!
 }
