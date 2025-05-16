@@ -14,166 +14,170 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import {
-	copyFuzz,
-	downloadFuzz,
-	getCompInfo,
-	getProblemSolvedSet,
-	openFuzz,
-} from "../api";
-import { nextUnsolvedProblem, selectedProblem } from "../utils";
-import {
-	CompState,
-	type CompTimes,
-	type TimeStateData,
-	getCurrentTimeStateData,
-	clockTick,
-	handleNotifications,
-} from "../clock";
-import CompInfo from "./CompInfo.svelte";
-import Loading from "./Loading.svelte";
-import Popout from "./Popout.svelte";
-import ProblemContents from "./ProblemContents.svelte";
-import Scoreboard from "./Scoreboard.svelte";
-import Sidebar from "./Sidebar.svelte";
+  import { copyFuzz, downloadFuzz, getCompInfo, getProblemSolvedSet, openFuzz } from "../api";
+  import { nextUnsolvedProblem, selectedProblem } from "../utils";
+  import {
+    CompState,
+    type CompTimes,
+    type TimeStateData,
+    getCurrentTimeStateData,
+    clockTick,
+    handleNotifications,
+  } from "../clock";
+  import CompInfo from "./CompInfo.svelte";
+  import Loading from "./Loading.svelte";
+  import Popout from "./Popout.svelte";
+  import ProblemContents from "./ProblemContents.svelte";
+  import Scoreboard from "./Scoreboard.svelte";
+  import Sidebar from "./Sidebar.svelte";
 
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
-import type { CompetitionScoreboardMessage } from "@progsoc/fuzzjudge-server/v1/score";
-import { getUsername } from "../api";
-import { initLiveState } from "../apiLive";
-import icons from "../icons";
-import Icon from "./Icon.svelte";
-import InlineCountdown from "./counters/InlineCountdown.svelte";
-import PageCountdown from "./counters/PageCountdown.svelte";
-import Settings from "./Settings.svelte";
-import Manual from "./admin/Manual.svelte";
-import Notification from "./Notification.svelte";
-import { NOTIFICATION } from "../notifications";
+  import { getUsername } from "../api";
+  // import { initLiveState } from "../apiLive";
+  import icons from "../icons";
+  import Icon from "./Icon.svelte";
+  import InlineCountdown from "./counters/InlineCountdown.svelte";
+  import PageCountdown from "./counters/PageCountdown.svelte";
+  import Settings from "./Settings.svelte";
+  import Manual from "./admin/Manual.svelte";
+  import Notification from "./Notification.svelte";
+  import { NOTIFICATION } from "../notifications";
+  import { client, wsClient } from "../gql/sdk";
+  import { ClockSubscriptionDocument, type ClockSubscriptionSubscription } from "../gql";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { onDestroy, onMount } from "svelte";
 
-let username = $state("Loading...");
+  const currentUserQuery = createQuery({
+    queryKey: ["username"],
+    queryFn: () => client.CurrentUser(),
+    select: (data) => data.data.me,
+  });
 
-getUsername().then((name) => {
-	username = name;
-});
+  const competitionName = createQuery({
+    queryKey: ["compInfo"],
+    queryFn: () => client.CompetitionData(),
+    select: (data) => {
+      return data.data.competition.name;
+    },
+  });
 
-let compTimes: CompTimes | undefined = undefined;
-let problems: Record<string, FuzzJudgeProblemMessage> | undefined =
-	$state(undefined);
-let scoreboard: CompetitionScoreboardMessage | undefined = $state(undefined);
-let solvedProblems = $state(new Set<string>());
+  let compTimes = $state<undefined | CompTimes>(undefined);
 
-const liveState = initLiveState();
-liveState.listenClock((clock) => {
-	compTimes = clock;
-});
-liveState.listenProblems(async (qs) => {
-	problems = Object.fromEntries(qs.map((q) => [q.slug, q]));
-	solvedProblems = await getProblemSolvedSet(Object.keys(problems));
-	if ($selectedProblem === "" && problems) {
-		selectedProblem.set(Object.keys(problems)[0] ?? "");
-	}
-});
-liveState.listenScoreboard((sb) => {
-	scoreboard = sb;
-});
+  let cleanupClock = () => {};
 
-getCompInfo().then((data) => {
-	window.document.title = data.title;
-});
+  $effect(() => {
+    if ($competitionName.data) {
+      window.document.title = `${$competitionName.data}`;
+    }
+  });
 
-let timeStateData: TimeStateData | undefined = $state(undefined);
-clockTick(() => {
-	if (compTimes !== undefined) {
-		timeStateData = getCurrentTimeStateData(compTimes);
-		handleNotifications(timeStateData);
-	}
-});
+  onMount(() => {
+    cleanupClock = wsClient.subscribe<ClockSubscriptionSubscription>(
+      {
+        query: ClockSubscriptionDocument,
+      },
+      {
+        next: (data) => {
+          console.log("ClockSubscription data", data.data?.clock);
+          if (data.data?.clock === undefined) return;
+          compTimes = data.data.clock;
+        },
+        error: (err) => {
+          console.error("Error in ClockSubscription", err);
+        },
+        complete: () => {
+          console.log("ClockSubscription completed");
+        },
+      },
+    );
+  });
 
-const setSolved = (slug: string) => {
-	solvedProblems.add(slug);
-};
+  onDestroy(() => {
+    cleanupClock();
+  });
 
-enum ShowingPopout {
-	None = 0,
-	Scoreboard = 1,
-	CompInfo = 2,
-	Settings = 3,
-	Manual = 4,
-}
+  let timeStateData = $state<TimeStateData | undefined>(undefined);
 
-// biome-ignore lint/style/useConst: is being assigned
-let showingPopout: ShowingPopout = $state(ShowingPopout.None);
+  clockTick(() => {
+    if (compTimes !== undefined) {
+      timeStateData = getCurrentTimeStateData(compTimes);
+      handleNotifications(timeStateData);
+    }
+  });
 
-const keydownHandler = (e: KeyboardEvent) => {
-	if (e.target === document.body && e.key === "ArrowRight") {
-		e.preventDefault();
-		if (problems === undefined) return;
-		const slug = nextUnsolvedProblem(
-			problems,
-			solvedProblems,
-			$selectedProblem,
-		);
-		if (slug !== null) {
-			selectedProblem.set(slug);
-		}
-	}
+  type ShowingPopout = "None" | "Scoreboard" | "CompInfo" | "Settings" | "Manual";
 
-	if (e.target === document.body && e.key === "ArrowLeft") {
-		e.preventDefault();
-		if (problems === undefined) return;
-		const slug = nextUnsolvedProblem(
-			problems,
-			solvedProblems,
-			$selectedProblem,
-			-1,
-		);
-		if (slug !== null) {
-			selectedProblem.set(slug);
-		}
-	}
+  let showingPopout: ShowingPopout = $state("None");
 
-	if (e.ctrlKey && e.key === "s") {
-		e.preventDefault();
+  const keydownHandler = (e: KeyboardEvent) => {
+    // if (e.target === document.body && e.key === "ArrowRight") {
+    // 	e.preventDefault();
+    // 	if (problems === undefined) return;
+    // 	const slug = nextUnsolvedProblem(
+    // 		problems,
+    // 		solvedProblems,
+    // 		$selectedProblem,
+    // 	);
+    // 	if (slug !== null) {
+    // 		selectedProblem.set(slug);
+    // 	}
+    // }
 
-		if (showingPopout === ShowingPopout.Scoreboard) {
-			showingPopout = ShowingPopout.None;
-			return;
-		}
+    // if (e.target === document.body && e.key === "ArrowLeft") {
+    // 	e.preventDefault();
+    // 	if (problems === undefined) return;
+    // 	const slug = nextUnsolvedProblem(
+    // 		problems,
+    // 		solvedProblems,
+    // 		$selectedProblem,
+    // 		-1,
+    // 	);
+    // 	if (slug !== null) {
+    // 		selectedProblem.set(slug);
+    // 	}
+    // }
 
-		showingPopout = ShowingPopout.Scoreboard;
-	}
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
 
-	if (e.ctrlKey && e.key === "m") {
-		e.preventDefault();
-		showingPopout = ShowingPopout.Manual;
-	}
+      if (showingPopout === "Scoreboard") {
+        showingPopout = "None";
+        return;
+      }
 
-	if (e.ctrlKey && e.key === "i") {
-		e.preventDefault();
-		openFuzz($selectedProblem);
-	}
+      showingPopout = "Scoreboard";
+    }
 
-	if (e.ctrlKey && e.key === "d") {
-		e.preventDefault();
-		downloadFuzz($selectedProblem);
-	}
+    if (e.ctrlKey && e.key === "m") {
+      e.preventDefault();
+      showingPopout = "Manual";
+    }
 
-	if (e.ctrlKey && e.altKey && e.key === "c") {
-		e.preventDefault();
-		copyFuzz($selectedProblem);
-	}
-};
+    if (e.ctrlKey && e.key === "i") {
+      e.preventDefault();
+      openFuzz($selectedProblem);
+    }
+
+    if (e.ctrlKey && e.key === "d") {
+      e.preventDefault();
+      downloadFuzz($selectedProblem);
+    }
+
+    if (e.ctrlKey && e.altKey && e.key === "c") {
+      e.preventDefault();
+      copyFuzz($selectedProblem);
+    }
+  };
 </script>
 
 <div class="layout">
   <div class="top-bar">
     <div>
-      <button onclick={() => (showingPopout = ShowingPopout.CompInfo)}>
+      <button onclick={() => (showingPopout = "CompInfo")}>
         <span class="vertical-center">
           <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
         </span>
       </button>
-      <button onclick={() => (showingPopout = ShowingPopout.Scoreboard)}>
+      <button onclick={() => (showingPopout = "Scoreboard")}>
         <span class="vertical-center">
           <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
         </span>
@@ -185,31 +189,25 @@ const keydownHandler = (e: KeyboardEvent) => {
       {/if}
     </div>
     <div class="vertical-center">
-      <span>
-        Logged in as <b>{username}</b>
-      </span>
+      {#if $currentUserQuery.data}
+        <span>
+          Logged in as <b>{$currentUserQuery.data.logn}</b>
+        </span>
+      {/if}
       <a href="/void" title="Enter empty credentials">
         <Icon icon={icons.logout} />
       </a>
-      <Icon icon={icons.cog} clickAction={() => (showingPopout = ShowingPopout.Settings)} />
+      <Icon icon={icons.cog} clickAction={() => (showingPopout = "Settings")} />
     </div>
   </div>
 
-  <Sidebar {solvedProblems} {problems} />
+  <Sidebar />
 
   <!-- main content -->
   {#if timeStateData === undefined}
     <Loading />
   {:else if timeStateData.problemsVisible && $selectedProblem !== ""}
-    {#if problems === undefined}
-      <Loading />
-    {:else}
-      <ProblemContents
-        problem={problems[$selectedProblem]}
-        solved={solvedProblems.has($selectedProblem)}
-        {setSolved}
-      />
-    {/if}
+    <ProblemContents problemSlug={$selectedProblem} />
   {:else if timeStateData.phase !== CompState.FINISHED}
     <div class="locked-message">
       {#if timeStateData.phase === CompState.BEFORE}
@@ -230,32 +228,23 @@ const keydownHandler = (e: KeyboardEvent) => {
 </div>
 
 <Popout
-  shown={showingPopout === ShowingPopout.Scoreboard}
-  close={() => (showingPopout = ShowingPopout.None)}
+  shown={showingPopout === "Scoreboard"}
+  close={() => (showingPopout = "None")}
   title="Scoreboard"
   icon={icons.scoreboard}
 >
-  {#if problems === undefined || scoreboard === undefined}
-    <Loading />
-  {:else}
-    <Scoreboard {problems} {scoreboard} />
-  {/if}
+  <Scoreboard />
 </Popout>
 
-<Popout shown={showingPopout === ShowingPopout.CompInfo} close={() => (showingPopout = ShowingPopout.None)}>
+<Popout shown={showingPopout === "CompInfo"} close={() => (showingPopout = "None")}>
   <CompInfo />
 </Popout>
 
-<Popout shown={showingPopout === ShowingPopout.Manual} close={() => (showingPopout = ShowingPopout.None)}>
+<Popout shown={showingPopout === "Manual"} close={() => (showingPopout = "None")}>
   <Manual />
 </Popout>
 
-<Popout
-  shown={showingPopout === ShowingPopout.Settings}
-  close={() => (showingPopout = ShowingPopout.None)}
-  title="Settings"
-  icon={icons.cog}
->
+<Popout shown={showingPopout === "Settings"} close={() => (showingPopout = "None")} title="Settings" icon={icons.cog}>
   <Settings />
 </Popout>
 

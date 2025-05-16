@@ -16,10 +16,21 @@
 import { onDestroy } from "svelte";
 import { unreachable } from "./utils";
 
-import type { CompetitionClockMessage } from "@progsoc/fuzzjudge-server/v1/clock";
+import type { ClockSubscriptionSubscription } from "./gql";
 import { showNotification } from "./notifications";
 
-export type CompTimes = CompetitionClockMessage;
+export type CompTimes = ClockSubscriptionSubscription["clock"];
+
+const timesToDate = (times: ClockSubscriptionSubscription["clock"]) => ({
+	start: times.start instanceof Date ? times.start : new Date(times.start),
+	hold:
+		times.hold instanceof Date
+			? times.hold
+			: typeof times.hold === "string"
+				? new Date(times.hold)
+				: times.hold,
+	finish: times.finish instanceof Date ? times.finish : new Date(times.finish),
+});
 
 export enum CompState {
 	BEFORE = 0,
@@ -65,7 +76,8 @@ function nextPhaseFromPhase(times: CompTimes, phase: CompState): CompState {
 	}
 }
 
-function phaseEndTime(times: CompTimes, phase: CompState): Date {
+function phaseEndTime(rawTimes: CompTimes, phase: CompState): Date {
+	const times = timesToDate(rawTimes);
 	switch (phase) {
 		case CompState.BEFORE:
 			return times.start;
@@ -82,7 +94,8 @@ function phaseEndTime(times: CompTimes, phase: CompState): Date {
 	}
 }
 
-export function getCurrentTimeStateData(times: CompTimes) {
+export function getCurrentTimeStateData(rawTimes: CompTimes) {
+	const times = timesToDate(rawTimes);
 	function msToS(ms: number) {
 		return Math.floor(Math.max(0, ms) / 1000);
 	}

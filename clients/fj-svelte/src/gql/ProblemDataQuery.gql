@@ -1,0 +1,9 @@
+query ProblemData($problemSlug: String!) {
+	problem(slug: $problemSlug) {
+		solved
+		name
+		difficulty
+		points
+		instructions
+	}
+}

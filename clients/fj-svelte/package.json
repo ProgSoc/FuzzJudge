@@ -34,6 +34,8 @@
 		"vite-tsconfig-paths": "5.1.4"
 	},
 	"dependencies": {
+		"@tanstack/svelte-query": "^5.76.0",
+		"@tanstack/svelte-query-devtools": "^5.76.0",
 		"graphql": "^16.11.0",
 		"graphql-scalars": "^1.24.2",
 		"graphql-ws": "^6.0.5",

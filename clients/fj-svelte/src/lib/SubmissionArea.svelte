@@ -14,69 +14,63 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { openFuzz, submitSolution } from "../api";
-  import { showNotification } from "../notifications";
-  import { selectedProblem } from "../utils";
+import { openFuzz, submitSolution } from "../api";
+import { showNotification } from "../notifications";
+import { selectedProblem } from "../utils";
 
-  interface Props {
-    setSolved: (slug: string) => void;
-  }
+let waitingOnServer = $state(false);
 
-  let { setSolved }: Props = $props();
+let errorMessage: string | undefined = $state(undefined);
 
-  let waitingOnServer = $state(false);
+let submissionValue = $state("");
+let sourceValue = $state("");
 
-  let errorMessage: string | undefined = $state(undefined);
+selectedProblem.subscribe((_) => {
+	submissionValue = "";
+	sourceValue = "";
+	waitingOnServer = false;
+	errorMessage = undefined;
+});
 
-  let submissionValue = $state("");
-  let sourceValue = $state("");
+const submit = (slug: string) => {
+	if (waitingOnServer === true) return;
 
-  selectedProblem.subscribe((_) => {
-    submissionValue = "";
-    sourceValue = "";
-    waitingOnServer = false;
-    errorMessage = undefined;
-  });
+	errorMessage = undefined;
 
-  const submit = (slug: string) => {
-    if (waitingOnServer === true) return;
+	waitingOnServer = true;
 
-    errorMessage = undefined;
+	// submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
+	//   waitingOnServer = false;
 
-    waitingOnServer = true;
+	//   if (slug === $selectedProblem) {
+	//     errorMessage = message;
+	//   }
 
-    submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
-      waitingOnServer = false;
+	//   if (correct && setSolved !== undefined) {
+	//     setSolved(slug);
+	//   }
+	// });
+};
 
-      if (slug === $selectedProblem) {
-        errorMessage = message;
-      }
+const keyHandler = (e: KeyboardEvent) => {
+	if (e.ctrlKey && e.altKey && e.key === "Enter") {
+		e.preventDefault();
 
-      if (correct && setSolved !== undefined) {
-        setSolved(slug);
-      }
-    });
-  };
+		if (submissionValue.length === 0 || sourceValue.length === 0) {
+			showNotification("Please fill in all fields before submitting.");
+			return;
+		}
 
-  const keyHandler = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.altKey && e.key === "Enter") {
-      e.preventDefault();
+		submit($selectedProblem);
+	}
 
-      if (submissionValue.length === 0 || sourceValue.length === 0) {
-        showNotification("Please fill in all fields before submitting.");
-        return;
-      }
-
-      submit($selectedProblem);
-    }
-
-    if (e.ctrlKey && e.altKey && e.key === "v") {
-      e.preventDefault();
-      navigator.clipboard.readText().then((text) => {
-        submissionValue = text;
-      });
-    }
-  };
+	if (e.ctrlKey && e.altKey && e.key === "v") {
+		e.preventDefault();
+		navigator.clipboard.readText().then((text) => {
+			submissionValue = text;
+		});
+	}
+};
 </script>
 
 <div class="problem-submission">

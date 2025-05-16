@@ -12,12 +12,12 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { hc } from "@progsoc/fuzzjudge-server/src/client";
+// import { hc } from "@progsoc/fuzzjudge-server/src/client";
 import { showNotification } from "./notifications";
 import { type ScoreboardUser, exists, parseScoreboard } from "./utils";
 
 export const BACKEND_SERVER: string = import.meta.env.VITE_BACKEND_URL || "";
-export const client = hc(BACKEND_SERVER);
+// export const client = hc(BACKEND_SERVER);
 
 console.log("Backend server URL:", BACKEND_SERVER);
 
@@ -29,7 +29,7 @@ export const subscribeToScoreboard = (
 	callback: (data: ScoreboardEvent) => void,
 ): (() => void) => {
 	try {
-		const wsURL = `${client.comp.scoreboard.$url().toString().replace(/^http/, "ws")}`;
+		const wsURL = `${BACKEND_SERVER.replace(/^http/, "ws")}`;
 
 		console.log("Connecting to scoreboard websocket at", wsURL);
 

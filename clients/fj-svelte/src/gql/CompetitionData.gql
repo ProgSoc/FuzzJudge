@@ -1,0 +1,6 @@
+query CompetitionData {
+	competition {
+		name
+		instructions
+	}
+}

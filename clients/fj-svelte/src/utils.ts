@@ -18,6 +18,10 @@ import { type Writable, writable } from "svelte/store";
 
 export const selectedProblem: Writable<string> = writable("");
 
+selectedProblem.subscribe((value) => {
+	console.log("Selected problem changed:", value);
+});
+
 export const difficultyName = (d: number) => {
 	switch (d) {
 		case 0:
@@ -95,10 +99,13 @@ export function currentYear() {
 	return date.getFullYear();
 }
 
-export function problemOrder(
-	a: FuzzJudgeProblemMessage,
-	b: FuzzJudgeProblemMessage,
-) {
+interface GenericProblem {
+	difficulty: number;
+	points: number;
+	name: string;
+}
+
+export function problemOrder(a: GenericProblem, b: GenericProblem) {
 	if (a.difficulty !== b.difficulty) {
 		return a.difficulty - b.difficulty;
 	}
@@ -111,7 +118,7 @@ export function problemOrder(
 		return a.points - b.points;
 	}
 
-	return a.doc.title.localeCompare(b.doc.title);
+	return a.name.localeCompare(b.name);
 }
 
 /**

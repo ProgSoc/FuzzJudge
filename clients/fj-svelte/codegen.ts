@@ -17,6 +17,7 @@ const config: CodegenConfig = {
 				"typescript-graphql-request",
 			],
 			config: {
+				useTypeImports: true,
 				scalars: {
 					DateTime: "Date | string",
 					File: "File",

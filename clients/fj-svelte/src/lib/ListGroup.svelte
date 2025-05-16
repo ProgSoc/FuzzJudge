@@ -14,38 +14,42 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
 import ProblemButton from "./ProblemButton.svelte";
 import { problemOrder } from "../utils";
+import type { ProblemsListQueryQuery } from "../gql";
+import { createQuery } from "@tanstack/svelte-query";
+import { client } from "../gql/sdk";
 
 interface Props {
 	name?: string;
-	problems: Record<string, FuzzJudgeProblemMessage>;
-	solvedProblems: Set<string>;
 	includes?: number | ((difficulty: number) => boolean);
 }
 
-let { name = "", problems, solvedProblems, includes = 0 }: Props = $props();
+let { name = "", includes = 0 }: Props = $props();
 
-let list = $derived(
-	Object.values(problems)
-		.filter((q) => {
-			if (typeof includes === "function") {
-				return includes(q.difficulty);
-			}
+const query = createQuery({
+	queryKey: ["problemsList"],
+	queryFn: () => client.ProblemsListQuery(),
+	select: (data) =>
+		data.data.problems
+			.filter((q) => {
+				if (typeof includes === "function") {
+					return includes(q.difficulty);
+				}
 
-			return q.difficulty === includes;
-		})
-		.sort(problemOrder),
-);
+				return q.difficulty === includes;
+			})
+			.sort(problemOrder),
+});
 </script>
 
-{#if list.length > 0}
+{#if $query.data}
   <div class="difficulty-divider">{name}</div>
-{/if}
-{#each list as q}
-  <ProblemButton problem={q} solved={solvedProblems.has(q.slug)} />
+  {#each $query.data as q}
+  <ProblemButton problem={q} />
 {/each}
+{/if}
+
 
 <style>
   .difficulty-divider {
