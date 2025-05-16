@@ -14,85 +14,87 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { openFuzz, submitSolution } from "../api";
-import { showNotification } from "../notifications";
-import { selectedProblem } from "../utils";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import { openFuzz } from "../api";
+  import { showNotification } from "../notifications";
+  import { selectedProblem } from "../utils";
+  import { client } from "../gql/sdk";
+  import type { JudgeSubmissionMutationVariables } from "../gql";
 
-let waitingOnServer = $state(false);
+  let submissionValue = $state("");
+  let sourceValue = $state("");
 
-let errorMessage: string | undefined = $state(undefined);
+  selectedProblem.subscribe((_) => {
+    submissionValue = "";
+    sourceValue = "";
+  });
 
-let submissionValue = $state("");
-let sourceValue = $state("");
+  const queryClient = useQueryClient();
 
-selectedProblem.subscribe((_) => {
-	submissionValue = "";
-	sourceValue = "";
-	waitingOnServer = false;
-	errorMessage = undefined;
-});
+  const submitMutation = createMutation({
+    mutationFn: (options: JudgeSubmissionMutationVariables) => client.JudgeSubmission(options),
+    onSuccess: (data) => {
+      if (data.data.judge.__typename === "JudgeErrorOutput") {
+        showNotification("Submission failed. Please check the error message.");
+      } else {
+        showNotification("Submission successful!");
+      }
+      queryClient.invalidateQueries({
+        queryKey: ["problem", $selectedProblem],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["problemsList"],
+      });
+    },
+    onError: (error) => {
+      showNotification("Submission failed. Please check the error message.");
+    },
+  });
 
-const submit = (slug: string) => {
-	if (waitingOnServer === true) return;
+  const fuzzQuery = createQuery({
+    queryKey: ["problem", $selectedProblem, "fuzz"],
+    queryFn: () => client.ProblemFuzzQuery({ problemSlug: $selectedProblem }),
+    select: (data) => data.data.problem.fuzz,
+  });
 
-	errorMessage = undefined;
+  const submit = (slug: string) => {
+    $submitMutation.mutate({
+      code: sourceValue,
+      output: submissionValue,
+      problemSlug: slug,
+    });
+  };
 
-	waitingOnServer = true;
+  const keyHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.altKey && e.key === "Enter") {
+      e.preventDefault();
 
-	// submitSolution(slug, submissionValue, sourceValue).then(({ correct, message }) => {
-	//   waitingOnServer = false;
+      if (submissionValue.length === 0 || sourceValue.length === 0) {
+        showNotification("Please fill in all fields before submitting.");
+        return;
+      }
 
-	//   if (slug === $selectedProblem) {
-	//     errorMessage = message;
-	//   }
+      submit($selectedProblem);
+    }
 
-	//   if (correct && setSolved !== undefined) {
-	//     setSolved(slug);
-	//   }
-	// });
-};
-
-const keyHandler = (e: KeyboardEvent) => {
-	if (e.ctrlKey && e.altKey && e.key === "Enter") {
-		e.preventDefault();
-
-		if (submissionValue.length === 0 || sourceValue.length === 0) {
-			showNotification("Please fill in all fields before submitting.");
-			return;
-		}
-
-		submit($selectedProblem);
-	}
-
-	if (e.ctrlKey && e.altKey && e.key === "v") {
-		e.preventDefault();
-		navigator.clipboard.readText().then((text) => {
-			submissionValue = text;
-		});
-	}
-};
+    if (e.ctrlKey && e.altKey && e.key === "v") {
+      e.preventDefault();
+      navigator.clipboard.readText().then((text) => {
+        submissionValue = text;
+      });
+    }
+  };
 </script>
 
 <div class="problem-submission">
   <div class="section">
-    <div class="text-area-buttons">
-      <span class="get-input">
-        To begin, <span
-          aria-label="problem input"
-          role="link"
-          tabindex="0"
-          onclick={() => openFuzz($selectedProblem)}
-          onkeyup={(e) => {
-            if (e.key === "Enter") {
-              openFuzz($selectedProblem);
-            }
-          }}
-          class="input-span"
-          >grab your problem input!
-        </span></span
-      >
-    </div>
     <div class="section submission-areas">
+      {#if $fuzzQuery.data}
+        <div class="solution-submission">
+          <h2>Problem Input</h2>
+          <textarea bind:value={$fuzzQuery.data}></textarea>
+        </div>
+      {/if}
       <div class="solution-submission">
         <h2>Problem Solution</h2>
         <textarea bind:value={submissionValue}></textarea>
@@ -107,15 +109,20 @@ const keyHandler = (e: KeyboardEvent) => {
     </div>
     <div class="text-area-buttons">
       <button class="submit" onclick={() => submit($selectedProblem)}>
-        {waitingOnServer ? "Processing..." : "Submit"}
+        {$submitMutation.isPending ? "Processing..." : "Submit"}
       </button>
     </div>
   </div>
 </div>
 <div class="error-message-area">
-  {#if errorMessage !== undefined}
+  {#if $submitMutation.isError}
     <pre class="error-message">
-      {errorMessage}
+      {$submitMutation.error.message}
+    </pre>
+  {/if}
+  {#if $submitMutation.data?.data.judge.__typename === "JudgeErrorOutput"}
+    <pre class="error-message">
+      {$submitMutation.data?.data.judge.errors}
     </pre>
   {/if}
 </div>

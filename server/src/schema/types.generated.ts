@@ -16,7 +16,7 @@ export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: Non
 export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string | number; }
+  ID: { input: string; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -105,7 +105,7 @@ export type MutationDeleteUserArgs = {
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
-  slug: Scalars['ID']['input'];
+  slug: Scalars['String']['input'];
 };
 
 
@@ -141,7 +141,7 @@ export type Problem = {
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
-  slug: Scalars['ID']['output'];
+  slug: Scalars['String']['output'];
   solved: Scalars['Boolean']['output'];
 };
 
@@ -339,7 +339,6 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Problem: ResolverTypeWrapper<ProblemMapper>;
   ProblemScore: ResolverTypeWrapper<ProblemScoreMapper>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
@@ -365,7 +364,6 @@ export type ResolversParentTypes = {
   Mutation: {};
   Boolean: Scalars['Boolean']['output'];
   Int: Scalars['Int']['output'];
-  ID: Scalars['ID']['output'];
   Problem: ProblemMapper;
   ProblemScore: ProblemScoreMapper;
   Float: Scalars['Float']['output'];
@@ -437,7 +435,7 @@ export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends Re
   instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  slug?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   solved?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

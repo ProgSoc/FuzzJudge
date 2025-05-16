@@ -4,7 +4,7 @@ extend type Query {
 }
 
 extend type Mutation {
-	judge(slug: ID!, code: String!, output: String!): JudgeOutput!
+	judge(slug: String!, code: String!, output: String!): JudgeOutput!
 }
 
 union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
@@ -19,7 +19,7 @@ type JudgeErrorOutput {
 }
 
 type Problem {
-	slug: ID!
+	slug: String!
 	icon: String!
 	name: String!
 	brief: String!

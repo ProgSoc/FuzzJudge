@@ -1,0 +1,8 @@
+query ProblemFuzzQuery($problemSlug: String!) {
+	problem(slug: $problemSlug) {
+		fuzz
+	}
+	me {
+		logn
+	}
+}

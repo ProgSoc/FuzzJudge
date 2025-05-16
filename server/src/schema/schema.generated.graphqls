@@ -33,7 +33,7 @@ type Mutation {
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!
   holdClock: Clock!
-  judge(code: String!, output: String!, slug: ID!): JudgeOutput!
+  judge(code: String!, output: String!, slug: String!): JudgeOutput!
   overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
   releaseClock(extendDuration: Boolean): Clock!
   updateTeam(id: Int!, name: String!): Team!
@@ -48,7 +48,7 @@ type Problem {
   instructions: String!
   name: String!
   points: Int!
-  slug: ID!
+  slug: String!
   solved: Boolean!
 }
 

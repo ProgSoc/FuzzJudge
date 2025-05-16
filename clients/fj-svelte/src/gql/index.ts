@@ -99,7 +99,7 @@ export type MutationDeleteUserArgs = {
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
-  slug: Scalars['ID']['input'];
+  slug: Scalars['String']['input'];
 };
 
 
@@ -135,7 +135,7 @@ export type Problem = {
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
-  slug: Scalars['ID']['output'];
+  slug: Scalars['String']['output'];
   solved: Scalars['Boolean']['output'];
 };
 
@@ -263,12 +263,28 @@ export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string } };
 
+export type JudgeSubmissionMutationVariables = Exact<{
+  problemSlug: Scalars['String']['input'];
+  code: Scalars['String']['input'];
+  output: Scalars['String']['input'];
+}>;
+
+
+export type JudgeSubmissionMutation = { __typename?: 'Mutation', judge: { __typename: 'JudgeErrorOutput', message: string, errors: string } | { __typename: 'JudgeSuccessOutput', message: string } };
+
 export type ProblemDataQueryVariables = Exact<{
   problemSlug: Scalars['String']['input'];
 }>;
 
 
 export type ProblemDataQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', solved: boolean, name: string, difficulty: number, points: number, instructions: string } };
+
+export type ProblemFuzzQueryQueryVariables = Exact<{
+  problemSlug: Scalars['String']['input'];
+}>;
+
+
+export type ProblemFuzzQueryQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz: string }, me: { __typename?: 'User', logn: string } };
 
 export type ProblemsListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -305,6 +321,20 @@ export const CurrentUserDocument = `
   }
 }
     `;
+export const JudgeSubmissionDocument = `
+    mutation JudgeSubmission($problemSlug: String!, $code: String!, $output: String!) {
+  judge(slug: $problemSlug, code: $code, output: $output) {
+    __typename
+    ... on JudgeSuccessOutput {
+      message
+    }
+    ... on JudgeErrorOutput {
+      message
+      errors
+    }
+  }
+}
+    `;
 export const ProblemDataDocument = `
     query ProblemData($problemSlug: String!) {
   problem(slug: $problemSlug) {
@@ -313,6 +343,16 @@ export const ProblemDataDocument = `
     difficulty
     points
     instructions
+  }
+}
+    `;
+export const ProblemFuzzQueryDocument = `
+    query ProblemFuzzQuery($problemSlug: String!) {
+  problem(slug: $problemSlug) {
+    fuzz
+  }
+  me {
+    logn
   }
 }
     `;
@@ -363,8 +403,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     CurrentUser(variables?: CurrentUserQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CurrentUserQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CurrentUserQuery>(CurrentUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CurrentUser', 'query', variables);
     },
+    JudgeSubmission(variables: JudgeSubmissionMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: JudgeSubmissionMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<JudgeSubmissionMutation>(JudgeSubmissionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'JudgeSubmission', 'mutation', variables);
+    },
     ProblemData(variables: ProblemDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemDataQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemDataQuery>(ProblemDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemData', 'query', variables);
+    },
+    ProblemFuzzQuery(variables: ProblemFuzzQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemFuzzQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemFuzzQueryQuery>(ProblemFuzzQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemFuzzQuery', 'query', variables);
     },
     ProblemsListQuery(variables?: ProblemsListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemsListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemsListQueryQuery>(ProblemsListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemsListQuery', 'query', variables);

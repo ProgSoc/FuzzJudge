@@ -3,12 +3,7 @@ import { GraphQLDateTime } from "graphql-scalars";
 
 const config: CodegenConfig = {
 	schema: "http://localhost:1989/graphql",
-	documents: [
-		"src/**/*.gql",
-		"src/**/*.graphql",
-		"src/**/*.svelte",
-		"src/**/*.ts",
-	],
+	documents: ["src/**/*.gql", "src/**/*.graphql"],
 	generates: {
 		"./src/gql/index.ts": {
 			plugins: [
