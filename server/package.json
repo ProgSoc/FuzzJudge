@@ -8,7 +8,7 @@
 		"access": "public"
 	},
 	"devDependencies": {
-		"@types/bun": "1.2.13",
+		"@types/bun": "1.2.14",
 		"drizzle-kit": "0.31.0",
 		"typescript": "5.8.3"
 	},
