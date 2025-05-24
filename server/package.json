@@ -29,7 +29,7 @@
 		"@asteasolutions/zod-to-openapi": "7.3.2",
 		"@hono/swagger-ui": "0.5.1",
 		"@hono/zod-openapi": "0.19.6",
-		"@scalar/hono-api-reference": "0.8.5",
+		"@scalar/hono-api-reference": "0.9.1",
 		"drizzle-orm": "0.43.1",
 		"gray-matter": "4.0.3",
 		"hono": "4.7.10",
