@@ -18,7 +18,7 @@ pub struct Problem {
     pub slug: String,
     pub title: String,
     pub icon: String,
-    pub difficulty: i32,
-    pub points: i32,
+    pub difficulty: i64,
+    pub points: i64,
     pub instructions: String,
 }

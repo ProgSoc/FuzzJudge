@@ -265,7 +265,7 @@ fn console(
     );
 }
 
-fn difficulty_label(difficulty: i32) -> Span<'static> {
+fn difficulty_label(difficulty: i64) -> Span<'static> {
     match difficulty {
         1 => "Easy".green(),
         2 => "Medium".yellow(),

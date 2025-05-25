@@ -5,19 +5,24 @@ edition = "2021"
 
 [dependencies]
 ratatui = "=0.27.0"
-tokio-macros = "=2.3.0"
-tokio = { version = "=1.38.0", features = ["full"] }
+tokio-macros = "=2.5.0"
+tokio = { version = "1.15", features = ["rt-multi-thread", "macros", "fs", "process"] }
 base64 = "=0.22.1"
-reqwest = "=0.12.5"
+reqwest = {version = "=0.12.5", features = ["json"]}
 markdown = "=1.0.0-alpha.17"
 clap = { version = "=4.5.7", features = ["derive"] }
 clap_derive = "=4.5.5"
-tokio-tungstenite = "=0.23.1"
+tokio-tungstenite = "=0.26.2"
 futures-util = { version = "=0.3.31", default-features = false, features = ["sink", "std"] }
 futures-channel = "=0.3.30"
 serde = "=1.0.203"
 serde_json = "=1.0.118"
-chrono = "=0.4.38"
+chrono = {version = "=0.4.38", features = ["serde"] }
 url = "=2.5.2"
 async-recursion = "=1.1.1"
+graphql_client = "0.14.0"
+graphql-ws-client = {version = "0.11.1", features = ["client-graphql-client", "tungstenite"]}
+async-tungstenite = { version = "0.28", features = [
+    "tokio-runtime",
+] }
 

@@ -14,7 +14,14 @@
  */
 
 use crate::{auth::Credentials, clock::Clock, problem::Problem, state::AppState};
-use std::{path::PathBuf, sync::Arc};
+use chrono::Utc;
+use graphql_client::{GraphQLQuery, Response};
+use graphql_ws_client::graphql::StreamingOperation;
+use reqwest::header::HeaderValue;
+use std::{any::Any, path::PathBuf, sync::Arc};
+use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+
+type DateTime = chrono::DateTime<Utc>;
 
 pub struct Session {
     pub creds: Credentials,
@@ -23,44 +30,102 @@ pub struct Session {
 }
 
 use async_recursion::async_recursion;
-use futures_util::{
-    future::{self, join_all},
-    pin_mut, StreamExt,
-};
-use tokio_tungstenite::connect_async;
+use futures_util::StreamExt;
 use url::Url;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/ProblemQuery.gql"
+)]
+pub struct ProblemQuery;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/ProblemsQuery.gql"
+)]
+pub struct ProblemsQuery;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/ClockSubscription.gql"
+)]
+pub struct ClockSubscription;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/CurrentUserQuery.gql"
+)]
+pub struct CurrentUserQuery;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/FuzzMutation.gql"
+)]
+pub struct FuzzMutation;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/JudgeProblemMutation.gql"
+)]
+pub struct JudgeProblemMutation;
+
 
 impl Session {
     #[async_recursion]
     pub async fn new(server: String, creds: Credentials) -> Result<Self, String> {
         println!("Connecting to server: {}...", server);
 
-        // This was checked earlier so we can unwrap.
-        let server = Url::parse(&server).unwrap();
-        let client = reqwest::Client::new();
-
-        let auth = server.join("/auth").map_err(|e| e.to_string())?;
-        let res = client
-            .get(auth)
-            .header("Authorization", creds.auth_header_value())
-            .send()
-            .await;
-
-        let res = match res {
-            Ok(res) => res,
-            Err(e) => {
-                if server.scheme() == "https" {
-                    println!("Falling back to http...");
-                    return Self::new(server.to_string().replacen("https", "http", 1), creds).await;
-                }
-
-                return Err(e.to_string());
-            }
-        };
-
-        if res.status() == 401 {
-            return Err("Invalid credentials. Refused by server.".to_string());
+        let server = Url::parse(&server).map_err(|e| e.to_string())?;
+        if server.scheme() != "http" && server.scheme() != "https" {
+            return Err("Server URL must start with http:// or https://".to_string());
         }
+
+        let req_body = CurrentUserQuery::build_query(current_user_query::Variables {});
+
+        let client = reqwest::Client::builder()
+            .user_agent("FJ-Tui")
+            .build()
+            .map_err(|e| e.to_string())?;
+
+        let res = client
+            .post(server.join("/graphql").expect("Invalid GraphQL URL"))
+            .header("Authorization", creds.auth_header_value())
+            .json(&req_body)
+            .send()
+            .await
+            .map_err(|e| e.to_string());
+
+        // check to see if the server returns a www-authenticate header
+        if let Some(auth_header) = res.as_ref().ok().and_then(|r| r.headers().get("www-authenticate")) {
+            if auth_header == "Basic realm=\"FuzzJudge\" charset=\"UTF-8\"" {
+                return Err("Invalid credentials. Refused by server.".to_string());
+            }
+        }
+
+        // If the server returns a 401 Unauthorized, we assume the credentials are invalid
+
+        if let Err(e) = res.as_ref() {
+            if e.to_string().contains("401") {
+                return Err("Invalid credentials. Refused by server.".to_string());
+            }
+        }
+
+        let res_body: Response<current_user_query::ResponseData> =
+            res.map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
+
+        if let Some(errors) = res_body.errors {
+            let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
+            return Err(format!("GraphQL errors: {:?}", error_messages));
+        }
+        // let data = res_body.data.ok_or("No data in response")?;
+
+        // return Err(data.me.logn.to_string());
 
         Ok(Self {
             server,
@@ -80,22 +145,27 @@ impl Session {
     }
 
     pub async fn fuzz(&self, slug: String) -> Result<String, String> {
-        let url = self.server.join("/comp/prob/").unwrap();
-        let url = url.join(&format!("{}/", &slug)).unwrap();
-        let url = url.join("fuzz").unwrap();
-
+        let url = self.server.join("/graphql").expect("Invalid GraphQL URL");
+        let req_body = FuzzMutation::build_query(fuzz_mutation::Variables { slug });
         let response = self
             .client
-            .get(url)
+            .post(url)
             .header("Authorization", self.creds.auth_header_value())
+            .json(&req_body)
             .send()
             .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
             .map_err(|e| e.to_string())?;
+           
 
-        Ok(response)
+        let response_body: Response<fuzz_mutation::ResponseData> = response.json().await.map_err(|e| e.to_string())?;
+
+        if let Some(errors) = response_body.errors {
+            let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
+            return Err(format!("GraphQL errors: {:?}", error_messages));
+        }
+        let data = response_body.data.ok_or("No data in response")?;
+
+        Ok(data.get_fuzz)
     }
 
     pub async fn judge(
@@ -108,192 +178,117 @@ impl Session {
             .await
             .map_err(|e| e.to_string())?;
 
-        let output = url::form_urlencoded::Serializer::new(output).finish();
-        let source = url::form_urlencoded::Serializer::new(source).finish();
+        let url = self.server.join("/graphql").expect("Invalid GraphQL URL");
 
-        let url = self.server.join("/comp/prob/").unwrap();
-        let url = url.join(&format!("{}/", &slug)).unwrap();
-        let url = url.join("judge").unwrap();
-
+        let req_body = judge_problem_mutation::Variables {
+            slug,
+            output,
+            code: source,
+        };
+        
+        let req_body = JudgeProblemMutation::build_query(req_body);
         let response = self
             .client
             .post(url)
             .header("Authorization", self.creds.auth_header_value())
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(format!("output={}&source={}", output, source))
+            .json(&req_body)
             .send()
             .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
             .map_err(|e| e.to_string())?;
 
-        Ok(response)
-    }
+        let response_body: Response<judge_problem_mutation::ResponseData> =
+            response.json().await.map_err(|e| e.to_string())?;
 
-    async fn fetch_problem(&self, slug: &str) -> Result<Problem, String> {
-        let url = self.server.join("/comp/prob/").unwrap();
-        let prob_url = url.join(&format!("{}/", &slug)).unwrap();
-
-        let title = reqwest::get(prob_url.join("name").unwrap())
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        let icon = reqwest::get(prob_url.join("icon").unwrap())
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        let difficulty = reqwest::get(prob_url.join("difficulty").unwrap())
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
-            .map_err(|e| e.to_string())?
-            .parse()
-            .map_err(|e: std::num::ParseIntError| e.to_string())?;
-
-        let points = reqwest::get(prob_url.join("points").unwrap())
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
-            .map_err(|e| e.to_string())?
-            .parse()
-            .map_err(|e: std::num::ParseIntError| e.to_string())?;
-
-        let instructions = self
-            .client
-            .get(prob_url.join("instructions").unwrap())
-            .header("Authorization", self.creds.auth_header_value())
-            .send()
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        Ok(Problem {
-            slug: slug.to_string(),
-            title,
-            icon,
-            difficulty,
-            points,
-            instructions,
-        })
+        if let Some(errors) = response_body.errors {
+            let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
+            return Err(format!("GraphQL errors: {:?}", error_messages));
+        }
+    
+        let response_data = response_body.data.ok_or("No data in response")?;
+        
+        match response_data.judge {
+            judge_problem_mutation::JudgeProblemMutationJudge::JudgeErrorOutput(e) => {
+                // Error and Messages
+                return Err(format!("Error: {}, Message: {}", e.message, e.errors));
+            }
+            judge_problem_mutation::JudgeProblemMutationJudge::JudgeSuccessOutput(s) => {
+                return Ok(s.message)
+            }
+        };
     }
 
     pub async fn fetch_all_problems(&self) -> Result<Vec<Problem>, String> {
-        let client = reqwest::Client::new();
-
-        let slugs = client
-            .get(self.server.join("/comp/prob").unwrap())
+        let req_body = ProblemsQuery::build_query(problems_query::Variables {});
+        let res = self
+            .client
+            .post(self.server.join("/graphql").expect("Invalid GraphQL URL"))
             .header("Authorization", self.creds.auth_header_value())
+            .json(&req_body)
             .send()
-            .await
-            .map_err(|e| e.to_string())?
-            .text()
             .await
             .map_err(|e| e.to_string())?;
 
-        let problems = join_all(
-            slugs
-                .lines()
-                .map(|slug| self.fetch_problem(slug))
-                .collect::<Vec<_>>(),
-        )
-        .await
-        .into_iter()
-        .collect::<Result<Vec<_>, _>>()?;
+        let response_body: Response<problems_query::ResponseData> =
+            res.json().await.map_err(|e| e.to_string())?;
+
+        if let Some(errors) = response_body.errors {
+            let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
+            return Err(format!("GraphQL errors: {:?}", error_messages));
+        }
+
+        let data = response_body.data.ok_or("No data in response")?;
+
+        let problems: Vec<Problem> = data
+            .problems
+            .into_iter()
+            .map(|p| Problem {
+                slug: p.slug,
+                title: p.name,
+                icon: p.icon,
+                difficulty: p.difficulty,
+                points: p.points,
+                instructions: p.instructions,
+            })
+            .collect();
 
         Ok(problems)
     }
 }
 
 pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mutex<AppState>>) {
-    let (_tx, rx) = futures_channel::mpsc::unbounded();
+    use graphql_ws_client::Client;
 
-    let (ws_stream, _) = connect_async(server).await.expect("Failed to connect");
+    let mut request = server
+        .into_client_request()
+        .expect("Failed to create WebSocket request");
+    request.headers_mut().insert(
+        "Sec-WebSocket-Protocol",
+        HeaderValue::from_str("graphql-transport-ws")
+            .expect("Failed to set WebSocket protocol header"),
+    );
 
-    app_state
-        .lock()
+    let (connection, _) = async_tungstenite::tokio::connect_async(request)
         .await
-        .console
-        .println("Connected to server");
+        .expect("Failed to connect to WebSocket");
 
-    let (write, read) = ws_stream.split();
+    let mut clock_subscription = Client::build(connection)
+        .subscribe(StreamingOperation::<ClockSubscription>::new(
+            clock_subscription::Variables,
+        ))
+        .await
+        .expect("Failed to subscribe to clock updates");
 
-    let send_msg = rx.map(Ok).forward(write);
-    let on_msg = {
-        read.for_each(|message| async {
-            let data = match message {
-                Ok(data) => data.into_data(),
-                Err(e) => {
-                    app_state.lock().await.console.eprintln(&e.to_string());
-                    return;
+    while let Some(item) = clock_subscription.next().await {
+        match item {
+            Ok(message) => {
+                if let Some(cloock_state) = message.data {
+                    app_state.lock().await.clock = Some(Clock {
+                        start: cloock_state.clock.start,
+                        finish: cloock_state.clock.finish,
+                    })
                 }
-            };
-
-            let text = String::from_utf8_lossy(&data).to_string();
-            let res = handle_web_socket_message(&text, app_state.clone()).await;
-
-            if let Err(e) = res {
-                app_state
-                    .lock()
-                    .await
-                    .console
-                    .println(&format!("WebSocketError: {}", e));
             }
-        })
-    };
-
-    pin_mut!(send_msg, on_msg);
-    future::select(send_msg, on_msg).await;
-}
-
-async fn handle_web_socket_message(
-    text: &str,
-    app_state: Arc<tokio::sync::Mutex<AppState>>,
-) -> Result<(), String> {
-    let json: serde_json::Value = serde_json::from_str(text).map_err(|e| e.to_string())?;
-
-    if let Some(kind) = json.get("kind") {
-        match kind.as_str().ok_or("Expected `kind`")? {
-            "clock" => {
-                let value: serde_json::Value = json["value"].clone();
-
-                let start: String = value["start"]
-                    .as_str()
-                    .ok_or("Expected `start`")?
-                    .to_string();
-                let finish: String = value["finish"]
-                    .as_str()
-                    .ok_or("Expected `finish`")?
-                    .to_string();
-
-                let start = chrono::DateTime::parse_from_rfc3339(&start)
-                    .map_err(|_| "Could not parse start time")?
-                    .to_utc();
-                let finish = chrono::DateTime::parse_from_rfc3339(&finish)
-                    .map_err(|_| "Could not parse finish time")?
-                    .to_utc();
-
-                // let hold = value["hold"].as_str().unwrap().to_string();
-
-                app_state.lock().await.clock = Some(Clock { start, finish });
-            }
-            "scoreboard" => {}
-            "problems" => {}
-            _ => {
-                return Err(format!("Unknown message kind: {}", kind));
-            }
+            _ => {}
         }
     }
-
-    Ok(())
 }

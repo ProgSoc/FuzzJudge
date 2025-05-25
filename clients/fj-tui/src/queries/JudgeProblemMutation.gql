@@ -1,0 +1,14 @@
+mutation JudgeProblemMutation($slug: String!, $code: String!, $output: String!) {
+  judge(slug: $slug, code: $code ,output: $output) {
+  	__typename
+    
+    ... on JudgeSuccessOutput {
+			message
+		}
+
+		... on JudgeErrorOutput {
+			message
+			errors
+		}
+  }
+}

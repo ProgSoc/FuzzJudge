@@ -1,0 +1,5 @@
+query CurrentUserQuery {
+  me {
+    logn
+  }
+}
