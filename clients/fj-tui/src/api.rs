@@ -18,7 +18,7 @@ use chrono::Utc;
 use graphql_client::{GraphQLQuery, Response};
 use graphql_ws_client::graphql::StreamingOperation;
 use reqwest::header::HeaderValue;
-use std::{any::Any, path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 
 type DateTime = chrono::DateTime<Utc>;
@@ -108,8 +108,6 @@ impl Session {
             }
         }
 
-        // If the server returns a 401 Unauthorized, we assume the credentials are invalid
-
         if let Err(e) = res.as_ref() {
             if e.to_string().contains("401") {
                 return Err("Invalid credentials. Refused by server.".to_string());
@@ -123,9 +121,6 @@ impl Session {
             let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
             return Err(format!("GraphQL errors: {:?}", error_messages));
         }
-        // let data = res_body.data.ok_or("No data in response")?;
-
-        // return Err(data.me.logn.to_string());
 
         Ok(Self {
             server,
@@ -209,7 +204,7 @@ impl Session {
         match response_data.judge {
             judge_problem_mutation::JudgeProblemMutationJudge::JudgeErrorOutput(e) => {
                 // Error and Messages
-                return Err(format!("Error: {}, Message: {}", e.message, e.errors));
+                return Err(format!("Message: {}, Errors: {}", e.message, e.errors));
             }
             judge_problem_mutation::JudgeProblemMutationJudge::JudgeSuccessOutput(s) => {
                 return Ok(s.message)
@@ -281,10 +276,10 @@ pub async fn connect_to_web_socket(server: &str, app_state: Arc<tokio::sync::Mut
     while let Some(item) = clock_subscription.next().await {
         match item {
             Ok(message) => {
-                if let Some(cloock_state) = message.data {
+                if let Some(clock_state) = message.data {
                     app_state.lock().await.clock = Some(Clock {
-                        start: cloock_state.clock.start,
-                        finish: cloock_state.clock.finish,
+                        start: clock_state.clock.start,
+                        finish: clock_state.clock.finish,
                     })
                 }
             }
