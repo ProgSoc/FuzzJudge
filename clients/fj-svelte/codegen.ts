@@ -1,8 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
-import { GraphQLDateTime } from "graphql-scalars";
 
 const config: CodegenConfig = {
-	schema: "http://localhost:1989/graphql",
+	schema: "../../server/src/schema/schema.generated.graphqls",
 	documents: ["src/**/*.gql", "src/**/*.graphql"],
 	generates: {
 		"./src/gql/index.ts": {
