@@ -13,10 +13,14 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
 import { type Writable, writable } from "svelte/store";
+import type { ProblemsListQueryQuery } from "./gql";
 
 export const selectedProblem: Writable<string> = writable("");
+
+selectedProblem.subscribe((value) => {
+	console.log("Selected problem changed:", value);
+});
 
 export const difficultyName = (d: number) => {
 	switch (d) {
@@ -39,47 +43,8 @@ export const truncateUsername = (username: string) => {
 		: username;
 };
 
-export interface ScoreboardUser {
-	name: string;
-	points: number;
-	solved: string[];
-}
-
-/** @deprecated */
-export const parseScoreboard = (data: string): ScoreboardUser[] => {
-	const lines = data.split("\n");
-	const users: ScoreboardUser[] = [];
-
-	for (let i = 1; i < lines.length; i++) {
-		const cells = lines[i].split(",").map((x) => x.trim());
-
-		if (cells.length < 2) continue;
-
-		const [name, points, ...solved] = cells;
-		users.push({ name, points: Number.parseInt(points), solved });
-	}
-
-	return users;
-};
-
 export function unreachable(x: never): never {
 	throw new Error(`Unreachable code reached: ${x}`);
-}
-
-export function exists<T>(val: T | null | undefined): val is T {
-	return val !== null && val !== undefined;
-}
-
-/**
- * Creates a WebSocket URL from a given path.
- * @param path The path to the WebSocket server
- * @returns The WebSocket URL
- */
-export function createWsUrl(path: string) {
-	const proto = window.location.protocol === "https:" ? "wss" : "ws";
-	const port = window.location.port ? `:${window.location.port}` : "";
-	const url = `${proto}://${window.location.host}${port}${path}`;
-	return url;
 }
 
 export function removeMdTitle(md: string): string {
@@ -95,10 +60,13 @@ export function currentYear() {
 	return date.getFullYear();
 }
 
-export function problemOrder(
-	a: FuzzJudgeProblemMessage,
-	b: FuzzJudgeProblemMessage,
-) {
+interface GenericProblem {
+	difficulty: number;
+	points: number;
+	name: string;
+}
+
+export function problemOrder(a: GenericProblem, b: GenericProblem) {
 	if (a.difficulty !== b.difficulty) {
 		return a.difficulty - b.difficulty;
 	}
@@ -111,7 +79,7 @@ export function problemOrder(
 		return a.points - b.points;
 	}
 
-	return a.doc.title.localeCompare(b.doc.title);
+	return a.name.localeCompare(b.name);
 }
 
 /**
@@ -119,14 +87,11 @@ export function problemOrder(
  * selected problem.
  */
 export function nextUnsolvedProblem(
-	problems: Record<string, FuzzJudgeProblemMessage>,
-	solvedProblems: Set<string>,
+	problems: ProblemsListQueryQuery["problems"],
 	selected: string,
 	offset = 1,
 ): string | null {
-	const probs = Object.values(problems)
-		.filter((p) => !solvedProblems.has(p.slug))
-		.sort(problemOrder);
+	const probs = problems.filter((p) => !p.solved).sort(problemOrder);
 
 	const selectedIndex = probs.findIndex((p) => p.slug === selected);
 

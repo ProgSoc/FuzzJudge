@@ -1,0 +1,10 @@
+query ProblemsQuery {
+  problems {
+    icon
+    name
+    instructions
+    difficulty
+    points
+    slug
+  }
+}

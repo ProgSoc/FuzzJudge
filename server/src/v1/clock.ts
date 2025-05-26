@@ -1,27 +1,8 @@
-/*
- * FuzzJudge - Randomised input judging server, designed for ProgComp.
- * Copyright (C) 2024 UTS Programmers' Society (ProgSoc)
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
-import { ee } from "../ee.ts";
 import { getOrSetDefaultMeta, setMeta } from "../services/meta.service.ts";
 
-export type ClockState = "live" | "hold" | "stop";
+type ClockState = "live" | "hold" | "stop";
 
-export type CompetitionClockMessage = {
+type CompetitionClockMessage = {
 	start: Date;
 	finish: Date;
 	hold: Date | null;
@@ -80,7 +61,8 @@ export async function createClock(plannedStart: Date, plannedFinish: Date) {
 					new Date(finish.getTime() - delta).toJSON(),
 				),
 			);
-		ee.emit("clock", now());
+
+		return now();
 	}
 
 	async function adjustFinish(timeOrMinutesDuration: Date | number) {
@@ -94,20 +76,23 @@ export async function createClock(plannedStart: Date, plannedFinish: Date) {
 		if (newFinish < start)
 			throw new RangeError("Finish time must be after start.");
 		finish = new Date(await setMeta("/comp/clock/finish", newFinish.toJSON()));
-		ee.emit("clock", now());
+
+		return now();
 	}
 
 	function hold() {
 		holdDate = new Date();
-		ee.emit("clock", now());
+
+		return now();
 	}
 
 	function release({ extendDuration = false }) {
-		if (holdDate === null) return;
+		if (holdDate === null) return now();
 		const delta = holdDate.getTime() - Date.now();
 		if (extendDuration) finish = new Date(finish.getTime() - delta);
 		holdDate = null;
-		ee.emit("clock", now());
+
+		return now();
 	}
 
 	return {
@@ -120,4 +105,4 @@ export async function createClock(plannedStart: Date, plannedFinish: Date) {
 	};
 }
 
-export type CompetitionClock = Awaited<ReturnType<typeof createClock>>;
+type CompetitionClock = Awaited<ReturnType<typeof createClock>>;

@@ -14,11 +14,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import Client from "./lib/Client.svelte";
-  import { SETTINGS } from "./settings";
-  import { Theme, themeClass } from "./themes/themes";
+import Client from "./lib/Client.svelte";
+import { QueryClientProvider, QueryClient } from "@tanstack/svelte-query";
+import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+import { SETTINGS } from "./settings";
+import { Theme, themeClass } from "./themes/themes";
+
+const queryClient = new QueryClient();
 </script>
 
+<QueryClientProvider client={queryClient}>
 <div id="theme-container" class={themeClass($SETTINGS.theme ?? Theme.Default)}>
   <Client />
 </div>
+  <SvelteQueryDevtools initialIsOpen={false} />
+</QueryClientProvider>

@@ -15,23 +15,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
   import SvelteMarkdown from "svelte-markdown";
-  import { getCompInfo } from "../api";
   import Loading from "./Loading.svelte";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { client } from "../gql/sdk";
 
-  let title: string | undefined = $state(undefined);
-  let instructions = $state("");
-
-  getCompInfo().then((data) => {
-    title = data.title;
-    instructions = data.instructions;
+  const instructionsQuery = createQuery({
+    queryKey: ["compInfo"],
+    queryFn: () => client.CompetitionData(),
+    select: ({ data }) => data,
   });
 </script>
 
-{#if title === undefined}
+{#if $instructionsQuery.data === undefined}
   <Loading />
 {:else}
-  <h1 style="margin-top: -0.2rem;">{title}</h1>
+  <h1 style="margin-top: -0.2rem;">{$instructionsQuery.data.competition.name}</h1>
   <span id="instructions-md">
-    <SvelteMarkdown source={instructions} />
+    <SvelteMarkdown source={$instructionsQuery.data.competition.instructions} />
   </span>
 {/if}

@@ -1,0 +1,124 @@
+type Clock {
+  finish: DateTime!
+  hold: DateTime
+  start: DateTime!
+}
+
+type Competition {
+  brief: String!
+  instructions: String!
+  name: String!
+}
+
+scalar DateTime
+
+scalar File
+
+type JudgeErrorOutput {
+  errors: String!
+  message: String!
+}
+
+union JudgeOutput = JudgeErrorOutput | JudgeSuccessOutput
+
+type JudgeSuccessOutput {
+  message: String!
+}
+
+type Mutation {
+  adjustFinishTime(finishTime: DateTime!): Clock!
+  adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
+  createTeam(name: String!): Team!
+  createUser(logn: String!, role: UserRole!, teamId: Int): User!
+  deleteTeam(id: Int!): Team!
+  deleteUser(id: Int!): User!
+  getFuzz(slug: String!): String!
+  holdClock: Clock!
+  judge(code: String!, output: String!, slug: String!): JudgeOutput!
+  overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
+  releaseClock(extendDuration: Boolean): Clock!
+  updateTeam(id: Int!, name: String!): Team!
+  updateUser(id: Int!, role: UserRole, teamId: Int): User!
+}
+
+type Problem {
+  brief: String!
+  difficulty: Int!
+  icon: String!
+  instructions: String!
+  name: String!
+  points: Int!
+  slug: String!
+  solved: Boolean!
+}
+
+type ProblemScore {
+  penalty: Float!
+  points: Int!
+  problem: Problem!
+  slug: String!
+  solved: Boolean!
+  tries: Int!
+}
+
+type Query {
+  competition: Competition!
+  header: String!
+  me: User!
+  problem(slug: String!): Problem!
+  problems: [Problem!]!
+  submission(id: Int!): Submission
+  submissions(problemSlug: String, teamId: Int): [Submission!]!
+  team(id: Int!): Team!
+  teams: [Team!]!
+  user(id: Int!): User!
+  users: [User!]!
+  version: String!
+}
+
+type ScoreboardRow {
+  penalty: Float!
+  points: Int!
+  problems: [ProblemScore!]!
+  rank: Int!
+  team: Team!
+  teamId: Int!
+}
+
+type Submission {
+  code: String
+  id: Int!
+  ok: Boolean
+  out: String
+  problemSlug: String!
+  team: Team!
+  teamId: Int!
+  time: DateTime!
+  vler: String
+  vlms: Float
+}
+
+type Subscription {
+  clock: Clock!
+  scoreboard: [ScoreboardRow!]!
+}
+
+type Team {
+  id: Int!
+  members: [User!]!
+  name: String!
+  submissions(problemSlug: String): [Submission!]!
+}
+
+type User {
+  id: Int!
+  logn: String!
+  role: UserRole!
+  team: Team
+  teamId: Int
+}
+
+enum UserRole {
+  ADMIN
+  COMPETITOR
+}

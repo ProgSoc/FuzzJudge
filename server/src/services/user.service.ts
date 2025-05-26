@@ -1,44 +1,5 @@
-import { eq } from "drizzle-orm";
-import type { z } from "zod";
 import { db } from "../db";
 import { type User, type UserRoles, userTable } from "../db/schema";
-import type { UserRoleSchema } from "../v1/schema/user.schema";
-
-/**
- * Get a user by their id
- * @param id - The id of the user to get
- * @returns
- */
-export async function getUser(id: number): Promise<User | undefined> {
-	const user = await db.query.userTable.findFirst({
-		where: (table) => eq(table.id, id),
-	});
-
-	return user;
-}
-
-/**
- * Get all users
- * @returns all users
- */
-export async function allUsers(): Promise<User[]> {
-	const users = await db.query.userTable.findMany();
-
-	return users;
-}
-
-/**
- * UserSchema
- * {
-    id: number;
-    team: number | null;
-    name: string | null;
-    logn: string;
-    salt: Buffer<ArrayBufferLike>;
-    hash: unknown;
-    role: "admin" | "competitor" | null;
-}
- */
 
 /**
  * Reset a user's login
@@ -69,53 +30,4 @@ export async function resetUser(
 	if (!updatedUser) throw new Error("Failed to reset user");
 
 	return updatedUser;
-}
-
-interface UpdateUserParams {
-	logn?: string;
-	name?: string;
-	role?: z.infer<typeof UserRoleSchema>;
-	team?: number;
-}
-
-/**
- * Edit a user
- * @param id - The id of the user to edit
- * @param params - The user edit parameters
- * @returns The edited user
- */
-export async function patchUser(
-	id: number,
-	params: UpdateUserParams,
-): Promise<User | undefined> {
-	const [updatedUser] = await db
-		.update(userTable)
-		.set({
-			logn: params.logn,
-			name: params.name,
-			role: params.role,
-			team: params.team,
-		})
-		.where(eq(userTable.id, id))
-		.returning();
-
-	if (!updatedUser) throw new Error("Failed to update user");
-
-	return updatedUser;
-}
-
-/**
- * Delete a user
- * @param id - The id of the user to delete
- * @returns The deleted user
- */
-export async function deleteUser(id: number) {
-	const [deletedUser] = await db
-		.delete(userTable)
-		.where(eq(userTable.id, id))
-		.returning();
-
-	if (!deletedUser) throw new Error("Failed to delete user");
-
-	return deletedUser;
 }

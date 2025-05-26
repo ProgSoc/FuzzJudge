@@ -1,0 +1,9 @@
+query ProblemQuery($slug: String!) {
+  problem(slug: $slug) {
+    icon
+    name
+    instructions
+    difficulty
+    points
+  }
+}

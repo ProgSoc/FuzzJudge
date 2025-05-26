@@ -14,47 +14,59 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { onDestroy } from "svelte";
-import SvelteMarkdown from "svelte-markdown";
-import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
-import SubmissionArea from "./SubmissionArea.svelte";
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+  import { onDestroy } from "svelte";
+  import SvelteMarkdown from "svelte-markdown";
+  import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
+  import SubmissionArea from "./SubmissionArea.svelte";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { derived } from "svelte/store";
+  import { client } from "../gql/sdk";
 
-interface Props {
-	problem: FuzzJudgeProblemMessage;
-	solved: boolean;
-	setSolved: (slug: string) => void;
-}
+  interface Props {
+    problemSlug: string;
+  }
 
-let { problem, solved, setSolved }: Props = $props();
+  let { problemSlug }: Props = $props();
 
-// biome-ignore lint/style/useConst: svelte
-let problemInstructions: HTMLDivElement | undefined = $state(undefined);
+  // biome-ignore lint/style/useConst: svelte
+  let problemInstructions: HTMLDivElement | undefined = $state(undefined);
 
-// Reset scroll to top when a new problem is selected
-const unsubScrollUp = selectedProblem.subscribe((slug) => {
-	if (slug === undefined) return;
+  // Reset scroll to top when a new problem is selected
+  const unsubScrollUp = selectedProblem.subscribe((slug) => {
+    if (slug === undefined) return;
 
-	if (problemInstructions !== undefined) {
-		problemInstructions.scrollTop = 0;
-	}
-});
+    if (problemInstructions !== undefined) {
+      problemInstructions.scrollTop = 0;
+    }
+  });
 
-onDestroy(() => {
-	unsubScrollUp();
-});
+  onDestroy(() => {
+    unsubScrollUp();
+  });
+  /**
+   * Solved
+   * Name
+   * Difficulty
+   * Points
+   * Body
+   */
+  const problemQuery = createQuery({
+    queryKey: ["problem", problemSlug],
+    queryFn: () => client.ProblemData({ problemSlug }),
+    select: (data) => data.data.problem,
+  });
 </script>
 
 <div class="problem" bind:this={problemInstructions}>
   <div id="problem-instructions" class="problem-instructions">
     {#if $selectedProblem !== undefined}
-      {#if problem !== undefined}
+      {#if $problemQuery.data}
         <h1 style="margin-top: 0px;">
-          <span style={solved ? "text-decoration: line-through;" : ""}>
-            {problem.doc.title}
+          <span style={$problemQuery.data.solved ? "text-decoration: line-through;" : ""}>
+            {$problemQuery.data.name}
           </span>
 
-          {#if solved}
+          {#if $problemQuery.data.solved}
             <span style="font-size: 1.3rem;">✓</span>
           {/if}
         </h1>
@@ -62,17 +74,17 @@ onDestroy(() => {
         <div class="stats">
           <span style="margin-right: 1rem;"
             ><b>Difficulty:</b>
-            {difficultyName(problem.difficulty)}</span
+            {difficultyName($problemQuery.data.difficulty)}</span
           >
-          <span><b>Points:</b> {problem.points}</span>
+          <span><b>Points:</b> {$problemQuery.data.points}</span>
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={removeMdTitle(problem.doc.body)} />
+          <SvelteMarkdown source={removeMdTitle($problemQuery.data.instructions)} />
         </div>
       {/if}
 
-      <SubmissionArea {setSolved} />
+      <SubmissionArea />
     {/if}
   </div>
 </div>

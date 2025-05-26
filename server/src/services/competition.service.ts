@@ -1,7 +1,7 @@
 import path from "node:path";
-import { z } from "@hono/zod-openapi";
 import { TOML } from "bun";
 import matter from "gray-matter";
+import { z } from "zod";
 import { parseMarkdownAttributes } from "./problems.service";
 
 const competitionSpec = z.object({

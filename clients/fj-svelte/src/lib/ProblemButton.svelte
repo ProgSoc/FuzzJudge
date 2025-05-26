@@ -13,16 +13,24 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
+<!-- 
+  Title
+  Slug
+  Points
+  Solved
+  Icon
+  Difficulty
+-->
+
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import type { ProblemsListQueryQuery } from "../gql";
 import { selectedProblem } from "../utils";
 
 interface Props {
-	problem: FuzzJudgeProblemMessage;
-	solved: boolean;
+	problem: ProblemsListQueryQuery["problems"][number];
 }
 
-let { problem, solved }: Props = $props();
+let { problem }: Props = $props();
 
 const select = () => {
 	selectedProblem.set(problem?.slug ?? "");
@@ -30,26 +38,26 @@ const select = () => {
 </script>
 
 <div
-  aria-label={`Select ${problem.doc.title}`}
+  aria-label={`Select ${problem.name}`}
   role="link"
   tabindex="0"
   onkeyup={select}
   class="option"
   class:selected={$selectedProblem === problem?.slug}
-  class:solved={solved}
+  class:solved={problem.solved}
   onclick={select}
 >
   <div class="icon">
-    {problem.doc.icon}
+    {problem.icon}
   </div>
   <div class="name">
-    <span style={solved ? "text-decoration: line-through;" : ""}>{problem.doc.title}</span>
+    <span style={problem.solved ? "text-decoration: line-through;" : ""}>{problem.name}</span>
     <br />
     <!-- <span class="subtext">{$q_.brief}</span> -->
     <span class="subtext">{problem.points} points</span>
   </div>
   <div class="status">
-    {#if solved}
+    {#if problem.solved}
       ✓
     {/if}
   </div>

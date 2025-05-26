@@ -1,0 +1,9 @@
+extend type Query {
+	competition: Competition!
+}
+
+type Competition {
+	name: String!
+	brief: String!
+	instructions: String!
+}

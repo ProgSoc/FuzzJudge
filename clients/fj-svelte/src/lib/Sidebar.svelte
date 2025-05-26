@@ -14,17 +14,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import type { FuzzJudgeProblemMessage } from "@progsoc/fuzzjudge-server/services/problems.service";
+import { createQuery } from "@tanstack/svelte-query";
 import icons from "../icons";
 import Icon from "./Icon.svelte";
 import ListGroup from "./ListGroup.svelte";
+import { client } from "../gql/sdk";
 
-interface Props {
-	problems?: Record<string, FuzzJudgeProblemMessage>;
-	solvedProblems: Set<string>;
-}
-
-let { problems = {}, solvedProblems }: Props = $props();
 let open = $state(true);
 
 function toggleOpen() {
@@ -37,6 +32,12 @@ const keydownHandler = (e: KeyboardEvent) => {
 		open = !open;
 	}
 };
+
+const query = createQuery({
+	queryKey: ["problemsList"],
+	queryFn: () => client.ProblemsListQuery(),
+	select: (data) => data.data.problems,
+});
 </script>
 
 <div class="problem-list" class:closed={!open}>
@@ -45,11 +46,13 @@ const keydownHandler = (e: KeyboardEvent) => {
       <h2 class="list-title">Problems</h2>
       <Icon icon={icons.arrowleft} clickAction={toggleOpen} />
     </div>
-
-    <ListGroup name="Easy" {problems} {solvedProblems} includes={1} />
-    <ListGroup name="Medium" {problems} {solvedProblems} includes={2} />
-    <ListGroup name="Hard" {problems} {solvedProblems} includes={3} />
-    <ListGroup name="Other" {problems} {solvedProblems} includes={(d) => d < 1 || d > 3} />
+    {#if $query.data}
+  <ListGroup name="Easy" includes={1} />
+    <ListGroup name="Medium"  includes={2} />
+    <ListGroup name="Hard" includes={3} />
+    <ListGroup name="Other" includes={(d) => d < 1 || d > 3} />
+    {/if}
+  
   {:else}
     <Icon icon={icons.arrowright} clickAction={toggleOpen} />
   {/if}

@@ -5,7 +5,7 @@ let ab = new AbortController();
 
 let exitPromise: Promise<number> | null = null;
 
-const buildEntryPoints = ["./src/index.ts", "./src/client.ts"];
+const buildEntryPoints = ["./src/index.ts"];
 const serverEntryPoint = "dist/index.js";
 
 const requestRestart = async () => {

@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { z } from "@hono/zod-openapi";
 import { TOML } from "bun";
 import matter from "gray-matter";
 import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 
 const problemSpec = z.object({
 	fuzz: z.object({
@@ -24,14 +24,14 @@ const problemSpec = z.object({
 
 type ProblemSpec = z.infer<typeof problemSpec>;
 
-export interface MarkdownAttributes {
+interface MarkdownAttributes {
 	title: string;
 	summary: string | undefined;
 	icon: string;
 	body: string;
 }
 
-export type FuzzJudgeProblemMessage = {
+type FuzzJudgeProblemMessage = {
 	slug: string;
 	doc: {
 		title: string;
@@ -248,7 +248,7 @@ export function parseMarkdownAttributes(body: string) {
 	};
 }
 
-export function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
+function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
 	return {
 		slug: problem.slug,
 		doc: {

@@ -6,7 +6,6 @@ import {
 	getProblemData,
 	getProblems,
 	judgeProblem,
-	problemToMessage,
 } from "./problems.service.ts";
 
 const sampleRoot = fileURLToPath(import.meta.resolve("../../../sample"));
@@ -18,10 +17,6 @@ describe("problem fuzzing and judging", () => {
 	test("getProblemData", async () => {
 		testProblem = await getProblemData(sampleRoot, problemSlug);
 		expect(testProblem).toBeDefined();
-	});
-
-	test("problem to message", async () => {
-		expect(problemToMessage(testProblem)).toBeDefined();
 	});
 
 	test("getProblemData with invalid slug", () => {

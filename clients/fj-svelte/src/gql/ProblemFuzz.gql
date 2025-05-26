@@ -1,0 +1,3 @@
+mutation GetProblemFuzz($problemId: String!) {
+	getFuzz(slug: $problemId)
+}

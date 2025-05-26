@@ -16,375 +16,99 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
-
-Backend
-
-/comp
-- /icon
-- /name
-- /brief
-- /instructions
-- /prob
-  - /:name
-	- /icon : utf-8 (emoji, one extended grapheme)
-	- /name
-	- /brief
-	- /instructions
-	- /input
-	- /judge
-/auth
-- /login : Get Bearer Token
-- /logout : Expire token
-
-*/
-
 import path from "node:path";
-import { swaggerUI } from "@hono/swagger-ui";
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { z } from "@hono/zod-openapi";
-import { Scalar } from "@scalar/hono-api-reference";
+
+import { createSchema, createYoga } from "graphql-yoga";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
 import { competitionRoot } from "./config.ts";
 import { migrateDB } from "./db/index.ts";
-import { ee } from "./ee.ts";
+
+import { Hono } from "hono";
+import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
+import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware.ts";
+import { resolvers } from "./schema/resolvers.generated";
+import { typeDefs } from "./schema/typeDefs.generated";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
-import {
-	type FuzzJudgeProblemMessage,
-	getProblems,
-	problemToMessage,
-} from "./services/problems.service.ts";
-import { manualJudge } from "./services/submission.service.ts";
 import { resetUser } from "./services/user.service.ts";
-import { type CompetitionClockMessage, createClock } from "./v1/clock.ts";
-import {
-	authMiddleware,
-	forbiddenResponse,
-	unauthorizedResponse,
-} from "./v1/middleware/auth.middleware.ts";
-import { compRouter } from "./v1/routers/competition.router.ts";
-import { teamRouter } from "./v1/routers/team.router.ts";
-import { userRouter } from "./v1/routers/user.router.ts";
-import {
-	type CompetitionScoreboardMessage,
-	createCompetitionScoreboard,
-} from "./v1/score.ts";
-import { HEADER } from "./version.ts";
+import { createClock } from "./v1/clock.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
 migrateDB();
 
 const root = competitionRoot;
 
-const problems = await getProblems(root);
 const competionData = await getCompetitionData(root);
 
 resetUser({ logn: "admin", role: "admin" }, false);
-
-export type SocketMessage =
-	| { kind: "clock"; value: CompetitionClockMessage }
-	| { kind: "problems"; value: FuzzJudgeProblemMessage[] }
-	| { kind: "scoreboard"; value: CompetitionScoreboardMessage };
 
 export const clock = await createClock(
 	competionData.times.start ?? new Date(),
 	competionData.times.finish ?? new Date(Date.now() + 180 * 60 * 1000), // 3 hrs
 );
 
-export const scoreboard = createCompetitionScoreboard(clock, problems);
+const schema = createSchema({ typeDefs, resolvers });
 
-let openWebSockets = 0;
+const graphqlWsMiddleware = makeWebsocketGraphQLMiddleware({
+	upgradeWebSocket,
+	schema,
+	context: ({ extra: { c } }) => ({
+		c,
+	}),
+});
+
+const yoga = createYoga({
+	schema,
+	graphiql: {
+		subscriptionsProtocol: "WS",
+	},
+});
 
 const basePath = Bun.env.BASE_PATH ?? "/";
-const app = new OpenAPIHono()
-	.basePath(basePath as "/")
-	.route("/comp", compRouter)
-	.route("/user", userRouter)
-	.route("/team", teamRouter)
-	.openapi(
-		createRoute({
-			path: "/docs/scalar",
-			hide: true,
-			method: "get",
-			responses: {
-				200: {
-					description: "OpenAPI JSON",
-				},
-			},
-			middleware: Scalar({
-				url: "/docs/json",
-			}),
-			operationId: "getOpenAPI",
-		}),
-		(c) => c.text("dummy response"),
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/docs/swagger",
-			hide: true,
-			responses: {
-				200: {
-					description: "Swagger UI",
-					content: {
-						"text/html": {
-							schema: z.string(),
-						},
-					},
-				},
-			},
-			middleware: swaggerUI({
-				url: "/docs/json",
-				title: "FuzzJudge API",
-			}),
-			operationId: "getSwaggerUI",
-		}),
-		async (c) => {
-			return c.text("dummy response");
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/",
-			responses: {
-				200: {
-					description: "FuzzJudge API",
-					content: {
-						"text/plain": {
-							schema: z.string(),
-						},
-					},
-				},
-			},
-			operationId: "getHeader",
-		}),
-		async (c) => {
-			return c.text(HEADER);
-		},
-	)
-	.openapi(
-		createRoute({
-			path: "/ws",
-			method: "get",
-			responses: {
-				101: {
-					description: "WebSocket connection",
-				},
-			},
-			// middleware: ,
-			operationId: "getWebSocket",
-		}),
-		async (c, next) => {
-			const websocketUpgrade = await upgradeWebSocket(() => {
-				let clockHandler: (data: CompetitionClockMessage) => void;
-				let scoreboardHandler: (data: CompetitionScoreboardMessage) => void;
+const app = new Hono().basePath(basePath as "/");
 
-				return {
-					onOpen: async (e, ws) => {
-						openWebSockets++;
+app.on(["BREW"], "/", async (c) => {
+	return c.text("I'm a teapot", 418);
+});
 
-						clockHandler = (msg) => {
-							ws.send(JSON.stringify({ kind: "clock", value: msg }));
-						};
-						scoreboardHandler = (msg) => {
-							ws.send(JSON.stringify({ kind: "scoreboard", value: msg }));
-						};
+app.on(
+	// Allowed methods for the GraphQL endpoint
+	["GET", "POST"],
+	// GraphQL endpoint
+	yoga.graphqlEndpoint,
+	// GraphQL Auth to get the user from basic auth
+	graphqlAuthMiddleware({
+		verifyUser: basicAuth,
+	}),
+	// GraphQL WebSocket upgrade if the request is a WebSocket
+	graphqlWsMiddleware,
+	// GraphQL Yoga server
+	(c) => yoga.fetch(c.req.raw, { c }),
+);
 
-						ee.on("clock", clockHandler);
-						ee.on("scoreboard", scoreboardHandler);
+app.use("/comp/prob/:slug/assets", async (c, next) => {
+	const id = c.req.param("slug");
+	const probPath = path.join(id, "assets");
+	const rootPath = path.join(root, probPath);
 
-						setTimeout(async () => {
-							ws.send(
-								JSON.stringify({
-									kind: "problems",
-									value: problems.map(problemToMessage),
-								}),
-							);
-							ws.send(JSON.stringify({ kind: "clock", value: clock.now() }));
-							ws.send(
-								JSON.stringify({
-									kind: "scoreboard",
-									value: await scoreboard.fullScoreboard(),
-								}),
-							);
-						}, 1000);
-
-						console.log(`🔗 (${openWebSockets}) Connection Opened`);
-					},
-					onClose: () => {
-						openWebSockets--;
-						ee.off("clock", clockHandler);
-						ee.off("scoreboard", scoreboardHandler);
-
-						console.log(`⛓️‍💥 (${openWebSockets}) Connection Closed`);
-					},
-				};
-			})(c, next);
-
-			if (websocketUpgrade) {
-				return websocketUpgrade;
+	const serveStaticResponse = await serveStatic({
+		root: rootPath,
+		rewriteRequestPath: (req) => {
+			const pathIndex = req.indexOf(probPath);
+			if (pathIndex === -1) {
+				return req;
 			}
+			return req.slice(pathIndex + probPath.length);
+		},
+	})(c, next);
 
-			return c.text("dummy response");
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "brew" as "get", // Nobody likes brew
-			path: "/",
-			responses: {
-				418: {
-					description: "I'm a teapot",
-				},
-			},
-			operationId: "brewTeapot",
-		}),
-		async (c) => {
-			return c.text("I'm a teapot", 418);
-		},
-	)
-	.openapi(
-		createRoute({
-			path: "/auth",
-			method: "get",
-			responses: {
-				200: {
-					description: "Auth",
-					content: {
-						"text/plain": {
-							schema: z.string(),
-						},
-					},
-				},
-				401: unauthorizedResponse,
-			},
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			operationId: "getAuth",
-		}),
-		async (c) => {
-			const { logn } = c.var.user;
-			return c.text(logn);
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/admin",
-			responses: {
-				200: {
-					description: "Admin",
-					content: {
-						"text/html": {
-							schema: z.string(),
-						},
-					},
-				},
-				401: unauthorizedResponse,
-			},
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: ["admin"],
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			operationId: "getAdmin",
-		}),
-		async (c) => {
-			const fileContent = await Bun.file(
-				new URL(import.meta.resolve("./admin.html")),
-			).text();
+	if (serveStaticResponse instanceof Response) {
+		return serveStaticResponse;
+	}
 
-			return c.body(fileContent, {
-				headers: {
-					"Content-Type": "text/html",
-				},
-			});
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/mark",
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: ["admin"],
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			responses: {
-				204: {
-					description: "OK",
-				},
-			},
-			request: {
-				query: z.object({
-					id: z.coerce.number().openapi({
-						param: {
-							name: "id",
-							in: "query",
-							required: true,
-						},
-					}),
-					ok: z.coerce.boolean().openapi({
-						param: {
-							name: "ok",
-							in: "query",
-							required: true,
-						},
-					}),
-				}),
-			},
-			operationId: "manualJudge",
-		}),
-		async (c) => {
-			const { ok, id } = c.req.valid("query");
-
-			await manualJudge(id, ok);
-			return c.body(null, { status: 204 });
-		},
-	)
-	.openapi(
-		createRoute({
-			method: "get",
-			path: "/void",
-			middleware: authMiddleware({
-				verifyUser: basicAuth,
-				roles: [null],
-			}),
-			security: [
-				{
-					Basic: [],
-				},
-			],
-			responses: {
-				204: {
-					description: "OK",
-				},
-				401: unauthorizedResponse,
-				403: forbiddenResponse,
-			},
-			operationId: "void",
-		}),
-		async (c) => {
-			return c.body(null, { status: 204 });
-		},
-	);
+	return c.notFound();
+});
 
 for (const dir of competionData.server?.public ?? []) {
 	const relativeDirPath = path.relative(process.cwd(), root);
@@ -398,46 +122,6 @@ for (const dir of competionData.server?.public ?? []) {
 	);
 }
 
-app.doc31("/docs/json", (c) => ({
-	info: {
-		title: "FuzzJudge API",
-		description: "FuzzJudge API",
-		version: "0.1.0",
-	},
-	openapi: "3.1.0",
-	tags: [
-		{
-			name: "Problems",
-			description: "Problem related endpoints",
-		},
-		{
-			name: "Competition",
-			description: "Competition related endpoints",
-		},
-		{
-			name: "Users",
-			description: "User related endpoints",
-		},
-		{
-			name: "Team",
-			description: "Team related endpoints",
-		},
-	],
-	servers: [
-		{
-			url: new URL(c.req.url).origin,
-			description: "Current environment",
-		},
-	],
-}));
-
-app.openAPIRegistry.registerComponent("securitySchemes", "Basic", {
-	type: "http",
-	scheme: "basic",
-});
-
 app.use(logger());
 
 export default app;
-
-export type AppType = typeof app;

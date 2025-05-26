@@ -1,0 +1,21 @@
+extend type Subscription {
+	scoreboard: [ScoreboardRow!]!
+}
+
+type ScoreboardRow {
+	rank: Int!
+	teamId: Int!
+	team: Team!
+	points: Int!
+	penalty: Float!
+	problems: [ProblemScore!]!
+}
+
+type ProblemScore {
+	slug: String!
+	problem: Problem!
+	solved: Boolean!
+	points: Int!
+	penalty: Float!
+	tries: Int!
+}

@@ -1,0 +1,11 @@
+type Query
+type Mutation
+type Subscription
+
+scalar DateTime
+scalar File
+
+extend type Query {
+	version: String!
+	header: String!
+}

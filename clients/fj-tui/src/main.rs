@@ -82,7 +82,7 @@ async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
         .session
         .fetch_all_problems()
         .await
-        .unwrap();
+        .expect("Failed to fetch problems");
 
     let cmds = app_state.lock().await.on_new_problem.clone();
 
@@ -111,8 +111,12 @@ async fn get_questions(app_state: Arc<Mutex<AppState>>, _: ()) {
 async fn start_web_socket(app_state: Arc<Mutex<AppState>>, _: ()) {
     let socket_addr = {
         let app_state = app_state.lock().await;
-        let mut addr = app_state.session.server.clone();
-        addr.set_scheme("ws").unwrap();
+        let mut addr = app_state.session.server.clone().join("/graphql").expect("Invalid WebSocket URL");
+        if addr.scheme() == "http" {
+            addr.set_scheme("ws").unwrap();
+        } else if addr.scheme() == "https" {
+            addr.set_scheme("wss").unwrap();
+        }
         addr
     };
 

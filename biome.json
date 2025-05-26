@@ -7,7 +7,13 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": ["./clients/fj-svelte/dist", "./node_modules", "./server/dist"]
+		"ignore": [
+			"./clients/fj-svelte/dist",
+			"./node_modules",
+			"./server/dist",
+			"./server/**/*.generated.ts",
+			"./clients/fj-svelte/src/gql/index.ts"
+		]
 	},
 	"formatter": {
 		"enabled": true,

@@ -1,0 +1,21 @@
+extend type Query {
+	submissions(teamId: Int, problemSlug: String): [Submission!]!
+	submission(id: Int!): Submission
+}
+
+extend type Mutation {
+	overrideJudge(submissionId: Int!, solved: Boolean!): Submission!
+}
+
+type Submission {
+	id: Int!
+	teamId: Int!
+	problemSlug: String!
+	time: DateTime!
+	out: String
+	code: String
+	ok: Boolean
+	vler: String
+	vlms: Float
+	team: Team!
+}

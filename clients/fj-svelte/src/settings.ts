@@ -16,7 +16,7 @@
 import { writable } from "svelte/store";
 import type { Theme } from "./themes/themes";
 
-export type UserSettings = {
+type UserSettings = {
 	theme?: Theme;
 	language?: string;
 };
