@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       args:
-        - VITE_BACKEND_URL=http://localhost/api
+        - VITE_BACKEND_URL=http://localhost/api/graphql
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fj-svelte.rule=Host(`localhost`)"

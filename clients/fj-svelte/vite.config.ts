@@ -12,13 +12,6 @@ export default defineConfig({
 	plugins: [svelte(), tsconfigPaths()],
 	build: {
 		sourcemap: "inline",
-		rollupOptions: {
-			input: {
-				main: resolve(__dirname, "index.html"),
-				scoreboard: resolve(__dirname, "scoreboard/index.html"),
-			},
-			external: ["svelte-markdown"],
-		},
 	},
 	server: {
 		proxy: {

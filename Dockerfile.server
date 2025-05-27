@@ -26,8 +26,7 @@ COPY . .
 RUN bun run --filter @progsoc/fuzzjudge-server build 
 
 
-
-FROM base as release
+FROM base AS release
 
 # Install Deno
 RUN apk add --no-cache deno
@@ -44,10 +43,10 @@ RUN apk add --no-cache go
 # Install Ruby
 RUN apk add --no-cache ruby
 
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/server/dist/index.js .
-COPY --from=prerelease /app/server/drizzle .
-COPY --from=prerelease /app/server/package.json .
+COPY --from=install /temp/prod/node_modules /app/node_modules
+COPY --from=prerelease /app/server/dist/index.js /app/dist/index.js
+COPY --from=prerelease /app/server/migrations /app/migrations
+COPY --from=prerelease /app/server/package.json /app/package.json
 
 ARG BASE_PATH
 # Set the environment variable for the backend URL
@@ -60,4 +59,4 @@ USER bun
 # Expose the port the app runs on
 EXPOSE 1989
 
-ENTRYPOINT [ "bun", "run", "index.js", "/competition" ]
+ENTRYPOINT [ "bun", "run", "/app/dist/index.js", "/competition" ]
