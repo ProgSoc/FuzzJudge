@@ -23,7 +23,7 @@
 		"datauri": "4.1.0",
 		"graphql-request": "^7.1.2",
 		"knip": "^5.56.0",
-		"svelte": "5.28.6",
+		"svelte": "5.33.3",
 		"svelte-check": "4.2.1",
 		"svelte-markdown": "^0.4.1",
 		"typescript": "^5.8.3",
