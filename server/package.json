@@ -21,7 +21,7 @@
 	},
 	"files": ["dist", "migrations", "README.md", "LICENSE"],
 	"dependencies": {
-		"@hono/zod-openapi": "0.19.6",
+		"@hono/zod-openapi": "0.19.7",
 		"drizzle-orm": "0.43.1",
 		"graphql": "^16.11.0",
 		"graphql-scalars": "^1.24.2",
