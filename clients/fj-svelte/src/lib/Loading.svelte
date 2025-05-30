@@ -14,17 +14,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { onDestroy } from "svelte";
+import { onDestroy } from "svelte";
 
-  let dots = $state(0);
+let dots = $state(0);
 
-  const interval = setInterval(() => {
-    dots = (dots + 1) % 4;
-  }, 500);
+const interval = setInterval(() => {
+	dots = (dots + 1) % 4;
+}, 500);
 
-  onDestroy(() => {
-    clearInterval(interval);
-  });
+onDestroy(() => {
+	clearInterval(interval);
+});
 </script>
 
 <div class="loading">Loading{".".repeat(dots)}</div>

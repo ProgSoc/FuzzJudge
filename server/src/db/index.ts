@@ -38,7 +38,7 @@ const database = new Database(databaseUrl);
 /**
  * The database query builder.
  */
-export const db = drizzle(database, { schema });
+const db = drizzle(database, { schema });
 
 const topMigrationFolderExists = await exists("./migrations");
 
@@ -49,12 +49,8 @@ const migrationFolder = topMigrationFolderExists
 
 console.log(`Using migrations folder: ${migrationFolder} `);
 
-/**
- * Performs any pending migrations.
- */
-export function migrateDB() {
-	// console.log("Running migrations...", cwdPath);
-	migrate(db, {
-		migrationsFolder: migrationFolder,
-	});
-}
+migrate(db, {
+	migrationsFolder: migrationFolder,
+});
+
+export { db };

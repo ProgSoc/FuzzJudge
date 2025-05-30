@@ -1,7 +1,7 @@
 subscription ClockSubscription {
-  clock {
-    start
-    finish
-    hold
-  }
+	clock {
+		start
+		finish
+		hold
+	}
 }

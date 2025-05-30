@@ -14,146 +14,149 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { copyFuzz, downloadFuzz } from "../api";
-  import { selectedProblem } from "../utils";
-  import {
-    CompState,
-    type CompTimes,
-    type TimeStateData,
-    getCurrentTimeStateData,
-    clockTick,
-    handleNotifications,
-  } from "../clock";
-  import CompInfo from "./CompInfo.svelte";
-  import Loading from "./Loading.svelte";
-  import Popout from "./Popout.svelte";
-  import ProblemContents from "./ProblemContents.svelte";
-  import Scoreboard from "./Scoreboard.svelte";
-  import Sidebar from "./Sidebar.svelte";
-  import icons from "../icons";
-  import Icon from "./Icon.svelte";
-  import InlineCountdown from "./counters/InlineCountdown.svelte";
-  import PageCountdown from "./counters/PageCountdown.svelte";
-  import Settings from "./Settings.svelte";
-  import Manual from "./admin/Manual.svelte";
-  import Notification from "./Notification.svelte";
-  import { NOTIFICATION } from "../notifications";
-  import { client, wsClient } from "../gql/sdk";
-  import { ClockSubscriptionDocument, type ClockSubscriptionSubscription } from "../gql";
-  import { createQuery } from "@tanstack/svelte-query";
-  import { onDestroy, onMount } from "svelte";
+import { createQuery } from "@tanstack/svelte-query";
+import { onDestroy, onMount } from "svelte";
+import { copyFuzz, downloadFuzz } from "../api";
+import {
+	CompState,
+	type CompTimes,
+	type TimeStateData,
+	clockTick,
+	getCurrentTimeStateData,
+	handleNotifications,
+} from "../clock";
+import {
+	ClockSubscriptionDocument,
+	type ClockSubscriptionSubscription,
+} from "../gql";
+import { client, wsClient } from "../gql/sdk";
+import icons from "../icons";
+import { NOTIFICATION } from "../notifications";
+import { selectedProblem } from "../utils";
+import CompInfo from "./CompInfo.svelte";
+import Icon from "./Icon.svelte";
+import Loading from "./Loading.svelte";
+import Notification from "./Notification.svelte";
+import Popout from "./Popout.svelte";
+import ProblemContents from "./ProblemContents.svelte";
+import Scoreboard from "./Scoreboard.svelte";
+import Settings from "./Settings.svelte";
+import Sidebar from "./Sidebar.svelte";
+import Manual from "./admin/Manual.svelte";
+import InlineCountdown from "./counters/InlineCountdown.svelte";
+import PageCountdown from "./counters/PageCountdown.svelte";
 
-  const currentUserQuery = createQuery({
-    queryKey: ["username"],
-    queryFn: () => client.CurrentUser(),
-    select: (data) => data.data.me,
-  });
+const currentUserQuery = createQuery({
+	queryKey: ["username"],
+	queryFn: () => client.CurrentUser(),
+	select: (data) => data.data.me,
+});
 
-  const competitionName = createQuery({
-    queryKey: ["compInfo"],
-    queryFn: () => client.CompetitionData(),
-    select: (data) => {
-      return data.data.competition.name;
-    },
-  });
+const competitionName = createQuery({
+	queryKey: ["compInfo"],
+	queryFn: () => client.CompetitionData(),
+	select: (data) => {
+		return data.data.competition.name;
+	},
+});
 
-  let compTimes = $state<undefined | CompTimes>(undefined);
+let compTimes = $state<undefined | CompTimes>(undefined);
 
-  let cleanupClock = () => {};
+let cleanupClock = () => {};
 
-  $effect(() => {
-    if ($competitionName.data) {
-      window.document.title = `${$competitionName.data}`;
-    }
-  });
+$effect(() => {
+	if ($competitionName.data) {
+		window.document.title = `${$competitionName.data}`;
+	}
+});
 
-  onMount(() => {
-    cleanupClock = wsClient.subscribe<ClockSubscriptionSubscription>(
-      {
-        query: ClockSubscriptionDocument,
-      },
-      {
-        next: (data) => {
-          console.log("ClockSubscription data", data.data?.clock);
-          if (data.data?.clock === undefined) return;
-          compTimes = data.data.clock;
-        },
-        error: (err) => {
-          console.error("Error in ClockSubscription", err);
-        },
-        complete: () => {
-          console.log("ClockSubscription completed");
-        },
-      },
-    );
-  });
+onMount(() => {
+	cleanupClock = wsClient.subscribe<ClockSubscriptionSubscription>(
+		{
+			query: ClockSubscriptionDocument,
+		},
+		{
+			next: (data) => {
+				console.log("ClockSubscription data", data.data?.clock);
+				if (data.data?.clock === undefined) return;
+				compTimes = data.data.clock;
+			},
+			error: (err) => {
+				console.error("Error in ClockSubscription", err);
+			},
+			complete: () => {
+				console.log("ClockSubscription completed");
+			},
+		},
+	);
+});
 
-  onDestroy(() => {
-    cleanupClock();
-  });
+onDestroy(() => {
+	cleanupClock();
+});
 
-  let timeStateData = $state<TimeStateData | undefined>(undefined);
+let timeStateData = $state<TimeStateData | undefined>(undefined);
 
-  clockTick(() => {
-    if (compTimes !== undefined) {
-      timeStateData = getCurrentTimeStateData(compTimes);
-      handleNotifications(timeStateData);
-    }
-  });
+clockTick(() => {
+	if (compTimes !== undefined) {
+		timeStateData = getCurrentTimeStateData(compTimes);
+		handleNotifications(timeStateData);
+	}
+});
 
-  type ShowingPopout = "None" | "Scoreboard" | "CompInfo" | "Settings" | "Manual";
+type ShowingPopout = "None" | "Scoreboard" | "CompInfo" | "Settings" | "Manual";
 
-  let showingPopout: ShowingPopout = $state("None");
+let showingPopout: ShowingPopout = $state("None");
 
-  const keydownHandler = (e: KeyboardEvent) => {
-    // if (e.target === document.body && e.key === "ArrowRight") {
-    // 	e.preventDefault();
-    // 	if (problems === undefined) return;
-    // 	const slug = nextUnsolvedProblem(
-    // 		problems,
-    // 		solvedProblems,
-    // 		$selectedProblem,
-    // 	);
-    // 	if (slug !== null) {
-    // 		selectedProblem.set(slug);
-    // 	}
-    // }
+const keydownHandler = (e: KeyboardEvent) => {
+	// if (e.target === document.body && e.key === "ArrowRight") {
+	// 	e.preventDefault();
+	// 	if (problems === undefined) return;
+	// 	const slug = nextUnsolvedProblem(
+	// 		problems,
+	// 		solvedProblems,
+	// 		$selectedProblem,
+	// 	);
+	// 	if (slug !== null) {
+	// 		selectedProblem.set(slug);
+	// 	}
+	// }
 
-    // if (e.target === document.body && e.key === "ArrowLeft") {
-    // 	e.preventDefault();
-    // 	if (problems === undefined) return;
-    // 	const slug = nextUnsolvedProblem(
-    // 		problems,
-    // 		solvedProblems,
-    // 		$selectedProblem,
-    // 		-1,
-    // 	);
-    // 	if (slug !== null) {
-    // 		selectedProblem.set(slug);
-    // 	}
-    // }
+	// if (e.target === document.body && e.key === "ArrowLeft") {
+	// 	e.preventDefault();
+	// 	if (problems === undefined) return;
+	// 	const slug = nextUnsolvedProblem(
+	// 		problems,
+	// 		solvedProblems,
+	// 		$selectedProblem,
+	// 		-1,
+	// 	);
+	// 	if (slug !== null) {
+	// 		selectedProblem.set(slug);
+	// 	}
+	// }
 
-    if (e.ctrlKey && e.key === "s") {
-      e.preventDefault();
+	if (e.ctrlKey && e.key === "s") {
+		e.preventDefault();
 
-      if (showingPopout === "Scoreboard") {
-        showingPopout = "None";
-        return;
-      }
+		if (showingPopout === "Scoreboard") {
+			showingPopout = "None";
+			return;
+		}
 
-      showingPopout = "Scoreboard";
-    }
+		showingPopout = "Scoreboard";
+	}
 
-    if (e.ctrlKey && e.key === "m") {
-      e.preventDefault();
-      showingPopout = "Manual";
-    }
+	if (e.ctrlKey && e.key === "m") {
+		e.preventDefault();
+		showingPopout = "Manual";
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "c") {
-      e.preventDefault();
-      copyFuzz($selectedProblem);
-    }
-  };
+	if (e.ctrlKey && e.altKey && e.key === "c") {
+		e.preventDefault();
+		copyFuzz($selectedProblem);
+	}
+};
 </script>
 
 <div class="layout">

@@ -22,7 +22,6 @@ import { createSchema, createYoga } from "graphql-yoga";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
 import { competitionRoot } from "./config.ts";
-import { migrateDB } from "./db/index.ts";
 
 import { Hono } from "hono";
 import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
@@ -31,17 +30,12 @@ import { resolvers } from "./schema/resolvers.generated";
 import { typeDefs } from "./schema/typeDefs.generated";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
-import { resetUser } from "./services/user.service.ts";
 import { createClock } from "./v1/clock.ts";
 import { upgradeWebSocket } from "./websocket.ts";
-
-migrateDB();
 
 const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
-
-resetUser({ logn: "admin", role: "admin" }, false);
 
 export const clock = await createClock(
 	competionData.times.start ?? new Date(),

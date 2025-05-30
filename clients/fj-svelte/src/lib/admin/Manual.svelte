@@ -14,20 +14,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import SvelteMarkdown from "svelte-markdown";
-  import Loading from "../Loading.svelte";
-  import { createQuery } from "@tanstack/svelte-query";
+import { createQuery } from "@tanstack/svelte-query";
+import SvelteMarkdown from "svelte-markdown";
+import Loading from "../Loading.svelte";
 
-  const manualQuery = createQuery({
-    queryKey: ["manual"],
-    queryFn: () =>
-      fetch("https://raw.githubusercontent.com/ProgSoc/FuzzJudge/refs/heads/main/docs/MANUAL.md")
-        .then((res) => res.text())
-        .catch((err) => {
-          console.error("Error fetching manual", err);
-          return "Error fetching manual";
-        }),
-  });
+const manualQuery = createQuery({
+	queryKey: ["manual"],
+	queryFn: () =>
+		fetch(
+			"https://raw.githubusercontent.com/ProgSoc/FuzzJudge/refs/heads/main/docs/MANUAL.md",
+		)
+			.then((res) => res.text())
+			.catch((err) => {
+				console.error("Error fetching manual", err);
+				return "Error fetching manual";
+			}),
+});
 </script>
 
 {#if $manualQuery.data}

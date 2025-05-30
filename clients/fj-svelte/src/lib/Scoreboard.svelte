@@ -14,49 +14,57 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { createQuery, experimental_streamedQuery } from "@tanstack/svelte-query";
-  import { ScoreboardSubscriptionDocument, type ScoreboardSubscriptionSubscription } from "../gql";
-  import { client, wsClient } from "../gql/sdk";
-  import { problemOrder, truncateUsername } from "../utils";
-  import { writable } from "svelte/store";
-  import { onDestroy, onMount } from "svelte";
+import {
+	createQuery,
+	experimental_streamedQuery,
+} from "@tanstack/svelte-query";
+import { onDestroy, onMount } from "svelte";
+import { writable } from "svelte/store";
+import {
+	ScoreboardSubscriptionDocument,
+	type ScoreboardSubscriptionSubscription,
+} from "../gql";
+import { client, wsClient } from "../gql/sdk";
+import { problemOrder, truncateUsername } from "../utils";
 
-  const errors: string[] = [];
+const errors: string[] = [];
 
-  const scoreboardRows = writable<ScoreboardSubscriptionSubscription["scoreboard"]>([]);
+const scoreboardRows = writable<
+	ScoreboardSubscriptionSubscription["scoreboard"]
+>([]);
 
-  let scoreboardcleanup = () => {};
+let scoreboardcleanup = () => {};
 
-  onMount(() => {
-    scoreboardcleanup = wsClient.subscribe<ScoreboardSubscriptionSubscription>(
-      {
-        query: ScoreboardSubscriptionDocument,
-      },
-      {
-        next: (data) => {
-          console.log("ScoreboardSubscription data", data.data?.scoreboard);
-          if (data.data?.scoreboard === undefined) return;
-          scoreboardRows.set(data.data.scoreboard);
-        },
-        error: (err) => {
-          console.error("Error in ScoreboardSubscription", err);
-        },
-        complete: () => {
-          console.log("ScoreboardSubscription completed");
-        },
-      },
-    );
-  });
+onMount(() => {
+	scoreboardcleanup = wsClient.subscribe<ScoreboardSubscriptionSubscription>(
+		{
+			query: ScoreboardSubscriptionDocument,
+		},
+		{
+			next: (data) => {
+				console.log("ScoreboardSubscription data", data.data?.scoreboard);
+				if (data.data?.scoreboard === undefined) return;
+				scoreboardRows.set(data.data.scoreboard);
+			},
+			error: (err) => {
+				console.error("Error in ScoreboardSubscription", err);
+			},
+			complete: () => {
+				console.log("ScoreboardSubscription completed");
+			},
+		},
+	);
+});
 
-  onDestroy(() => {
-    scoreboardcleanup();
-  });
+onDestroy(() => {
+	scoreboardcleanup();
+});
 
-  const query = createQuery({
-    queryKey: ["problemsList"],
-    queryFn: () => client.ProblemsListQuery(),
-    select: (data) => data.data.problems,
-  });
+const query = createQuery({
+	queryKey: ["problemsList"],
+	queryFn: () => client.ProblemsListQuery(),
+	select: (data) => data.data.problems,
+});
 </script>
 
 {#if $scoreboardRows}

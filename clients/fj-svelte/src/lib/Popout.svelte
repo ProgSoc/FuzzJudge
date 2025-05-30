@@ -14,37 +14,36 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import icons from "../icons";
-  import type { IconDescriptor } from "../types";
-  import Icon from "./Icon.svelte";
+import icons from "../icons";
+import type { IconDescriptor } from "../types";
+import Icon from "./Icon.svelte";
 
-  
-  interface Props {
-    // biome-ignore lint/style/useConst: is assigned as a prop
-    shown?: boolean;
-    close?: any;
-    title?: string | undefined;
-    icon?: IconDescriptor | undefined;
-    children?: import('svelte').Snippet;
-  }
+interface Props {
+	// biome-ignore lint/style/useConst: is assigned as a prop
+	shown?: boolean;
+	close?: any;
+	title?: string | undefined;
+	icon?: IconDescriptor | undefined;
+	children?: import("svelte").Snippet;
+}
 
-  let {
-    shown = false,
-    close = () => {},
-    title = undefined,
-    icon = undefined,
-    children
-  }: Props = $props();
+let {
+	shown = false,
+	close = () => {},
+	title = undefined,
+	icon = undefined,
+	children,
+}: Props = $props();
 
-  let maximized = $state(false);
-  const onMaximiseToggle = () => {
-    maximized = !maximized;
-  };
+let maximized = $state(false);
+const onMaximiseToggle = () => {
+	maximized = !maximized;
+};
 
-  const keydownHandler = (e: KeyboardEvent) => {
-    if (!shown || e.key !== "Escape") return;
-    close();
-  };
+const keydownHandler = (e: KeyboardEvent) => {
+	if (!shown || e.key !== "Escape") return;
+	close();
+};
 </script>
 
 {#if shown}

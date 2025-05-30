@@ -16,7 +16,6 @@ export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
 			logn,
 			role: role.toLowerCase() as "admin" | "competitor",
 			team: teamId,
-			salt: Buffer.from(crypto.getRandomValues(new Uint8Array(32)).buffer),
 		})
 		.returning();
 

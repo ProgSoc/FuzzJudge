@@ -240,7 +240,7 @@ export function parseMarkdownAttributes(body: string) {
 	return {
 		title,
 		summary,
-		icon,
+		icon: icon ?? "",
 		body:
 			titleMatch === undefined
 				? outputBody

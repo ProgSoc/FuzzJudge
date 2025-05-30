@@ -11,9 +11,9 @@
 		"@eddeee888/gcg-typescript-resolver-files": "^0.12.0",
 		"@graphql-codegen/cli": "^5.0.6",
 		"@types/bun": "1.2.15",
-		"@types/node": "^22.15.18",
 		"drizzle-kit": "0.31.0",
 		"knip": "^5.56.0",
+		"tsdown": "^0.12.5",
 		"typescript": "^5.8.3"
 	},
 	"engines": {
@@ -27,12 +27,12 @@
 		"graphql-ws": "^6.0.4",
 		"graphql-yoga": "^5.13.4",
 		"gray-matter": "4.0.3",
-		"hono": "4.7.9"
+		"hono": "4.7.9",
+		"zod": "^3.25.41"
 	},
 	"scripts": {
-		"build:types": "bun tsc -b",
-		"build": "bun run build.ts",
-		"dev": "bun run dev.ts ../sample",
-		"knip": "knip"
+		"build": "bun --bun tsdown",
+		"dev": "bun --bun tsdown --watch",
+		"start": "bun run dist/index.js"
 	}
 }

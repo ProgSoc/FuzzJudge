@@ -14,113 +14,118 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
-  import { showNotification } from "../notifications";
-  import { selectedProblem } from "../utils";
-  import { client } from "../gql/sdk";
-  import type { JudgeSubmissionMutationVariables } from "../gql";
-  import { downloadFuzz } from "../api";
+import {
+	createMutation,
+	createQuery,
+	useQueryClient,
+} from "@tanstack/svelte-query";
+import { downloadFuzz } from "../api";
+import type { JudgeSubmissionMutationVariables } from "../gql";
+import { client } from "../gql/sdk";
+import { showNotification } from "../notifications";
+import { selectedProblem } from "../utils";
 
-  let submissionValue = $state("");
-  let sourceValue = $state("");
+let submissionValue = $state("");
+let sourceValue = $state("");
 
-  selectedProblem.subscribe((_) => {
-    submissionValue = "";
-    sourceValue = "";
-  });
+selectedProblem.subscribe((_) => {
+	submissionValue = "";
+	sourceValue = "";
+});
 
-  const queryClient = useQueryClient();
+const queryClient = useQueryClient();
 
-  const submitMutation = createMutation({
-    mutationFn: (options: JudgeSubmissionMutationVariables) => client.JudgeSubmission(options),
-    onSuccess: (data) => {
-      if (data.data.judge.__typename === "JudgeErrorOutput") {
-        showNotification("Submission failed. Please check the error message.");
-      } else {
-        showNotification("Submission successful!");
-      }
-      queryClient.invalidateQueries({
-        queryKey: ["problem", $selectedProblem],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["problemsList"],
-      });
-    },
-    onError: (error) => {
-      showNotification("Submission failed. Please check the error message.");
-    },
-  });
+const submitMutation = createMutation({
+	mutationFn: (options: JudgeSubmissionMutationVariables) =>
+		client.JudgeSubmission(options),
+	onSuccess: (data) => {
+		if (data.data.judge.__typename === "JudgeErrorOutput") {
+			showNotification("Submission failed. Please check the error message.");
+		} else {
+			showNotification("Submission successful!");
+		}
+		queryClient.invalidateQueries({
+			queryKey: ["problem", $selectedProblem],
+		});
+		queryClient.invalidateQueries({
+			queryKey: ["problemsList"],
+		});
+	},
+	onError: (error) => {
+		showNotification("Submission failed. Please check the error message.");
+	},
+});
 
-  const getFuzz = createMutation({
-    mutationFn: (slug: string) => client.GetProblemFuzz({ problemId: slug }),
-    onSuccess: (data) => {
-      if (data.errors?.length) {
-        const errorMessage = data.errors.map((error) => error.message).join(", ");
-        showNotification(`Failed to get fuzz input: ${errorMessage}`);
-      }
-    },
-    onError: (error) => {
-      showNotification("Failed to get fuzz input. Server error.");
-    },
-  });
+const getFuzz = createMutation({
+	mutationFn: (slug: string) => client.GetProblemFuzz({ problemId: slug }),
+	onSuccess: (data) => {
+		if (data.errors?.length) {
+			const errorMessage = data.errors.map((error) => error.message).join(", ");
+			showNotification(`Failed to get fuzz input: ${errorMessage}`);
+		}
+	},
+	onError: (error) => {
+		showNotification("Failed to get fuzz input. Server error.");
+	},
+});
 
-  const submit = (slug: string) => {
-    $submitMutation.mutate({
-      code: sourceValue,
-      output: submissionValue,
-      problemSlug: slug,
-    });
-  };
+const submit = (slug: string) => {
+	$submitMutation.mutate({
+		code: sourceValue,
+		output: submissionValue,
+		problemSlug: slug,
+	});
+};
 
-  const handleDownload = async () => {
-    const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
-    downloadFuzz($selectedProblem, fuzzData.data.getFuzz);
-  };
+const handleDownload = async () => {
+	const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
+	downloadFuzz($selectedProblem, fuzzData.data.getFuzz);
+};
 
-  const handleCopy = async () => {
-    const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
-    await navigator.clipboard.writeText(fuzzData.data.getFuzz);
-    showNotification("Fuzz input copied to clipboard!");
-  };
+const handleCopy = async () => {
+	const fuzzData = await $getFuzz.mutateAsync($selectedProblem);
+	await navigator.clipboard.writeText(fuzzData.data.getFuzz);
+	showNotification("Fuzz input copied to clipboard!");
+};
 
-  const windowKeyHandler = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.altKey && e.key === "Enter") {
-      e.preventDefault();
+const windowKeyHandler = (e: KeyboardEvent) => {
+	if (e.ctrlKey && e.altKey && e.key === "Enter") {
+		e.preventDefault();
 
-      if (submissionValue.length === 0 || sourceValue.length === 0) {
-        showNotification("Please fill in all fields before submitting.");
-        return;
-      }
+		if (submissionValue.length === 0 || sourceValue.length === 0) {
+			showNotification("Please fill in all fields before submitting.");
+			return;
+		}
 
-      submit($selectedProblem);
-    }
+		submit($selectedProblem);
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "c") {
-      e.preventDefault();
-      handleCopy();
-    }
+	if (e.ctrlKey && e.altKey && e.key === "c") {
+		e.preventDefault();
+		handleCopy();
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "d") {
-      e.preventDefault();
-      handleDownload();
-    }
+	if (e.ctrlKey && e.altKey && e.key === "d") {
+		e.preventDefault();
+		handleDownload();
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "s") {
-      e.preventDefault();
-      if (submissionValue.length === 0 || sourceValue.length === 0) {
-        showNotification("Please fill in all fields before submitting.");
-        return;
-      }
-      submit($selectedProblem);
-    }
+	if (e.ctrlKey && e.altKey && e.key === "s") {
+		e.preventDefault();
+		if (submissionValue.length === 0 || sourceValue.length === 0) {
+			showNotification("Please fill in all fields before submitting.");
+			return;
+		}
+		submit($selectedProblem);
+	}
 
-    if (e.ctrlKey && e.altKey && e.key === "v") {
-      e.preventDefault();
-      navigator.clipboard.readText().then((text) => {
-        submissionValue = text;
-      });
-    }
-  };
+	if (e.ctrlKey && e.altKey && e.key === "v") {
+		e.preventDefault();
+		navigator.clipboard.readText().then((text) => {
+			submissionValue = text;
+		});
+	}
+};
 </script>
 
 <svelte:window onkeydown={windowKeyHandler} />

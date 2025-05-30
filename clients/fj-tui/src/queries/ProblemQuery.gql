@@ -1,9 +1,9 @@
 query ProblemQuery($slug: String!) {
-  problem(slug: $slug) {
-    icon
-    name
-    instructions
-    difficulty
-    points
-  }
+	problem(slug: $slug) {
+		icon
+		name
+		instructions
+		difficulty
+		points
+	}
 }

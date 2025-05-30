@@ -19,7 +19,6 @@
 		"@graphql-codegen/typescript-operations": "^4.6.1",
 		"@sveltejs/vite-plugin-svelte": "5.0.3",
 		"@tsconfig/svelte": "5.0.4",
-		"@types/node": "^22.15.18",
 		"datauri": "4.1.0",
 		"graphql-request": "^7.1.2",
 		"knip": "^5.56.0",

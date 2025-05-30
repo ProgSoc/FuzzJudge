@@ -1,9 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { migrateDB } from "../db";
 import { getOrSetDefaultMeta } from "./meta.service";
-
-await migrateDB();
 
 describe("Meta Service", () => {
 	test("getOrSetDefaultMeta", async () => {

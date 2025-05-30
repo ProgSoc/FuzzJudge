@@ -1,8 +1,8 @@
 .theme-default {
 	--text-prim: #f8f8f8;
 	--text-sec: #d7d7d7;
-	--accent: #383A41;
-	--link: #8FA5E4;
+	--accent: #383a41;
+	--link: #8fa5e4;
 	--bg-prim: #27292f;
 	--bg-sec: #141519;
 	--border: #666;
@@ -14,12 +14,12 @@
 .theme-wikipedia {
 	--text-prim: black;
 	--text-sec: #333333;
-	--accent: #EAECF0;
+	--accent: #eaecf0;
 	--link: #36c;
 	--bg-prim: white;
-	--bg-sec: #F9F9F9;
-	--border: #C8CCD1;
-	--code-bg: #F8F9FA;
+	--bg-sec: #f9f9f9;
+	--border: #c8ccd1;
+	--code-bg: #f8f9fa;
 	--code-text: var(--text-prim);
 	--solved: #cef2e0;
 }
@@ -51,24 +51,23 @@
 }
 
 .theme-gruvbox-light {
-	--text-prim: #3C3836;
-	--text-sec: #3C3836;
-	--accent: #D5C4A3;
-	--link: #9B0511;
-	--bg-prim: #FBF0C9;
-	--bg-sec: #EBDAB4;
-	--border: #7C6F65;
+	--text-prim: #3c3836;
+	--text-sec: #3c3836;
+	--accent: #d5c4a3;
+	--link: #9b0511;
+	--bg-prim: #fbf0c9;
+	--bg-sec: #ebdab4;
+	--border: #7c6f65;
 	--code-bg: var(--text-prim);
 	--code-text: var(--bg-prim);
 	--solved: #98971a;
 }
 
-
 .theme-gruvbox-dark {
-	--text-prim: #ECDBB5;
-	--text-sec: #ECDBB5;
+	--text-prim: #ecdbb5;
+	--text-sec: #ecdbb5;
 	--accent: #807266;
-	--link: #84A598;
+	--link: #84a598;
 	--bg-prim: #282828;
 	--bg-sec: #353230;
 	--border: #504945;

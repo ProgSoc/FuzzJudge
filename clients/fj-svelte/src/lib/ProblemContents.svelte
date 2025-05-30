@@ -14,47 +14,47 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { onDestroy } from "svelte";
-  import SvelteMarkdown from "svelte-markdown";
-  import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
-  import SubmissionArea from "./SubmissionArea.svelte";
-  import { createQuery } from "@tanstack/svelte-query";
-  import { derived } from "svelte/store";
-  import { client } from "../gql/sdk";
+import { createQuery } from "@tanstack/svelte-query";
+import { onDestroy } from "svelte";
+import SvelteMarkdown from "svelte-markdown";
+import { derived } from "svelte/store";
+import { client } from "../gql/sdk";
+import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
+import SubmissionArea from "./SubmissionArea.svelte";
 
-  interface Props {
-    problemSlug: string;
-  }
+interface Props {
+	problemSlug: string;
+}
 
-  let { problemSlug }: Props = $props();
+let { problemSlug }: Props = $props();
 
-  // biome-ignore lint/style/useConst: svelte
-  let problemInstructions: HTMLDivElement | undefined = $state(undefined);
+// biome-ignore lint/style/useConst: svelte
+let problemInstructions: HTMLDivElement | undefined = $state(undefined);
 
-  // Reset scroll to top when a new problem is selected
-  const unsubScrollUp = selectedProblem.subscribe((slug) => {
-    if (slug === undefined) return;
+// Reset scroll to top when a new problem is selected
+const unsubScrollUp = selectedProblem.subscribe((slug) => {
+	if (slug === undefined) return;
 
-    if (problemInstructions !== undefined) {
-      problemInstructions.scrollTop = 0;
-    }
-  });
+	if (problemInstructions !== undefined) {
+		problemInstructions.scrollTop = 0;
+	}
+});
 
-  onDestroy(() => {
-    unsubScrollUp();
-  });
-  /**
-   * Solved
-   * Name
-   * Difficulty
-   * Points
-   * Body
-   */
-  const problemQuery = createQuery({
-    queryKey: ["problem", problemSlug],
-    queryFn: () => client.ProblemData({ problemSlug }),
-    select: (data) => data.data.problem,
-  });
+onDestroy(() => {
+	unsubScrollUp();
+});
+/**
+ * Solved
+ * Name
+ * Difficulty
+ * Points
+ * Body
+ */
+const problemQuery = createQuery({
+	queryKey: ["problem", problemSlug],
+	queryFn: () => client.ProblemData({ problemSlug }),
+	select: (data) => data.data.problem,
+});
 </script>
 
 <div class="problem" bind:this={problemInstructions}>

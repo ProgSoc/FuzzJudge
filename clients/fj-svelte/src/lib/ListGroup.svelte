@@ -14,11 +14,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import ProblemButton from "./ProblemButton.svelte";
-import { problemOrder } from "../utils";
-import type { ProblemsListQueryQuery } from "../gql";
 import { createQuery } from "@tanstack/svelte-query";
+import type { ProblemsListQueryQuery } from "../gql";
 import { client } from "../gql/sdk";
+import { problemOrder } from "../utils";
+import ProblemButton from "./ProblemButton.svelte";
 
 interface Props {
 	name?: string;

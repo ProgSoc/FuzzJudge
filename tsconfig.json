@@ -1,39 +1,10 @@
 {
+	"extends": "./tsconfig.base.json",
+	"files": [],
 	"compilerOptions": {
-		// Enable latest features
-		"lib": ["ESNext", "DOM"],
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleDetection": "force",
-		"jsx": "react-jsx",
-		"allowJs": true,
 		"composite": true,
-		"outDir": "dist/types",
-
-		// Bundler mode
-		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
-		"emitDeclarationOnly": true,
-		"verbatimModuleSyntax": true,
-
-		// Best practices
-		"strict": true,
-		"skipLibCheck": true,
-		"noFallthroughCasesInSwitch": true,
-
-		// Some stricter flags (disabled by default)
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"noPropertyAccessFromIndexSignature": false,
-		"declarationMap": true,
-		"declaration": true,
-		// "baseUrl": ".",
-		"paths": {
-			"@progsoc/fuzzjudge-server": ["./server/src"],
-			"@progsoc/fuzzjudge-server/*": ["./server/*"]
-		}
+		"outDir": "dist"
 	},
-	"include": ["package.json"],
 	"references": [
 		{
 			"path": "./server/tsconfig.json"
