@@ -30,7 +30,7 @@ import { resolvers } from "./schema/resolvers.generated";
 import { typeDefs } from "./schema/typeDefs.generated";
 import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
-import { resetUser } from "./services/user.service.ts";
+// import { resetUser } from "./services/user.service.ts";
 import { createClock } from "./v1/clock.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
@@ -38,7 +38,7 @@ const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
 
-await resetUser({ logn: "admin", role: "admin" }, false);
+// await resetUser({ logn: "admin", role: "admin" }, false);
 
 export const clock = await createClock(
 	competionData.times.start ?? new Date(),
