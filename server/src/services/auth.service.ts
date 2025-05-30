@@ -23,6 +23,7 @@ export async function basicAuth(
 			.from(userTable);
 
 		if (userCountData?.userCount === 0) {
+			console.log("No users found, creating the first user...");
 			// If no user exists, create a new user with the provided login and hashed password.
 			const [newUser] = await db
 				.insert(userTable)
@@ -30,6 +31,8 @@ export async function basicAuth(
 				.returning();
 
 			if (!newUser) return null;
+
+			console.log("Created user:", newUser.logn)
 
 			return newUser;
 		}
