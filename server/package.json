@@ -8,13 +8,13 @@
 		"access": "public"
 	},
 	"devDependencies": {
-		"@eddeee888/gcg-typescript-resolver-files": "^0.12.0",
-		"@graphql-codegen/cli": "^5.0.6",
+		"@eddeee888/gcg-typescript-resolver-files": "0.12.1",
+		"@graphql-codegen/cli": "5.0.6",
 		"@types/bun": "1.2.15",
 		"drizzle-kit": "0.31.1",
-		"knip": "^5.56.0",
-		"tsdown": "^0.12.5",
-		"typescript": "^5.8.3"
+		"knip": "5.59.1",
+		"tsdown": "0.12.5",
+		"typescript": "5.8.3"
 	},
 	"engines": {
 		"bun": ">=1.2.0"
@@ -22,13 +22,13 @@
 	"files": ["dist", "migrations", "README.md", "LICENSE"],
 	"dependencies": {
 		"drizzle-orm": "0.44.0",
-		"graphql": "^16.11.0",
-		"graphql-scalars": "^1.24.2",
-		"graphql-ws": "^6.0.4",
-		"graphql-yoga": "^5.13.4",
+		"graphql": "16.11.0",
+		"graphql-scalars": "1.24.2",
+		"graphql-ws": "6.0.5",
+		"graphql-yoga": "5.13.5",
 		"gray-matter": "4.0.3",
 		"hono": "4.7.10",
-		"zod": "^3.25.41"
+		"zod": "3.25.42"
 	},
 	"scripts": {
 		"build": "bun --bun tsdown",
