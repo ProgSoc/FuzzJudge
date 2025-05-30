@@ -5,14 +5,14 @@ WORKDIR /app
 # this will cache them and speed up future builds
 FROM base AS install
 RUN mkdir -p /temp/dev
-COPY package.json bun.lockb /temp/dev/
+COPY package.json bun.lock /temp/dev/
 COPY server/package.json /temp/dev/server/package.json
 RUN cd /temp/dev && bun install --filter @progsoc/fuzzjudge-server
 
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
-COPY package.json bun.lockb /temp/prod/
+COPY package.json bun.lock /temp/prod/
 COPY server/package.json /temp/prod/server/package.json
 RUN cd /temp/prod && bun install --filter @progsoc/fuzzjudge-server
 
