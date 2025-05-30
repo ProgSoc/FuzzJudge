@@ -21,7 +21,7 @@
 	},
 	"files": ["dist", "migrations", "README.md", "LICENSE"],
 	"dependencies": {
-		"drizzle-orm": "0.43.1",
+		"drizzle-orm": "0.44.0",
 		"graphql": "^16.11.0",
 		"graphql-scalars": "^1.24.2",
 		"graphql-ws": "^6.0.4",
