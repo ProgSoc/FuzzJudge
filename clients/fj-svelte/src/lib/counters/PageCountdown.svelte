@@ -14,14 +14,20 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { CompState, dateToTimeString, secondsToBinary, secondsToString, type TimeStateData } from "../../clock";
-  import { unreachable } from "../../utils";
+import {
+	CompState,
+	type TimeStateData,
+	dateToTimeString,
+	secondsToBinary,
+	secondsToString,
+} from "../../clock";
+import { unreachable } from "../../utils";
 
-  interface Props {
-    timeStateData: TimeStateData;
-  }
+interface Props {
+	timeStateData: TimeStateData;
+}
 
-  let { timeStateData }: Props = $props();
+let { timeStateData }: Props = $props();
 </script>
 
 <div class="countdown">

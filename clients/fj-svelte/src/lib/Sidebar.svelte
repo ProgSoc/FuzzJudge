@@ -15,10 +15,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <script lang="ts">
 import { createQuery } from "@tanstack/svelte-query";
+import { client } from "../gql/sdk";
 import icons from "../icons";
 import Icon from "./Icon.svelte";
 import ListGroup from "./ListGroup.svelte";
-import { client } from "../gql/sdk";
 
 let open = $state(true);
 

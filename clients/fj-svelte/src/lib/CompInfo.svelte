@@ -14,16 +14,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import SvelteMarkdown from "svelte-markdown";
-  import Loading from "./Loading.svelte";
-  import { createQuery } from "@tanstack/svelte-query";
-  import { client } from "../gql/sdk";
+import { createQuery } from "@tanstack/svelte-query";
+import SvelteMarkdown from "svelte-markdown";
+import { client } from "../gql/sdk";
+import Loading from "./Loading.svelte";
 
-  const instructionsQuery = createQuery({
-    queryKey: ["compInfo"],
-    queryFn: () => client.CompetitionData(),
-    select: ({ data }) => data,
-  });
+const instructionsQuery = createQuery({
+	queryKey: ["compInfo"],
+	queryFn: () => client.CompetitionData(),
+	select: ({ data }) => data,
+});
 </script>
 
 {#if $instructionsQuery.data === undefined}

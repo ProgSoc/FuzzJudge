@@ -1,34 +1,34 @@
 <script lang="ts">
-  import icons from "../icons";
-  import { NOTIFICATION } from "../notifications";
-  import Icon from "./Icon.svelte";
-  import { onDestroy } from "svelte";
+import { onDestroy } from "svelte";
+import icons from "../icons";
+import { NOTIFICATION } from "../notifications";
+import Icon from "./Icon.svelte";
 
-  interface Props {
-    message: string;
-    close: () => void;
-  }
+interface Props {
+	message: string;
+	close: () => void;
+}
 
-  let { message, close }: Props = $props();
+let { message, close }: Props = $props();
 
-  let opacity = $state(0);
+let opacity = $state(0);
 
-  setTimeout(() => {
-    opacity = 100;
-  }, 50);
+setTimeout(() => {
+	opacity = 100;
+}, 50);
 
-  let closeTimer = setTimeout(() => {
-    close();
-  }, 3000);
+let closeTimer = setTimeout(() => {
+	close();
+}, 3000);
 
-  let fadeOutTimer = setTimeout(() => {
-    opacity = 0;
-  }, 2500);
+let fadeOutTimer = setTimeout(() => {
+	opacity = 0;
+}, 2500);
 
-  onDestroy(() => {
-    clearTimeout(closeTimer);
-    clearTimeout(fadeOutTimer);
-  });
+onDestroy(() => {
+	clearTimeout(closeTimer);
+	clearTimeout(fadeOutTimer);
+});
 </script>
 
 <div class="notification" style={`opacity: ${opacity}%;`}>

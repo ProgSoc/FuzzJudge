@@ -23,6 +23,10 @@ export async function getOrSetDefaultMeta<T extends string | undefined>(
 			.values({ key, val: defaultValue })
 			.returning()
 			.onConflictDoNothing();
+
+		if (!defVal) {
+			return defaultValue;
+		}
 		return defVal.val as T extends undefined ? string | null : string;
 	}
 	return value?.val as T extends undefined ? string | null : string;

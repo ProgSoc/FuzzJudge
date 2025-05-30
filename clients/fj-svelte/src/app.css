@@ -36,7 +36,6 @@ button:hover {
 	border: 1px solid var(--text-sec);
 }
 
-
 #theme-container {
 	background-color: var(--bg-prim);
 	color: var(--text-prim);
@@ -44,7 +43,6 @@ button:hover {
 	width: 1vw;
 	height: 1vh;
 }
-
 
 ::-webkit-scrollbar {
 	width: 6px;
@@ -107,7 +105,8 @@ textarea {
 	font-family: monospace;
 }
 
-code, pre {
+code,
+pre {
 	font-family: monospace;
 }
 
@@ -142,7 +141,8 @@ table {
 	border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
 	border: 1px solid var(--border);
 	padding: 0.4rem;
 }

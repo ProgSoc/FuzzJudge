@@ -14,27 +14,31 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import type { IconDescriptor } from "../types";
+import type { IconDescriptor } from "../types";
 
-  interface Props {
-    icon: IconDescriptor;
-    clickAction?: (() => void) | undefined;
-    overrideWidth?: string | undefined;
-  }
+interface Props {
+	icon: IconDescriptor;
+	clickAction?: (() => void) | undefined;
+	overrideWidth?: string | undefined;
+}
 
-  let { icon, clickAction = undefined, overrideWidth = undefined }: Props = $props();
+let {
+	icon,
+	clickAction = undefined,
+	overrideWidth = undefined,
+}: Props = $props();
 
-  const width = overrideWidth ?? icon.width ?? "1.5rem";
+const width = overrideWidth ?? icon.width ?? "1.5rem";
 
-  const styles = {
-    width: width,
-    height: icon.height ?? width,
-    mask: `url(${icon.dataUri}) no-repeat center`,
-  };
+const styles = {
+	width: width,
+	height: icon.height ?? width,
+	mask: `url(${icon.dataUri}) no-repeat center`,
+};
 
-  const css = Object.entries(styles)
-    .map(([key, value]) => `${key}:${value}`)
-    .join(";");
+const css = Object.entries(styles)
+	.map(([key, value]) => `${key}:${value}`)
+	.join(";");
 </script>
 
 <span class:darken-on-hover={icon.darkenOnHover === true || clickAction !== undefined}>

@@ -11,7 +11,7 @@ export const ProblemScore: ProblemScoreResolvers = {
 			difficulty: problemData.problem.difficulty,
 			instructions: problemData.attributes.body,
 			name: problemData.attributes.title,
-			icon: problemData.attributes.icon,
+			icon: problemData.attributes.icon ?? "",
 			points: problemData.problem.points,
 			slug,
 		};

@@ -1,11 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-	blob,
-	integer,
-	real,
-	sqliteTable,
-	text,
-} from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const teamTable = sqliteTable("team", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -22,8 +16,7 @@ export const userTable = sqliteTable("user", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	team: integer("team").references(() => teamTable.id),
 	logn: text("logn").unique().notNull(),
-	salt: blob("salt", { mode: "buffer" }).notNull(),
-	hash: blob("hash"),
+	password: text("password"),
 	name: text("name"),
 	role: text("role", { enum: ["admin", "competitor"] }).notNull(),
 });

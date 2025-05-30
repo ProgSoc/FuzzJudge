@@ -14,14 +14,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { CompState, dateToTimeString, secondsToString, type TimeStateData } from "../../clock";
-  import { unreachable } from "../../utils";
+import {
+	CompState,
+	type TimeStateData,
+	dateToTimeString,
+	secondsToString,
+} from "../../clock";
+import { unreachable } from "../../utils";
 
-  interface Props {
-    timeStateData: TimeStateData;
-  }
+interface Props {
+	timeStateData: TimeStateData;
+}
 
-  let { timeStateData }: Props = $props();
+let { timeStateData }: Props = $props();
 </script>
 
 {#if timeStateData.phase === CompState.BEFORE}

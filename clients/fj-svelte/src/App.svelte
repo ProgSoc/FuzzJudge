@@ -14,9 +14,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import Client from "./lib/Client.svelte";
-import { QueryClientProvider, QueryClient } from "@tanstack/svelte-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
 import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+import Client from "./lib/Client.svelte";
 import { SETTINGS } from "./settings";
 import { Theme, themeClass } from "./themes/themes";
 

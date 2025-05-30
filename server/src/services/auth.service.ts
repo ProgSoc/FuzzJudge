@@ -6,38 +6,32 @@ export async function basicAuth(
 	logn: string,
 	password: string,
 ): Promise<User | null> {
-	const pass = new Uint8Array(
-		await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password)),
-	);
-	// const user = db.queryEntries<User>("SELECT * FROM user WHERE logn = :logn", { logn })[0] ?? null;
+	const hash = await Bun.password.hash(password);
+
+	// Check if the user exists in the database.
 	const user = await db.query.userTable.findFirst({
 		where: (table) => eq(table.logn, logn),
 	});
 
+	// If no user is found, return null.
 	if (!user) return null;
-	const hash = new Uint8Array(
-		await crypto.subtle.digest(
-			"SHA-256",
-			new Uint8Array([...pass, ...user.salt]),
-		),
-	);
+
 	// Password reset mode, overwrite with new password.
-	if (user.hash === null) {
-		// db.query("UPDATE user SET hash = :hash WHERE id = :id", { hash, id: user.id });
-		db.update(userTable)
-			.set({ hash })
+	if (user.password === null) {
+		const [newUser] = await db
+			.update(userTable)
+			.set({ password: hash })
 			.where(eq(userTable.id, user.id))
 			.returning();
-		user.hash = hash;
+
+		if (!newUser) return null;
+
+		return newUser;
 	}
-	// normal authentication flow
-	else {
-		let matches = true;
-		// SECURITY: scan full list to avoid any potential side-channel
-		for (let i = 0; i < hash.length; ++i)
-			if (hash[i] !== (user.hash as Uint8Array<ArrayBuffer>)[i])
-				matches = false;
-		if (!matches) return null;
-	}
-	return user;
+
+	// Verify the password against the stored hash.
+	const isValid = await Bun.password.verify(password, user.password);
+
+	// If the password is valid, return the user object.
+	return isValid ? user : null;
 }

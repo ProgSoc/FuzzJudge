@@ -15,7 +15,6 @@ export async function resetUser(
 		.insert(userTable)
 		.values({
 			logn: params.logn,
-			salt: Buffer.from(crypto.getRandomValues(new Uint8Array(32)).buffer),
 			role: params.role,
 		})
 		.onConflictDoUpdate({

@@ -15,6 +15,7 @@ const config: CodegenConfig = {
 			},
 			typesPluginsConfig: {
 				contextType: "@/context#GraphQLContext",
+				useTypeImports: true,
 				namingConvention: {
 					enumValues: "change-case-all#lowerCase",
 				},

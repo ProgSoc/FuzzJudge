@@ -1,10 +1,10 @@
-import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { ProblemMapper } from './problems/schema.mappers';
-import { ProblemScoreMapper, ScoreboardRowMapper } from './scoreboard/schema.mappers';
-import { SubmissionMapper } from './submissions/schema.mappers';
-import { TeamMapper } from './teams/schema.mappers';
-import { UserMapper } from './users/schema.mappers';
-import { GraphQLContext } from '@/context';
+import type { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import type { ProblemMapper } from './problems/schema.mappers';
+import type { ProblemScoreMapper, ScoreboardRowMapper } from './scoreboard/schema.mappers';
+import type { SubmissionMapper } from './submissions/schema.mappers';
+import type { TeamMapper } from './teams/schema.mappers';
+import type { UserMapper } from './users/schema.mappers';
+import type { GraphQLContext } from '@/context';
 export type Maybe<T> = T | null | undefined;
 export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

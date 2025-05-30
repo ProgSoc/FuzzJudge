@@ -14,6 +14,7 @@
 		"@types/node": "^22.15.18",
 		"drizzle-kit": "0.31.0",
 		"knip": "^5.56.0",
+		"tsdown": "^0.12.4",
 		"typescript": "^5.8.3"
 	},
 	"engines": {
@@ -27,12 +28,13 @@
 		"graphql-ws": "^6.0.4",
 		"graphql-yoga": "^5.13.4",
 		"gray-matter": "4.0.3",
-		"hono": "4.7.9"
+		"hono": "4.7.9",
+		"zod": "^3.25.41"
 	},
 	"scripts": {
-		"build:types": "bun tsc -b",
-		"build": "bun run build.ts",
-		"dev": "bun run dev.ts ../sample",
-		"knip": "knip"
+		"watch": "bun --bun tsdown --watch",
+		"build": "bun --bun tsdown",
+		"dev": "bun run src/index.ts --watch",
+		"start": "bun run dist/index.js"
 	}
 }
