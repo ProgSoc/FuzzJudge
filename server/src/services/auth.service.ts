@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "../db";
 import { type User, userTable } from "../db/schema";
 
@@ -14,7 +14,28 @@ export async function basicAuth(
 	});
 
 	// If no user is found, return null.
-	if (!user) return null;
+	if (!user) {
+		// get user count
+		const [userCountData] = await db
+			.select({
+				userCount: count(),
+			})
+			.from(userTable);
+
+		if (userCountData?.userCount === 0) {
+			// If no user exists, create a new user with the provided login and hashed password.
+			const [newUser] = await db
+				.insert(userTable)
+				.values({ logn, password: hash, role: "admin" })
+				.returning();
+
+			if (!newUser) return null;
+
+			return newUser;
+		}
+
+		return null;
+	}
 
 	// Password reset mode, overwrite with new password.
 	if (user.password === null) {
