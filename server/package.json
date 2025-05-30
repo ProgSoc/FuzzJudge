@@ -27,7 +27,7 @@
 		"graphql-ws": "^6.0.4",
 		"graphql-yoga": "^5.13.4",
 		"gray-matter": "4.0.3",
-		"hono": "4.7.9",
+		"hono": "4.7.10",
 		"zod": "^3.25.41"
 	},
 	"scripts": {
