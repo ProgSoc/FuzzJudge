@@ -11,6 +11,10 @@
 	"peerDependencies": {
 		"typescript": "5.8.3"
 	},
+	"scripts": {
+		"build": "bun run -F @progsoc/* build",
+		"start": "bun run -F @progsoc/fuzzjudge-server start"
+	},
 	"trustedDependencies": ["lefthook", "@biomejs/biome"],
 	"workspaces": ["clients/*", "server"]
 }

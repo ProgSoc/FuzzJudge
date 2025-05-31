@@ -7,18 +7,19 @@ export default defineConfig({
 	optimizeDeps: {
 		exclude: ["svelte-markdown"],
 	},
-	base: "",
+	base: "/clients/fj-svelte/",
 	plugins: [svelte(), tsconfigPaths()],
 	build: {
 		sourcemap: "inline",
+		outDir: "../../server/dist/clients/fj-svelte",
+		emptyOutDir: true,
 	},
 	server: {
 		proxy: {
-			"/api": {
-				target: "http://localhost:1989",
+			"/graphql": {
+				target: "http://localhost:1989/graphql",
 				changeOrigin: true,
 				ws: true,
-				rewrite: (path) => path.replace(/^\/api/, ""), // remove /api prefix
 			},
 		},
 	},

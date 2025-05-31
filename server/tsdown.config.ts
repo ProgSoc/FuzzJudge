@@ -10,6 +10,7 @@ export default defineConfig([
 		platform: "node",
 		external: ["bun", "bun:sqlite"],
 		sourcemap: true,
+		clean: false,
 		onSuccess: async ({ watch }, signal) => {
 			const procConfig = path.dirname(fileURLToPath(import.meta.url));
 			if (!watch) return;

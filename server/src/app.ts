@@ -116,6 +116,13 @@ for (const dir of competionData.server?.public ?? []) {
 	);
 }
 
+app.use(
+	"clients/**/*",
+	serveStatic({
+		root: import.meta.dir,
+	}),
+);
+
 app.use(logger());
 
 export default app;

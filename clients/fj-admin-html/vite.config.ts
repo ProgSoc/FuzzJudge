@@ -1,13 +1,17 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
+	base: "/clients/fj-admin-html/",
+	build: {
+		outDir: "../../server/dist/clients/fj-admin-html",
+		emptyOutDir: true,
+	},
 	server: {
 		proxy: {
-			"/api": {
-				target: "http://localhost:1989",
+			"/graphql": {
+				target: "http://localhost:1989/graphql",
 				changeOrigin: true,
 				ws: true,
-				rewrite: (path) => path.replace(/^\/api/, ""), // remove /api prefix
 			},
 		},
 	},
