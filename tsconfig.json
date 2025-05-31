@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "./clients/fj-svelte/tsconfig.json"
+		},
+		{
+			"path": "./clients/fj-admin-html/tsconfig.json"
 		}
 	]
 }

@@ -12,7 +12,8 @@
 			"./node_modules",
 			"./server/dist",
 			"./server/**/*.generated.ts",
-			"./clients/fj-svelte/src/gql/index.ts"
+			"./clients/fj-svelte/src/gql/index.ts",
+			"./clients/fj-admin-html/src/gql/index.ts"
 		]
 	},
 	"formatter": {
@@ -50,6 +51,16 @@
 				"rules": {
 					"style": {
 						"useConst": "off"
+					}
+				}
+			}
+		},
+		{
+			"include": ["./clients/fj-admin-html/src/**/*.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noNonNullAssertion": "off"
 					}
 				}
 			}

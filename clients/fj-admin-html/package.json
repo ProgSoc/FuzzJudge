@@ -1,0 +1,25 @@
+{
+	"name": "fj-admin-html",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview",
+		"codegen": "graphql-codegen --config codegen.ts"
+	},
+	"devDependencies": {
+		"@graphql-codegen/cli": "^5.0.6",
+		"@graphql-codegen/typescript": "^4.1.6",
+		"@graphql-codegen/typescript-graphql-request": "^6.3.0",
+		"@graphql-codegen/typescript-operations": "^4.6.1",
+		"typescript": "~5.8.3",
+		"vite": "^6.3.5"
+	},
+	"dependencies": {
+		"graphql": "^16.11.0",
+		"graphql-request": "^7.2.0",
+		"graphql-scalars": "^1.24.2"
+	}
+}

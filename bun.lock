@@ -13,6 +13,23 @@
         "typescript": "5.8.3",
       },
     },
+    "clients/fj-admin-html": {
+      "name": "fj-admin-html",
+      "version": "0.0.0",
+      "dependencies": {
+        "graphql": "^16.11.0",
+        "graphql-request": "^7.2.0",
+        "graphql-scalars": "^1.24.2",
+      },
+      "devDependencies": {
+        "@graphql-codegen/cli": "^5.0.6",
+        "@graphql-codegen/typescript": "^4.1.6",
+        "@graphql-codegen/typescript-graphql-request": "^6.3.0",
+        "@graphql-codegen/typescript-operations": "^4.6.1",
+        "typescript": "~5.8.3",
+        "vite": "^6.3.5",
+      },
+    },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
       "version": "0.0.1",
@@ -43,7 +60,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "bin": "dist/index.js",
       "dependencies": {
         "drizzle-orm": "0.44.0",
@@ -724,6 +741,8 @@
     "fill-range": ["fill-range@7.1.1", "", { "dependencies": { "to-regex-range": "^5.0.1" } }, "sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg=="],
 
     "find-up": ["find-up@4.1.0", "", { "dependencies": { "locate-path": "^5.0.0", "path-exists": "^4.0.0" } }, "sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw=="],
+
+    "fj-admin-html": ["fj-admin-html@workspace:clients/fj-admin-html"],
 
     "formatly": ["formatly@0.2.3", "", { "dependencies": { "fd-package-json": "^1.2.0" }, "bin": { "formatly": "bin/index.mjs" } }, "sha512-WH01vbXEjh9L3bqn5V620xUAWs32CmK4IzWRRY6ep5zpa/mrisL4d9+pRVuETORVDTQw8OycSO1WC68PL51RaA=="],
 
