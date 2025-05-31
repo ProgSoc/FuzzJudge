@@ -1,3 +1,7 @@
+directive @auth(roles: [UserRole!] = [COMPETITOR, ADMIN]) on ENUM_VALUE | FIELD_DEFINITION
+
+directive @clock on FIELD_DEFINITION
+
 type Clock {
   finish: DateTime!
   hold: DateTime

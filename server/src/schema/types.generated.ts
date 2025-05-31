@@ -380,6 +380,16 @@ export type ResolversParentTypes = {
   User: UserMapper;
 };
 
+export type AuthDirectiveArgs = {
+  roles?: Maybe<Array<UserRole>>;
+};
+
+export type AuthDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type ClockDirectiveArgs = { };
+
+export type ClockDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = ClockDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
 export type ClockResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Clock'] = ResolversParentTypes['Clock']> = {
   finish?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   hold?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
@@ -538,3 +548,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   UserRole?: UserRoleResolvers;
 };
 
+export type DirectiveResolvers<ContextType = GraphQLContext> = {
+  auth?: AuthDirectiveResolver<any, any, ContextType>;
+  clock?: ClockDirectiveResolver<any, any, ContextType>;
+};

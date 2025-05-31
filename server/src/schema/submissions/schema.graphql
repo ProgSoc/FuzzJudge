@@ -1,6 +1,7 @@
 extend type Query {
 	submissions(teamId: Int, problemSlug: String): [Submission!]!
-	submission(id: Int!): Submission
+		@auth(roles: [ADMIN])
+	submission(id: Int!): Submission @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

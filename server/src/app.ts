@@ -37,12 +37,74 @@ const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
 
+import { MapperKind, getDirective, mapSchema } from "@graphql-tools/utils";
+import { type GraphQLSchema, defaultFieldResolver } from "graphql";
+import type { GraphQLContext } from "./context.ts";
+import type { UserRole } from "./schema/types.generated.ts";
+
+type AuthDirectiveOptionsType =
+	| {
+			roles: UserRole[];
+	  }
+	| undefined;
+
+function authDirective(
+	directiveName: string,
+): (schema: GraphQLSchema) => GraphQLSchema {
+	return (schema) =>
+		mapSchema(schema, {
+			[MapperKind.OBJECT_FIELD]: (fieldConfig) => {
+				const authDirective = getDirective(
+					schema,
+					fieldConfig,
+					directiveName,
+				)?.[0] as AuthDirectiveOptionsType;
+				if (authDirective) {
+					const { resolve = defaultFieldResolver } = fieldConfig;
+					return {
+						...fieldConfig,
+						resolve: async (source, args, context: GraphQLContext, info) => {
+							console.log(`Auth directive applied to field: ${info.fieldName}`);
+							console.log(authDirective.roles);
+							const result = await resolve(source, args, context, info);
+							return result;
+						},
+					};
+				}
+			},
+			[MapperKind.ENUM_VALUE](enumValueConfig) {
+				const authDirective = getDirective(
+					schema,
+					enumValueConfig,
+					directiveName,
+				)?.[0] as AuthDirectiveOptionsType;
+				if (authDirective) {
+					console.log(authDirective.roles);
+					console.log(
+						`Auth directive applied to enum value: ${enumValueConfig.value}`,
+					);
+				}
+
+				return enumValueConfig;
+			},
+		});
+}
+
 export const clock = await createClock(
 	competionData.times.start ?? new Date(),
 	competionData.times.finish ?? new Date(Date.now() + 180 * 60 * 1000), // 3 hrs
 );
 
-const schema = createSchema({ typeDefs, resolvers });
+const directives = [authDirective("auth")];
+
+let schema = createSchema({
+	typeDefs,
+	resolvers,
+});
+schema = directives.reduce(
+	(curSchema, directive) => directive(curSchema),
+	schema,
+);
 
 const graphqlWsMiddleware = makeWebsocketGraphQLMiddleware({
 	upgradeWebSocket,

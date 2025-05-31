@@ -22,3 +22,7 @@ type User {
 	team: Team
 	logn: String!
 }
+
+directive @auth(
+	roles: [UserRole!] = [COMPETITOR, ADMIN]
+) on FIELD_DEFINITION | ENUM_VALUE
