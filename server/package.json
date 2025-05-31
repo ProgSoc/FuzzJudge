@@ -15,7 +15,7 @@
 		"knip": "5.59.1",
 		"tsdown": "0.12.5",
 		"typescript": "5.8.3",
-		"drizzle-orm": "0.44.0",
+		"drizzle-orm": "0.44.1",
 		"graphql": "16.11.0",
 		"graphql-scalars": "1.24.2",
 		"graphql-ws": "6.0.5",
