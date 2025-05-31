@@ -15,11 +15,10 @@
 		"@graphql-codegen/typescript-graphql-request": "^6.3.0",
 		"@graphql-codegen/typescript-operations": "^4.6.1",
 		"typescript": "~5.8.3",
-		"vite": "^6.3.5"
-	},
-	"dependencies": {
+		"vite": "^6.3.5",
 		"graphql": "^16.11.0",
 		"graphql-request": "^7.2.0",
 		"graphql-scalars": "^1.24.2"
-	}
+	},
+	"dependencies": {}
 }

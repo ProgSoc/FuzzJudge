@@ -1,38 +1,11 @@
 services:
-  router:
-    image: traefik:v3
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "80:80"
-      - "443:443"
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
   server:
-    build: 
+    build:
       context: .
-      dockerfile: Dockerfile.server
-      args:
-        - BASE_PATH=/api
-    volumes:
-      - ./sample:/competition
+      dockerfile: Dockerfile
     ports:
-      - "1989:1989"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=Host(`localhost`) && PathPrefix(`/api`)"
-      - "traefik.http.services.server.loadbalancer.server.port=1989"
-  fj-svelte:
-    build: 
-      context: .
-      dockerfile: Dockerfile.frontend
-      args:
-        - VITE_BACKEND_URL=http://localhost/api/graphql
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fj-svelte.rule=Host(`localhost`)"
-      - "traefik.http.services.fj-svelte.loadbalancer.server.port=80"
-  
+      - 1989:1989
+    environment:
+      - COMPETITION_PATH=/app/competition
+    volumes:
+      - ./sample:/app/competition
