@@ -33,7 +33,7 @@ jobs:
       # run any `bun` or `bunx` command
       - run: bun install
       - name: Build JS
-        run: bun run --filter @progsoc/fuzzjudge-server build
+        run: bun run -F @progsoc/* build
       - run: cd server && bun publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
