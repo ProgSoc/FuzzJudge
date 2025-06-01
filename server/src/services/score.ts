@@ -134,8 +134,14 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 	 * Sort the teams by score
 	 * The teams are sorted by points, then by penalty
 	 */
-	const scoreboard = teamScore.map(
-		({ points, penalty, problems, teamId }, index) => ({
+	const scoreboard = teamScore
+		.sort((teamA, teamB) => {
+			if (teamB.points !== teamA.points) {
+				return teamB.points - teamA.points; // Sort by points descending
+			}
+			return teamA.penalty - teamB.penalty; // If points are equal, sort by penalty ascending
+		})
+		.map(({ points, penalty, problems, teamId }, index) => ({
 			/** Rank of the team */
 			rank: index + 1,
 			/** Team Name */
@@ -146,8 +152,7 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 			penalty,
 			/** Problem Score Breakdown */
 			problems,
-		}),
-	);
+		}));
 
 	return scoreboard;
 }
