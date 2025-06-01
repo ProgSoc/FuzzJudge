@@ -12,8 +12,8 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -31,6 +31,13 @@ export type Clock = {
   hold?: Maybe<Scalars['DateTime']['output']>;
   start: Scalars['DateTime']['output'];
 };
+
+export type ClockStatus =
+  | 'after'
+  | 'before'
+  | 'freeze'
+  | 'hold'
+  | 'running';
 
 export type Competition = {
   __typename?: 'Competition';
@@ -334,6 +341,7 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Clock: ResolverTypeWrapper<Clock>;
+  ClockStatus: ResolverTypeWrapper<'before' | 'after' | 'hold' | 'freeze' | 'running'>;
   Competition: ResolverTypeWrapper<Competition>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
@@ -386,7 +394,9 @@ export type AuthDirectiveArgs = {
 
 export type AuthDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type ClockDirectiveArgs = { };
+export type ClockDirectiveArgs = {
+  disallowedStatus?: Array<ClockStatus>;
+};
 
 export type ClockDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = ClockDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
@@ -396,6 +406,8 @@ export type ClockResolvers<ContextType = GraphQLContext, ParentType extends Reso
   start?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export type ClockStatusResolvers = EnumResolverSignature<{ after?: any, before?: any, freeze?: any, hold?: any, running?: any }, ResolversTypes['ClockStatus']>;
 
 export type CompetitionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Competition'] = ResolversParentTypes['Competition']> = {
   brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -530,6 +542,7 @@ export type UserRoleResolvers = EnumResolverSignature<{ admin?: any, competitor?
 
 export type Resolvers<ContextType = GraphQLContext> = {
   Clock?: ClockResolvers<ContextType>;
+  ClockStatus?: ClockStatusResolvers;
   Competition?: CompetitionResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   File?: GraphQLScalarType;

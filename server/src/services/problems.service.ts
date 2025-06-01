@@ -1,8 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { TOML } from "bun";
-import matter from "gray-matter";
-import { HTTPException } from "hono/http-exception";
+import { readMarkdown } from "@/lib/writeMd";
 import { z } from "zod";
 
 const problemSpec = z.object({
@@ -44,32 +42,14 @@ type FuzzJudgeProblemMessage = {
 };
 
 export async function getProblemData(root: string, slug: string) {
-	const problemFile = await Bun.file(path.join(root, slug, "prob.md"));
+	const probPath = path.join(root, slug, "prob.md");
 
-	if (!problemFile.exists()) {
-		throw new HTTPException(404, {
-			message: `Problem ${slug} not found`,
-		});
-	}
-
-	const problemFileContent = await problemFile.text();
-
-	const { data, content } = matter(problemFileContent, {
-		engines: {
-			toml: TOML.parse,
-		},
-	});
-
-	const problemData = await problemSpec.safeParseAsync(data);
-
-	if (!problemData.success) {
-		throw new Error(`Problem data validation failed: ${problemData.error}`);
-	}
+	const { content, frontmatter } = await readMarkdown(probPath, problemSpec);
 
 	const attributes = parseMarkdownAttributes(content);
 
 	return {
-		...problemData.data,
+		...frontmatter,
 		attributes,
 		slug,
 		content,

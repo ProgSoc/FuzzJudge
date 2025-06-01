@@ -15,4 +15,14 @@ type Clock {
 	hold: DateTime
 }
 
-directive @clock on FIELD_DEFINITION
+enum ClockStatus {
+	before
+	after
+	hold
+	freeze
+	running
+}
+
+directive @clock(
+	disallowedStatus: [ClockStatus!]! = [before, after, freeze, hold]
+) on FIELD_DEFINITION

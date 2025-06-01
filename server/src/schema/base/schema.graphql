@@ -8,7 +8,7 @@ scalar File
 directive @deprecated(reason: String) on FIELD_DEFINITION | ENUM_VALUE
 
 extend type Query {
-	version: String!
+	version: String! @clock
 
-	header: String!
+	header: String! @clock
 }

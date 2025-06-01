@@ -1,5 +1,5 @@
-import { clock as compClock } from "@/app";
 import { pubSub } from "@/pubsub";
+import { now } from "@/v1/clock";
 import type {
 	ResolversTypes,
 	SubscriptionResolvers,
@@ -7,7 +7,7 @@ import type {
 
 export const clock: NonNullable<SubscriptionResolvers["clock"]> = {
 	subscribe: async function* (_parent, _arg, _ctx) {
-		yield compClock.now();
+		yield now();
 
 		const clockSub = pubSub.subscribe("clock");
 

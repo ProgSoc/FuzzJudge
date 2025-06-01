@@ -28,7 +28,6 @@ import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middlewar
 import { resolvers } from "./schema/resolvers.generated";
 import { typeDefs } from "./schema/typeDefs.generated";
 import { getCompetitionData } from "./services/competition.service.ts";
-import { createClock } from "./v1/clock.ts";
 import { upgradeWebSocket } from "./websocket.ts";
 
 const root = competitionRoot;
@@ -38,11 +37,6 @@ import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers.
 import { directiveResolvers } from "./directives/directiveResolvers.ts";
 import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
 import { basicAuth } from "./services/auth.service.ts";
-
-export const clock = await createClock(
-	competionData.times.start ?? new Date(),
-	competionData.times.finish ?? new Date(Date.now() + 180 * 60 * 1000), // 3 hrs
-);
 
 const schema = attachDirectiveResolvers(
 	createSchema({
