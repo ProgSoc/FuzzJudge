@@ -5,6 +5,7 @@ export const teamTable = sqliteTable("team", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	seed: text("seed").notNull(),
 	name: text("name").notNull(),
+	hidden: integer("hidden", { mode: "boolean" }).notNull().default(false),
 });
 
 export const teamTableRelations = relations(teamTable, ({ many }) => ({

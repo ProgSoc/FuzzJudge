@@ -28,6 +28,7 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 
 	// for each team, get the submissions grouped by problem
 	const teamsAndSubmissions = await db.query.teamTable.findMany({
+		where: (teamTable, { eq }) => eq(teamTable.hidden, false), // Only include visible teams
 		columns: {
 			id: true,
 			name: true,

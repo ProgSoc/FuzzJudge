@@ -59,8 +59,9 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 		});
 
 		console.log(`✅ Problem ${submission.id} solved by ${user.name}`);
-
-		pubSub.publish("scoreboard", await calculateScoreboard());
+		if (!userTeam.hidden) {
+			pubSub.publish("scoreboard", await calculateScoreboard());
+		}
 
 		return {
 			__typename: "JudgeSuccessOutput",

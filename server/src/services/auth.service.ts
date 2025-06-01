@@ -29,7 +29,7 @@ export async function basicAuth(
 				.join("");
 			const [newTeam] = await db
 				.insert(teamTable)
-				.values({ name: "Default Team", seed })
+				.values({ name: "Admin Team", seed, hidden: true })
 				.returning();
 
 			if (!newTeam) {
