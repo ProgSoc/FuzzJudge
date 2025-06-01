@@ -19,5 +19,5 @@ type Submission @auth(role: admin) {
 	ok: Boolean
 	vler: String
 	vlms: Float
-	team: Team!
+	team: Team! @auth
 }

@@ -9,10 +9,11 @@
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
+		"allowImportingTsExtensions": false,
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
 		"noEmit": true,
+		"outDir": "./node_modules/.tmp/main",
 
 		/* Linting */
 		"strict": true,

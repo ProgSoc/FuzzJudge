@@ -508,7 +508,7 @@ export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends
   ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   out?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   problemSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  team?: Resolver<ResolversTypes['Team'], ParentType, ContextType>;
+  team?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>>;
   teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   vler?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
