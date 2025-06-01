@@ -12,7 +12,7 @@ export const Team: TeamResolvers = {
 
 		return members.map((user) => ({
 			id: user.id,
-			role: (user.role.toUpperCase() as "COMPETITOR" | "ADMIN") ?? undefined,
+			role: user.role,
 			teamId: user.team ?? undefined,
 			logn: user.logn ?? undefined,
 		}));

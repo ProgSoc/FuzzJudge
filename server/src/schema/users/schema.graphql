@@ -11,8 +11,8 @@ extend type Mutation {
 }
 
 enum UserRole {
-	COMPETITOR
-	ADMIN
+	competitor
+	admin
 }
 
 type User {
@@ -23,6 +23,4 @@ type User {
 	logn: String!
 }
 
-directive @auth(
-	roles: [UserRole!] = [COMPETITOR, ADMIN]
-) on FIELD_DEFINITION | ENUM_VALUE
+directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT

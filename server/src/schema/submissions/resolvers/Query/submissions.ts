@@ -1,14 +1,12 @@
 import { db } from "@/db";
 import { submissionTable } from "@/db/schema";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { type SQL, eq } from "drizzle-orm";
 import type { QueryResolvers } from "./../../../types.generated";
 export const submissions: NonNullable<QueryResolvers["submissions"]> = async (
 	_parent,
 	{ teamId, problemSlug },
-	{ c },
+	{ user },
 ) => {
-	await ensureRole(c, ["admin"]);
 	const conditions: SQL[] = [];
 
 	if (teamId) {

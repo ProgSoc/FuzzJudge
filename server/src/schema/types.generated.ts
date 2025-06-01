@@ -4,7 +4,7 @@ import type { ProblemScoreMapper, ScoreboardRowMapper } from './scoreboard/schem
 import type { SubmissionMapper } from './submissions/schema.mappers';
 import type { TeamMapper } from './teams/schema.mappers';
 import type { UserMapper } from './users/schema.mappers';
-import type { GraphQLContext } from '@/context';
+import type { GraphQLContext, AuthenticatedContext } from '@/context';
 export type Maybe<T> = T | null | undefined;
 export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -255,8 +255,8 @@ export type User = {
 };
 
 export type UserRole =
-  | 'ADMIN'
-  | 'COMPETITOR';
+  | 'admin'
+  | 'competitor';
 
 
 
@@ -353,7 +353,7 @@ export type ResolversTypes = {
   Subscription: ResolverTypeWrapper<{}>;
   Team: ResolverTypeWrapper<TeamMapper>;
   User: ResolverTypeWrapper<UserMapper>;
-  UserRole: ResolverTypeWrapper<'COMPETITOR' | 'ADMIN'>;
+  UserRole: ResolverTypeWrapper<'competitor' | 'admin'>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -381,7 +381,7 @@ export type ResolversParentTypes = {
 };
 
 export type AuthDirectiveArgs = {
-  roles?: Maybe<Array<UserRole>>;
+  role?: Maybe<UserRole>;
 };
 
 export type AuthDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
@@ -437,7 +437,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   getFuzz?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationGetFuzzArgs, 'slug'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, ContextType, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
-  overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, ContextType, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
+  overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
   releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, Partial<MutationReleaseClockArgs>>;
   updateTeam?: Resolver<ResolversTypes['Team'], ParentType, ContextType, RequireFields<MutationUpdateTeamArgs, 'id' | 'name'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
@@ -471,8 +471,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   problem?: Resolver<ResolversTypes['Problem'], ParentType, ContextType, RequireFields<QueryProblemArgs, 'slug'>>;
   problems?: Resolver<Array<ResolversTypes['Problem']>, ParentType, ContextType>;
-  submission?: Resolver<Maybe<ResolversTypes['Submission']>, ParentType, ContextType, RequireFields<QuerySubmissionArgs, 'id'>>;
-  submissions?: Resolver<Array<ResolversTypes['Submission']>, ParentType, ContextType, Partial<QuerySubmissionsArgs>>;
+  submission?: Resolver<Maybe<ResolversTypes['Submission']>, ParentType, AuthenticatedContext<ContextType>, RequireFields<QuerySubmissionArgs, 'id'>>;
+  submissions?: Resolver<Array<ResolversTypes['Submission']>, ParentType, AuthenticatedContext<ContextType>, Partial<QuerySubmissionsArgs>>;
   team?: Resolver<ResolversTypes['Team'], ParentType, ContextType, RequireFields<QueryTeamArgs, 'id'>>;
   teams?: Resolver<Array<ResolversTypes['Team']>, ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
@@ -496,7 +496,7 @@ export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends
   ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   out?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   problemSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  team?: Resolver<ResolversTypes['Team'], ParentType, ContextType>;
+  team?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>>;
   teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   vler?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -526,7 +526,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type UserRoleResolvers = EnumResolverSignature<{ ADMIN?: any, COMPETITOR?: any }, ResolversTypes['UserRole']>;
+export type UserRoleResolvers = EnumResolverSignature<{ admin?: any, competitor?: any }, ResolversTypes['UserRole']>;
 
 export type Resolvers<ContextType = GraphQLContext> = {
   Clock?: ClockResolvers<ContextType>;

@@ -30,4 +30,8 @@ export const User: UserResolvers = {
 
 		return team;
 	},
+	role: ({ role }, _arg, _ctx) => {
+		/* User.role resolver is required because User.role and UserMapper.role are not compatible */
+		return role;
+	},
 };

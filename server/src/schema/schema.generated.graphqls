@@ -1,4 +1,4 @@
-directive @auth(roles: [UserRole!] = [COMPETITOR, ADMIN]) on ENUM_VALUE | FIELD_DEFINITION
+directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT
 
 directive @clock on FIELD_DEFINITION
 
@@ -123,6 +123,6 @@ type User {
 }
 
 enum UserRole {
-  ADMIN
-  COMPETITOR
+  admin
+  competitor
 }

@@ -10,7 +10,7 @@ export const users: NonNullable<QueryResolvers["users"]> = async (
 	const users = await db.query.userTable.findMany();
 	return users.map((user) => ({
 		id: user.id,
-		role: (user.role.toUpperCase() as "ADMIN" | "COMPETITOR") ?? undefined,
+		role: user.role,
 		teamId: user.team ?? undefined,
 		logn: user.logn ?? undefined,
 	}));

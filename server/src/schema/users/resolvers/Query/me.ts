@@ -9,7 +9,7 @@ export const me: NonNullable<QueryResolvers["me"]> = async (
 
 	return {
 		id: user.id,
-		role: (user.role.toUpperCase() as "ADMIN" | "COMPETITOR") ?? undefined,
+		role: user.role,
 		teamId: user.team ?? undefined,
 		logn: user.logn ?? undefined,
 	};

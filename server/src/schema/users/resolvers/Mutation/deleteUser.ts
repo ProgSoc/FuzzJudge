@@ -22,8 +22,7 @@ export const deleteUser: NonNullable<MutationResolvers["deleteUser"]> = async (
 
 	return {
 		id: deletedUser.id,
-		role:
-			(deletedUser.role.toUpperCase() as "ADMIN" | "COMPETITOR") ?? undefined,
+		role: deletedUser.role,
 		teamId: deletedUser.team ?? undefined,
 		logn: deletedUser.logn ?? undefined,
 	};

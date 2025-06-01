@@ -16,6 +16,7 @@ const config: CodegenConfig = {
 			typesPluginsConfig: {
 				contextType: "@/context#GraphQLContext",
 				useTypeImports: true,
+				directiveContextTypes: ["auth#@/context#AuthenticatedContext"],
 				namingConvention: {
 					enumValues: "change-case-all#lowerCase",
 				},

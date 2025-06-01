@@ -25,7 +25,7 @@ export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
 
 	return {
 		id: newUser.id,
-		role: (newUser.role.toUpperCase() as "ADMIN" | "COMPETITOR") ?? undefined,
+		role: newUser.role,
 		teamId: newUser.team ?? undefined,
 		logn: newUser.logn ?? undefined,
 	};

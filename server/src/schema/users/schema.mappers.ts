@@ -1,6 +1,6 @@
 export interface UserMapper {
 	id: number;
 	teamId?: number;
-	role: "ADMIN" | "COMPETITOR";
+	role: "admin" | "competitor";
 	logn: string;
 }
