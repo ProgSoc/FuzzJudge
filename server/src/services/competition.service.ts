@@ -1,6 +1,6 @@
 import path from "node:path";
-import { readMarkdown } from "@/lib/writeMd";
 import { z } from "zod";
+import { readMarkdown } from "../lib/writeMd";
 import { parseMarkdownAttributes } from "./problems.service";
 
 export const competitionSpec = z.object({
