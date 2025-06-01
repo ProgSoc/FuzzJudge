@@ -1,6 +1,5 @@
 import { db } from "@/db";
 import { userTable } from "@/db/schema";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
@@ -8,8 +7,6 @@ export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
 	{ role, teamId, logn },
 	{ c },
 ) => {
-	await ensureRole(c, ["admin"]);
-
 	const [newUser] = await db
 		.insert(userTable)
 		.values({

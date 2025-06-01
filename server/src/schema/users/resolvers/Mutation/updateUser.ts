@@ -1,6 +1,5 @@
 import { db } from "@/db";
 import { userTable } from "@/db/schema";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { eq } from "drizzle-orm";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
@@ -9,8 +8,6 @@ export const updateUser: NonNullable<MutationResolvers["updateUser"]> = async (
 	{ id, role, teamId },
 	{ c },
 ) => {
-	await ensureRole(c, ["admin"]);
-
 	const [updatedUser] = await db
 		.update(userTable)
 		.set({

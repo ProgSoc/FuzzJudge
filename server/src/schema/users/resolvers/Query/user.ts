@@ -1,15 +1,12 @@
 import { db } from "@/db";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { GraphQLError } from "graphql";
 import type { QueryResolvers } from "./../../../types.generated";
 export const user: NonNullable<QueryResolvers["user"]> = async (
 	_parent,
 	{ id },
-	{ c },
+	{ c, user: authedUser },
 ) => {
-	const user = await ensureRole(c);
-
-	if (user.id !== id && user.role !== "admin") {
+	if (authedUser.id !== id && authedUser.role !== "admin") {
 		throw new GraphQLError("You are not authorized to view this user");
 	}
 
@@ -23,7 +20,7 @@ export const user: NonNullable<QueryResolvers["user"]> = async (
 
 	return {
 		id: userData.id,
-		role: (userData.role.toUpperCase() as "ADMIN" | "COMPETITOR") ?? undefined,
+		role: userData.role,
 		teamId: userData.team ?? undefined,
 		logn: userData.logn ?? undefined,
 	};

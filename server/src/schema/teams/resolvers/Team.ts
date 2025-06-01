@@ -1,11 +1,8 @@
 import { db } from "@/db";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import type { TeamResolvers } from "./../../types.generated";
 export const Team: TeamResolvers = {
 	/* Implement Team resolver logic here */
 	members: async ({ id: teamId }, _arg, { c }) => {
-		await ensureRole(c, ["admin"]);
-
 		const members = await db.query.userTable.findMany({
 			where: (userTable, { eq }) => eq(userTable.team, teamId),
 		});
@@ -18,8 +15,6 @@ export const Team: TeamResolvers = {
 		}));
 	},
 	submissions: async ({ id }, _arg, { c }) => {
-		await ensureRole(c, ["admin"]);
-
 		const submission = await db.query.submissionTable.findMany({
 			where: (submissionTable, { eq }) => eq(submissionTable.team, id),
 		});

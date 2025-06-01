@@ -1,5 +1,4 @@
 import { db } from "@/db";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { GraphQLError } from "graphql";
 import type { QueryResolvers } from "./../../../types.generated";
 export const submission: NonNullable<QueryResolvers["submission"]> = async (
@@ -7,8 +6,6 @@ export const submission: NonNullable<QueryResolvers["submission"]> = async (
 	{ id },
 	{ c },
 ) => {
-	await ensureRole(c, ["admin"]);
-
 	const rawSubmission = await db.query.submissionTable.findFirst({
 		where: (submissionTable, { eq }) => eq(submissionTable.id, id),
 	});

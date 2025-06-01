@@ -24,11 +24,9 @@ import { logger } from "hono/logger";
 import { competitionRoot } from "./config.ts";
 
 import { Hono } from "hono";
-import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
 import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware.ts";
 import { resolvers } from "./schema/resolvers.generated";
 import { typeDefs } from "./schema/typeDefs.generated";
-import { basicAuth } from "./services/auth.service.ts";
 import { getCompetitionData } from "./services/competition.service.ts";
 import { createClock } from "./v1/clock.ts";
 import { upgradeWebSocket } from "./websocket.ts";
@@ -79,10 +77,6 @@ app.on(
 	["GET", "POST"],
 	// GraphQL endpoint
 	yoga.graphqlEndpoint,
-	// GraphQL Auth to get the user from basic auth
-	graphqlAuthMiddleware({
-		verifyUser: basicAuth,
-	}),
 	// GraphQL WebSocket upgrade if the request is a WebSocket
 	graphqlWsMiddleware,
 	// GraphQL Yoga server

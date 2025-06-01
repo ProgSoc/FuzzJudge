@@ -1,6 +1,5 @@
 import { competitionRoot } from "@/config";
 import { db } from "@/db";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { getProblemData, judgeProblem } from "@/services/problems.service";
 import { postSubmission, solved } from "@/services/submission.service";
 import { GraphQLError } from "graphql";
@@ -8,10 +7,8 @@ import type { MutationResolvers } from "./../../../types.generated";
 export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	_parent,
 	{ code, output, slug },
-	{ c },
+	{ user },
 ) => {
-	const user = await ensureRole(c);
-
 	const { team: teamId } = user;
 
 	if (!teamId) {

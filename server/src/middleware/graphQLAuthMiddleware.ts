@@ -1,4 +1,3 @@
-import type { GraphQLContext } from "@/context";
 import type { User } from "@/db/schema";
 import { GraphQLError } from "graphql";
 import { createMiddleware } from "hono/factory";
@@ -50,23 +49,3 @@ const forceAuth = () =>
 			},
 		},
 	});
-
-export const ensureRole = (c: GraphQLContext["c"], roles?: User["role"][]) => {
-	const { user } = c.var;
-
-	if (!user) {
-		throw forceAuth();
-	}
-
-	if (!roles?.length || roles.includes(user.role)) {
-		return user;
-	}
-
-	throw new GraphQLError("Forbidden", {
-		extensions: {
-			http: {
-				status: 403,
-			},
-		},
-	});
-};

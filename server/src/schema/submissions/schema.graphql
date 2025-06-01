@@ -9,7 +9,7 @@ extend type Mutation {
 		@auth(role: admin)
 }
 
-type Submission {
+type Submission @role(role: admin) {
 	id: Int!
 	teamId: Int!
 	problemSlug: String!
@@ -19,5 +19,5 @@ type Submission {
 	ok: Boolean
 	vler: String
 	vlms: Float
-	team: Team! @auth
+	team: Team!
 }
