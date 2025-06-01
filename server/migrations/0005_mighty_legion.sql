@@ -1,0 +1,1 @@
+ALTER TABLE `team` ADD `hidden` integer DEFAULT false NOT NULL;
