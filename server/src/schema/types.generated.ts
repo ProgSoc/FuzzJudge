@@ -134,8 +134,9 @@ export type MutationReleaseClockArgs = {
 
 
 export type MutationUpdateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['Int']['input'];
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -241,9 +242,11 @@ export type Subscription = {
 
 export type Team = {
   __typename?: 'Team';
+  hidden: Scalars['Boolean']['output'];
   id: Scalars['Int']['output'];
   members: Array<User>;
   name: Scalars['String']['output'];
+  seed: Scalars['String']['output'];
   submissions: Array<Submission>;
 };
 
@@ -451,7 +454,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
   overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
   releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, Partial<MutationReleaseClockArgs>>;
-  updateTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateTeamArgs, 'id' | 'name'>>;
+  updateTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateTeamArgs, 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateUserArgs, 'id'>>;
 };
 
@@ -522,9 +525,11 @@ export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType exten
 };
 
 export type TeamResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Team'] = ResolversParentTypes['Team']> = {
+  hidden?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  seed?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>>;
   submissions?: Resolver<Array<ResolversTypes['Submission']>, ParentType, AuthenticatedContext<ContextType>, Partial<TeamSubmissionsArgs>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

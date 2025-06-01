@@ -13,6 +13,8 @@ export const Submission: SubmissionResolvers = {
 			columns: {
 				id: true,
 				name: true,
+				hidden: true, // Include hidden field if needed
+				seed: true, // Include seed if needed
 			},
 		});
 

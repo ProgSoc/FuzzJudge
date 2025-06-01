@@ -21,5 +21,6 @@ export const deleteTeam: NonNullable<MutationResolvers["deleteTeam"]> = async (
 		id: deletedTeam.id,
 		name: deletedTeam.name,
 		seed: deletedTeam.seed,
+		hidden: deletedTeam.hidden,
 	};
 };

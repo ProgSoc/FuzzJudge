@@ -9,6 +9,8 @@ export const teams: NonNullable<QueryResolvers["teams"]> = async (
 		columns: {
 			id: true,
 			name: true,
+			hidden: true,
+			seed: true, // Include seed if needed
 		},
 	});
 

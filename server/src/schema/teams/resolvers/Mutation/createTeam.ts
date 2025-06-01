@@ -26,5 +26,6 @@ export const createTeam: NonNullable<MutationResolvers["createTeam"]> = async (
 		id: newTeam.id,
 		name: newTeam.name,
 		seed: newTeam.seed,
+		hidden: newTeam.hidden,
 	};
 };

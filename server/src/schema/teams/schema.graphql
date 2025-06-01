@@ -5,7 +5,7 @@ extend type Query {
 
 extend type Mutation {
 	createTeam(name: String!): Team! @auth(role: admin)
-	updateTeam(id: Int!, name: String!): Team! @auth(role: admin)
+	updateTeam(id: Int!, name: String, hidden: Boolean): Team! @auth(role: admin)
 	deleteTeam(id: Int!): Team! @auth(role: admin)
 }
 
@@ -14,4 +14,6 @@ type Team {
 	name: String!
 	submissions(problemSlug: String): [Submission!]! @auth(role: admin)
 	members: [User!]!
+	hidden: Boolean!
+	seed: String! @auth(role: admin)
 }

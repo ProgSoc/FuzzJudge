@@ -9,6 +9,8 @@ export const ScoreboardRow: ScoreboardRowResolvers = {
 			columns: {
 				id: true,
 				name: true,
+				hidden: true, // Include hidden field if needed
+				seed: true, // Include seed if needed
 			},
 		});
 
@@ -16,9 +18,6 @@ export const ScoreboardRow: ScoreboardRowResolvers = {
 			throw new GraphQLError(`Team with id ${teamId} not found`);
 		}
 
-		return {
-			id: team.id,
-			name: team.name,
-		};
+		return team;
 	},
 };
