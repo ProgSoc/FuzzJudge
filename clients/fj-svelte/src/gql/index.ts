@@ -26,6 +26,14 @@ export type Clock = {
   start: Scalars['DateTime']['output'];
 };
 
+export enum ClockStatus {
+  After = 'after',
+  Before = 'before',
+  Freeze = 'freeze',
+  Hold = 'hold',
+  Running = 'running'
+}
+
 export type Competition = {
   __typename?: 'Competition';
   brief: Scalars['String']['output'];
@@ -249,8 +257,8 @@ export type User = {
 };
 
 export enum UserRole {
-  Admin = 'ADMIN',
-  Competitor = 'COMPETITOR'
+  Admin = 'admin',
+  Competitor = 'competitor'
 }
 
 export type ClockSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
