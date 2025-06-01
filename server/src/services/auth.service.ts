@@ -1,6 +1,6 @@
 import { count, eq } from "drizzle-orm";
 import { db } from "../db";
-import { type User, userTable } from "../db/schema";
+import { type User, teamTable, userTable } from "../db/schema";
 
 export async function basicAuth(
 	logn: string,
@@ -24,10 +24,24 @@ export async function basicAuth(
 
 		if (userCountData?.userCount === 0) {
 			console.log("No users found, creating the first user...");
+			const seed = [...crypto.getRandomValues(new Uint8Array(8))]
+				.map((v) => v.toString(16).padStart(2, "0"))
+				.join("");
+			const [newTeam] = await db
+				.insert(teamTable)
+				.values({ name: "Default Team", seed })
+				.returning();
+
+			if (!newTeam) {
+				console.error("Failed to create default team.");
+				return null;
+			}
+			console.log("Created default team:", newTeam.name);
+
 			// If no user exists, create a new user with the provided login and hashed password.
 			const [newUser] = await db
 				.insert(userTable)
-				.values({ logn, password: hash, role: "admin" })
+				.values({ logn, password: hash, role: "admin", team: newTeam.id })
 				.returning();
 
 			if (!newUser) return null;
