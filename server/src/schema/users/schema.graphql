@@ -20,7 +20,7 @@ type User {
 	id: Int!
 	role: UserRole!
 	teamId: Int
-	team: Team @auth(role: admin)
+	team: Team @auth
 	logn: String!
 }
 
