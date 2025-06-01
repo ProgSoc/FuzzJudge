@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readMarkdown } from "@/lib/writeMd";
 import { z } from "zod";
+import { readMarkdown } from "../lib/writeMd";
 
 const problemSpec = z.object({
 	fuzz: z.object({

@@ -1,10 +1,10 @@
 import path from "node:path";
 import { competitionRoot } from "@/config.ts";
-import { readMarkdown, writeFrontmatter } from "@/lib/writeMd.ts";
 import { pubSub } from "@/pubsub.ts";
 import type { ClockStatus } from "@/schema/types.generated";
 import { competitionSpec } from "@/services/competition.service.ts";
 import { GraphQLError } from "graphql";
+import { readMarkdown, writeFrontmatter } from "../lib/writeMd.ts";
 
 export async function now() {
 	const competitionConfig = path.join(competitionRoot, "comp.md");
