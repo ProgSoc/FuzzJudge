@@ -9,7 +9,7 @@ extend type Mutation {
 		@auth(role: admin)
 }
 
-type Submission @role(role: admin) {
+type Submission @auth(role: admin) {
 	id: Int!
 	teamId: Int!
 	problemSlug: String!
