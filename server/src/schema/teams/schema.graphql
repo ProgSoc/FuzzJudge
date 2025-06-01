@@ -1,17 +1,17 @@
 extend type Query {
-	teams: [Team!]!
-	team(id: Int!): Team!
+	teams: [Team!]! @auth(role: admin)
+	team(id: Int!): Team! @auth(role: admin)
 }
 
 extend type Mutation {
-	createTeam(name: String!): Team!
-	updateTeam(id: Int!, name: String!): Team!
-	deleteTeam(id: Int!): Team!
+	createTeam(name: String!): Team! @auth(role: admin)
+	updateTeam(id: Int!, name: String!): Team! @auth(role: admin)
+	deleteTeam(id: Int!): Team! @auth(role: admin)
 }
 
 type Team {
 	id: Int!
 	name: String!
-	submissions(problemSlug: String): [Submission!]!
+	submissions(problemSlug: String): [Submission!]! @auth(role: admin)
 	members: [User!]!
 }

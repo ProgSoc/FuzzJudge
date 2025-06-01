@@ -1,24 +1,27 @@
 extend type Query {
-	users: [User!]!
-	user(id: Int!): User!
-	me: User!
+	users: [User!]! @auth(role: admin)
+	user(id: Int!): User! @auth(role: admin)
+	me: User! @auth @clock
 }
 
 extend type Mutation {
 	createUser(logn: String!, role: UserRole!, teamId: Int): User!
-	updateUser(id: Int!, role: UserRole, teamId: Int): User!
-	deleteUser(id: Int!): User!
+		@auth(role: admin)
+	updateUser(id: Int!, role: UserRole, teamId: Int): User! @auth(role: admin)
+	deleteUser(id: Int!): User! @auth(role: admin)
 }
 
 enum UserRole {
-	COMPETITOR
-	ADMIN
+	competitor
+	admin
 }
 
 type User {
 	id: Int!
 	role: UserRole!
 	teamId: Int
-	team: Team
+	team: Team @auth(role: admin)
 	logn: String!
 }
+
+directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT

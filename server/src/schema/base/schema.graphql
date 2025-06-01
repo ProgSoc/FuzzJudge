@@ -5,7 +5,10 @@ type Subscription
 scalar DateTime
 scalar File
 
+directive @deprecated(reason: String) on FIELD_DEFINITION | ENUM_VALUE
+
 extend type Query {
-	version: String!
-	header: String!
+	version: String! @clock
+
+	header: String! @clock
 }

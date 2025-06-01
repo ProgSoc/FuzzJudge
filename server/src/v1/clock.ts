@@ -1,108 +1,162 @@
-import { getOrSetDefaultMeta, setMeta } from "../services/meta.service.ts";
+import path from "node:path";
+import { competitionRoot } from "@/config.ts";
+import { pubSub } from "@/pubsub.ts";
+import type { ClockStatus } from "@/schema/types.generated";
+import { competitionSpec } from "@/services/competition.service.ts";
+import { GraphQLError } from "graphql";
+import { readMarkdown, writeFrontmatter } from "../lib/writeMd.ts";
 
-type ClockState = "live" | "hold" | "stop";
-
-type CompetitionClockMessage = {
-	start: Date;
-	finish: Date;
-	hold: Date | null;
-};
-
-export async function createClock(plannedStart: Date, plannedFinish: Date) {
-	const state: ClockState = "hold";
-	let start: Date;
-	let finish: Date;
-	let holdDate: Date | null;
-	start = new Date(
-		await getOrSetDefaultMeta("/comp/clock/start", plannedStart.toJSON()),
-	);
-	// if (plannedFinish < plannedStart) plannedFinish = plannedStart;
-	const newFinish = plannedFinish < plannedStart ? plannedStart : plannedFinish;
-
-	finish = new Date(
-		await getOrSetDefaultMeta("/comp/clock/finish", newFinish.toJSON()),
-	);
-	holdDate = null;
-
-	function protect(allowWhen: Iterable<ClockState>): undefined | never {
-		const allowedStates = new Set(allowWhen);
-		if (!allowedStates.has(state)) {
-			let message = "";
-			switch (state) {
-				case "hold":
-					message = "Clock on hold.\n";
-					break;
-				case "live":
-					message = "Clock is live.\n";
-					break;
-				case "stop":
-					message = "Clock is stopped.\n";
-					break;
-			}
-			throw new Response(`503 Unavailable\n\n${message}`, { status: 503 });
-		}
-	}
-
-	function now() {
-		return {
-			start: start,
-			finish: finish,
-			hold: holdDate,
-		};
-	}
-
-	async function adjustStart(time: Date, { keepDuration = false }) {
-		const delta = start.getTime() - time.getTime();
-		start = new Date(await setMeta("/comp/clock/start", time.toJSON()));
-		if (keepDuration)
-			finish = new Date(
-				await setMeta(
-					"/comp/clock/finish",
-					new Date(finish.getTime() - delta).toJSON(),
-				),
-			);
-
-		return now();
-	}
-
-	async function adjustFinish(timeOrMinutesDuration: Date | number) {
-		let newFinish: Date;
-		if (typeof timeOrMinutesDuration === "number") {
-			const duration = timeOrMinutesDuration;
-			newFinish = new Date(start.getTime() + duration * 60_000);
-		} else {
-			newFinish = timeOrMinutesDuration;
-		}
-		if (newFinish < start)
-			throw new RangeError("Finish time must be after start.");
-		finish = new Date(await setMeta("/comp/clock/finish", newFinish.toJSON()));
-
-		return now();
-	}
-
-	function hold() {
-		holdDate = new Date();
-
-		return now();
-	}
-
-	function release({ extendDuration = false }) {
-		if (holdDate === null) return now();
-		const delta = holdDate.getTime() - Date.now();
-		if (extendDuration) finish = new Date(finish.getTime() - delta);
-		holdDate = null;
-
-		return now();
-	}
-
-	return {
-		now,
-		adjustStart,
-		adjustFinish,
-		hold,
-		release,
-		protect,
-	};
+export async function now() {
+	const competitionConfig = path.join(competitionRoot, "comp.md");
+	// parse the compeition config file to get the start and finish times
+	const {
+		frontmatter: { times },
+	} = await readMarkdown(competitionConfig, competitionSpec);
+	return times;
 }
 
-type CompetitionClock = Awaited<ReturnType<typeof createClock>>;
+export async function adjustStart(time: Date, moveDuration = false) {
+	const currentTimes = await now();
+	const delta = currentTimes.start.getTime() - time.getTime();
+	const newFinish = moveDuration
+		? new Date(currentTimes.finish.getTime() - delta)
+		: currentTimes.finish;
+
+	const competitionConfig = path.join(competitionRoot, "comp.md");
+
+	await writeFrontmatter(competitionConfig, competitionSpec, {
+		times: {
+			start: time.toISOString(),
+			finish: newFinish.toISOString(),
+		},
+	});
+
+	const newTimes = {
+		start: time,
+		finish: newFinish,
+		hold: currentTimes.hold,
+	};
+
+	pubSub.publish("clock", newTimes);
+
+	return newTimes;
+}
+
+export async function adjustFinish(newFinish: Date) {
+	const currentTimes = await now();
+	if (newFinish < currentTimes.start)
+		throw new Error("Finish time must be after start time.");
+	const competitionConfig = path.join(competitionRoot, "comp.md");
+
+	await writeFrontmatter(competitionConfig, competitionSpec, {
+		times: {
+			finish: newFinish.toISOString(),
+		},
+	});
+
+	const newTimes = {
+		start: currentTimes.start,
+		finish: newFinish,
+		hold: currentTimes.hold,
+	};
+
+	pubSub.publish("clock", newTimes);
+
+	return newTimes;
+}
+
+export async function holdClockTime() {
+	const currentTimes = await now();
+	if (currentTimes.hold) {
+		throw new GraphQLError("Clock is already on hold.");
+	}
+	const competitionConfig = path.join(competitionRoot, "comp.md");
+	const holdDate = new Date();
+	await writeFrontmatter(competitionConfig, competitionSpec, {
+		times: {
+			hold: holdDate.toISOString(),
+		},
+	});
+
+	const newTimes = {
+		hold: holdDate,
+		start: currentTimes.start,
+		finish: currentTimes.finish,
+	};
+
+	pubSub.publish("clock", newTimes);
+
+	return newTimes;
+}
+
+export async function releaseClockTime(extendDuration = false) {
+	const currentTimes = await now();
+	if (!currentTimes.hold) {
+		throw new GraphQLError("Clock is not on hold.");
+	}
+	const holdDuration = Date.now() - currentTimes.hold.getTime();
+	const newFinish = extendDuration
+		? new Date(currentTimes.finish.getTime() + holdDuration)
+		: currentTimes.finish;
+	const competitionConfig = path.join(competitionRoot, "comp.md");
+	await writeFrontmatter(competitionConfig, competitionSpec, {
+		times: {
+			hold: null,
+			finish: newFinish.toISOString(),
+		},
+	});
+
+	const newTimes = {
+		hold: null,
+		start: currentTimes.start,
+		finish: newFinish,
+	};
+
+	pubSub.publish("clock", newTimes);
+
+	return newTimes;
+}
+
+const getCompetitionState = async (
+	clockTimes: Awaited<ReturnType<typeof now>>,
+): Promise<ClockStatus[]> => {
+	const clockState: ClockStatus[] = [];
+	if (clockTimes.hold) {
+		clockState.push("hold");
+	}
+	if (clockTimes.start > new Date()) {
+		clockState.push("before");
+	}
+	if (clockTimes.finish < new Date()) {
+		clockState.push("after");
+	}
+	// freeze is derived from the number of minutes until the finish time (from clockTimes.freeze)
+	if (
+		clockTimes.freeze &&
+		clockTimes.finish.getTime() - Date.now() < 60 * 1000 * clockTimes.freeze
+	) {
+		clockState.push("freeze");
+	}
+	if (!clockState.length) {
+		clockState.push("running");
+	}
+	return clockState;
+};
+
+/**
+ * Protect an operation based on the current clock state.
+ * This may be part of a directive or a function that checks the clock state before allowing an operation.
+ * @param disallow An array of clock states that are not allowed for the operation.
+ * @returns The current clock state if the operation is allowed.
+ */
+export async function protectClock(disallow: ClockStatus[] = ["running"]) {
+	const currentTimes = await now();
+	const clockState = await getCompetitionState(currentTimes);
+
+	if (clockState.some((state) => disallow.includes(state))) {
+		throw new GraphQLError(
+			`Operation not allowed in the current clock state: ${clockState.join(", ")}`,
+		);
+	}
+	return clockState;
+}

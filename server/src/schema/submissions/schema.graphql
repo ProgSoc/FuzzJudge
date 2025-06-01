@@ -1,13 +1,15 @@
 extend type Query {
 	submissions(teamId: Int, problemSlug: String): [Submission!]!
-	submission(id: Int!): Submission
+		@auth(role: admin)
+	submission(id: Int!): Submission @auth(role: admin)
 }
 
 extend type Mutation {
 	overrideJudge(submissionId: Int!, solved: Boolean!): Submission!
+		@auth(role: admin)
 }
 
-type Submission {
+type Submission @auth(role: admin) {
 	id: Int!
 	teamId: Int!
 	problemSlug: String!
@@ -17,5 +19,5 @@ type Submission {
 	ok: Boolean
 	vler: String
 	vlms: Float
-	team: Team!
+	team: Team! @auth
 }

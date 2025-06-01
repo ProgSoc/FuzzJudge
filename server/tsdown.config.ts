@@ -9,7 +9,7 @@ export default defineConfig([
 		format: ["esm"],
 		platform: "node",
 		external: ["bun", "bun:sqlite"],
-		sourcemap: true,
+		sourcemap: "inline",
 		clean: false,
 		onSuccess: async ({ watch }, signal) => {
 			const procConfig = path.dirname(fileURLToPath(import.meta.url));

@@ -1,15 +1,10 @@
-import { clock } from "@/app";
-import { pubSub } from "@/pubsub";
+import { adjustStart } from "@/v1/clock";
 import type { MutationResolvers } from "./../../../types.generated";
 export const adjustStartTime: NonNullable<
 	MutationResolvers["adjustStartTime"]
 > = async (_parent, { startTime, keepDuration }, _ctx) => {
-	const newClock = await clock.adjustStart(
+	return adjustStart(
 		startTime instanceof Date ? startTime : new Date(startTime),
-		{ keepDuration: keepDuration ?? undefined },
+		keepDuration ?? undefined,
 	);
-
-	pubSub.publish("clock", newClock);
-
-	return newClock;
 };

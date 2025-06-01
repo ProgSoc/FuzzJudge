@@ -4,8 +4,8 @@ extend type Query {
 }
 
 extend type Mutation {
-	judge(slug: String!, code: String!, output: String!): JudgeOutput!
-	getFuzz(slug: String!): String!
+	judge(slug: String!, code: String!, output: String!): JudgeOutput! @auth
+	getFuzz(slug: String!): String! @auth
 }
 
 union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
@@ -19,7 +19,7 @@ type JudgeErrorOutput {
 	errors: String!
 }
 
-type Problem {
+type Problem @auth {
 	slug: String!
 	icon: String!
 	name: String!

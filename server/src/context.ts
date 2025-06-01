@@ -8,3 +8,7 @@ interface Env extends HonoEnv {
 }
 
 export type GraphQLContext = { c: HonoContext<Env> };
+
+export type AuthenticatedContext<Context> = Context & {
+	user: User;
+};

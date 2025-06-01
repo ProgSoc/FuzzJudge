@@ -1,14 +1,9 @@
-import { clock } from "@/app";
-import { pubSub } from "@/pubsub";
+import { adjustFinish } from "@/v1/clock";
 import type { MutationResolvers } from "./../../../types.generated";
 export const adjustFinishTime: NonNullable<
 	MutationResolvers["adjustFinishTime"]
 > = async (_parent, { finishTime }, _ctx) => {
-	const newClock = await clock.adjustFinish(
+	return adjustFinish(
 		finishTime instanceof Date ? finishTime : new Date(finishTime),
 	);
-
-	pubSub.publish("clock", newClock);
-
-	return newClock;
 };

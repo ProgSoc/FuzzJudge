@@ -1,12 +1,9 @@
 import { db } from "@/db";
-import { ensureRole } from "@/middleware/graphQLAuthMiddleware";
 import { GraphQLError } from "graphql";
 import type { SubmissionResolvers } from "./../../types.generated";
 export const Submission: SubmissionResolvers = {
 	/* Implement Submission resolver logic here */
-	team: async ({ teamId }, _arg, { c }) => {
-		const user = await ensureRole(c);
-
+	team: async ({ teamId }, _arg, { c, user }) => {
 		if (user.team !== teamId && user.role !== "admin") {
 			throw new GraphQLError("You are not in this team");
 		}

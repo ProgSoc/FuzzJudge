@@ -32,7 +32,7 @@ export async function basicAuth(
 
 			if (!newUser) return null;
 
-			console.log("Created user:", newUser.logn)
+			console.log("Created user:", newUser.logn);
 
 			return newUser;
 		}

@@ -1,7 +1,19 @@
+directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT
+
+directive @clock(disallowedStatus: [ClockStatus!]! = [before, after, freeze, hold]) on FIELD_DEFINITION
+
 type Clock {
   finish: DateTime!
   hold: DateTime
   start: DateTime!
+}
+
+enum ClockStatus {
+  after
+  before
+  freeze
+  hold
+  running
 }
 
 type Competition {
@@ -119,6 +131,6 @@ type User {
 }
 
 enum UserRole {
-  ADMIN
-  COMPETITOR
+  admin
+  competitor
 }
