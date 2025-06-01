@@ -1,4 +1,4 @@
-export const VERSION = "0.3.6";
+export const VERSION = "0.3.7";
 
 export const HEADER = `\
 FuzzJudge v${VERSION} - Randomised input judging server, designed for ProgComp.

@@ -44,6 +44,7 @@ type Mutation {
   createUser(logn: String!, role: UserRole!, teamId: Int): User!
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!
+  getAdminFuzz(slug: String!, teamId: Int!): String!
   getFuzz(slug: String!): String!
   holdClock: Clock!
   judge(code: String!, output: String!, slug: String!): JudgeOutput!

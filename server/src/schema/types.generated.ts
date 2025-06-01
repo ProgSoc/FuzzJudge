@@ -67,6 +67,7 @@ export type Mutation = {
   createUser: User;
   deleteTeam: Team;
   deleteUser: User;
+  getAdminFuzz: Scalars['String']['output'];
   getFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
@@ -107,6 +108,12 @@ export type MutationDeleteTeamArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type MutationGetAdminFuzzArgs = {
+  slug: Scalars['String']['input'];
+  teamId: Scalars['Int']['input'];
 };
 
 
@@ -449,6 +456,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'logn' | 'role'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  getAdminFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetAdminFuzzArgs, 'slug' | 'teamId'>>;
   getFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetFuzzArgs, 'slug'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;

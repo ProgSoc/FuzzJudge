@@ -6,6 +6,7 @@ extend type Query {
 extend type Mutation {
 	judge(slug: String!, code: String!, output: String!): JudgeOutput! @auth
 	getFuzz(slug: String!): String! @auth
+	getAdminFuzz(slug: String!, teamId: Int!): String! @auth(role: admin)
 }
 
 union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
