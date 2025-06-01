@@ -36,6 +36,8 @@ const root = competitionRoot;
 const competionData = await getCompetitionData(root);
 import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers.ts";
 import { directiveResolvers } from "./directives/directiveResolvers.ts";
+import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
+import { basicAuth } from "./services/auth.service.ts";
 
 export const clock = await createClock(
 	competionData.times.start ?? new Date(),
@@ -77,6 +79,9 @@ app.on(
 	["GET", "POST"],
 	// GraphQL endpoint
 	yoga.graphqlEndpoint,
+	graphqlAuthMiddleware({
+		verifyUser: basicAuth,
+	}),
 	// GraphQL WebSocket upgrade if the request is a WebSocket
 	graphqlWsMiddleware,
 	// GraphQL Yoga server
