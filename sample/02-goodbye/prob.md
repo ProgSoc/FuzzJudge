@@ -16,11 +16,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 [fuzz]
-exec = ["deno", "run", "-A" ,"fuzz.ts"]
+exec = ["deno", "run", "-A", "-q" ,"fuzz.ts"]
 env = {}
 
 [judge]
-exec = ["deno", "run", "-A", "judge.ts"]
+exec = ["deno", "run", "-A", "-q", "judge.ts"]
 
 [problem]
 title = "Goodbye World"
