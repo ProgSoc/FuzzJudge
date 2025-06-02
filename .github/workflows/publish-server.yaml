@@ -45,11 +45,6 @@ jobs:
     permissions: 
       packages: write
       id-token: write
-    strategy:
-      matrix:
-        platform: 
-          - linux/amd64
-          - linux/arm64
     env:
       IMAGE: ghcr.io/progsoc/fuzzjudge
       REGISTRY: ghcr.io
@@ -85,5 +80,5 @@ jobs:
           push: true
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:latest
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
       
