@@ -1,6 +1,6 @@
 {
 	"name": "@progsoc/fj-svelte",
-	"private": false,
+	"private": true,
 	"version": "0.0.1",
 	"files": ["dist", "LICENSE.md"],
 	"type": "module",

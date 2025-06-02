@@ -1,4 +1,6 @@
-export const VERSION = "0.3.11";
+import { version } from "../package.json" with { type: "json" };
+
+export const VERSION = version;
 
 export const HEADER = `\
 FuzzJudge v${VERSION} - Randomised input judging server, designed for ProgComp.

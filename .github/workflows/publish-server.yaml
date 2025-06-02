@@ -1,11 +1,21 @@
+name: Release
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-name: Publish Server
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  test-server:
+  release:
     name: Test Bun
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
     steps:
       # ...
       - uses: actions/checkout@v4
@@ -16,10 +26,22 @@ jobs:
           deno-version: v2.x
       # run any `bun` or `bunx` command
       - run: bun install
-      - run: cd server && bun test
+      - run: bun test
+      - name: Create Release Pull Request
+        id: changesets
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          # this npm script triggers `changeset publish`
+          publish: bun changeset tag
+          createGithubReleases: true
+  
   publish-server-pkg:
     name: Publish Bun
-    needs: test-server
+    needs: release
+    if: needs.release.outputs.published == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +63,12 @@ jobs:
   publish-docker:
     name: Publish Docker Images
     runs-on: ubuntu-latest
-    needs: test-server
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
     permissions: 
       packages: write
       id-token: write
@@ -60,6 +87,10 @@ jobs:
           tags: |
             # use custom value instead of git tag
             type=raw,value=latest
+            type=semver,pattern={{version}},value=${{ matrix.package.version }}
+            type=semver,pattern={{major}},value=${{ matrix.package.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
+            type=sha
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
