@@ -42,4 +42,4 @@ COPY --from=prerelease /usr/src/app/server/package.json server/package.json
 # run the app
 USER bun
 EXPOSE 1989/tcp
-ENTRYPOINT [ "bun", "run", "start" ]
+CMD [ "bun", "run", "start" ]
