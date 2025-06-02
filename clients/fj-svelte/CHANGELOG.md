@@ -1,5 +1,11 @@
 # @progsoc/fj-svelte
 
+## 0.3.14
+
+### Patch Changes
+
+- [`7cacd9f`](https://github.com/ProgSoc/FuzzJudge/commit/7cacd9fa9a45dde042f9f0b418e866323c69fa7d) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix the way the fuzz is queried to be derived from the currently selected problem
+
 ## 0.3.13
 
 ### Patch Changes
