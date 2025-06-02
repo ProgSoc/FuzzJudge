@@ -80,4 +80,5 @@ jobs:
           push: true
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:latest
+          platforms: linux/amd64,linux/arm64
       

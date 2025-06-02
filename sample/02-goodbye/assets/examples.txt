@@ -1,0 +1,8 @@
+Valid:
+Goodbye Bob!
+Goodbye Goodbye, World!!
+
+Invalid:
+GoodbyeJoe!
+Hi!
+Hey mate
