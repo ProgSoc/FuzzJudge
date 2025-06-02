@@ -1,8 +1,11 @@
 {
 	"name": "@progsoc/fj-svelte",
 	"private": true,
-	"version": "0.0.1",
-	"files": ["dist", "LICENSE.md"],
+	"version": "0.3.13",
+	"files": [
+		"dist",
+		"LICENSE.md"
+	],
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
