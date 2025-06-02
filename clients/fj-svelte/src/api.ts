@@ -13,7 +13,15 @@
  * with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { queryOptions } from "@tanstack/svelte-query";
+import { client } from "./gql/sdk";
 import { showNotification } from "./notifications";
+
+export const fuzzQuery = (slug: string) =>
+	queryOptions({
+		queryKey: ["fuzz", slug],
+		queryFn: async () => client.GetProblemFuzz({ problemId: slug }),
+	});
 
 export async function downloadFuzz(slug: string, fuzz: string) {
 	const blob = new Blob([fuzz], { type: "text/plain" });
