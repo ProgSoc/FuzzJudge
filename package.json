@@ -16,6 +16,7 @@
 	},
 	"scripts": {
 		"build": "bun run -F @progsoc/* build",
+		"knip": "bun run -F @progsoc/* knip",
 		"start": "bun run -F @progsoc/fuzzjudge-server start"
 	},
 	"trustedDependencies": ["lefthook", "@biomejs/biome"],

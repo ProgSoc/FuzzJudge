@@ -1,5 +1,5 @@
 import path from "node:path";
-import { fileURLToPath } from "bun";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "tsdown/config";
 
 export default defineConfig([

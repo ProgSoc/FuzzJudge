@@ -86,21 +86,21 @@ export function problemOrder(a: GenericProblem, b: GenericProblem) {
  * Gets the slug of the next unsolved problem `offset` problems away from the
  * selected problem.
  */
-export function nextUnsolvedProblem(
-	problems: ProblemsListQueryQuery["problems"],
-	selected: string,
-	offset = 1,
-): string | null {
-	const probs = problems.filter((p) => !p.solved).sort(problemOrder);
+// export function nextUnsolvedProblem(
+// 	problems: ProblemsListQueryQuery["problems"],
+// 	selected: string,
+// 	offset = 1,
+// ): string | null {
+// 	const probs = problems.filter((p) => !p.solved).sort(problemOrder);
 
-	const selectedIndex = probs.findIndex((p) => p.slug === selected);
+// 	const selectedIndex = probs.findIndex((p) => p.slug === selected);
 
-	if (selectedIndex === -1) return null;
+// 	if (selectedIndex === -1) return null;
 
-	let newIndex = (selectedIndex + offset) % probs.length;
-	while (newIndex < 0) newIndex += probs.length;
+// 	let newIndex = (selectedIndex + offset) % probs.length;
+// 	while (newIndex < 0) newIndex += probs.length;
 
-	if (newIndex === selectedIndex) return null;
+// 	if (newIndex === selectedIndex) return null;
 
-	return probs[newIndex].slug;
-}
+// 	return probs[newIndex].slug;
+// }

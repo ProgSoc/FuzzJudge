@@ -1,4 +1,6 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
-	"ignore": ["./src/gql/index.ts"]
+	"ignore": ["./src/gql/index.ts"],
+	"ignoreBinaries": ["vite", "svelte-check", "knip"],
+	"ignoreDependencies": ["svelte-check"]
 }

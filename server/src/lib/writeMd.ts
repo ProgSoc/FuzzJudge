@@ -17,11 +17,11 @@ type DeepPartial<T> = T extends object
 		}
 	: T;
 
-export function isObject(item: unknown): item is Record<string, unknown> {
+function isObject(item: unknown): item is Record<string, unknown> {
 	return item !== null && typeof item === "object" && !Array.isArray(item);
 }
 
-export default function mergeDeep(
+function mergeDeep(
 	target: Record<string, unknown>,
 	source: Record<string, unknown>,
 ): Record<string, unknown> {

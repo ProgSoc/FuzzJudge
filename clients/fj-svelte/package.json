@@ -2,10 +2,7 @@
 	"name": "@progsoc/fj-svelte",
 	"private": true,
 	"version": "0.3.14",
-	"files": [
-		"dist",
-		"LICENSE.md"
-	],
+	"files": ["dist", "LICENSE.md"],
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -36,7 +33,6 @@
 		"@tanstack/svelte-query": "5.79.0",
 		"@tanstack/svelte-query-devtools": "5.79.0",
 		"graphql": "16.11.0",
-		"graphql-scalars": "1.24.2",
 		"graphql-ws": "6.0.5"
 	}
 }
