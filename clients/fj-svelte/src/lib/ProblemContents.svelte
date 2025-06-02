@@ -14,47 +14,43 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-import { createQuery } from "@tanstack/svelte-query";
-import { onDestroy } from "svelte";
-import SvelteMarkdown from "svelte-markdown";
-import { derived } from "svelte/store";
-import { client } from "../gql/sdk";
-import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
-import SubmissionArea from "./SubmissionArea.svelte";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { onDestroy } from "svelte";
+  import SvelteMarkdown from "svelte-markdown";
+  import { derived } from "svelte/store";
+  import { client } from "../gql/sdk";
+  import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
+  import SubmissionArea from "./SubmissionArea.svelte";
 
-interface Props {
-	problemSlug: string;
-}
+  // biome-ignore lint/style/useConst: svelte
+  let problemInstructions: HTMLDivElement | undefined = $state(undefined);
 
-let { problemSlug }: Props = $props();
+  // Reset scroll to top when a new problem is selected
+  const unsubScrollUp = selectedProblem.subscribe((slug) => {
+    if (slug === undefined) return;
 
-// biome-ignore lint/style/useConst: svelte
-let problemInstructions: HTMLDivElement | undefined = $state(undefined);
+    if (problemInstructions !== undefined) {
+      problemInstructions.scrollTop = 0;
+    }
+  });
 
-// Reset scroll to top when a new problem is selected
-const unsubScrollUp = selectedProblem.subscribe((slug) => {
-	if (slug === undefined) return;
-
-	if (problemInstructions !== undefined) {
-		problemInstructions.scrollTop = 0;
-	}
-});
-
-onDestroy(() => {
-	unsubScrollUp();
-});
-/**
- * Solved
- * Name
- * Difficulty
- * Points
- * Body
- */
-const problemQuery = createQuery({
-	queryKey: ["problem", problemSlug],
-	queryFn: () => client.ProblemData({ problemSlug }),
-	select: (data) => data.data.problem,
-});
+  onDestroy(() => {
+    unsubScrollUp();
+  });
+  /**
+   * Solved
+   * Name
+   * Difficulty
+   * Points
+   * Body
+   */
+  const problemQuery = createQuery(
+    derived(selectedProblem, ($selectedProblem) => ({
+      queryKey: ["problem", $selectedProblem],
+      queryFn: () => client.ProblemData({ problemSlug: $selectedProblem }),
+      select: (data: Awaited<ReturnType<typeof client.ProblemData>>) => data.data.problem,
+    })),
+  );
 </script>
 
 <div class="problem" bind:this={problemInstructions}>
