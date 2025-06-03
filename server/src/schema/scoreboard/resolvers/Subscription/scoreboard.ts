@@ -33,15 +33,18 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 			yield await calculateScoreboard();
 		}
 
-		return pipe(
+		const scoreboardUpdates = pipe(
 			pubSub.subscribe("scoreboard"),
 			filter(async () => {
-				if (isAdmin) return true; // Admins always see the full scoreboard and all updates
 				const isFrozen = await isScoreboardFrozen();
-				return !isFrozen; // Non-admins only see updates when the scoreboard is not frozen
+				return !isFrozen || isAdmin; // Only allow updates if not frozen or user is admin
 			}),
 			map((payload) => payload.filter((row) => isAdmin || !row.teamHidden)),
 		);
+
+		for await (const payload of scoreboardUpdates) {
+			yield payload;
+		}
 	},
 	resolve: (payload: ScoreboardRow[]) => payload,
 };

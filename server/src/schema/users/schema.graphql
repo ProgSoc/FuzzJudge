@@ -1,7 +1,7 @@
 extend type Query {
 	users: [User!]! @auth(role: admin)
 	user(id: Int!): User! @auth(role: admin)
-	me: User! @auth @clock
+	me: User! @auth
 }
 
 extend type Mutation {
