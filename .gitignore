@@ -3,3 +3,4 @@
 ./competition/
 node_modules/
 dist
+scoreboard.json

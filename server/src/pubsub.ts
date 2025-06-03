@@ -1,10 +1,10 @@
 import { createPubSub } from "graphql-yoga";
-import type { ScoreboardRowMapper } from "./schema/scoreboard/schema.mappers";
 import type { ResolversTypes } from "./schema/types.generated";
+import type { ScoreboardRow } from "./services/score";
 
 type PubSub = {
 	clock: [payload: Awaited<ResolversTypes["Clock"]>];
-	scoreboard: [payload: ScoreboardRowMapper[]];
+	scoreboard: [payload: ScoreboardRow[]];
 };
 
 export const pubSub = createPubSub<PubSub>({});

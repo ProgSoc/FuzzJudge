@@ -5,7 +5,7 @@ public = [ "client" ]
 [times]
 start = "2024-06-24T11:30:00+1000"
 finish = "2025-06-23T17:31:05.909Z"
-freeze = 60
+freeze = 6000000000000
 ---
 
 # ProgComp 2023
