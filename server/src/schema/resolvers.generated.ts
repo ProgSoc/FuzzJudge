@@ -24,6 +24,7 @@ import    { holdClock as Mutation_holdClock } from './clock/resolvers/Mutation/h
 import    { judge as Mutation_judge } from './problems/resolvers/Mutation/judge';
 import    { overrideJudge as Mutation_overrideJudge } from './submissions/resolvers/Mutation/overrideJudge';
 import    { releaseClock as Mutation_releaseClock } from './clock/resolvers/Mutation/releaseClock';
+import    { releaseResults as Mutation_releaseResults } from './clock/resolvers/Mutation/releaseResults';
 import    { updateTeam as Mutation_updateTeam } from './teams/resolvers/Mutation/updateTeam';
 import    { updateUser as Mutation_updateUser } from './users/resolvers/Mutation/updateUser';
 import    { clock as Subscription_clock } from './clock/resolvers/Subscription/clock';
@@ -42,7 +43,7 @@ import    { JudgeOutput } from './problems/resolvers/JudgeOutput';
 import    { DateTimeResolver } from 'graphql-scalars';
     export const resolvers: Resolvers = {
       Query: { competition: Query_competition,header: Query_header,me: Query_me,problem: Query_problem,problems: Query_problems,submission: Query_submission,submissions: Query_submissions,team: Query_team,teams: Query_teams,user: Query_user,users: Query_users,version: Query_version },
-      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,getAdminFuzz: Mutation_getAdminFuzz,getFuzz: Mutation_getFuzz,holdClock: Mutation_holdClock,judge: Mutation_judge,overrideJudge: Mutation_overrideJudge,releaseClock: Mutation_releaseClock,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
+      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,getAdminFuzz: Mutation_getAdminFuzz,getFuzz: Mutation_getFuzz,holdClock: Mutation_holdClock,judge: Mutation_judge,overrideJudge: Mutation_overrideJudge,releaseClock: Mutation_releaseClock,releaseResults: Mutation_releaseResults,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
       Subscription: { clock: Subscription_clock,scoreboard: Subscription_scoreboard },
       Clock: Clock,
 Competition: Competition,

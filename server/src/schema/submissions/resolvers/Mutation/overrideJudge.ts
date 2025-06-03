@@ -1,7 +1,8 @@
 import { db } from "@/db";
 import { submissionTable } from "@/db/schema";
+import { pubSub } from "@/pubsub";
 import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
-import { getCompetitionState, now } from "@/v1/clock";
+import { isFrozen } from "@/v1/clock";
 import { eq } from "drizzle-orm";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
@@ -20,13 +21,12 @@ export const overrideJudge: NonNullable<
 		throw new GraphQLError("Submission not found");
 	}
 
-	const competitionTimes = await now();
-	const competitionState = await getCompetitionState(competitionTimes);
-
+	const frozen = await isFrozen();
 	const scoreboard = await calculateScoreboard();
-	if (!competitionState.includes("freeze")) {
+	if (!frozen) {
 		await writeScoreboardToFile(scoreboard);
 	}
+	pubSub.publish("scoreboard", scoreboard);
 
 	return {
 		id: updated.id,

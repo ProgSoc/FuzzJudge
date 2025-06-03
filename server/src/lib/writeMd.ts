@@ -6,50 +6,19 @@
  * * Write the markdown file to the filesystem with the language and frontmatter intact
  */
 
+import {
+	competitionSpec,
+	type timesSpec,
+} from "@/services/competition.service";
 import matter from "gray-matter";
 import * as TOML from "smol-toml";
 import yaml from "yaml";
 import type { z } from "zod";
 
-type DeepPartial<T> = T extends object
-	? {
-			[P in keyof T]?: DeepPartial<T[P]>;
-		}
-	: T;
-
-function isObject(item: unknown): item is Record<string, unknown> {
-	return item !== null && typeof item === "object" && !Array.isArray(item);
-}
-
-function mergeDeep(
-	target: Record<string, unknown>,
-	source: Record<string, unknown>,
-): Record<string, unknown> {
-	const output = Object.assign({}, target);
-	if (isObject(target) && isObject(source)) {
-		for (const key of Object.keys(source)) {
-			if (isObject(source[key])) {
-				if (!(key in target)) Object.assign(output, { [key]: source[key] });
-				else
-					output[key] = mergeDeep(
-						target[key] as Record<string, unknown>,
-						source[key] as Record<string, unknown>,
-					);
-			} else {
-				Object.assign(output, { [key]: source[key] });
-			}
-		}
-	}
-	return output;
-}
-
 export async function readMarkdown<TSchema extends z.AnyZodObject>(
 	filePath: string,
 	frontmatterSchema: TSchema,
-): Promise<{
-	content: string;
-	frontmatter: z.infer<TSchema>;
-}> {
+) {
 	const markdownFile = Bun.file(filePath);
 
 	if (!markdownFile.exists()) {
@@ -58,7 +27,7 @@ export async function readMarkdown<TSchema extends z.AnyZodObject>(
 
 	const problemFileContent = await markdownFile.text();
 
-	const { data, content } = matter(problemFileContent, {
+	const { data, content, language } = matter(problemFileContent, {
 		engines: {
 			toml: TOML,
 			yaml: yaml,
@@ -75,45 +44,35 @@ export async function readMarkdown<TSchema extends z.AnyZodObject>(
 
 	return {
 		content,
-		frontmatter: frontmatterData.data,
+		frontmatter: frontmatterData.data as z.infer<TSchema>,
+		language,
 	};
 }
 
-export async function writeFrontmatter<TSchema extends z.AnyZodObject>(
+export async function writeCompetitionTimes(
 	filePath: string,
-	frontmatterSchema: TSchema,
-	data: DeepPartial<z.infer<TSchema>>,
+	data: Partial<z.infer<typeof timesSpec>>,
 ) {
-	const markdownFile = Bun.file(filePath);
+	const { content, frontmatter, language } = await readMarkdown(
+		filePath,
+		competitionSpec,
+	);
 
-	if (!markdownFile.exists()) {
-		throw new Error(`Competition file not found at ${filePath}`);
-	}
+	const newFrontmatter: z.infer<typeof competitionSpec> = {
+		...frontmatter,
+		times: {
+			...frontmatter.times,
+			...data,
+		},
+	};
 
-	const problemFileContent = await markdownFile.text();
-
-	const {
-		data: originalFrontmatter,
-		content,
-		language,
-	} = matter(problemFileContent, {
+	const frontmatterString = matter.stringify(content, newFrontmatter, {
+		language: language,
 		engines: {
 			toml: TOML,
 			yaml: yaml,
 		},
 	});
-
-	const frontmatterString = matter.stringify(
-		content,
-		mergeDeep(originalFrontmatter, data),
-		{
-			language: language,
-			engines: {
-				toml: TOML,
-				yaml: yaml,
-			},
-		},
-	);
 
 	// replace the first line with the frontmatter string `---${language}\n`
 	const frontmatterLines = frontmatterString.split("\n");
@@ -121,4 +80,6 @@ export async function writeFrontmatter<TSchema extends z.AnyZodObject>(
 	const frontmatterStringWithLanguage = frontmatterLines.join("\n");
 
 	await Bun.write(filePath, frontmatterStringWithLanguage);
+
+	return newFrontmatter.times;
 }
