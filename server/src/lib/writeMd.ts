@@ -6,14 +6,14 @@
  * * Write the markdown file to the filesystem with the language and frontmatter intact
  */
 
-import {
-	competitionSpec,
-	type timesSpec,
-} from "@/services/competition.service";
 import matter from "gray-matter";
 import * as TOML from "smol-toml";
 import yaml from "yaml";
 import type { z } from "zod";
+import {
+	competitionSpec,
+	type timesSpec,
+} from "../services/competition.service";
 
 export async function readMarkdown<TSchema extends z.AnyZodObject>(
 	filePath: string,
