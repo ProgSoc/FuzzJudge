@@ -6,8 +6,9 @@ import { parseMarkdownAttributes } from "./problems.service";
 export const timesSpec = z.object({
 	start: z.coerce.date(),
 	finish: z.coerce.date(),
-	hold: z.coerce.date().nullable().optional(),
-	freeze: z.number(),
+	hold: z.coerce.date().nullable().optional(), // Whether the competition is currently on hold
+	isReleased: z.boolean().optional(), // Whether the final scoreboard is released (only relevant after the competition ends)
+	freeze: z.number(), // The number of minutes before the end of the competition when the scoreboard is frozen
 });
 
 export type Times = z.infer<typeof timesSpec>;

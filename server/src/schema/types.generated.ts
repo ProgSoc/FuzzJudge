@@ -73,6 +73,7 @@ export type Mutation = {
   judge: JudgeOutput;
   overrideJudge: Submission;
   releaseClock: Clock;
+  releaseResults: Clock;
   updateTeam: Team;
   updateUser: User;
 };
@@ -404,9 +405,7 @@ export type AuthDirectiveArgs = {
 
 export type AuthDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type ClockDirectiveArgs = {
-  disallowedStatus?: Array<ClockStatus>;
-};
+export type ClockDirectiveArgs = { };
 
 export type ClockDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = ClockDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
@@ -450,18 +449,19 @@ export type JudgeSuccessOutputResolvers<ContextType = GraphQLContext, ParentType
 };
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, RequireFields<MutationAdjustFinishTimeArgs, 'finishTime'>>;
-  adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, RequireFields<MutationAdjustStartTimeArgs, 'startTime'>>;
+  adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustFinishTimeArgs, 'finishTime'>>;
+  adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustStartTimeArgs, 'startTime'>>;
   createTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateTeamArgs, 'name'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'logn' | 'role'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteUserArgs, 'id'>>;
   getAdminFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetAdminFuzzArgs, 'slug' | 'teamId'>>;
   getFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetFuzzArgs, 'slug'>>;
-  holdClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType>;
+  holdClock?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
   overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
-  releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, ContextType, Partial<MutationReleaseClockArgs>>;
+  releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, Partial<MutationReleaseClockArgs>>;
+  releaseResults?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>>;
   updateTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateTeamArgs, 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateUserArgs, 'id'>>;
 };

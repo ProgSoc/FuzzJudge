@@ -1,6 +1,6 @@
 directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT
 
-directive @clock(disallowedStatus: [ClockStatus!]! = [before, after, freeze, hold]) on FIELD_DEFINITION
+directive @clock on FIELD_DEFINITION
 
 type Clock {
   finish: DateTime!
@@ -50,6 +50,7 @@ type Mutation {
   judge(code: String!, output: String!, slug: String!): JudgeOutput!
   overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
   releaseClock(extendDuration: Boolean): Clock!
+  releaseResults: Clock!
   updateTeam(hidden: Boolean, id: Int!, name: String): Team!
   updateUser(id: Int!, role: UserRole, teamId: Int): User!
 }

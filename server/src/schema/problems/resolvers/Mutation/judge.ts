@@ -4,7 +4,7 @@ import { pubSub } from "@/pubsub";
 import { getProblemData, judgeProblem } from "@/services/problems.service";
 import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
 import { postSubmission, solved } from "@/services/submission.service";
-import { getCompetitionState, now } from "@/v1/clock";
+import { isFrozen } from "@/v1/clock";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 
@@ -61,11 +61,10 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 		});
 
 		console.log(`✅ Problem ${submission.id} solved by ${user.name}`);
-		const competitionTimes = await now();
-		const competitionState = await getCompetitionState(competitionTimes);
 
+		const frozen = await isFrozen();
 		const scoreboard = await calculateScoreboard();
-		if (!competitionState.includes("freeze")) {
+		if (!frozen) {
 			await writeScoreboardToFile(scoreboard);
 		}
 

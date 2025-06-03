@@ -3,10 +3,12 @@ extend type Subscription {
 }
 
 extend type Mutation {
-	holdClock: Clock!
-	releaseClock(extendDuration: Boolean): Clock!
+	holdClock: Clock! @auth(role: admin)
+	releaseClock(extendDuration: Boolean): Clock! @auth(role: admin)
 	adjustStartTime(startTime: DateTime!, keepDuration: Boolean): Clock!
-	adjustFinishTime(finishTime: DateTime!): Clock!
+		@auth(role: admin)
+	adjustFinishTime(finishTime: DateTime!): Clock! @auth(role: admin)
+	releaseResults: Clock! @auth(role: admin)
 }
 
 type Clock {
@@ -23,6 +25,4 @@ enum ClockStatus {
 	running
 }
 
-directive @clock(
-	disallowedStatus: [ClockStatus!]! = [before, after, freeze, hold]
-) on FIELD_DEFINITION
+directive @clock on FIELD_DEFINITION
