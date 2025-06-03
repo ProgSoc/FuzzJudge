@@ -2,16 +2,23 @@ import path from "node:path";
 import { competitionRoot } from "@/config.ts";
 import { pubSub } from "@/pubsub.ts";
 import type { ClockStatus } from "@/schema/types.generated";
-import { competitionSpec } from "@/services/competition.service.ts";
+import { type Times, competitionSpec } from "@/services/competition.service.ts";
 import { GraphQLError } from "graphql";
 import { readMarkdown, writeFrontmatter } from "../lib/writeMd.ts";
 
+let cacheNow: Times | null = null;
 export async function now() {
+	if (cacheNow) {
+		return cacheNow;
+	}
 	const competitionConfig = path.join(competitionRoot, "comp.md");
 	// parse the compeition config file to get the start and finish times
 	const {
 		frontmatter: { times },
 	} = await readMarkdown(competitionConfig, competitionSpec);
+
+	cacheNow = times;
+
 	return times;
 }
 
@@ -37,6 +44,11 @@ export async function adjustStart(time: Date, moveDuration = false) {
 		hold: currentTimes.hold,
 	};
 
+	cacheNow = {
+		...newTimes,
+		freeze: currentTimes.freeze,
+	};
+
 	pubSub.publish("clock", newTimes);
 
 	return newTimes;
@@ -58,6 +70,11 @@ export async function adjustFinish(newFinish: Date) {
 		start: currentTimes.start,
 		finish: newFinish,
 		hold: currentTimes.hold,
+	};
+
+	cacheNow = {
+		...newTimes,
+		freeze: currentTimes.freeze,
 	};
 
 	pubSub.publish("clock", newTimes);
@@ -82,6 +99,11 @@ export async function holdClockTime() {
 		hold: holdDate,
 		start: currentTimes.start,
 		finish: currentTimes.finish,
+	};
+
+	cacheNow = {
+		...newTimes,
+		freeze: currentTimes.freeze,
 	};
 
 	pubSub.publish("clock", newTimes);
@@ -112,12 +134,17 @@ export async function releaseClockTime(extendDuration = false) {
 		finish: newFinish,
 	};
 
+	cacheNow = {
+		...newTimes,
+		freeze: currentTimes.freeze,
+	};
+
 	pubSub.publish("clock", newTimes);
 
 	return newTimes;
 }
 
-const getCompetitionState = async (
+export const getCompetitionState = async (
 	clockTimes: Awaited<ReturnType<typeof now>>,
 ): Promise<ClockStatus[]> => {
 	const clockState: ClockStatus[] = [];

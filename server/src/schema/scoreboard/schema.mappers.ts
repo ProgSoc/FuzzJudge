@@ -1,6 +1,7 @@
 export interface ScoreboardRowMapper {
 	rank: number;
 	teamId: number;
+	teamHidden: boolean;
 	points: number;
 	penalty: number;
 	problems: ProblemScoreMapper[];

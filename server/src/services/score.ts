@@ -1,8 +1,31 @@
+import path from "node:path";
 import { competitionRoot } from "@/config";
 import type { ScoreboardRowMapper } from "@/schema/scoreboard/schema.mappers";
+import { z } from "zod";
 import { db } from "../db";
 import { getCompetitionData } from "./competition.service";
 import { getProblems } from "./problems.service";
+
+const problemScoreSpec = z.object({
+	slug: z.string(),
+	solved: z.boolean(),
+	points: z.number(),
+	penalty: z.number(),
+	tries: z.number(),
+});
+
+export type ProblemScore = z.infer<typeof problemScoreSpec>;
+
+const scoreboardRowSpec = z.object({
+	rank: z.number(),
+	teamId: z.number(),
+	teamHidden: z.boolean(),
+	points: z.number(),
+	penalty: z.number(),
+	problems: z.array(problemScoreSpec),
+});
+
+export type ScoreboardRow = z.infer<typeof scoreboardRowSpec>;
 
 /**
  * Generate the entire scoreboard
@@ -10,7 +33,7 @@ import { getProblems } from "./problems.service";
  * @param startTim The start time of the competition
  * @return The scoreboard with all teams and their scores
  */
-export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
+export async function calculateScoreboard(): Promise<ScoreboardRow[]> {
 	const competitionData = await getCompetitionData(competitionRoot);
 
 	const startTime = competitionData.times.start;
@@ -28,10 +51,9 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 
 	// for each team, get the submissions grouped by problem
 	const teamsAndSubmissions = await db.query.teamTable.findMany({
-		where: (teamTable, { eq }) => eq(teamTable.hidden, false), // Only include visible teams
 		columns: {
 			id: true,
-			name: true,
+			hidden: true, // Include hidden field if needed
 		},
 		with: {
 			submissions: {
@@ -53,6 +75,7 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 		.map((team) => ({
 			id: team.id,
 			submissions: team.submissions,
+			hidden: team.hidden,
 		}));
 
 	/**
@@ -121,6 +144,8 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 		return {
 			/** Team Name */
 			teamId: team.id,
+			/**  Team Hidden */
+			teamHidden: team.hidden,
 			/**  Total points */
 			points: totalScore.points,
 			/** Total Penalty (Not Applied) */
@@ -141,11 +166,13 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 			}
 			return teamA.penalty - teamB.penalty; // If points are equal, sort by penalty ascending
 		})
-		.map(({ points, penalty, problems, teamId }, index) => ({
+		.map(({ points, penalty, problems, teamId, teamHidden }, index) => ({
 			/** Rank of the team */
 			rank: index + 1,
 			/** Team Name */
 			teamId,
+			/** Team Hidden */
+			teamHidden,
 			/** Total Points */
 			points,
 			/** Total Penalty (Not Applied) */
@@ -156,6 +183,47 @@ export async function calculateScoreboard(): Promise<ScoreboardRowMapper[]> {
 
 	return scoreboard;
 }
+
+let cachedScoreboard: ScoreboardRow[] | null = null;
+
+export const getCachedScoreboard = async (): Promise<ScoreboardRow[]> => {
+	if (cachedScoreboard) {
+		return cachedScoreboard; // Return cached scoreboard if available
+	}
+	const filePath = path.join(competitionRoot, "scoreboard.json");
+	try {
+		const scoreboardData = await Bun.file(filePath).json();
+
+		// safe parse the scoreboard data
+		const parsedScoreboard = scoreboardRowSpec
+			.array()
+			.safeParse(scoreboardData);
+		if (parsedScoreboard.success) {
+			return parsedScoreboard.data;
+		}
+		console.error("Invalid scoreboard data format:", parsedScoreboard.error);
+		return [];
+	} catch (error) {
+		console.error("Error reading cached scoreboard:", error);
+		return [];
+	}
+};
+
+/**
+ * Write the scoreboard to a file
+ * @param scoreboard The scoreboard to write to the file
+ */
+export const writeScoreboardToFile = async (
+	scoreboard: ScoreboardRow[],
+): Promise<void> => {
+	cachedScoreboard = scoreboard; // Cache the scoreboard for future use
+	const filePath = path.join(competitionRoot, "scoreboard.json");
+	try {
+		await Bun.write(filePath, JSON.stringify(scoreboard, null, 2));
+	} catch (error) {
+		console.error("Error writing scoreboard to file:", error);
+	}
+};
 
 /**
  * Calculate the score for a single team (used for incremental updates) of the scoreboard
@@ -176,6 +244,17 @@ async function calculateTeamScore(
 
 	if (!startTime) {
 		throw new Error("Competition start time is not defined");
+	}
+
+	const team = await db.query.teamTable.findFirst({
+		where: (teamTable, { eq }) => eq(teamTable.id, teamId),
+		columns: {
+			id: true,
+			hidden: true, // Include hidden field if needed
+		},
+	});
+	if (!team) {
+		throw new Error(`Team with id ${teamId} not found`);
 	}
 
 	// Map the problems to a new object with only the slug and points
@@ -254,6 +333,8 @@ async function calculateTeamScore(
 	return {
 		/** Team Name */
 		teamId,
+		/** Team Hidden */
+		teamHidden: team.hidden,
 		/**  Total points */
 		points: totalScore.points,
 		/** Total Penalty (Not Applied) */

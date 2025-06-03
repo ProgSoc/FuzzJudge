@@ -2,10 +2,12 @@ import { competitionRoot } from "@/config";
 import { db } from "@/db";
 import { pubSub } from "@/pubsub";
 import { getProblemData, judgeProblem } from "@/services/problems.service";
-import { calculateScoreboard } from "@/services/score";
+import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
 import { postSubmission, solved } from "@/services/submission.service";
+import { getCompetitionState, now } from "@/v1/clock";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
+
 export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	_parent,
 	{ code, output, slug },
@@ -59,9 +61,15 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 		});
 
 		console.log(`✅ Problem ${submission.id} solved by ${user.name}`);
-		if (!userTeam.hidden) {
-			pubSub.publish("scoreboard", await calculateScoreboard());
+		const competitionTimes = await now();
+		const competitionState = await getCompetitionState(competitionTimes);
+
+		const scoreboard = await calculateScoreboard();
+		if (!competitionState.includes("freeze")) {
+			await writeScoreboardToFile(scoreboard);
 		}
+
+		pubSub.publish("scoreboard", scoreboard);
 
 		return {
 			__typename: "JudgeSuccessOutput",
