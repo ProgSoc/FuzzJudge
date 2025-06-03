@@ -1,5 +1,7 @@
 # @progsoc/fj-svelte
 
+## 0.4.0
+
 ## 0.3.14
 
 ### Patch Changes
