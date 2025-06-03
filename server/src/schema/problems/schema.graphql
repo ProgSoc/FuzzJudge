@@ -4,8 +4,10 @@ extend type Query {
 }
 
 extend type Mutation {
-	judge(slug: String!, code: String!, output: String!): JudgeOutput! @auth
-	getFuzz(slug: String!): String! @auth
+	judge(slug: String!, code: String!, output: String!): JudgeOutput!
+		@auth
+		@clock
+	getFuzz(slug: String!): String! @auth @clock
 	getAdminFuzz(slug: String!, teamId: Int!): String! @auth(role: admin)
 }
 
@@ -27,6 +29,6 @@ type Problem @auth {
 	brief: String!
 	difficulty: Int! # 1-3
 	points: Int!
-	instructions: String!
-	solved: Boolean!
+	instructions: String! @clock
+	solved: Boolean! @clock @auth
 }
