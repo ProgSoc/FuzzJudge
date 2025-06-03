@@ -1,5 +1,15 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.1
+
+### Patch Changes
+
+- [#231](https://github.com/ProgSoc/FuzzJudge/pull/231) [`4aae373`](https://github.com/ProgSoc/FuzzJudge/commit/4aae3739d200fd260499aebdcfe12ff6bc6b860a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change the way time data is handled
+
+- [`b1f34c4`](https://github.com/ProgSoc/FuzzJudge/commit/b1f34c49a75006a7869d49140bfe40d85a265f65) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Enable scoreboard update for manual overrides
+
+- [#231](https://github.com/ProgSoc/FuzzJudge/pull/231) [`4aae373`](https://github.com/ProgSoc/FuzzJudge/commit/4aae3739d200fd260499aebdcfe12ff6bc6b860a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Simplify competition state calculator
+
 ## 0.4.0
 
 ### Minor Changes
