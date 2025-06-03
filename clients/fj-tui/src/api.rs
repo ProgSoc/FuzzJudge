@@ -61,12 +61,6 @@ pub struct ClockSubscription;
 )]
 pub struct CurrentUserQuery;
 
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "../../server/src/schema/schema.generated.graphqls",
-    query_path = "src/queries/FuzzMutation.gql"
-)]
-pub struct FuzzMutation;
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -139,9 +133,9 @@ impl Session {
         }
     }
 
-    pub async fn fuzz(&self, slug: String) -> Result<String, String> {
+    pub async fn fuzz(&self, slug: String) -> Result<Option<String>, String> {
         let url = self.server.join("/graphql").expect("Invalid GraphQL URL");
-        let req_body = FuzzMutation::build_query(fuzz_mutation::Variables { slug });
+        let req_body = ProblemQuery::build_query(problem_query::Variables { slug });
         let response = self
             .client
             .post(url)
@@ -152,7 +146,7 @@ impl Session {
             .map_err(|e| e.to_string())?;
            
 
-        let response_body: Response<fuzz_mutation::ResponseData> = response.json().await.map_err(|e| e.to_string())?;
+        let response_body: Response<problem_query::ResponseData> = response.json().await.map_err(|e| e.to_string())?;
 
         if let Some(errors) = response_body.errors {
             let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
@@ -160,7 +154,7 @@ impl Session {
         }
         let data = response_body.data.ok_or("No data in response")?;
 
-        Ok(data.get_fuzz)
+        Ok(data.problem.fuzz)
     }
 
     pub async fn judge(

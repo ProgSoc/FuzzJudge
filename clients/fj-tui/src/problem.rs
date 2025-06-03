@@ -20,5 +20,5 @@ pub struct Problem {
     pub icon: String,
     pub difficulty: i64,
     pub points: i64,
-    pub instructions: String,
+    pub instructions: Option<String>
 }

@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { GraphQLError } from "graphql";
 import { z } from "zod";
 import { readMarkdown } from "../lib/writeMd";
 
@@ -122,14 +123,14 @@ export async function fuzzProblem(root: string, slug: string, seed: string) {
 	if (proc.exitCode !== 0) {
 		const errText = await err.text();
 		if (errText.length > 0) {
-			throw new Error(`Fuzzing error: ${errText}`);
+			throw new GraphQLError(`Fuzzing error: ${errText}`);
 		}
-		throw new Error("Fuzzing error: unknown error");
+		throw new GraphQLError("Fuzzing error: unknown error");
 	}
 
 	const outText = await out.text();
 	if (outText.length === 0) {
-		throw new Error("Fuzzing error: no output");
+		throw new GraphQLError("Fuzzing error: no output");
 	}
 
 	return outText;

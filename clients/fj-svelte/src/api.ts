@@ -17,10 +17,12 @@ import { queryOptions } from "@tanstack/svelte-query";
 import { client } from "./gql/sdk";
 import { showNotification } from "./notifications";
 
-export const fuzzQuery = (slug: string) =>
+export const problemQueryOption = (slug: string) =>
 	queryOptions({
-		queryKey: ["fuzz", slug],
-		queryFn: async () => client.GetProblemFuzz({ problemId: slug }),
+		queryKey: ["problem", slug],
+		queryFn: () => client.ProblemData({ problemSlug: slug }),
+		select: (data: Awaited<ReturnType<typeof client.ProblemData>>) =>
+			data.data.problem,
 	});
 
 export async function downloadFuzz(slug: string, fuzz: string) {

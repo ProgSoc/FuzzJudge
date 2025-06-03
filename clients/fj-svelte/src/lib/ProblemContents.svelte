@@ -21,8 +21,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import { client } from "../gql/sdk";
   import { difficultyName, removeMdTitle, selectedProblem } from "../utils";
   import SubmissionArea from "./SubmissionArea.svelte";
+  import { problemQueryOption } from "../api";
 
-  // biome-ignore lint/style/useConst: svelte
   let problemInstructions: HTMLDivElement | undefined = $state(undefined);
 
   // Reset scroll to top when a new problem is selected
@@ -44,25 +44,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
    * Points
    * Body
    */
-  const problemQuery = createQuery(
-    derived(selectedProblem, ($selectedProblem) => ({
-      queryKey: ["problem", $selectedProblem],
-      queryFn: () => client.ProblemData({ problemSlug: $selectedProblem }),
-      select: (data: Awaited<ReturnType<typeof client.ProblemData>>) => data.data.problem,
-    })),
+  const problemData = createQuery(
+    derived(selectedProblem, ($selectedProblem) =>
+      problemQueryOption($selectedProblem),
+    ),
   );
 </script>
 
 <div class="problem" bind:this={problemInstructions}>
   <div id="problem-instructions" class="problem-instructions">
     {#if $selectedProblem !== undefined}
-      {#if $problemQuery.data}
+      {#if $problemData.data}
         <h1 style="margin-top: 0px;">
-          <span style={$problemQuery.data.solved ? "text-decoration: line-through;" : ""}>
-            {$problemQuery.data.name}
+          <span
+            style={$problemData.data.solved
+              ? "text-decoration: line-through;"
+              : ""}
+          >
+            {$problemData.data.name}
           </span>
 
-          {#if $problemQuery.data.solved}
+          {#if $problemData.data.solved}
             <span style="font-size: 1.3rem;">✓</span>
           {/if}
         </h1>
@@ -70,13 +72,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         <div class="stats">
           <span style="margin-right: 1rem;"
             ><b>Difficulty:</b>
-            {difficultyName($problemQuery.data.difficulty)}</span
+            {difficultyName($problemData.data.difficulty)}</span
           >
-          <span><b>Points:</b> {$problemQuery.data.points}</span>
+          <span><b>Points:</b> {$problemData.data.points}</span>
         </div>
 
         <div id="instructions-md">
-          <SvelteMarkdown source={removeMdTitle($problemQuery.data.instructions)} />
+          {#if $problemData.data.instructions}
+            <SvelteMarkdown
+              source={removeMdTitle($problemData.data.instructions)}
+            />
+          {/if}
         </div>
       {/if}
 

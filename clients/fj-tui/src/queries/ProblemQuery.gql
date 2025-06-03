@@ -5,5 +5,6 @@ query ProblemQuery($slug: String!) {
 		instructions
 		difficulty
 		points
+		fuzz
 	}
 }

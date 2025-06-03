@@ -1,3 +1,0 @@
-mutation FuzzMutation($slug: String!) {
-	getFuzz(slug: $slug)
-}

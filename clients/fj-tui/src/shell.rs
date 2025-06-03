@@ -131,10 +131,10 @@ pub async fn exec(
 
             let out = match response {
                 Ok(response) => response,
-                Err(e) => e.to_string(),
+                Err(e) => Some(e.to_string()),
             };
 
-            output.println(&out).await;
+            output.println(out.as_deref().unwrap_or("")).await;
         }
         "j" | "judge" => {
             if args.len() != 2 {

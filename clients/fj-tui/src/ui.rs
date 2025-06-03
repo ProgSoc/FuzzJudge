@@ -135,7 +135,7 @@ fn instructions(
                 app_state.problems[s].difficulty,
                 app_state.problems[s].points,
             ),
-            None => ("".to_string(), "No problem selected".to_string(), 0, 0),
+            None => ("".to_string(), Some("No Question Selected".to_string()), 0, 0),
         };
 
     let mut contents: Vec<Line> = vec![];
@@ -146,7 +146,7 @@ fn instructions(
         clock::ClockState::During
     };
 
-    let md = markdown::to_mdast(&md_source, &markdown::ParseOptions::default()).unwrap();
+    let md = markdown::to_mdast(md_source.as_deref().unwrap_or(""), &markdown::ParseOptions::default()).unwrap();
 
     match clock_state {
         ClockState::During => {

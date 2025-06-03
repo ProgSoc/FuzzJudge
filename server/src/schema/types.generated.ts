@@ -68,7 +68,6 @@ export type Mutation = {
   deleteTeam: Team;
   deleteUser: User;
   getAdminFuzz: Scalars['String']['output'];
-  getFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
   overrideJudge: Submission;
@@ -118,11 +117,6 @@ export type MutationGetAdminFuzzArgs = {
 };
 
 
-export type MutationGetFuzzArgs = {
-  slug: Scalars['String']['input'];
-};
-
-
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
@@ -158,12 +152,13 @@ export type Problem = {
   __typename?: 'Problem';
   brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
+  fuzz?: Maybe<Scalars['String']['output']>;
   icon: Scalars['String']['output'];
-  instructions: Scalars['String']['output'];
+  instructions?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
-  solved: Scalars['Boolean']['output'];
+  solved?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ProblemScore = {
@@ -456,7 +451,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteUserArgs, 'id'>>;
   getAdminFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetAdminFuzzArgs, 'slug' | 'teamId'>>;
-  getFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetFuzzArgs, 'slug'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
   overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
@@ -469,12 +463,13 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Problem'] = ResolversParentTypes['Problem']> = {
   brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   difficulty?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  fuzz?: Resolver<Maybe<ResolversTypes['String']>, ParentType, AuthenticatedContext<ContextType>>;
   icon?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  instructions?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  solved?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  solved?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, AuthenticatedContext<ContextType>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

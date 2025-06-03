@@ -14,8 +14,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
-  import { downloadFuzz, fuzzQuery } from "../api";
+  import {
+    createMutation,
+    createQuery,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
+  import { downloadFuzz, problemQueryOption } from "../api";
   import type { JudgeSubmissionMutationVariables } from "../gql";
   import { client } from "../gql/sdk";
   import { showNotification } from "../notifications";
@@ -33,7 +37,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   const queryClient = useQueryClient();
 
   const submitMutation = createMutation({
-    mutationFn: (options: JudgeSubmissionMutationVariables) => client.JudgeSubmission(options),
+    mutationFn: (options: JudgeSubmissionMutationVariables) =>
+      client.JudgeSubmission(options),
     onSuccess: (data) => {
       if (data.data.judge.__typename === "JudgeErrorOutput") {
         showNotification("Submission failed. Please check the error message.");
@@ -52,7 +57,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     },
   });
 
-  const fuzz = createQuery(derived(selectedProblem, ($selectedProblem) => fuzzQuery($selectedProblem)));
+  const problemQuery = createQuery(
+    derived(selectedProblem, ($selectedProblem) =>
+      problemQueryOption($selectedProblem),
+    ),
+  );
 
   const submit = (slug: string) => {
     $submitMutation.mutate({
@@ -63,13 +72,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   };
 
   const handleDownload = async () => {
-    const fuzzData = await queryClient.ensureQueryData(fuzzQuery($selectedProblem));
-    downloadFuzz($selectedProblem, fuzzData.data.getFuzz);
+    const fuzzData = await queryClient.ensureQueryData(
+      problemQueryOption($selectedProblem),
+    );
+    const { fuzz } = fuzzData.data.problem;
+    if (!fuzz) {
+      showNotification("No fuzz input available to download.");
+      return;
+    }
+    downloadFuzz($selectedProblem, fuzz);
   };
 
   const handleCopy = async () => {
-    const fuzzData = await queryClient.ensureQueryData(fuzzQuery($selectedProblem));
-    await navigator.clipboard.writeText(fuzzData.data.getFuzz);
+    const fuzzData = await queryClient.ensureQueryData(
+      problemQueryOption($selectedProblem),
+    );
+    const { fuzz } = fuzzData.data.problem;
+    if (!fuzz) {
+      showNotification("No fuzz input available to copy.");
+      return;
+    }
+    await navigator.clipboard.writeText(fuzz);
     showNotification("Fuzz input copied to clipboard!");
   };
 
@@ -120,17 +143,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div class="section submission-areas">
       <div class="solution-submission">
         <h2>Problem Input</h2>
-        {#if $fuzz.isLoading}
+        {#if $problemQuery.isLoading}
           <textarea value={"Loading"} readonly></textarea>
-        {:else if $fuzz.isError}
+        {:else if $problemQuery.isError}
           <textarea value={"Error loading input"} readonly></textarea>
-        {:else if $fuzz.data?.data.getFuzz === null}
+        {:else if !$problemQuery.data?.fuzz}
           <textarea value={"No Input"} readonly></textarea>
         {:else}
-          <textarea value={$fuzz.data?.data.getFuzz} readonly></textarea>
+          <textarea value={$problemQuery.data.fuzz} readonly></textarea>
         {/if}
       </div>
-      <button class="get-input" onclick={handleDownload}> Download Input </button>
+      <button class="get-input" onclick={handleDownload}>
+        Download Input
+      </button>
       <button class="get-input" onclick={handleCopy}> Copy Input </button>
       <div class="solution-submission">
         <h2>Problem Solution</h2>
