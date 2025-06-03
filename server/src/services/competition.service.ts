@@ -11,6 +11,9 @@ export const timesSpec = z.object({
 	freeze: z.number(), // The number of minutes before the end of the competition when the scoreboard is frozen
 });
 
+const partialTimeSpec = timesSpec.partial();
+export type PartialTimes = z.infer<typeof partialTimeSpec>;
+
 export type Times = z.infer<typeof timesSpec>;
 
 export const competitionSpec = z.object({
@@ -22,6 +25,8 @@ export const competitionSpec = z.object({
 		.optional(),
 	times: timesSpec,
 });
+
+export type CompetitionSpec = z.infer<typeof competitionSpec>;
 
 export async function getCompetitionData(root: string) {
 	const filePath = path.join(root, "comp.md");

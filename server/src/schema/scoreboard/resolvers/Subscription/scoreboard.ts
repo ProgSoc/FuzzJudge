@@ -14,6 +14,7 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 		const potentialUser = c.get("user");
 		const isAdmin = potentialUser?.role === "admin";
 		const isCurrentlyFrozen = await isFrozen();
+		// If they're an admin, or if the scoreboard is not frozen, calculate the scoreboard
 		if (isCurrentlyFrozen && !isAdmin) {
 			// return a cached scoreboard if the scoreboard is frozen and the user is not an admin
 			const scoreboard = await getCachedScoreboard();

@@ -11,8 +11,9 @@ import * as TOML from "smol-toml";
 import yaml from "yaml";
 import type { z } from "zod";
 import {
+	type CompetitionSpec,
+	type PartialTimes,
 	competitionSpec,
-	type timesSpec,
 } from "../services/competition.service";
 
 export async function readMarkdown<TSchema extends z.AnyZodObject>(
@@ -51,14 +52,14 @@ export async function readMarkdown<TSchema extends z.AnyZodObject>(
 
 export async function writeCompetitionTimes(
 	filePath: string,
-	data: Partial<z.infer<typeof timesSpec>>,
+	data: PartialTimes,
 ) {
 	const { content, frontmatter, language } = await readMarkdown(
 		filePath,
 		competitionSpec,
 	);
 
-	const newFrontmatter: z.infer<typeof competitionSpec> = {
+	const newFrontmatter: CompetitionSpec = {
 		...frontmatter,
 		times: {
 			...frontmatter.times,

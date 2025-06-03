@@ -105,10 +105,13 @@ export const releaseResults = async () => {
 	const newTimes = await writeCompetitionTimes(competitionConfigPath, {
 		isReleased: true,
 	});
-	pubSub.publish("clock", newTimes);
-	const scoreboard = await calculateScoreboard();
 
+	cacheNow = newTimes;
+	pubSub.publish("clock", newTimes);
+
+	const scoreboard = await calculateScoreboard();
 	pubSub.publish("scoreboard", scoreboard);
+
 	return newTimes;
 };
 
@@ -140,5 +143,5 @@ export const isFrozen = async () => {
 
 	const afterFreeze = nowDate >= freezeStart;
 
-	return afterFreeze || !!currentTimes.isReleased;
+	return afterFreeze && !currentTimes.isReleased; // Only frozen if after the freeze start time and results are not released
 };
