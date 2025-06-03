@@ -5,7 +5,6 @@ extend type Subscription {
 type ScoreboardRow {
 	rank: Int!
 	teamId: Int!
-	teamHidden: Boolean!
 	team: Team!
 	points: Int!
 	penalty: Float!

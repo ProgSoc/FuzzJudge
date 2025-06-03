@@ -55,7 +55,7 @@ export async function getProblemData(root: string, slug: string) {
 		content,
 	};
 }
-interface Problem extends ProblemSpec {
+export interface Problem extends ProblemSpec {
 	slug: string;
 	content: string;
 	attributes: MarkdownAttributes;

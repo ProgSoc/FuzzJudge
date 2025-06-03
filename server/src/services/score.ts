@@ -1,6 +1,5 @@
 import path from "node:path";
 import { competitionRoot } from "@/config";
-import type { ScoreboardRowMapper } from "@/schema/scoreboard/schema.mappers";
 import { z } from "zod";
 import { db } from "../db";
 import { getCompetitionData } from "./competition.service";
@@ -234,7 +233,7 @@ export const writeScoreboardToFile = async (
  */
 async function calculateTeamScore(
 	teamId: number,
-): Promise<Omit<ScoreboardRowMapper, "rank"> | null> {
+): Promise<Omit<ScoreboardRow, "rank"> | null> {
 	// Load the problem set
 	const problemsData = await getProblems(competitionRoot);
 
