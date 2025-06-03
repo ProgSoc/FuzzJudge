@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.2
+
+### Patch Changes
+
+- [`40912f2`](https://github.com/ProgSoc/FuzzJudge/commit/40912f2c2c076f49f14b0f1a9ca191628943345b) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Lock question details behind clock
+
 ## 0.4.1
 
 ### Patch Changes
