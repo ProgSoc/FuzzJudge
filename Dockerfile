@@ -43,3 +43,27 @@ COPY --from=prerelease /usr/src/app/server/package.json server/package.json
 USER bun
 EXPOSE 1989/tcp
 ENTRYPOINT [ "bun", "run", "start" ]
+
+FROM release as release-runtimes
+
+USER root
+
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories
+# Install Different Programming Languages (apk)
+RUN apk upgrade --no-cache
+
+RUN apk add --no-cache \
+    curl \
+    python3 \
+    py3-pip \
+    gcc \
+    g++ \
+    make \
+    deno
+
+USER bun
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+
+ENV PATH="/home/bun/.cargo/bin:$PATH"

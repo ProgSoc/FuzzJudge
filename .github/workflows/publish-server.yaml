@@ -80,14 +80,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: meta
+      - name: Docker Meta Release
+        id: meta-release
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
           tags: |
             # use custom value instead of git tag
             type=raw,value=latest
+            type=semver,pattern={{version}},value=${{ matrix.package.version }}
+            type=semver,pattern={{major}},value=${{ matrix.package.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
+            type=sha
+      - name: Docker Meta Release (runtimes)
+        id: meta-release-runtimes
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: |
+            prefix=runtimes-
+          tags: |
+            # use custom value instead of git tag
             type=semver,pattern={{version}},value=${{ matrix.package.version }}
             type=semver,pattern={{major}},value=${{ matrix.package.version }}
             type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
@@ -108,9 +121,19 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta-release.outputs.tags }}
           push: true
-          labels: ${{ steps.meta.outputs.labels }}
+          target: release
+          labels: ${{ steps.meta-release.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:latest
+          platforms: linux/amd64,linux/arm64
+      - name: Build and Push Runtimes
+        uses: docker/build-push-action@v6
+        with:
+          tags: ${{ steps.meta-release-runtimes.outputs.tags }}
+          push: true
+          target: release-runtimes
+          labels: ${{ steps.meta-release-runtimes.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE }}:runtimes-latest
           platforms: linux/amd64,linux/arm64
       
