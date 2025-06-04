@@ -101,7 +101,6 @@ jobs:
             prefix=runtimes-,onlatest=true
           tags: |
             # use custom value instead of git tag
-            type=raw,value=runtimes-latest
             type=semver,pattern={{version}},value=${{ matrix.package.version }}
             type=semver,pattern={{major}},value=${{ matrix.package.version }}
             type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
