@@ -43,9 +43,7 @@ export function streamedQuery<
 			}
 
 			if (chunk.errors) {
-				throw new Error(
-					`GraphQL errors: ${chunk.errors.map((e) => e.message).join(", ")}`,
-				);
+				throw chunk.errors;
 			}
 
 			if (chunk.data === undefined || chunk.data === null) {
