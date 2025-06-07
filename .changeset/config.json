@@ -9,6 +9,7 @@
 		[
 			"@progsoc/fuzzjudge-server",
 			"@progsoc/fj-svelte",
+			"@progsoc/fj-react",
 			"@progsoc/fj-admin-html"
 		]
 	],
