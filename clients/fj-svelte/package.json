@@ -2,10 +2,7 @@
 	"name": "@progsoc/fj-svelte",
 	"private": true,
 	"version": "0.4.6",
-	"files": [
-		"dist",
-		"LICENSE.md"
-	],
+	"files": ["dist", "LICENSE.md"],
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -25,7 +22,7 @@
 		"datauri": "4.1.0",
 		"graphql-request": "7.2.0",
 		"knip": "5.60.2",
-		"svelte": "5.33.14",
+		"svelte": "5.33.16",
 		"svelte-check": "4.2.1",
 		"svelte-markdown": "0.4.1",
 		"typescript": "5.8.3",
