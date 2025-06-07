@@ -14,6 +14,9 @@
 		},
 		{
 			"path": "./clients/fj-admin-html/tsconfig.json"
+		},
+		{
+			"path": "./clients/fj-client-react/tsconfig.json"
 		}
 	]
 }
