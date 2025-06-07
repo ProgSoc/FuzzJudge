@@ -15,6 +15,7 @@ const queryClient = new QueryClient();
 
 // Create a new router instance
 const router = createRouter({
+	basepath: import.meta.env.BASE_URL,
 	routeTree,
 	context: {
 		queryClient,

@@ -267,12 +267,33 @@ export enum UserRole {
   Competitor = 'competitor'
 }
 
+export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string }> }> };
+
 export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQueryQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string } };
 
 
+export const LeaderboardSubscriptionDocument = `
+    subscription LeaderboardSubscription {
+  scoreboard {
+    points
+    penalty
+    teamId
+    team {
+      name
+    }
+    problems {
+      solved
+      slug
+    }
+  }
+}
+    `;
 export const MeQueryDocument = `
     query MeQuery {
   me {
@@ -288,6 +309,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);
+    },
     MeQuery(variables?: MeQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: MeQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<MeQueryQuery>(MeQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'MeQuery', 'query', variables);
     }

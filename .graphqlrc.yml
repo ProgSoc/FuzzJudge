@@ -1,0 +1,6 @@
+schema: './server/src/schema/schema.generated.graphqls'
+documents: './clients/**/*.{graphql,gql,js,ts,jsx,tsx}'
+extensions:
+  endpoints:
+    default: 
+      url: 'http://localhost:1989/graphql'
