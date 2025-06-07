@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
+	base: "/clients/fj-react/",
 	plugins: [
 		TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
 		react({
@@ -38,4 +39,17 @@ export default defineConfig({
 			},
 		}),
 	],
+	build: {
+		outDir: "../../server/dist/clients/fj-react",
+		emptyOutDir: true,
+	},
+	server: {
+		proxy: {
+			"/graphql": {
+				target: "http://localhost:1989",
+				changeOrigin: true,
+				ws: true,
+			},
+		},
+	},
 });

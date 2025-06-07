@@ -14,9 +14,9 @@
 			"./server/**/*.generated.ts",
 			"./clients/fj-svelte/src/gql/index.ts",
 			"./clients/fj-admin-html/src/gql/index.ts",
-			"./clients/fj-client-react/src/routeTree.gen.ts",
-			"./clients/fj-client-react/dist",
-			"./clients/fj-client-react/src/gql/index.ts"
+			"./clients/fj-react/src/routeTree.gen.ts",
+			"./clients/fj-react/dist",
+			"./clients/fj-react/src/gql/index.ts"
 		]
 	},
 	"formatter": {
