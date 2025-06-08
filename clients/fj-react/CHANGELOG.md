@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.4.17
+
+### Patch Changes
+
+- [#268](https://github.com/ProgSoc/FuzzJudge/pull/268) [`8302a60`](https://github.com/ProgSoc/FuzzJudge/commit/8302a60918e67501018710d50efa60069c5b120b) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Update leaderboard.tsx
+
 ## 0.4.16
 
 ### Patch Changes
