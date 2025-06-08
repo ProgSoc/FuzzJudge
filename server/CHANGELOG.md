@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.12
+
+### Patch Changes
+
+- [`db7ae3c`](https://github.com/ProgSoc/FuzzJudge/commit/db7ae3c573cb550fb804dd52180c95ace3d1e282) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Split os workflow build
+
 ## 0.4.11
 
 ### Patch Changes
