@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.13
+
+### Patch Changes
+
+- [`d432a5c`](https://github.com/ProgSoc/FuzzJudge/commit/d432a5ccf8cb6939d6b345da81fba9aaec2df7c0) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Run on arm runner
+
 ## 0.4.12
 
 ### Patch Changes
