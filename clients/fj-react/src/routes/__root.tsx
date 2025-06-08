@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { FaHome, FaList } from "react-icons/fa";
+import { MdPeople } from "react-icons/md";
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -19,9 +20,14 @@ export const Route = createRootRouteWithContext<{
 						icon: <FaHome />,
 					},
 					{
+						label: "Problems",
+						to: "/problems",
+						icon: <FaList />,
+					},
+					{
 						label: "Leaderboard",
 						to: "/leaderboard",
-						icon: <FaList />,
+						icon: <MdPeople />,
 					},
 				]}
 				style={{ marginTop: "auto" }}
