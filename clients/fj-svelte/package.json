@@ -22,7 +22,7 @@
 		"datauri": "4.1.0",
 		"graphql-request": "7.2.0",
 		"knip": "5.60.2",
-		"svelte": "5.33.16",
+		"svelte": "5.33.17",
 		"svelte-check": "4.2.1",
 		"svelte-markdown": "0.4.1",
 		"typescript": "5.8.3",
@@ -30,8 +30,8 @@
 		"vite-tsconfig-paths": "5.1.4"
 	},
 	"dependencies": {
-		"@tanstack/svelte-query": "5.80.5",
-		"@tanstack/svelte-query-devtools": "5.80.5",
+		"@tanstack/svelte-query": "5.80.6",
+		"@tanstack/svelte-query-devtools": "5.80.6",
 		"graphql": "16.11.0",
 		"graphql-ws": "6.0.5"
 	}
