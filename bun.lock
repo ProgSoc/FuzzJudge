@@ -18,7 +18,7 @@
     },
     "clients/fj-admin-html": {
       "name": "@progsoc/fj-admin-html",
-      "version": "0.4.7",
+      "version": "0.4.8",
       "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
@@ -33,7 +33,7 @@
     },
     "clients/fj-react": {
       "name": "@progsoc/fj-react",
-      "version": "0.4.7",
+      "version": "0.4.8",
       "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.0",
@@ -74,7 +74,7 @@
     },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
-      "version": "0.4.7",
+      "version": "0.4.8",
       "dependencies": {
         "@tanstack/svelte-query": "5.80.6",
         "@tanstack/svelte-query-devtools": "5.80.6",
@@ -101,7 +101,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.4.7",
+      "version": "0.4.8",
       "bin": "dist/index.js",
       "dependencies": {
         "@graphql-tools/utils": "10.8.6",
@@ -1748,8 +1748,6 @@
 
     "@tanstack/router-utils/diff": ["diff@7.0.0", "", {}, "sha512-PJWHUb1RFevKCwaFA9RlG5tCd+FO5iRh9A8HEtkmBH2Li03iJriB6m6JIN4rGz3K3JLawI7/veA1xzRKP6ISBw=="],
 
-    "@tanstack/svelte-query/@tanstack/query-core": ["@tanstack/query-core@5.80.5", "", {}, "sha512-kFWXdQOUcjL/Ugk3GrI9eMuG3DsKBGaLIgyOLekR2UOrRrJgkLgPUNzZ10i8FCkfi4SgLABhOtQhx1HjoB9EZQ=="],
-
     "@typescript-eslint/eslint-plugin/ignore": ["ignore@7.0.5", "", {}, "sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg=="],
 
     "@typescript/analyze-trace/p-limit": ["p-limit@3.1.0", "", { "dependencies": { "yocto-queue": "^0.1.0" } }, "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ=="],
@@ -1775,8 +1773,6 @@
     "hoist-non-react-statics/react-is": ["react-is@16.13.1", "", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 
     "import-fresh/resolve-from": ["resolve-from@4.0.0", "", {}, "sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g=="],
-
-    "knip/zod": ["zod@3.25.51", "", {}, "sha512-TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg=="],
 
     "listr2/wrap-ansi": ["wrap-ansi@7.0.0", "", { "dependencies": { "ansi-styles": "^4.0.0", "string-width": "^4.1.0", "strip-ansi": "^6.0.0" } }, "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q=="],
 
