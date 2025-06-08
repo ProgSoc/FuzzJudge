@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.8
+
+### Patch Changes
+
+- [`4fe21f3`](https://github.com/ProgSoc/FuzzJudge/commit/4fe21f3f01e0e9624cb24afa3b44b44fa751e3b2) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix lock
+
 ## 0.4.7
 
 ## 0.4.6
