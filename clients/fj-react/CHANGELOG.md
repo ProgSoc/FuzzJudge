@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.4.16
+
+### Patch Changes
+
+- [`3405839`](https://github.com/ProgSoc/FuzzJudge/commit/3405839a99c09d81c404707ed4784ed7a3309e46) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Improve the react client and fix some types that don't need auth
+
 ## 0.4.15
 
 ## 0.4.14
