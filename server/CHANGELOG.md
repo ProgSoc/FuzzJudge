@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.14
+
+### Patch Changes
+
+- [`ed4c451`](https://github.com/ProgSoc/FuzzJudge/commit/ed4c45170b10b309606753b27f9dd731714ceb94) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix typo
+
 ## 0.4.13
 
 ### Patch Changes
