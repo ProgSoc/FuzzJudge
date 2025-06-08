@@ -9,6 +9,7 @@
 		"@changesets/cli": "2.29.4",
 		"@types/bun": "latest",
 		"@typescript/analyze-trace": "0.10.1",
+		"graphql-config": "^5.1.5",
 		"lefthook": "1.11.13"
 	},
 	"peerDependencies": {

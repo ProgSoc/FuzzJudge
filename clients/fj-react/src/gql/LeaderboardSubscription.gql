@@ -1,0 +1,14 @@
+subscription LeaderboardSubscription {
+	scoreboard {
+		points
+		penalty
+		teamId
+		team {
+			name
+		}
+		problems {
+			solved
+			slug
+		}
+	}
+}
