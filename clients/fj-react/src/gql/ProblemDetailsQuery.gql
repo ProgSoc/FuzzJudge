@@ -1,0 +1,11 @@
+query ProblemDetailsQuery($slug: String!) {
+	problem(slug: $slug) {
+		slug
+		name
+		solved
+		points
+		difficulty
+		fuzz
+		instructions
+	}
+}

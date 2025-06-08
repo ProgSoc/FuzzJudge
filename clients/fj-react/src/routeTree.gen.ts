@@ -11,10 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ProblemsImport } from './routes/problems'
 import { Route as LeaderboardImport } from './routes/leaderboard'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProblemsIndexImport } from './routes/problems/index'
+import { Route as ProblemsSlugImport } from './routes/problems/$slug'
 
 // Create/Update Routes
+
+const ProblemsRoute = ProblemsImport.update({
+  id: '/problems',
+  path: '/problems',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LeaderboardRoute = LeaderboardImport.update({
   id: '/leaderboard',
@@ -26,6 +35,18 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProblemsIndexRoute = ProblemsIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProblemsRoute,
+} as any)
+
+const ProblemsSlugRoute = ProblemsSlugImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProblemsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -46,44 +67,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardImport
       parentRoute: typeof rootRoute
     }
+    '/problems': {
+      id: '/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof ProblemsImport
+      parentRoute: typeof rootRoute
+    }
+    '/problems/$slug': {
+      id: '/problems/$slug'
+      path: '/$slug'
+      fullPath: '/problems/$slug'
+      preLoaderRoute: typeof ProblemsSlugImport
+      parentRoute: typeof ProblemsImport
+    }
+    '/problems/': {
+      id: '/problems/'
+      path: '/'
+      fullPath: '/problems/'
+      preLoaderRoute: typeof ProblemsIndexImport
+      parentRoute: typeof ProblemsImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface ProblemsRouteChildren {
+  ProblemsSlugRoute: typeof ProblemsSlugRoute
+  ProblemsIndexRoute: typeof ProblemsIndexRoute
+}
+
+const ProblemsRouteChildren: ProblemsRouteChildren = {
+  ProblemsSlugRoute: ProblemsSlugRoute,
+  ProblemsIndexRoute: ProblemsIndexRoute,
+}
+
+const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
+  ProblemsRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/problems': typeof ProblemsRouteWithChildren
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems/': typeof ProblemsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems': typeof ProblemsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/problems': typeof ProblemsRouteWithChildren
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems/': typeof ProblemsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/leaderboard'
+  fullPaths:
+    | '/'
+    | '/leaderboard'
+    | '/problems'
+    | '/problems/$slug'
+    | '/problems/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/leaderboard'
-  id: '__root__' | '/' | '/leaderboard'
+  to: '/' | '/leaderboard' | '/problems/$slug' | '/problems'
+  id:
+    | '__root__'
+    | '/'
+    | '/leaderboard'
+    | '/problems'
+    | '/problems/$slug'
+    | '/problems/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  ProblemsRoute: typeof ProblemsRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LeaderboardRoute: LeaderboardRoute,
+  ProblemsRoute: ProblemsRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +174,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/leaderboard"
+        "/leaderboard",
+        "/problems"
       ]
     },
     "/": {
@@ -105,6 +183,21 @@ export const routeTree = rootRoute
     },
     "/leaderboard": {
       "filePath": "leaderboard.tsx"
+    },
+    "/problems": {
+      "filePath": "problems.tsx",
+      "children": [
+        "/problems/$slug",
+        "/problems/"
+      ]
+    },
+    "/problems/$slug": {
+      "filePath": "problems/$slug.tsx",
+      "parent": "/problems"
+    },
+    "/problems/": {
+      "filePath": "problems/index.tsx",
+      "parent": "/problems"
     }
   }
 }

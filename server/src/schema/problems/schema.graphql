@@ -29,6 +29,6 @@ type Problem @auth {
 	difficulty: Int! # 1-3
 	points: Int!
 	instructions: String @clock
-	solved: Boolean @clock @auth
+	solved: Boolean @clock
 	fuzz: String @auth @clock
 }

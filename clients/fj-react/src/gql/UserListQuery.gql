@@ -1,0 +1,11 @@
+query UserListQuery {
+	users {
+		id
+		logn
+		role
+		teamId
+		team {
+			name
+		}
+	}
+}

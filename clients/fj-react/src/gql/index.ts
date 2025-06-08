@@ -275,7 +275,24 @@ export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription',
 export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQueryQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string } };
+export type MeQueryQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string, role: UserRole } };
+
+export type ProblemDetailsQueryQueryVariables = Exact<{
+  slug: Scalars['String']['input'];
+}>;
+
+
+export type ProblemDetailsQueryQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', slug: string, name: string, solved?: boolean | null, points: number, difficulty: number, fuzz?: string | null, instructions?: string | null } };
+
+export type ProblemListQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProblemListQueryQuery = { __typename?: 'Query', problems: Array<{ __typename?: 'Problem', slug: string, name: string, icon: string, solved?: boolean | null, points: number, difficulty: number }> };
+
+export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null, team?: { __typename?: 'Team', name: string } | null }> };
 
 
 export const LeaderboardSubscriptionDocument = `
@@ -298,6 +315,45 @@ export const MeQueryDocument = `
     query MeQuery {
   me {
     logn
+    role
+  }
+}
+    `;
+export const ProblemDetailsQueryDocument = `
+    query ProblemDetailsQuery($slug: String!) {
+  problem(slug: $slug) {
+    slug
+    name
+    solved
+    points
+    difficulty
+    fuzz
+    instructions
+  }
+}
+    `;
+export const ProblemListQueryDocument = `
+    query ProblemListQuery {
+  problems {
+    slug
+    name
+    icon
+    solved
+    points
+    difficulty
+  }
+}
+    `;
+export const UserListQueryDocument = `
+    query UserListQuery {
+  users {
+    id
+    logn
+    role
+    teamId
+    team {
+      name
+    }
   }
 }
     `;
@@ -314,6 +370,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     MeQuery(variables?: MeQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: MeQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<MeQueryQuery>(MeQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'MeQuery', 'query', variables);
+    },
+    ProblemDetailsQuery(variables: ProblemDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemDetailsQueryQuery>(ProblemDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemDetailsQuery', 'query', variables);
+    },
+    ProblemListQuery(variables?: ProblemListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemListQueryQuery>(ProblemListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemListQuery', 'query', variables);
+    },
+    UserListQuery(variables?: UserListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UserListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<UserListQueryQuery>(UserListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UserListQuery', 'query', variables);
     }
   };
 }

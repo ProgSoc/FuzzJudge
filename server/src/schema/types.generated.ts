@@ -469,7 +469,7 @@ export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends Re
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  solved?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, AuthenticatedContext<ContextType>>;
+  solved?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

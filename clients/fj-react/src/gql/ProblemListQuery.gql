@@ -1,0 +1,10 @@
+query ProblemListQuery {
+	problems {
+		slug
+		name
+		icon
+		solved
+		points
+		difficulty
+	}
+}
