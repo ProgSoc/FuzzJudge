@@ -10,6 +10,7 @@ RUN mkdir -p /temp/dev
 COPY package.json bun.lock /temp/dev/
 COPY clients/fj-admin-html/package.json /temp/dev/clients/fj-admin-html/
 COPY clients/fj-svelte/package.json /temp/dev/clients/fj-svelte/
+COPY clients/fj-react/package.json /temp/dev/clients/fj-react/
 COPY server/package.json /temp/dev/server/
 RUN cd /temp/dev && bun install --frozen-lockfile
 
@@ -19,7 +20,8 @@ COPY package.json bun.lock /temp/prod/
 COPY server/package.json /temp/prod/server/
 COPY clients/fj-admin-html/package.json /temp/prod/clients/fj-admin-html/
 COPY clients/fj-svelte/package.json /temp/prod/clients/fj-svelte/
-RUN cd /temp/prod && bun install --frozen-lockfile --production
+COPY clients/fj-react/package.json /temp/prod/clients/fj-react/
+RUN cd /temp/prod && bun install --frozen-lockfile --production --filter @progsoc/fuzzjudge-server
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
@@ -44,7 +46,7 @@ USER bun
 EXPOSE 1989/tcp
 ENTRYPOINT [ "bun", "run", "start" ]
 
-FROM release as release-runtimes
+FROM release AS release-runtimes
 
 USER root
 

@@ -18,7 +18,7 @@
     },
     "clients/fj-admin-html": {
       "name": "@progsoc/fj-admin-html",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
@@ -33,7 +33,7 @@
     },
     "clients/fj-react": {
       "name": "@progsoc/fj-react",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.0",
@@ -74,7 +74,7 @@
     },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "dependencies": {
         "@tanstack/svelte-query": "5.80.6",
         "@tanstack/svelte-query-devtools": "5.80.6",
@@ -101,7 +101,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "bin": "dist/index.js",
       "dependencies": {
         "@graphql-tools/utils": "10.8.6",

@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: release
     ports:
       - 1989:1989
     environment:
