@@ -33,6 +33,7 @@ import { upgradeWebSocket } from "./websocket.ts";
 const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
+import { readdir } from "node:fs/promises";
 import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers.ts";
 import { directiveResolvers } from "./directives/directiveResolvers.ts";
 import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
@@ -117,12 +118,26 @@ for (const dir of competionData.server?.public ?? []) {
 	);
 }
 
-app.use(
-	"clients/**/*",
-	serveStatic({
-		root: import.meta.dir,
-	}),
-);
+// All clients have their own folder under clients/ that contains an index.html, if not found return that index.html
+
+const clientFolders = await readdir(path.join(import.meta.dir, "clients"));
+
+for (const folder of clientFolders) {
+	app
+		.use(
+			`/clients/${folder}/*`,
+			serveStatic({
+				root: import.meta.dir,
+			}),
+		)
+		.use(
+			`/clients/${folder}/*`,
+			serveStatic({
+				root: import.meta.dir,
+				path: `clients/${folder}/index.html`,
+			}),
+		);
+}
 
 app.use(logger());
 
