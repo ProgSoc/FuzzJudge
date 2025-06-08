@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.10
+
+### Patch Changes
+
+- [`6d85d14`](https://github.com/ProgSoc/FuzzJudge/commit/6d85d14479a2dac98a87386d29b4811e3121c54b) Thanks [@sebasptsch](https://github.com/sebasptsch)! - No more frozen lock
+
 ## 0.4.9
 
 ### Patch Changes
