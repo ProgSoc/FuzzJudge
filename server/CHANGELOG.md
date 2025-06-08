@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.11
+
+### Patch Changes
+
+- [`391acae`](https://github.com/ProgSoc/FuzzJudge/commit/391acaef19056fc7778ef6b774b18db2302d0655) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix SPA Index Routing
+
 ## 0.4.10
 
 ### Patch Changes
