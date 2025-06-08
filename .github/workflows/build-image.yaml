@@ -1,0 +1,97 @@
+on: 
+  workflow_call: 
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+        type: string
+        
+jobs:
+  metadata-docker:
+    runs-on: ubuntu-latest
+    env:
+        IMAGE: ghcr.io/progsoc/fuzzjudge
+        REGISTRY: ghcr.io
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Meta Release
+        id: meta-release
+        uses: docker/metadata-action@v5
+        with:
+            images: ${{ env.IMAGE }}
+            tags: |
+                # use custom value instead of git tag
+                type=raw,value=latest
+                type=semver,pattern={{version}},value=${{ inputs.version }}
+                type=semver,pattern={{major}},value=${{ inputs.version }}
+                type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
+                type=sha
+      - name: Docker Meta Release (runtimes)
+        id: meta-release-runtimes
+        uses: docker/metadata-action@v5
+        with:
+            images: ${{ env.IMAGE }}
+            flavor: |
+                prefix=runtimes-,onlatest=true
+            tags: |
+                # use custom value instead of git tag
+                type=semver,pattern={{version}},value=${{ inputs.version }}
+                type=semver,pattern={{major}},value=${{ inputs.version }}
+                type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
+                type=sha
+    outputs:
+      tags: ${{ steps.meta-release.outputs.tags }}
+      labels: ${{ steps.meta-release.outputs.labels }}
+      tags-runtimes: ${{ steps.meta-release-runtimes.outputs.tags }}
+      labels-runtimes: ${{ steps.meta-release-runtimes.outputs.labels }}
+
+  publish-docker:
+    name: Publish Docker Images
+    runs-on: ubuntu-latest
+    needs: metadata-docker
+    permissions: 
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false 
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    env:
+      IMAGE: ghcr.io/progsoc/fuzzjudge
+      REGISTRY: ghcr.io
+    steps:
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          tags: ${{ needs.metadata-docker.outputs.tags }}
+          push: true
+          target: release
+          labels: ${{ needs.metadata-docker.outputs.labels}}
+          cache-from: type=registry,ref=${{ env.IMAGE }}:latest
+          platforms: ${{ matrix.platform }}
+      - name: Build and Push Runtimes
+        uses: docker/build-push-action@v6
+        with:
+          tags: ${{ needs.metadata-docker.outputs.tags-runtimes }}
+          push: true
+          target: release-runtimes
+          labels: ${{ needs.metadata-docker.outputs.labels-runtimes}}
+          cache-from: type=registry,ref=${{ env.IMAGE }}:runtimes-latest
+          platforms: ${{ matrix.platform }}
+      

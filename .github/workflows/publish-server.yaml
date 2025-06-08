@@ -63,77 +63,13 @@ jobs:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish-docker:
     name: Publish Docker Images
-    runs-on: ubuntu-latest
     needs: release
     if: needs.release.outputs.published == 'true'
     strategy:
       fail-fast: true
       matrix:
         package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
-    permissions: 
-      packages: write
-      id-token: write
-    env:
-      IMAGE: ghcr.io/progsoc/fuzzjudge
-      REGISTRY: ghcr.io
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Docker Meta Release
-        id: meta-release
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            # use custom value instead of git tag
-            type=raw,value=latest
-            type=semver,pattern={{version}},value=${{ matrix.package.version }}
-            type=semver,pattern={{major}},value=${{ matrix.package.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
-            type=sha
-      - name: Docker Meta Release (runtimes)
-        id: meta-release-runtimes
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          flavor: |
-            prefix=runtimes-,onlatest=true
-          tags: |
-            # use custom value instead of git tag
-            type=semver,pattern={{version}},value=${{ matrix.package.version }}
-            type=semver,pattern={{major}},value=${{ matrix.package.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ matrix.package.version }}
-            type=sha
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and Push
-        uses: docker/build-push-action@v6
-        with:
-          tags: ${{ steps.meta-release.outputs.tags }}
-          push: true
-          target: release
-          labels: ${{ steps.meta-release.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.IMAGE }}:latest
-          platforms: linux/amd64,linux/arm64
-      - name: Build and Push Runtimes
-        uses: docker/build-push-action@v6
-        with:
-          tags: ${{ steps.meta-release-runtimes.outputs.tags }}
-          push: true
-          target: release-runtimes
-          labels: ${{ steps.meta-release-runtimes.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.IMAGE }}:runtimes-latest
-          platforms: linux/amd64,linux/arm64
-      
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      version: ${{ matrix.package.version}}
+   
