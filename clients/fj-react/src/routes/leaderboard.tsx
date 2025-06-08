@@ -11,7 +11,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import {
-	type Table as ReactTable,
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
