@@ -90,7 +90,7 @@ jobs:
           target: release
           labels: ${{ needs.metadata-docker.outputs.labels}}
           cache-from: type=registry,ref=${{ env.IMAGE }}:latest
-          platforms: ${{ matrix.platform }}
+          platforms: ${{ matrix.platform.docker }}
       - name: Build and Push Runtimes
         uses: docker/build-push-action@v6
         with:
