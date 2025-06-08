@@ -1,6 +1,6 @@
 {
 	"name": "@progsoc/fuzzjudge-server",
-	"version": "0.4.14",
+	"version": "0.4.15",
 	"module": "main.ts",
 	"devDependencies": {
 		"@eddeee888/gcg-typescript-resolver-files": "0.12.1",

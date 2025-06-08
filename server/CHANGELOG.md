@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.4.15
+
+### Patch Changes
+
+- [`3665e55`](https://github.com/ProgSoc/FuzzJudge/commit/3665e555bfd77bc79a30e157c517a1039b988552) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Revert workflow changes, emulation is good enough for now
+
 ## 0.4.14
 
 ### Patch Changes
