@@ -2,7 +2,7 @@ import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 import { LinkListItemButton } from "@/components/LinkListItemButton";
 import { problemQuery } from "@/queries/problem.query";
-import { Avatar, Button, ListItemAvatar } from "@mui/material";
+import { Avatar, ListItemAvatar } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
