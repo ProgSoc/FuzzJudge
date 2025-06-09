@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.4.18
+
+### Patch Changes
+
+- [`c824a65`](https://github.com/ProgSoc/FuzzJudge/commit/c824a65b7a2d50b995ac25b07a5f187f3bae8006) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add basic skeleton for all admin data
+
 ## 0.4.17
 
 ### Patch Changes
