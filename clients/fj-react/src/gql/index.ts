@@ -85,6 +85,7 @@ export type MutationAdjustStartTimeArgs = {
 
 
 export type MutationCreateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
 };
 
@@ -277,6 +278,14 @@ export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never
 
 export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string, brief: string } };
 
+export type CreateTeamMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: number, name: string } };
+
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
   teamId?: InputMaybe<Scalars['Int']['input']>;
@@ -339,6 +348,14 @@ export const CompetitionDetailsQueryDocument = `
     name
     instructions
     brief
+  }
+}
+    `;
+export const CreateTeamDocument = `
+    mutation CreateTeam($name: String!, $hidden: Boolean) {
+  createTeam(name: $name, hidden: $hidden) {
+    id
+    name
   }
 }
     `;
@@ -449,6 +466,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     CompetitionDetailsQuery(variables?: CompetitionDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CompetitionDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CompetitionDetailsQueryQuery>(CompetitionDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CompetitionDetailsQuery', 'query', variables);
+    },
+    CreateTeam(variables: CreateTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateTeamMutation>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateTeam', 'mutation', variables);
     },
     CreateUser(variables: CreateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateUser', 'mutation', variables);

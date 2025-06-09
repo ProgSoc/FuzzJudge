@@ -4,7 +4,7 @@ import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 export const createTeam: NonNullable<MutationResolvers["createTeam"]> = async (
 	_parent,
-	{ name },
+	{ name, hidden },
 	_ctx,
 ) => {
 	const seed = [...crypto.getRandomValues(new Uint8Array(8))]
@@ -15,6 +15,7 @@ export const createTeam: NonNullable<MutationResolvers["createTeam"]> = async (
 		.values({
 			name,
 			seed,
+			hidden: hidden ?? false,
 		})
 		.returning();
 

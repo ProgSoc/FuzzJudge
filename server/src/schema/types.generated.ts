@@ -90,6 +90,7 @@ export type MutationAdjustStartTimeArgs = {
 
 
 export type MutationCreateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
 };
 

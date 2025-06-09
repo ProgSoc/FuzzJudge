@@ -40,7 +40,7 @@ type JudgeSuccessOutput {
 type Mutation {
   adjustFinishTime(finishTime: DateTime!): Clock!
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
-  createTeam(name: String!): Team!
+  createTeam(hidden: Boolean, name: String!): Team!
   createUser(logn: String!, role: UserRole!, teamId: Int): User!
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!

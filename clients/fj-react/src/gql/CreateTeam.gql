@@ -1,0 +1,6 @@
+mutation CreateTeam($name: String!, $hidden: Boolean) {
+	createTeam(name: $name, hidden: $hidden) {
+		id
+		name
+	}
+}
