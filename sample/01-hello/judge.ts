@@ -18,7 +18,7 @@
 
 import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod.ts";
 
-import { fuzz } from "./fuzz";
+import { fuzz } from "./fuzz.ts";
 
 if (import.meta.main) {
 	const names = fuzz(Deno.args[0] ?? "");
