@@ -17,7 +17,7 @@ import fs from "node:fs/promises";
 import { basename, extname, join as joinPath } from "node:path";
 import { TOML } from "bun";
 import datauri from "datauri";
-import type { IconDescriptor, IconList } from "../src/types.ts";
+import type { IconDescriptor, IconList } from "../src/types";
 
 const ICONS_DIR = "./icons";
 

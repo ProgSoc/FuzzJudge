@@ -1,10 +1,10 @@
 import path from "node:path";
-import { competitionRoot } from "@/config.ts";
-import { pubSub } from "@/pubsub.ts";
-import { type Times, competitionSpec } from "@/services/competition.service.ts";
-import { calculateScoreboard } from "@/services/score.ts";
+import { competitionRoot } from "@/config";
+import { pubSub } from "@/pubsub";
+import { type Times, competitionSpec } from "@/services/competition.service";
+import { calculateScoreboard } from "@/services/score";
 import { GraphQLError } from "graphql";
-import { readMarkdown, writeCompetitionTimes } from "../lib/writeMd.ts";
+import { readMarkdown, writeCompetitionTimes } from "../lib/writeMd";
 
 let cacheNow: Times | null = null;
 

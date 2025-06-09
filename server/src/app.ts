@@ -21,23 +21,23 @@ import path from "node:path";
 import { createSchema, createYoga } from "graphql-yoga";
 import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
-import { competitionRoot } from "./config.ts";
+import { competitionRoot } from "./config";
 
 import { Hono } from "hono";
-import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware.ts";
+import { makeWebsocketGraphQLMiddleware } from "./middleware/graphqlWs.middleware";
 import { resolvers } from "./schema/resolvers.generated";
 import { typeDefs } from "./schema/typeDefs.generated";
-import { getCompetitionData } from "./services/competition.service.ts";
-import { upgradeWebSocket } from "./websocket.ts";
+import { getCompetitionData } from "./services/competition.service";
+import { upgradeWebSocket } from "./websocket";
 
 const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
 import { readdir } from "node:fs/promises";
-import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers.ts";
-import { directiveResolvers } from "./directives/directiveResolvers.ts";
-import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware.ts";
-import { basicAuth } from "./services/auth.service.ts";
+import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers";
+import { directiveResolvers } from "./directives/directiveResolvers";
+import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware";
+import { basicAuth } from "./services/auth.service";
 
 const schema = attachDirectiveResolvers(
 	createSchema({

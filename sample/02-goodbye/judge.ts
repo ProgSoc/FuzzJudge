@@ -16,9 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod";
 
-import { fuzz } from "./fuzz.ts";
+import { fuzz } from "./fuzz";
 
 if (import.meta.main) {
 	const names = fuzz(Deno.args[0] ?? "");

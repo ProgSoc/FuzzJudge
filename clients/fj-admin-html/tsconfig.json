@@ -12,7 +12,7 @@
 		"allowImportingTsExtensions": false,
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
-		"noEmit": true,
+		"noEmit": false,
 		"outDir": "./node_modules/.tmp/main",
 
 		/* Linting */

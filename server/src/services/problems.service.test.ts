@@ -6,7 +6,7 @@ import {
 	getProblemData,
 	getProblems,
 	judgeProblem,
-} from "./problems.service.ts";
+} from "./problems.service";
 
 const sampleRoot = fileURLToPath(import.meta.resolve("../../../sample"));
 const problemSlug = "01-hello";

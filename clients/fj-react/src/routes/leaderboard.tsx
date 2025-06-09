@@ -4,29 +4,13 @@ import {
 	LeaderboardSubscriptionDocument,
 	type LeaderboardSubscriptionSubscription,
 } from "@/gql";
-import { wsClient } from "@/gql/client";
 import useSubscription from "@/hooks/useSubscription";
 import { problemQuery } from "@/queries/problem.query";
-import {
-	Avatar,
-	Paper,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Tooltip,
-} from "@mui/material";
+import { Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-	createColumnHelper,
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { createColumnHelper } from "@tanstack/react-table";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/leaderboard")({
 	component: RouteComponent,

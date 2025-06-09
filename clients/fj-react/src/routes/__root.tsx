@@ -1,17 +1,9 @@
-import LinkBottomNavigation from "@/components/LinkBottomNavigation";
-import ModeSwitchButton from "@/components/ModeSwitchButton";
 import TopBar from "@/components/TopBar";
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import {
-	Outlet,
-	createRootRouteWithContext,
-	useRouterState,
-} from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { FaHome, FaList } from "react-icons/fa";
-import { MdPeople } from "react-icons/md";
 import BottomBar from "../components/BottomBar";
 
 export const Route = createRootRouteWithContext<{

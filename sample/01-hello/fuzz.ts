@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { makeSeededGenerators } from "https://deno.land/x/vegas@v1.3.0/mod.ts";
+import { makeSeededGenerators } from "https://deno.land/x/vegas@v1.3.0/mod";
 
 const names = [
 	"Linus",

@@ -21,8 +21,8 @@ import { exists } from "node:fs/promises";
 import path from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { databaseUrl } from "../config.ts";
-import * as schema from "./schema.ts";
+import { databaseUrl } from "../config";
+import * as schema from "./schema";
 
 if (databaseUrl === ":memory:") {
 	console.warn(

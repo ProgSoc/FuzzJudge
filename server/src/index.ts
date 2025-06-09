@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
-import app from "./app.ts";
-import { websocket } from "./websocket.ts";
+import app from "./app";
+import { websocket } from "./websocket";
 
 if (import.meta.main) {
 	const server = Bun.serve({
