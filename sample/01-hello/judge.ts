@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod";
+import { TextLineStream } from "https://deno.land/std@0.223.0/streams/mod.ts";
 
 import { fuzz } from "./fuzz";
 
