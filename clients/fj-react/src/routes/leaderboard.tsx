@@ -4,6 +4,7 @@ import {
 	type LeaderboardSubscriptionSubscription,
 } from "@/gql";
 import { wsClient } from "@/gql/client";
+import useSubscription from "@/hooks/useSubscription";
 import { problemQuery } from "@/queries/problem.query";
 import {
 	Avatar,
@@ -35,34 +36,10 @@ type LeaderboardRow = LeaderboardSubscriptionSubscription["scoreboard"][number];
 const columnHelper = createColumnHelper<LeaderboardRow>();
 
 function RouteComponent() {
-	/**
-	 * This component subscribes to the leaderboard updates via WebSocket
-	 * and displays the leaderboard in a table format.
-	 */
-	const [leaderboardState, setLeaderboardState] = useState<LeaderboardRow[]>(
-		[],
-	);
-
-	useEffect(() => {
-		console.log("Subscribing to leaderboard updates");
-		const unsubscribe = wsClient.subscribe<LeaderboardSubscriptionSubscription>(
-			{ query: LeaderboardSubscriptionDocument },
-			{
-				next: (data) => {
-					if (!data.data) return;
-					setLeaderboardState(data.data.scoreboard);
-				},
-				complete: () => {},
-				error: (error) => {
-					console.error("Error in leaderboard subscription:", error);
-				},
-			},
-		);
-		return () => {
-			console.log("Unsubscribing from leaderboard updates");
-			unsubscribe();
-		};
-	}, []);
+	const leaderboardState = useSubscription({
+		query: LeaderboardSubscriptionDocument,
+		select: (data: LeaderboardSubscriptionSubscription) => data.scoreboard,
+	});
 
 	const problemsQuery = useQuery({
 		...problemQuery.problemList(),
@@ -141,7 +118,7 @@ function RouteComponent() {
 	}, [problemsQuery.data]);
 
 	const table = useReactTable({
-		data: leaderboardState,
+		data: leaderboardState ?? [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	});

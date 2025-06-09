@@ -13,10 +13,12 @@ export const userQuery = {
 		queryOptions({
 			queryKey: userQueryKeys.me(),
 			queryFn: () => client.MeQuery(),
+			select: (data) => data.data.me,
 		}),
 	userList: () =>
 		queryOptions({
 			queryKey: userQueryKeys.list(),
 			queryFn: () => client.UserListQuery(),
+			select: (data) => data.data.users,
 		}),
 };

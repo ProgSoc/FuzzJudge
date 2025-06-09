@@ -1,5 +1,6 @@
 import LinkBottomNavigation from "@/components/LinkBottomNavigation";
 import ModeSwitchButton from "@/components/ModeSwitchButton";
+import TopBar from "@/components/TopBar";
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -11,26 +12,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { FaHome, FaList } from "react-icons/fa";
 import { MdPeople } from "react-icons/md";
-
-function TopBar() {
-	const matches = useRouterState({ select: (s) => s.matches });
-
-	const title = matches
-		.map((match) => match.context.getTitle?.())
-		.filter((match) => match !== undefined)
-		.at(-1);
-
-	return (
-		<AppBar position="static">
-			<Toolbar>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					{title || "FuzzJudge"}
-				</Typography>
-				<ModeSwitchButton />
-			</Toolbar>
-		</AppBar>
-	);
-}
+import BottomBar from "../components/BottomBar";
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -56,25 +38,7 @@ export const Route = createRootRouteWithContext<{
 			>
 				<Outlet />
 			</Box>
-			<LinkBottomNavigation
-				tabs={[
-					{
-						label: "Home",
-						to: "/",
-						icon: <FaHome />,
-					},
-					{
-						label: "Problems",
-						to: "/problems",
-						icon: <FaList />,
-					},
-					{
-						label: "Leaderboard",
-						to: "/leaderboard",
-						icon: <MdPeople />,
-					},
-				]}
-			/>
+			<BottomBar />
 			<ReactQueryDevtools buttonPosition="bottom-left" />
 			<TanStackRouterDevtools position="bottom-right" />
 		</Box>

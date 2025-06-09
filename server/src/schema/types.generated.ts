@@ -175,7 +175,7 @@ export type Query = {
   __typename?: 'Query';
   competition: Competition;
   header: Scalars['String']['output'];
-  me: User;
+  me?: Maybe<User>;
   problem: Problem;
   problems: Array<Problem>;
   submission?: Maybe<Submission>;
@@ -486,7 +486,7 @@ export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType exten
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   competition?: Resolver<ResolversTypes['Competition'], ParentType, ContextType>;
   header?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  me?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>>;
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   problem?: Resolver<ResolversTypes['Problem'], ParentType, ContextType, RequireFields<QueryProblemArgs, 'slug'>>;
   problems?: Resolver<Array<ResolversTypes['Problem']>, ParentType, ContextType>;
   submission?: Resolver<Maybe<ResolversTypes['Submission']>, ParentType, AuthenticatedContext<ContextType>, RequireFields<QuerySubmissionArgs, 'id'>>;

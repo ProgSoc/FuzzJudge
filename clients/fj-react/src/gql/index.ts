@@ -170,7 +170,7 @@ export type Query = {
   __typename?: 'Query';
   competition: Competition;
   header: Scalars['String']['output'];
-  me: User;
+  me?: Maybe<User>;
   problem: Problem;
   problems: Array<Problem>;
   submission?: Maybe<Submission>;
@@ -267,6 +267,11 @@ export enum UserRole {
   Competitor = 'competitor'
 }
 
+export type ClockSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ClockSubscriptionSubscription = { __typename?: 'Subscription', clock: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
+
 export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -280,7 +285,7 @@ export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription',
 export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQueryQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string, role: UserRole } };
+export type MeQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', logn: string, role: UserRole } | null };
 
 export type ProblemDetailsQueryQueryVariables = Exact<{
   slug: Scalars['String']['input'];
@@ -300,6 +305,15 @@ export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null, team?: { __typename?: 'Team', name: string } | null }> };
 
 
+export const ClockSubscriptionDocument = `
+    subscription ClockSubscription {
+  clock {
+    finish
+    hold
+    start
+  }
+}
+    `;
 export const CompetitionDetailsQueryDocument = `
     query CompetitionDetailsQuery {
   competition {
@@ -383,6 +397,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    ClockSubscription(variables?: ClockSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ClockSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ClockSubscriptionSubscription>(ClockSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ClockSubscription', 'subscription', variables);
+    },
     CompetitionDetailsQuery(variables?: CompetitionDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CompetitionDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CompetitionDetailsQueryQuery>(CompetitionDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CompetitionDetailsQuery', 'query', variables);
     },

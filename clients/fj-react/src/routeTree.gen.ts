@@ -13,9 +13,13 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProblemsImport } from './routes/problems'
 import { Route as LeaderboardImport } from './routes/leaderboard'
+import { Route as AdminImport } from './routes/admin'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProblemsIndexImport } from './routes/problems/index'
+import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as ProblemsSlugImport } from './routes/problems/$slug'
+import { Route as AdminUsersImport } from './routes/admin/users'
+import { Route as AdminClockImport } from './routes/admin/clock'
 
 // Create/Update Routes
 
@@ -31,6 +35,12 @@ const LeaderboardRoute = LeaderboardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminRoute = AdminImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
@@ -43,10 +53,28 @@ const ProblemsIndexRoute = ProblemsIndexImport.update({
   getParentRoute: () => ProblemsRoute,
 } as any)
 
+const AdminIndexRoute = AdminIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+
 const ProblemsSlugRoute = ProblemsSlugImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProblemsRoute,
+} as any)
+
+const AdminUsersRoute = AdminUsersImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminClockRoute = AdminClockImport.update({
+  id: '/clock',
+  path: '/clock',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -58,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminImport
       parentRoute: typeof rootRoute
     }
     '/leaderboard': {
@@ -74,12 +109,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProblemsImport
       parentRoute: typeof rootRoute
     }
+    '/admin/clock': {
+      id: '/admin/clock'
+      path: '/clock'
+      fullPath: '/admin/clock'
+      preLoaderRoute: typeof AdminClockImport
+      parentRoute: typeof AdminImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersImport
+      parentRoute: typeof AdminImport
+    }
     '/problems/$slug': {
       id: '/problems/$slug'
       path: '/$slug'
       fullPath: '/problems/$slug'
       preLoaderRoute: typeof ProblemsSlugImport
       parentRoute: typeof ProblemsImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexImport
+      parentRoute: typeof AdminImport
     }
     '/problems/': {
       id: '/problems/'
@@ -92,6 +148,20 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface AdminRouteChildren {
+  AdminClockRoute: typeof AdminClockRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminClockRoute: AdminClockRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ProblemsRouteChildren {
   ProblemsSlugRoute: typeof ProblemsSlugRoute
@@ -109,25 +179,36 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/problems': typeof ProblemsRouteWithChildren
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/problems/': typeof ProblemsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/problems': typeof ProblemsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/problems': typeof ProblemsRouteWithChildren
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/problems/': typeof ProblemsIndexRoute
 }
 
@@ -135,30 +216,47 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/leaderboard'
     | '/problems'
+    | '/admin/clock'
+    | '/admin/users'
     | '/problems/$slug'
+    | '/admin/'
     | '/problems/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/leaderboard' | '/problems/$slug' | '/problems'
+  to:
+    | '/'
+    | '/leaderboard'
+    | '/admin/clock'
+    | '/admin/users'
+    | '/problems/$slug'
+    | '/admin'
+    | '/problems'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/leaderboard'
     | '/problems'
+    | '/admin/clock'
+    | '/admin/users'
     | '/problems/$slug'
+    | '/admin/'
     | '/problems/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   LeaderboardRoute: typeof LeaderboardRoute
   ProblemsRoute: typeof ProblemsRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   LeaderboardRoute: LeaderboardRoute,
   ProblemsRoute: ProblemsRouteWithChildren,
 }
@@ -174,12 +272,21 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/admin",
         "/leaderboard",
         "/problems"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/admin": {
+      "filePath": "admin.tsx",
+      "children": [
+        "/admin/clock",
+        "/admin/users",
+        "/admin/"
+      ]
     },
     "/leaderboard": {
       "filePath": "leaderboard.tsx"
@@ -191,9 +298,21 @@ export const routeTree = rootRoute
         "/problems/"
       ]
     },
+    "/admin/clock": {
+      "filePath": "admin/clock.tsx",
+      "parent": "/admin"
+    },
+    "/admin/users": {
+      "filePath": "admin/users.tsx",
+      "parent": "/admin"
+    },
     "/problems/$slug": {
       "filePath": "problems/$slug.tsx",
       "parent": "/problems"
+    },
+    "/admin/": {
+      "filePath": "admin/index.tsx",
+      "parent": "/admin"
     },
     "/problems/": {
       "filePath": "problems/index.tsx",

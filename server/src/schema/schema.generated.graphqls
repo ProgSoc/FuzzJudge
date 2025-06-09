@@ -78,7 +78,7 @@ type ProblemScore {
 type Query {
   competition: Competition!
   header: String!
-  me: User!
+  me: User
   problem(slug: String!): Problem!
   problems: [Problem!]!
   submission(id: Int!): Submission
