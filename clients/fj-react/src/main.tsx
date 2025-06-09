@@ -20,15 +20,35 @@ const router = createRouter({
 	routeTree,
 	context: {
 		queryClient,
+		getTitle: () => "FuzzJudge React Client",
 	},
 	defaultPreload: "intent",
 	// Since we're using React Query, we don't want loader calls to ever be stale
 	// This will ensure that the loader is always called when the route is preloaded or visited
 	defaultPreloadStaleTime: 0,
 	scrollRestoration: true,
+	defaultViewTransition: {
+		types: ({ fromLocation, toLocation }) => {
+			let direction = "none";
+
+			if (fromLocation) {
+				const fromIndex = fromLocation.state.__TSR_index;
+				const toIndex = toLocation.state.__TSR_index;
+
+				direction = fromIndex > toIndex ? "right" : "left";
+			}
+
+			return [`slide-${direction}`];
+		},
+	},
 });
 
-const theme = createTheme();
+const theme = createTheme({
+	colorSchemes: {
+		light: true,
+		dark: true,
+	},
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

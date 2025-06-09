@@ -267,10 +267,15 @@ export enum UserRole {
   Competitor = 'competitor'
 }
 
+export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string, brief: string } };
+
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string }> }> };
+export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
 
 export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -295,6 +300,15 @@ export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null, team?: { __typename?: 'Team', name: string } | null }> };
 
 
+export const CompetitionDetailsQueryDocument = `
+    query CompetitionDetailsQuery {
+  competition {
+    name
+    instructions
+    brief
+  }
+}
+    `;
 export const LeaderboardSubscriptionDocument = `
     subscription LeaderboardSubscription {
   scoreboard {
@@ -307,6 +321,10 @@ export const LeaderboardSubscriptionDocument = `
     problems {
       solved
       slug
+      problem {
+        icon
+        name
+      }
     }
   }
 }
@@ -365,6 +383,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    CompetitionDetailsQuery(variables?: CompetitionDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CompetitionDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<CompetitionDetailsQueryQuery>(CompetitionDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CompetitionDetailsQuery', 'query', variables);
+    },
     LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);
     },

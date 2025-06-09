@@ -9,6 +9,10 @@ subscription LeaderboardSubscription {
 		problems {
 			solved
 			slug
+			problem {
+				icon
+				name
+			}
 		}
 	}
 }

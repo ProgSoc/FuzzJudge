@@ -1,5 +1,12 @@
+import { LinkButton } from "@/components/LinkButton";
+import {
+	LeaderboardSubscriptionDocument,
+	type LeaderboardSubscriptionSubscription,
+} from "@/gql";
+import { wsClient } from "@/gql/client";
 import { problemQuery } from "@/queries/problem.query";
 import {
+	Avatar,
 	Paper,
 	Table,
 	TableBody,
@@ -7,6 +14,7 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	Tooltip,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -16,36 +24,45 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { useMemo } from "react";
-import { leaderboardQuery } from "../queries/leaderboard.query";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/leaderboard")({
 	component: RouteComponent,
 });
 
-type LeaderboardRow = {
-	__typename?: "ScoreboardRow";
-	points: number;
-	penalty: number;
-	teamId: number;
-	team: {
-		__typename?: "Team";
-		name: string;
-	};
-	problems: Array<{
-		__typename?: "ProblemScore";
-		solved: boolean;
-		slug: string;
-	}>;
-};
+type LeaderboardRow = LeaderboardSubscriptionSubscription["scoreboard"][number];
 
 const columnHelper = createColumnHelper<LeaderboardRow>();
 
 function RouteComponent() {
-	const leaderboard = useQuery({
-		...leaderboardQuery.subscription(),
-		select: (data) => data?.scoreboard,
-	});
+	/**
+	 * This component subscribes to the leaderboard updates via WebSocket
+	 * and displays the leaderboard in a table format.
+	 */
+	const [leaderboardState, setLeaderboardState] = useState<LeaderboardRow[]>(
+		[],
+	);
+
+	useEffect(() => {
+		console.log("Subscribing to leaderboard updates");
+		const unsubscribe = wsClient.subscribe<LeaderboardSubscriptionSubscription>(
+			{ query: LeaderboardSubscriptionDocument },
+			{
+				next: (data) => {
+					if (!data.data) return;
+					setLeaderboardState(data.data.scoreboard);
+				},
+				complete: () => {},
+				error: (error) => {
+					console.error("Error in leaderboard subscription:", error);
+				},
+			},
+		);
+		return () => {
+			console.log("Unsubscribing from leaderboard updates");
+			unsubscribe();
+		};
+	}, []);
 
 	const problemsQuery = useQuery({
 		...problemQuery.problemList(),
@@ -58,15 +75,40 @@ function RouteComponent() {
 			problemsQuery.data?.map((problem) =>
 				columnHelper.accessor(
 					(row) => {
-						const problemScore = row.problems.find(
-							(p) => p.slug === problem.slug,
-						);
-						return problemScore ? problemScore.solved : false;
+						const value = row.problems.find((p) => p.slug === problem.slug);
+						return value?.solved ?? false;
 					},
 					{
 						id: problem.slug,
-						header: () => problem.name,
-						cell: (info) => (info.getValue() ? "✔️" : "❌"),
+						header: () => (
+							<Tooltip title={problem.name}>
+								<LinkButton
+									to="/problems/$slug"
+									params={{ slug: problem.slug }}
+								>
+									{problem.icon}
+								</LinkButton>
+							</Tooltip>
+						),
+						cell: (info) => (
+							<Tooltip
+								title={
+									info.getValue() ? "Problem solved" : "Problem not solved"
+								}
+							>
+								{info.getValue() ? (
+									// Checkmark emoji for solved problems
+									<span role="img" aria-label="checkmark">
+										✅
+									</span>
+								) : (
+									// Cross emoji for unsolved problems
+									<span role="img" aria-label="cross">
+										❌
+									</span>
+								)}
+							</Tooltip>
+						),
 					},
 				),
 			) ?? [];
@@ -76,23 +118,30 @@ function RouteComponent() {
 				id: "teamName",
 				header: "Team Name",
 				cell: (info) => info.getValue(),
+				size: 200,
+				maxSize: 200,
 			}),
 			columnHelper.accessor("points", {
 				id: "points",
 				header: "Points",
 				cell: (info) => info.getValue(),
+				size: 100,
+				maxSize: 100,
 			}),
 			columnHelper.accessor("penalty", {
 				id: "penalty",
 				header: "Penalty",
 				cell: (info) => info.getValue(),
+				size: 100,
+				maxSize: 100,
 			}),
+
 			...problemColumns,
 		];
 	}, [problemsQuery.data]);
 
 	const table = useReactTable({
-		data: leaderboard.data ?? [],
+		data: leaderboardState,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	});
@@ -105,7 +154,11 @@ function RouteComponent() {
 						<TableRow key={headerGroup.id}>
 							{headerGroup.headers.map((header) => {
 								return (
-									<TableCell key={header.id} colSpan={header.colSpan}>
+									<TableCell
+										key={header.id}
+										colSpan={header.colSpan}
+										width={header.getSize()}
+									>
 										{header.isPlaceholder ? null : (
 											<div>
 												{flexRender(
@@ -126,7 +179,7 @@ function RouteComponent() {
 							<TableRow key={row.id}>
 								{row.getVisibleCells().map((cell) => {
 									return (
-										<TableCell key={cell.id}>
+										<TableCell key={cell.id} width={cell.column.getSize()}>
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext(),
