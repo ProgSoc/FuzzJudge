@@ -10,7 +10,7 @@ import { Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 export const Route = createFileRoute("/leaderboard")({
 	component: RouteComponent,
@@ -20,10 +20,13 @@ type LeaderboardRow = LeaderboardSubscriptionSubscription["scoreboard"][number];
 
 const columnHelper = createColumnHelper<LeaderboardRow>();
 
+const selectScoreboard = (data: LeaderboardSubscriptionSubscription) =>
+	data.scoreboard;
+
 function RouteComponent() {
 	const leaderboardState = useSubscription({
 		query: LeaderboardSubscriptionDocument,
-		select: (data: LeaderboardSubscriptionSubscription) => data.scoreboard,
+		select: selectScoreboard,
 	});
 
 	const problemsQuery = useQuery({
@@ -101,6 +104,10 @@ function RouteComponent() {
 			...problemColumns,
 		];
 	}, [problemsQuery.data]);
+
+	useEffect(() => {
+		console.log("Columns changed", columns);
+	}, [columns]);
 
 	return (
 		<Datatable

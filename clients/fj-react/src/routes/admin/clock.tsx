@@ -9,10 +9,12 @@ export const Route = createFileRoute("/admin/clock")({
 	component: RouteComponent,
 });
 
+const selectFn = (data: ClockSubscriptionSubscription) => data.clock;
+
 function RouteComponent() {
 	const clockState = useSubscription({
 		query: ClockSubscriptionDocument,
-		select: (data: ClockSubscriptionSubscription) => data.clock,
+		select: selectFn,
 	});
 
 	return <div>{clockState?.start.toString()}</div>;

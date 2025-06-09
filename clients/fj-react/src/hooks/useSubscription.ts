@@ -14,7 +14,7 @@ export default function useSubscription<
 	TQueryFnData = unknown,
 	TData = TQueryFnData,
 >(options: UseSubscriptionOptions<TQueryFnData, TData>): TQueryFnData | null {
-	const { query, variables = {}, select } = options;
+	const { query, variables, select } = options;
 
 	const [data, setData] = useState<TQueryFnData | null>(null);
 
