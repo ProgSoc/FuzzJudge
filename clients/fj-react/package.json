@@ -13,22 +13,22 @@
 		"@emotion/react": "11.14.0",
 		"@emotion/styled": "11.14.0",
 		"@fontsource/roboto": "5.2.6",
-		"@hookform/resolvers": "^5.1.0",
+		"@hookform/resolvers": "5.1.1",
 		"@mui/material": "7.1.1",
-		"@tanstack/match-sorter-utils": "^8.19.4",
+		"@tanstack/match-sorter-utils": "8.19.4",
 		"@tanstack/react-query": "5.80.6",
 		"@tanstack/react-router": "1.120.20",
 		"@tanstack/react-router-devtools": "1.120.20",
-		"@tanstack/react-table": "^8.21.3",
+		"@tanstack/react-table": "8.21.3",
 		"graphql": "16.11.0",
 		"graphql-request": "7.2.0",
 		"graphql-ws": "6.0.5",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
-		"react-hook-form": "^7.57.0",
+		"react-hook-form": "7.57.0",
 		"react-icons": "5.5.0",
 		"react-markdown": "10.1.0",
-		"usehooks-ts": "^3.1.1"
+		"usehooks-ts": "3.1.1"
 	},
 	"devDependencies": {
 		"@emotion/babel-plugin": "11.13.5",
@@ -51,6 +51,6 @@
 		"typescript-eslint": "8.33.1",
 		"vite": "6.3.5",
 		"vite-plugin-graphql-codegen": "3.6.1",
-		"vite-tsconfig-paths": "^5.1.4"
+		"vite-tsconfig-paths": "5.1.4"
 	}
 }
