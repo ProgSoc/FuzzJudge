@@ -277,6 +277,15 @@ export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never
 
 export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string, brief: string } };
 
+export type CreateUserMutationVariables = Exact<{
+  username: Scalars['String']['input'];
+  teamId?: InputMaybe<Scalars['Int']['input']>;
+  role: UserRole;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, logn: string, teamId?: number | null, role: UserRole } };
+
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -330,6 +339,16 @@ export const CompetitionDetailsQueryDocument = `
     name
     instructions
     brief
+  }
+}
+    `;
+export const CreateUserDocument = `
+    mutation CreateUser($username: String!, $teamId: Int, $role: UserRole!) {
+  createUser(logn: $username, teamId: $teamId, role: $role) {
+    id
+    logn
+    teamId
+    role
   }
 }
     `;
@@ -430,6 +449,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     CompetitionDetailsQuery(variables?: CompetitionDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CompetitionDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CompetitionDetailsQueryQuery>(CompetitionDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CompetitionDetailsQuery', 'query', variables);
+    },
+    CreateUser(variables: CreateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateUser', 'mutation', variables);
     },
     LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);

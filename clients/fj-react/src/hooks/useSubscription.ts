@@ -3,25 +3,29 @@ import { useEffect, useState } from "react";
 
 type SelectFn<TData, TQueryFnData> = (data: TData) => TQueryFnData;
 
-export default function useSubscription<
-	TQueryFnData = unknown,
-	TData = TQueryFnData,
->(options: {
+type UseSubscriptionOptions<TQueryFnData, TData> = {
 	query: string;
 	// biome-ignore lint/suspicious/noExplicitAny: Variable type is generic
 	variables?: Record<string, any>;
 	select?: SelectFn<TData, TQueryFnData>;
-}): TQueryFnData | null {
+};
+
+export default function useSubscription<
+	TQueryFnData = unknown,
+	TData = TQueryFnData,
+>(options: UseSubscriptionOptions<TQueryFnData, TData>): TQueryFnData | null {
+	const { query, variables = {}, select } = options;
+
 	const [data, setData] = useState<TQueryFnData | null>(null);
 
 	useEffect(() => {
 		const unsubscribe = wsClient.subscribe<TData>(
-			{ query: options.query, variables: options.variables },
+			{ query, variables },
 			{
 				next: (response) => {
 					if (!response.data) return;
-					const selectedData = options.select
-						? options.select(response.data)
+					const selectedData = select
+						? select(response.data)
 						: (response.data as TQueryFnData);
 					setData(selectedData);
 				},
@@ -36,7 +40,7 @@ export default function useSubscription<
 		return () => {
 			unsubscribe();
 		};
-	}, [options.query, options.variables, options.select]);
+	}, [query, variables, select]);
 
 	return data;
 }

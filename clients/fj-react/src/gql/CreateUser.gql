@@ -1,0 +1,8 @@
+mutation CreateUser($username: String!, $teamId: Int, $role: UserRole!) {
+	createUser(logn: $username, teamId: $teamId, role: $role) {
+		id
+		logn
+		teamId
+		role
+	}
+}

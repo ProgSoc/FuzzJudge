@@ -13,6 +13,7 @@
 		"@emotion/react": "11.14.0",
 		"@emotion/styled": "11.14.0",
 		"@fontsource/roboto": "5.2.6",
+		"@hookform/resolvers": "^5.1.0",
 		"@mui/material": "7.1.1",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@tanstack/react-query": "5.80.6",
@@ -24,8 +25,10 @@
 		"graphql-ws": "6.0.5",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
+		"react-hook-form": "^7.57.0",
 		"react-icons": "5.5.0",
-		"react-markdown": "^10.1.0"
+		"react-markdown": "^10.1.0",
+		"usehooks-ts": "^3.1.1"
 	},
 	"devDependencies": {
 		"@emotion/babel-plugin": "11.13.5",
