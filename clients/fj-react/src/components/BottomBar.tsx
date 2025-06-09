@@ -1,6 +1,6 @@
 import { UserRole } from "@/gql";
 import type { TabItem } from "@/hooks/useTabIndex";
-import { userQuery } from "@/queries/user.query";
+import { userQueries } from "@/queries/user.query";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { FaHome, FaList } from "react-icons/fa";
@@ -35,7 +35,7 @@ const adminTabs = baseTabs.concat([
 
 export default function BottomBar() {
 	const currentUserRole = useQuery({
-		...userQuery.me(),
+		...userQueries.me(),
 		select: (data) => data.data.me?.role,
 	});
 

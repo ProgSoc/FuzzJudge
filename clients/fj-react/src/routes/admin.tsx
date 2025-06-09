@@ -1,11 +1,11 @@
 import LinkTabs from "@/components/LinkTabs";
-import { userQuery } from "@/queries/user.query";
+import { userQueries } from "@/queries/user.query";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin")({
 	component: RouteComponent,
-	loader: async ({ context: { queryClient } }) => {
-		const currentUser = await queryClient.ensureQueryData(userQuery.me());
+	beforeLoad: async ({ context: { queryClient } }) => {
+		const currentUser = await queryClient.ensureQueryData(userQueries.me());
 
 		if (currentUser.data.me?.role !== "admin") {
 			throw redirect({
@@ -31,6 +31,14 @@ function RouteComponent() {
 					{
 						to: "/admin/users",
 						label: "Users",
+					},
+					{
+						to: "/admin/teams",
+						label: "Teams",
+					},
+					{
+						to: "/admin/submissions",
+						label: "Submissions",
 					},
 				]}
 			/>

@@ -1,3 +1,4 @@
+import Datatable from "@/components/Datatable";
 import { LinkButton } from "@/components/LinkButton";
 import {
 	LeaderboardSubscriptionDocument,
@@ -117,58 +118,11 @@ function RouteComponent() {
 		];
 	}, [problemsQuery.data]);
 
-	const table = useReactTable({
-		data: leaderboardState ?? [],
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-	});
-
 	return (
-		<TableContainer component={Paper}>
-			<Table sx={{ minWidth: 650 }} aria-label="simple table">
-				<TableHead>
-					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id}>
-							{headerGroup.headers.map((header) => {
-								return (
-									<TableCell
-										key={header.id}
-										colSpan={header.colSpan}
-										width={header.getSize()}
-									>
-										{header.isPlaceholder ? null : (
-											<div>
-												{flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
-											</div>
-										)}
-									</TableCell>
-								);
-							})}
-						</TableRow>
-					))}
-				</TableHead>
-				<TableBody>
-					{table.getRowModel().rows.map((row) => {
-						return (
-							<TableRow key={row.id}>
-								{row.getVisibleCells().map((cell) => {
-									return (
-										<TableCell key={cell.id} width={cell.column.getSize()}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									);
-								})}
-							</TableRow>
-						);
-					})}
-				</TableBody>
-			</Table>
-		</TableContainer>
+		<Datatable
+			component={Paper}
+			columns={columns}
+			data={leaderboardState ?? []}
+		/>
 	);
 }

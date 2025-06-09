@@ -8,7 +8,7 @@ export const userQueryKeys = {
 	list: () => [...userQueryKeys.root, "list"],
 };
 
-export const userQuery = {
+export const userQueries = {
 	me: () =>
 		queryOptions({
 			queryKey: userQueryKeys.me(),

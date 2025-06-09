@@ -299,10 +299,20 @@ export type ProblemListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ProblemListQueryQuery = { __typename?: 'Query', problems: Array<{ __typename?: 'Problem', slug: string, name: string, icon: string, solved?: boolean | null, points: number, difficulty: number }> };
 
+export type SubmissionsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SubmissionsQueryQuery = { __typename?: 'Query', submissions: Array<{ __typename?: 'Submission', id: number, ok?: boolean | null, problemSlug: string, teamId: number, time: Date | string }> };
+
+export type TeamQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TeamQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, id: number, seed: string, hidden: boolean }> };
+
 export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null, team?: { __typename?: 'Team', name: string } | null }> };
+export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null }> };
 
 
 export const ClockSubscriptionDocument = `
@@ -376,6 +386,27 @@ export const ProblemListQueryDocument = `
   }
 }
     `;
+export const SubmissionsQueryDocument = `
+    query SubmissionsQuery {
+  submissions {
+    id
+    ok
+    problemSlug
+    teamId
+    time
+  }
+}
+    `;
+export const TeamQueryDocument = `
+    query TeamQuery {
+  teams {
+    name
+    id
+    seed
+    hidden
+  }
+}
+    `;
 export const UserListQueryDocument = `
     query UserListQuery {
   users {
@@ -383,9 +414,6 @@ export const UserListQueryDocument = `
     logn
     role
     teamId
-    team {
-      name
-    }
   }
 }
     `;
@@ -414,6 +442,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     ProblemListQuery(variables?: ProblemListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemListQueryQuery>(ProblemListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemListQuery', 'query', variables);
+    },
+    SubmissionsQuery(variables?: SubmissionsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmissionsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmissionsQueryQuery>(SubmissionsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmissionsQuery', 'query', variables);
+    },
+    TeamQuery(variables?: TeamQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamQueryQuery>(TeamQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamQuery', 'query', variables);
     },
     UserListQuery(variables?: UserListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UserListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<UserListQueryQuery>(UserListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UserListQuery', 'query', variables);

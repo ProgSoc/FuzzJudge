@@ -1,0 +1,8 @@
+query TeamQuery {
+	teams {
+		name
+		id
+		seed
+		hidden
+	}
+}

@@ -1,0 +1,9 @@
+query SubmissionsQuery {
+	submissions {
+		id
+		ok
+		problemSlug
+		teamId
+		time
+	}
+}
