@@ -11,7 +11,7 @@ import type { MutationResolvers } from "./../../../types.generated";
 export const login: NonNullable<MutationResolvers["login"]> = async (
 	_parent,
 	{ username, password },
-	{ c, session: oldSession, user: oldUser },
+	{ c },
 ) => {
 	// get the user by username
 	const user = await getUserFromUsername(username);

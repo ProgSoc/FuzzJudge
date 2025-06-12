@@ -1,7 +1,17 @@
-mutation CreateUser($username: String!, $teamId: Int, $role: UserRole!) {
-	createUser(logn: $username, teamId: $teamId, role: $role) {
+mutation CreateUser(
+	$username: String!
+	$password: String!
+	$teamId: Int
+	$role: UserRole!
+) {
+	createUser(
+		username: $username
+		teamId: $teamId
+		role: $role
+		password: $password
+	) {
 		id
-		logn
+		username
 		teamId
 		role
 	}

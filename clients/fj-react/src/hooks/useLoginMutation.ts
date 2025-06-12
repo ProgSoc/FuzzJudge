@@ -1,23 +1,25 @@
 import { toaster } from "@/components/Toaster";
-import { client } from "@/gql/client";
+import { client, wsClient } from "@/gql/client";
 import { userQueryKeys } from "@/queries/user.query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function useCreateUserMutation() {
+export default function useLoginMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: client.CreateUser,
+		mutationFn: client.Login,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: userQueryKeys.list() });
+			wsClient.terminate(); // Terminates existing WebSocket connection, will retry
+			queryClient.invalidateQueries({
+				queryKey: userQueryKeys.me(),
+			});
 			toaster.success({
-				title: "User created successfully!",
-				description: "The new user has been created and is ready to use.",
+				title: "Logged in successfully!",
 			});
 		},
 		onError: (error) => {
 			toaster.error({
-				title: "User creation failed",
+				title: "Login failed",
 				description: error.message,
 			});
 		},

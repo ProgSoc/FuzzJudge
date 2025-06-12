@@ -17,7 +17,7 @@ type TableRow = UserListQueryQuery["users"][number];
 const columnHelper = createColumnHelper<TableRow>();
 
 const columns = [
-	columnHelper.accessor("logn", {
+	columnHelper.accessor("username", {
 		header: "Login",
 	}),
 	columnHelper.accessor("role", {

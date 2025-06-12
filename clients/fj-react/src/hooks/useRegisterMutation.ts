@@ -1,23 +1,23 @@
 import { toaster } from "@/components/Toaster";
 import { client } from "@/gql/client";
-import { teamQueryKeys } from "@/queries/team.query";
+import { userQueryKeys } from "@/queries/user.query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function useCreateTeamMutation() {
+export default function useRegisterMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: client.CreateTeam,
+		mutationFn: client.Register,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: teamQueryKeys.list() });
+			queryClient.invalidateQueries({ queryKey: userQueryKeys.me() });
 			toaster.success({
-				title: "Team created successfully!",
-				description: "Your team has been created and is ready to use.",
+				title: "Registered successfully! Please log in.",
+				description: "You can now log in with your new account.",
 			});
 		},
 		onError: (error) => {
 			toaster.error({
-				title: "Team creation failed",
+				title: "Registration failed",
 				description: error.message,
 			});
 		},

@@ -65,7 +65,10 @@ export type Mutation = {
   getAdminFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
+  login: User;
+  logout: Scalars['Boolean']['output'];
   overrideJudge: Submission;
+  register: User;
   releaseClock: Clock;
   releaseResults: Clock;
   updateTeam: Team;
@@ -91,9 +94,10 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationCreateUserArgs = {
-  logn: Scalars['String']['input'];
+  password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username: Scalars['String']['input'];
 };
 
 
@@ -120,9 +124,22 @@ export type MutationJudgeArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
   submissionId: Scalars['Int']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -257,10 +274,10 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
-  logn: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
+  username: Scalars['String']['output'];
 };
 
 export enum UserRole {
@@ -288,22 +305,36 @@ export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __type
 
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
   teamId?: InputMaybe<Scalars['Int']['input']>;
   role: UserRole;
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, logn: string, teamId?: number | null, role: UserRole } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, username: string, teamId?: number | null, role: UserRole } };
 
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
 
+export type LoginMutationVariables = Exact<{
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', username: string, role: UserRole } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
 export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', logn: string, role: UserRole } | null };
+export type MeQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', username: string, role: UserRole } | null };
 
 export type ProblemDetailsQueryQueryVariables = Exact<{
   slug: Scalars['String']['input'];
@@ -316,6 +347,15 @@ export type ProblemListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProblemListQueryQuery = { __typename?: 'Query', problems: Array<{ __typename?: 'Problem', slug: string, name: string, icon: string, solved?: boolean | null, points: number, difficulty: number }> };
+
+export type RegisterMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', username: string, role: UserRole } };
 
 export type SubmissionsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -330,7 +370,7 @@ export type TeamQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?:
 export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, logn: string, role: UserRole, teamId?: number | null }> };
+export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null }> };
 
 
 export const ClockSubscriptionDocument = `
@@ -360,10 +400,15 @@ export const CreateTeamDocument = `
 }
     `;
 export const CreateUserDocument = `
-    mutation CreateUser($username: String!, $teamId: Int, $role: UserRole!) {
-  createUser(logn: $username, teamId: $teamId, role: $role) {
+    mutation CreateUser($username: String!, $password: String!, $teamId: Int, $role: UserRole!) {
+  createUser(
+    username: $username
+    teamId: $teamId
+    role: $role
+    password: $password
+  ) {
     id
-    logn
+    username
     teamId
     role
   }
@@ -389,10 +434,23 @@ export const LeaderboardSubscriptionDocument = `
   }
 }
     `;
+export const LoginDocument = `
+    mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    username
+    role
+  }
+}
+    `;
+export const LogoutDocument = `
+    mutation Logout {
+  logout
+}
+    `;
 export const MeQueryDocument = `
     query MeQuery {
   me {
-    logn
+    username
     role
   }
 }
@@ -422,6 +480,14 @@ export const ProblemListQueryDocument = `
   }
 }
     `;
+export const RegisterDocument = `
+    mutation Register($name: String!, $username: String!, $password: String!) {
+  register(username: $username, password: $password, name: $name) {
+    username
+    role
+  }
+}
+    `;
 export const SubmissionsQueryDocument = `
     query SubmissionsQuery {
   submissions {
@@ -447,7 +513,7 @@ export const UserListQueryDocument = `
     query UserListQuery {
   users {
     id
-    logn
+    username
     role
     teamId
   }
@@ -476,6 +542,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);
     },
+    Login(variables: LoginMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LoginMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Login', 'mutation', variables);
+    },
+    Logout(variables?: LogoutMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LogoutMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<LogoutMutation>(LogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Logout', 'mutation', variables);
+    },
     MeQuery(variables?: MeQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: MeQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<MeQueryQuery>(MeQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'MeQuery', 'query', variables);
     },
@@ -484,6 +556,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     ProblemListQuery(variables?: ProblemListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemListQueryQuery>(ProblemListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemListQuery', 'query', variables);
+    },
+    Register(variables: RegisterMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: RegisterMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<RegisterMutation>(RegisterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Register', 'mutation', variables);
     },
     SubmissionsQuery(variables?: SubmissionsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmissionsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmissionsQueryQuery>(SubmissionsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmissionsQuery', 'query', variables);

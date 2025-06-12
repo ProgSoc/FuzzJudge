@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProblemsImport } from './routes/problems'
+import { Route as LoginImport } from './routes/login'
 import { Route as LeaderboardImport } from './routes/leaderboard'
 import { Route as AdminImport } from './routes/admin'
 import { Route as IndexImport } from './routes/index'
@@ -28,6 +29,12 @@ import { Route as AdminClockImport } from './routes/admin/clock'
 const ProblemsRoute = ProblemsImport.update({
   id: '/problems',
   path: '/problems',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -114,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
     '/problems': {
@@ -213,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
   '/admin/clock': typeof AdminClockRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
@@ -226,6 +241,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/admin/clock': typeof AdminClockRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -240,6 +256,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
   '/admin/clock': typeof AdminClockRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
@@ -256,6 +273,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/leaderboard'
+    | '/login'
     | '/problems'
     | '/admin/clock'
     | '/admin/submissions'
@@ -268,6 +286,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/leaderboard'
+    | '/login'
     | '/admin/clock'
     | '/admin/submissions'
     | '/admin/teams'
@@ -280,6 +299,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/leaderboard'
+    | '/login'
     | '/problems'
     | '/admin/clock'
     | '/admin/submissions'
@@ -295,6 +315,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   LeaderboardRoute: typeof LeaderboardRoute
+  LoginRoute: typeof LoginRoute
   ProblemsRoute: typeof ProblemsRouteWithChildren
 }
 
@@ -302,6 +323,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   LeaderboardRoute: LeaderboardRoute,
+  LoginRoute: LoginRoute,
   ProblemsRoute: ProblemsRouteWithChildren,
 }
 
@@ -318,6 +340,7 @@ export const routeTree = rootRoute
         "/",
         "/admin",
         "/leaderboard",
+        "/login",
         "/problems"
       ]
     },
@@ -336,6 +359,9 @@ export const routeTree = rootRoute
     },
     "/leaderboard": {
       "filePath": "leaderboard.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
     },
     "/problems": {
       "filePath": "problems.tsx",
