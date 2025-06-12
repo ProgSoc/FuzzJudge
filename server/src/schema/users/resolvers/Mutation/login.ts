@@ -2,7 +2,7 @@ import { verifyPasswordHash } from "@/auth/password";
 import {
 	createSession,
 	generateSessionToken,
-	invalidateSession,
+	invalidateUserSessions,
 	setSessionTokenCookie,
 } from "@/auth/session";
 import { getUserFromUsername, getUserPasswordHash } from "@/auth/user";
@@ -27,9 +27,7 @@ export const login: NonNullable<MutationResolvers["login"]> = async (
 	const sessionToken = generateSessionToken();
 
 	// invalidate the old session if it exists
-	if (oldSession) {
-		await invalidateSession(oldSession.id);
-	}
+	await invalidateUserSessions(user.id);
 
 	const session = await createSession(sessionToken, user.id);
 
