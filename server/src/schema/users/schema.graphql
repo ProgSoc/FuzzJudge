@@ -5,10 +5,17 @@ extend type Query {
 }
 
 extend type Mutation {
-	createUser(logn: String!, role: UserRole!, teamId: Int): User!
-		@auth(role: admin)
+	createUser(
+		username: String!
+		password: String!
+		role: UserRole!
+		teamId: Int
+	): User! @auth(role: admin)
 	updateUser(id: Int!, role: UserRole, teamId: Int): User! @auth(role: admin)
 	deleteUser(id: Int!): User! @auth(role: admin)
+	login(username: String!, password: String!): User!
+	register(username: String!, password: String!, name: String!): User!
+	logout: Boolean! @auth(role: competitor)
 }
 
 enum UserRole {
@@ -21,7 +28,7 @@ type User {
 	role: UserRole!
 	teamId: Int
 	team: Team @auth
-	logn: String!
+	username: String!
 }
 
 directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT

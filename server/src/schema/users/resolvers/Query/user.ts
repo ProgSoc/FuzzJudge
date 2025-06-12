@@ -4,7 +4,7 @@ import type { QueryResolvers } from "./../../../types.generated";
 export const user: NonNullable<QueryResolvers["user"]> = async (
 	_parent,
 	{ id },
-	{ c, user: authedUser },
+	{ user: authedUser },
 ) => {
 	if (authedUser.id !== id && authedUser.role !== "admin") {
 		throw new GraphQLError("You are not authorized to view this user");
@@ -21,7 +21,7 @@ export const user: NonNullable<QueryResolvers["user"]> = async (
 	return {
 		id: userData.id,
 		role: userData.role,
-		teamId: userData.team ?? undefined,
-		logn: userData.logn ?? undefined,
+		teamId: userData.teamId,
+		username: userData.username,
 	};
 };

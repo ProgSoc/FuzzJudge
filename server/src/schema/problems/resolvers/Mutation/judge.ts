@@ -13,7 +13,7 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	{ code, output, slug },
 	{ user },
 ) => {
-	const { team: teamId } = user;
+	const { teamId } = user;
 
 	if (!teamId) {
 		throw new GraphQLError("You are not in a team");

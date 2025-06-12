@@ -5,10 +5,9 @@ import { solved } from "@/services/submission.service";
 import { GraphQLError } from "graphql";
 import type { ProblemResolvers } from "./../../types.generated";
 export const Problem: ProblemResolvers = {
-	solved: async ({ slug }, _arg, { c }) => {
-		const user = c.get("user");
+	solved: async ({ slug }, _arg, { user }) => {
 		if (!user) return null;
-		const { team: teamId } = user;
+		const { teamId } = user;
 		if (!teamId) {
 			throw new GraphQLError("You are not in a team");
 		}
@@ -21,7 +20,7 @@ export const Problem: ProblemResolvers = {
 		return problemSolved;
 	},
 	fuzz: async ({ slug }, _args, { user }) => {
-		const { team: teamId } = user;
+		const { teamId } = user;
 		if (!teamId) {
 			throw new GraphQLError("You are not in a team");
 		}

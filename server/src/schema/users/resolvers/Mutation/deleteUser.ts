@@ -6,7 +6,6 @@ import type { MutationResolvers } from "./../../../types.generated";
 export const deleteUser: NonNullable<MutationResolvers["deleteUser"]> = async (
 	_parent,
 	{ id },
-	{ c },
 ) => {
 	const [deletedUser] = await db
 		.delete(userTable)
@@ -20,7 +19,7 @@ export const deleteUser: NonNullable<MutationResolvers["deleteUser"]> = async (
 	return {
 		id: deletedUser.id,
 		role: deletedUser.role,
-		teamId: deletedUser.team ?? undefined,
-		logn: deletedUser.logn ?? undefined,
+		teamId: deletedUser.teamId,
+		username: deletedUser.username,
 	};
 };

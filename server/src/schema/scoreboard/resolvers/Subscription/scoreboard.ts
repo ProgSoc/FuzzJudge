@@ -10,8 +10,7 @@ import type { SubscriptionResolvers } from "./../../../types.generated";
 
 // Todo: Score latest version of scoreboard in temp file and then when in the freeze period, use that file to calculate the scoreboard.
 export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
-	subscribe: async function* (_parent, _arg, { c }) {
-		const potentialUser = c.get("user");
+	subscribe: async function* (_parent, _arg, { user: potentialUser }) {
 		const isAdmin = potentialUser?.role === "admin";
 		const isCurrentlyFrozen = await isFrozen();
 		// If they're an admin, or if the scoreboard is not frozen, calculate the scoreboard

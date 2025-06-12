@@ -6,13 +6,12 @@ import type { MutationResolvers } from "./../../../types.generated";
 export const updateUser: NonNullable<MutationResolvers["updateUser"]> = async (
 	_parent,
 	{ id, role, teamId },
-	{ c },
 ) => {
 	const [updatedUser] = await db
 		.update(userTable)
 		.set({
-			role: role?.toLowerCase() as "admin" | "competitor" | undefined,
-			team: teamId,
+			role: role ?? undefined, // Allow role to be optional
+			teamId,
 		})
 		.where(eq(userTable.id, id))
 		.returning();
@@ -24,7 +23,7 @@ export const updateUser: NonNullable<MutationResolvers["updateUser"]> = async (
 	return {
 		id: updatedUser.id,
 		role: updatedUser.role,
-		teamId: updatedUser.team ?? undefined,
-		logn: updatedUser.logn ?? undefined,
+		teamId: updatedUser.teamId,
+		username: updatedUser.username,
 	};
 };

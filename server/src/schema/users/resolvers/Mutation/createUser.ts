@@ -4,15 +4,15 @@ import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
 	_parent,
-	{ role, teamId, logn },
-	{ c },
+	{ role, teamId, username, password },
 ) => {
 	const [newUser] = await db
 		.insert(userTable)
 		.values({
-			logn,
-			role: role.toLowerCase() as "admin" | "competitor",
-			team: teamId,
+			username,
+			password,
+			role,
+			teamId,
 		})
 		.returning();
 
@@ -23,7 +23,7 @@ export const createUser: NonNullable<MutationResolvers["createUser"]> = async (
 	return {
 		id: newUser.id,
 		role: newUser.role,
-		teamId: newUser.team ?? undefined,
-		logn: newUser.logn ?? undefined,
+		teamId: newUser.teamId,
+		username: newUser.username,
 	};
 };

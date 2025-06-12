@@ -1,14 +1,6 @@
-import type { Context as HonoContext, Env as HonoEnv } from "hono";
-import type { User } from "./db/schema";
+import type { Context } from "hono";
+import type { SessionValidationResult, SessionWithUser } from "./auth/session";
 
-interface Env extends HonoEnv {
-	Variables: {
-		user?: User;
-	};
-}
+export type GraphQLContext = SessionValidationResult & { c: Context };
 
-export type GraphQLContext = { c: HonoContext<Env> };
-
-export type AuthenticatedContext<Context> = Context & {
-	user: User;
-};
+export type AuthenticatedContext<Context> = Context & SessionWithUser;
