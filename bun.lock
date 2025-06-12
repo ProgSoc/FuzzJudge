@@ -18,7 +18,7 @@
     },
     "clients/fj-admin-html": {
       "name": "@progsoc/fj-admin-html",
-      "version": "0.4.18",
+      "version": "0.4.19",
       "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
@@ -33,7 +33,7 @@
     },
     "clients/fj-react": {
       "name": "@progsoc/fj-react",
-      "version": "0.4.18",
+      "version": "0.4.19",
       "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.0",
@@ -81,7 +81,7 @@
     },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
-      "version": "0.4.18",
+      "version": "0.4.19",
       "dependencies": {
         "@tanstack/svelte-query": "5.80.6",
         "@tanstack/svelte-query-devtools": "5.80.6",
@@ -108,7 +108,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.4.18",
+      "version": "0.4.19",
       "bin": "dist/index.js",
       "dependencies": {
         "@graphql-tools/utils": "10.8.6",
@@ -125,7 +125,7 @@
       "devDependencies": {
         "@eddeee888/gcg-typescript-resolver-files": "0.12.1",
         "@graphql-codegen/cli": "5.0.7",
-        "@types/bun": "1.2.15",
+        "@types/bun": "1.2.16",
         "drizzle-kit": "0.31.1",
         "graphql-scalars": "1.24.2",
         "knip": "5.60.2",
@@ -1923,6 +1923,8 @@
 
     "@manypkg/get-packages/fs-extra": ["fs-extra@8.1.0", "", { "dependencies": { "graceful-fs": "^4.2.0", "jsonfile": "^4.0.0", "universalify": "^0.1.0" } }, "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g=="],
 
+    "@progsoc/fuzzjudge-server/@types/bun": ["@types/bun@1.2.16", "", { "dependencies": { "bun-types": "1.2.16" } }, "sha512-1aCZJ/6nSiViw339RsaNhkNoEloLaPzZhxMOYEa7OzRzO41IGg5n/7I43/ZIAW/c+Q6cT12Vf7fOZOoVIzb5BQ=="],
+
     "@tanstack/router-generator/prettier": ["prettier@3.5.3", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw=="],
 
     "@tanstack/router-utils/ansis": ["ansis@3.17.0", "", {}, "sha512-0qWUglt9JEqLFr3w1I1pbrChn1grhaiAR2ocX1PP/flRmxgtwTzPFFFnfIlD6aMOLQZgSuCRlidD70lvx8yhzg=="],
@@ -2058,6 +2060,8 @@
     "@graphql-codegen/typescript-graphql-request/@graphql-codegen/visitor-plugin-common/tslib": ["tslib@2.4.1", "", {}, "sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA=="],
 
     "@manypkg/find-root/find-up/locate-path": ["locate-path@5.0.0", "", { "dependencies": { "p-locate": "^4.1.0" } }, "sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g=="],
+
+    "@progsoc/fuzzjudge-server/@types/bun/bun-types": ["bun-types@1.2.16", "", { "dependencies": { "@types/node": "*" } }, "sha512-ciXLrHV4PXax9vHvUrkvun9VPVGOVwbbbBF/Ev1cXz12lyEZMoJpIJABOfPcN9gDJRaiKF9MVbSygLg4NXu3/A=="],
 
     "babel-plugin-macros/cosmiconfig/yaml": ["yaml@1.10.2", "", {}, "sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg=="],
 
