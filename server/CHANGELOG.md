@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.1
+
+### Patch Changes
+
+- [`93b515d`](https://github.com/ProgSoc/FuzzJudge/commit/93b515da1400fffc245907708a9d5e3a0c9812d9) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add more admin details
+
 ## 0.5.0
 
 ### Minor Changes
