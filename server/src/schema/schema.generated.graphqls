@@ -1,4 +1,4 @@
-directive @auth(role: UserRole = competitor) on FIELD_DEFINITION | OBJECT
+directive @auth(role: UserRole = competitor) on ARGUMENT_DEFINITION | FIELD_DEFINITION | OBJECT
 
 directive @clock on FIELD_DEFINITION
 
@@ -41,7 +41,7 @@ type Mutation {
   adjustFinishTime(finishTime: DateTime!): Clock!
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
   createTeam(hidden: Boolean, name: String!): Team!
-  createUser(password: String!, role: UserRole!, teamId: Int, username: String!): User!
+  createUser(name: String!, password: String!, role: UserRole!, teamId: Int, username: String!): User!
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!
   getAdminFuzz(slug: String!, teamId: Int!): String!
@@ -54,13 +54,13 @@ type Mutation {
   releaseClock(extendDuration: Boolean): Clock!
   releaseResults: Clock!
   updateTeam(hidden: Boolean, id: Int!, name: String): Team!
-  updateUser(id: Int!, role: UserRole, teamId: Int): User!
+  updateUser(id: Int!, name: String, role: UserRole, teamId: Int): User!
 }
 
 type Problem {
   brief: String!
   difficulty: Int!
-  fuzz: String
+  fuzz(teamId: Int): String
   icon: String!
   instructions: String
   name: String!
@@ -107,6 +107,7 @@ type Submission {
   id: Int!
   ok: Boolean
   out: String
+  problem: Problem!
   problemSlug: String!
   team: Team!
   teamId: Int!

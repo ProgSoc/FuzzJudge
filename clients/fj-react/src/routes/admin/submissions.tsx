@@ -1,11 +1,19 @@
 import Datatable from "@/components/Datatable";
+import { LinkButton } from "@/components/LinkButton";
 import type { SubmissionsQueryQuery } from "@/gql";
 import { submissionQueries } from "@/queries/submission.query";
+import { Stack, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useMemo } from "react";
+import { z } from "zod";
 
 export const Route = createFileRoute("/admin/submissions")({
+	validateSearch: z.object({
+		teamId: z.coerce.number().int().optional(),
+		problemSlug: z.string().optional(),
+	}),
 	component: RouteComponent,
 });
 
@@ -13,7 +21,7 @@ type SubmissionRow = SubmissionsQueryQuery["submissions"][number];
 
 const columnHelper = createColumnHelper<SubmissionRow>();
 
-const columns = [
+const createColumns = (teamId?: number, problemSlug?: string) => [
 	columnHelper.accessor("id", {
 		header: "Submission ID",
 	}),
@@ -27,9 +35,49 @@ const columns = [
 		header: "Status",
 		cell: (info) => (info.getValue() ? "Solved" : "Incorrect"),
 	}),
+	columnHelper.display({
+		id: "view",
+		header: "View",
+		cell: (info) => (
+			<LinkButton
+				to={"/admin/submissions/submission"}
+				replace
+				search={{ submissionId: info.row.original.id }}
+				mask={{
+					to: "/admin/submissions",
+					unmaskOnReload: true,
+					params: {
+						teamId: teamId ?? undefined,
+						problemSlug: problemSlug ?? undefined,
+					},
+				}}
+			>
+				View Submission
+			</LinkButton>
+		),
+	}),
 ];
 
 function RouteComponent() {
-	const submissionsQuery = useQuery(submissionQueries.list());
-	return <Datatable columns={columns} data={submissionsQuery.data ?? []} />;
+	const { teamId, problemSlug } = Route.useSearch();
+	const navigate = Route.useNavigate();
+
+	const submissionsQuery = useQuery(
+		submissionQueries.list({
+			teamId,
+			problemSlug,
+		}),
+	);
+
+	const columns = useMemo(
+		() => createColumns(teamId, problemSlug),
+		[teamId, problemSlug],
+	);
+
+	return (
+		<>
+			<Datatable columns={columns} data={submissionsQuery.data ?? []} />
+			<Outlet />
+		</>
+	);
 }

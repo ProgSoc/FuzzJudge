@@ -20,4 +20,5 @@ type Submission @auth(role: admin) {
 	vler: String
 	vlms: Float
 	team: Team! @auth
+	problem: Problem! @auth
 }

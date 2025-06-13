@@ -1,0 +1,5 @@
+query TeamProblemFuzz($teamId: Int!, $slug: String!) {
+	problem(slug: $slug) {
+		fuzz(teamId: $teamId)
+	}
+}

@@ -1,4 +1,6 @@
+import { competitionRoot } from "@/config";
 import { db } from "@/db";
+import { getProblemData } from "@/services/problems.service";
 import { GraphQLError } from "graphql";
 import type { SubmissionResolvers } from "./../../types.generated";
 export const Submission: SubmissionResolvers = {
@@ -23,5 +25,18 @@ export const Submission: SubmissionResolvers = {
 		}
 
 		return submissionTeam;
+	},
+	problem: async ({ problemSlug }, _arg, _ctx) => {
+		const problemData = await getProblemData(competitionRoot, problemSlug);
+
+		return {
+			brief: problemData.attributes.summary ?? "",
+			difficulty: problemData.problem.difficulty,
+			instructions: problemData.attributes.body,
+			name: problemData.attributes.title,
+			icon: problemData.attributes.icon ?? "",
+			points: problemData.problem.points,
+			slug: problemSlug,
+		};
 	},
 };

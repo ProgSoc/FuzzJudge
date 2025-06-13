@@ -39,6 +39,7 @@ export interface DatatableProps<Data extends object>
 	rowSelection?: RowSelectionState;
 	onRowSelectionChange?: OnChangeFn<RowSelectionState>;
 	onRowSelect?: (row: Row<Data>) => void;
+	enableColumnFilters?: boolean;
 }
 
 declare module "@tanstack/table-core" {
@@ -74,6 +75,7 @@ export default function Datatable<Data extends object>({
 	rowSelection,
 	onRowSelectionChange,
 	enableRowSelection,
+	enableColumnFilters = false,
 	...tableContainerProps
 }: DatatableProps<Data>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
@@ -96,6 +98,7 @@ export default function Datatable<Data extends object>({
 			fuzzy: fuzzyFilter,
 		},
 		globalFilterFn: fuzzyFilter,
+		enableColumnFilters,
 		state: {
 			sorting,
 			columnVisibility,

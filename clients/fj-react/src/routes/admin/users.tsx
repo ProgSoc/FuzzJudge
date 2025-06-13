@@ -1,5 +1,6 @@
 import { CreateUserDialog } from "@/components/CreateUserDialog";
 import Datatable from "@/components/Datatable";
+import UserRoleSelect from "@/components/UserRoleSelect";
 import UserTeamSelect from "@/components/UserTeamSelect";
 import type { UserListQueryQuery } from "@/gql";
 import { useDisclosure } from "@/hooks/useDisclosure";
@@ -26,6 +27,13 @@ const columns = [
 	}),
 	columnHelper.accessor("role", {
 		header: "Role",
+		cell: (info) => (
+			<UserRoleSelect
+				role={info.getValue()}
+				userId={info.row.original.id}
+				key={info.getValue()}
+			/>
+		),
 	}),
 	columnHelper.accessor("team", {
 		header: "Team",

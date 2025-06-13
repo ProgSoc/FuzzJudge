@@ -1,5 +1,5 @@
-query SubmissionsQuery {
-	submissions {
+query SubmissionsQuery($problemSlug: String, $teamId: Int) {
+	submissions(problemSlug: $problemSlug, teamId: $teamId) {
 		id
 		ok
 		problemSlug

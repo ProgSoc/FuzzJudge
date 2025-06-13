@@ -19,8 +19,8 @@ export const Problem: ProblemResolvers = {
 
 		return problemSolved;
 	},
-	fuzz: async ({ slug }, _args, { user }) => {
-		const { teamId } = user;
+	fuzz: async ({ slug }, { teamId: argTeamId }, { user }) => {
+		const teamId = argTeamId ?? user.teamId;
 		if (!teamId) {
 			throw new GraphQLError("You are not in a team");
 		}

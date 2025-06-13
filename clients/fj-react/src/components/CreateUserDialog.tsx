@@ -22,6 +22,7 @@ type UserCreateDialogProps = {
 };
 
 const createUserSchema = z.object({
+	name: z.string().min(1, "Name is required"),
 	username: z.string().min(1, "Username is required"),
 	role: z.nativeEnum(UserRole),
 	password: z.string().min(6, "Password must be at least 6 characters"),
@@ -45,6 +46,7 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 			username: data.username,
 			teamId: data.team?.value ?? null,
 			password: data.password,
+			name: data.name,
 		});
 		onClose();
 	};
@@ -82,6 +84,14 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 					and you can optionally assign a team.
 				</DialogContentText>
 				<Stack gap={2} mt={2}>
+					<ControlledTextField
+						control={control}
+						name="name"
+						label="Name"
+						variant="outlined"
+						fullWidth
+						required
+					/>
 					<ControlledTextField
 						control={control}
 						name="username"

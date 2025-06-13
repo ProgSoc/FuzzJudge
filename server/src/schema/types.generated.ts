@@ -99,6 +99,7 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationCreateUserArgs = {
+  name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
@@ -162,6 +163,7 @@ export type MutationUpdateTeamArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -177,6 +179,11 @@ export type Problem = {
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
   solved?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type ProblemFuzzArgs = {
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ProblemScore = {
@@ -247,6 +254,7 @@ export type Submission = {
   id: Scalars['Int']['output'];
   ok?: Maybe<Scalars['Boolean']['output']>;
   out?: Maybe<Scalars['String']['output']>;
+  problem: Problem;
   problemSlug: Scalars['String']['output'];
   team: Team;
   teamId: Scalars['Int']['output'];
@@ -466,7 +474,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustFinishTimeArgs, 'finishTime'>>;
   adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustStartTimeArgs, 'startTime'>>;
   createTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateTeamArgs, 'name'>>;
-  createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'password' | 'role' | 'username'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'name' | 'password' | 'role' | 'username'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteUserArgs, 'id'>>;
   getAdminFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetAdminFuzzArgs, 'slug' | 'teamId'>>;
@@ -485,7 +493,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Problem'] = ResolversParentTypes['Problem']> = {
   brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   difficulty?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  fuzz?: Resolver<Maybe<ResolversTypes['String']>, ParentType, AuthenticatedContext<ContextType>>;
+  fuzz?: Resolver<Maybe<ResolversTypes['String']>, ParentType, AuthenticatedContext<ContextType>, Partial<ProblemFuzzArgs>>;
   icon?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   instructions?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -535,6 +543,7 @@ export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   out?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  problem?: Resolver<ResolversTypes['Problem'], ParentType, AuthenticatedContext<ContextType>>;
   problemSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   team?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>>;
   teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;

@@ -23,6 +23,7 @@ import { Route as AdminUsersImport } from './routes/admin/users'
 import { Route as AdminTeamsImport } from './routes/admin/teams'
 import { Route as AdminSubmissionsImport } from './routes/admin/submissions'
 import { Route as AdminClockImport } from './routes/admin/clock'
+import { Route as AdminSubmissionsSubmissionImport } from './routes/admin/submissions/submission'
 
 // Create/Update Routes
 
@@ -97,6 +98,14 @@ const AdminClockRoute = AdminClockImport.update({
   path: '/clock',
   getParentRoute: () => AdminRoute,
 } as any)
+
+const AdminSubmissionsSubmissionRoute = AdminSubmissionsSubmissionImport.update(
+  {
+    id: '/submission',
+    path: '/submission',
+    getParentRoute: () => AdminSubmissionsRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -186,14 +195,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProblemsIndexImport
       parentRoute: typeof ProblemsImport
     }
+    '/admin/submissions/submission': {
+      id: '/admin/submissions/submission'
+      path: '/submission'
+      fullPath: '/admin/submissions/submission'
+      preLoaderRoute: typeof AdminSubmissionsSubmissionImport
+      parentRoute: typeof AdminSubmissionsImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AdminSubmissionsRouteChildren {
+  AdminSubmissionsSubmissionRoute: typeof AdminSubmissionsSubmissionRoute
+}
+
+const AdminSubmissionsRouteChildren: AdminSubmissionsRouteChildren = {
+  AdminSubmissionsSubmissionRoute: AdminSubmissionsSubmissionRoute,
+}
+
+const AdminSubmissionsRouteWithChildren =
+  AdminSubmissionsRoute._addFileChildren(AdminSubmissionsRouteChildren)
+
 interface AdminRouteChildren {
   AdminClockRoute: typeof AdminClockRoute
-  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
+  AdminSubmissionsRoute: typeof AdminSubmissionsRouteWithChildren
   AdminTeamsRoute: typeof AdminTeamsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -201,7 +228,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClockRoute: AdminClockRoute,
-  AdminSubmissionsRoute: AdminSubmissionsRoute,
+  AdminSubmissionsRoute: AdminSubmissionsRouteWithChildren,
   AdminTeamsRoute: AdminTeamsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -230,12 +257,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
   '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/problems/': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
 }
 
 export interface FileRoutesByTo {
@@ -243,12 +271,13 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/problems': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
 }
 
 export interface FileRoutesById {
@@ -259,12 +288,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
   '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/problems/': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
 }
 
 export interface FileRouteTypes {
@@ -282,6 +312,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin/'
     | '/problems/'
+    | '/admin/submissions/submission'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -294,6 +325,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin'
     | '/problems'
+    | '/admin/submissions/submission'
   id:
     | '__root__'
     | '/'
@@ -308,6 +340,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin/'
     | '/problems/'
+    | '/admin/submissions/submission'
   fileRoutesById: FileRoutesById
 }
 
@@ -376,7 +409,10 @@ export const routeTree = rootRoute
     },
     "/admin/submissions": {
       "filePath": "admin/submissions.tsx",
-      "parent": "/admin"
+      "parent": "/admin",
+      "children": [
+        "/admin/submissions/submission"
+      ]
     },
     "/admin/teams": {
       "filePath": "admin/teams.tsx",
@@ -397,6 +433,10 @@ export const routeTree = rootRoute
     "/problems/": {
       "filePath": "problems/index.tsx",
       "parent": "/problems"
+    },
+    "/admin/submissions/submission": {
+      "filePath": "admin/submissions/submission.tsx",
+      "parent": "/admin/submissions"
     }
   }
 }

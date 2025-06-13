@@ -9,7 +9,7 @@ import type {
 } from "react-hook-form";
 import ControlledAutocomplete from "./ControlledAutocomplete";
 
-export default function TeamAutocomplete<
+export default function ControlledTeamAutocomplete<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(props: UseControllerProps<TFieldValues, TName>) {

@@ -3,13 +3,16 @@ mutation CreateUser(
 	$password: String!
 	$teamId: Int
 	$role: UserRole!
+	$name: String!
 ) {
 	createUser(
 		username: $username
 		teamId: $teamId
 		role: $role
 		password: $password
+		name: $name
 	) {
+		name
 		id
 		username
 		teamId

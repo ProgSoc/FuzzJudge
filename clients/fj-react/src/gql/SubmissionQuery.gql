@@ -1,0 +1,11 @@
+query SubmissionQuery($id: Int!) {
+	submission(id: $id) {
+		ok
+		out
+		time
+		vler
+		code
+		teamId
+		problemSlug
+	}
+}

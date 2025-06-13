@@ -22,4 +22,10 @@ export const problemQuery = {
 			queryKey: problemQueryKeys.list(),
 			queryFn: () => client.ProblemListQuery(),
 		}),
+	teamProblemFuzz: (slug: string, teamId: number) =>
+		queryOptions({
+			queryKey: [...problemQueryKeys.problem(slug), "fuzz", teamId],
+			queryFn: () => client.TeamProblemFuzz({ slug, teamId }),
+			select: (data) => data.data.problem.fuzz,
+		}),
 };

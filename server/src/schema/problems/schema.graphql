@@ -30,5 +30,5 @@ type Problem @auth {
 	points: Int!
 	instructions: String @clock
 	solved: Boolean @clock
-	fuzz: String @auth @clock
+	fuzz(teamId: Int @auth(role: admin)): String @auth @clock
 }

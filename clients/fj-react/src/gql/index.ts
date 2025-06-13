@@ -94,6 +94,7 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationCreateUserArgs = {
+  name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
@@ -157,6 +158,7 @@ export type MutationUpdateTeamArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -172,6 +174,11 @@ export type Problem = {
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
   solved?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type ProblemFuzzArgs = {
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ProblemScore = {
@@ -242,6 +249,7 @@ export type Submission = {
   id: Scalars['Int']['output'];
   ok?: Maybe<Scalars['Boolean']['output']>;
   out?: Maybe<Scalars['String']['output']>;
+  problem: Problem;
   problemSlug: Scalars['String']['output'];
   team: Team;
   teamId: Scalars['Int']['output'];
@@ -309,14 +317,16 @@ export type CreateUserMutationVariables = Exact<{
   password: Scalars['String']['input'];
   teamId?: InputMaybe<Scalars['Int']['input']>;
   role: UserRole;
+  name: Scalars['String']['input'];
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, username: string, teamId?: number | null, role: UserRole } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', name: string, id: number, username: string, teamId?: number | null, role: UserRole } };
 
 export type EditUserTeamMutationVariables = Exact<{
   userId: Scalars['Int']['input'];
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<UserRole>;
 }>;
 
 
@@ -366,10 +376,37 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', username: string, role: UserRole } };
 
-export type SubmissionsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+export type SubmissionQueryQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type SubmissionQueryQuery = { __typename?: 'Query', submission?: { __typename?: 'Submission', ok?: boolean | null, out?: string | null, time: Date | string, vler?: string | null, code?: string | null, teamId: number, problemSlug: string } | null };
+
+export type SubmissionsQueryQueryVariables = Exact<{
+  problemSlug?: InputMaybe<Scalars['String']['input']>;
+  teamId?: InputMaybe<Scalars['Int']['input']>;
+}>;
 
 
 export type SubmissionsQueryQuery = { __typename?: 'Query', submissions: Array<{ __typename?: 'Submission', id: number, ok?: boolean | null, problemSlug: string, teamId: number, time: Date | string }> };
+
+export type SubmitProblemMutationVariables = Exact<{
+  code: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
+  output: Scalars['String']['input'];
+}>;
+
+
+export type SubmitProblemMutation = { __typename?: 'Mutation', judge: { __typename: 'JudgeErrorOutput', message: string, errors: string } | { __typename: 'JudgeSuccessOutput', message: string } };
+
+export type TeamProblemFuzzQueryVariables = Exact<{
+  teamId: Scalars['Int']['input'];
+  slug: Scalars['String']['input'];
+}>;
+
+
+export type TeamProblemFuzzQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz?: string | null } };
 
 export type TeamQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -409,13 +446,15 @@ export const CreateTeamDocument = `
 }
     `;
 export const CreateUserDocument = `
-    mutation CreateUser($username: String!, $password: String!, $teamId: Int, $role: UserRole!) {
+    mutation CreateUser($username: String!, $password: String!, $teamId: Int, $role: UserRole!, $name: String!) {
   createUser(
     username: $username
     teamId: $teamId
     role: $role
     password: $password
+    name: $name
   ) {
+    name
     id
     username
     teamId
@@ -424,8 +463,8 @@ export const CreateUserDocument = `
 }
     `;
 export const EditUserTeamDocument = `
-    mutation EditUserTeam($userId: Int!, $teamId: Int) {
-  updateUser(teamId: $teamId, id: $userId) {
+    mutation EditUserTeam($userId: Int!, $teamId: Int, $role: UserRole) {
+  updateUser(teamId: $teamId, id: $userId, role: $role) {
     id
     username
     role
@@ -507,14 +546,48 @@ export const RegisterDocument = `
   }
 }
     `;
+export const SubmissionQueryDocument = `
+    query SubmissionQuery($id: Int!) {
+  submission(id: $id) {
+    ok
+    out
+    time
+    vler
+    code
+    teamId
+    problemSlug
+  }
+}
+    `;
 export const SubmissionsQueryDocument = `
-    query SubmissionsQuery {
-  submissions {
+    query SubmissionsQuery($problemSlug: String, $teamId: Int) {
+  submissions(problemSlug: $problemSlug, teamId: $teamId) {
     id
     ok
     problemSlug
     teamId
     time
+  }
+}
+    `;
+export const SubmitProblemDocument = `
+    mutation SubmitProblem($code: String!, $slug: String!, $output: String!) {
+  judge(code: $code, slug: $slug, output: $output) {
+    __typename
+    ... on JudgeErrorOutput {
+      message
+      errors
+    }
+    ... on JudgeSuccessOutput {
+      message
+    }
+  }
+}
+    `;
+export const TeamProblemFuzzDocument = `
+    query TeamProblemFuzz($teamId: Int!, $slug: String!) {
+  problem(slug: $slug) {
+    fuzz(teamId: $teamId)
   }
 }
     `;
@@ -586,8 +659,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     Register(variables: RegisterMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: RegisterMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<RegisterMutation>(RegisterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Register', 'mutation', variables);
     },
+    SubmissionQuery(variables: SubmissionQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmissionQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmissionQueryQuery>(SubmissionQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmissionQuery', 'query', variables);
+    },
     SubmissionsQuery(variables?: SubmissionsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmissionsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmissionsQueryQuery>(SubmissionsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmissionsQuery', 'query', variables);
+    },
+    SubmitProblem(variables: SubmitProblemMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmitProblemMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmitProblemMutation>(SubmitProblemDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmitProblem', 'mutation', variables);
+    },
+    TeamProblemFuzz(variables: TeamProblemFuzzQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamProblemFuzzQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamProblemFuzzQuery>(TeamProblemFuzzDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamProblemFuzz', 'query', variables);
     },
     TeamQuery(variables?: TeamQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamQueryQuery>(TeamQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamQuery', 'query', variables);
