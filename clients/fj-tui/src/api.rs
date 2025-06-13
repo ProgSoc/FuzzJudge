@@ -61,7 +61,6 @@ pub struct ClockSubscription;
 )]
 pub struct CurrentUserQuery;
 
-
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "../../server/src/schema/schema.generated.graphqls",
@@ -69,6 +68,12 @@ pub struct CurrentUserQuery;
 )]
 pub struct JudgeProblemMutation;
 
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "../../server/src/schema/schema.generated.graphqls",
+    query_path = "src/queries/Login.gql"
+)]
+pub struct Login;
 
 impl Session {
     #[async_recursion]
@@ -80,27 +85,23 @@ impl Session {
             return Err("Server URL must start with http:// or https://".to_string());
         }
 
-        let req_body = CurrentUserQuery::build_query(current_user_query::Variables {});
+        let req_body = Login::build_query(login::Variables {
+            username: creds.username.clone(),
+            password: creds.password.clone(),
+        });
 
         let client = reqwest::Client::builder()
+            .cookie_store(true) // Enable cookie store to handle sessions
             .user_agent("FJ-Tui")
             .build()
             .map_err(|e| e.to_string())?;
 
         let res = client
             .post(server.join("/graphql").expect("Invalid GraphQL URL"))
-            .header("Authorization", creds.auth_header_value())
             .json(&req_body)
             .send()
             .await
             .map_err(|e| e.to_string());
-
-        // check to see if the server returns a www-authenticate header
-        if let Some(auth_header) = res.as_ref().ok().and_then(|r| r.headers().get("www-authenticate")) {
-            if auth_header == "Basic realm=\"FuzzJudge\" charset=\"UTF-8\"" {
-                return Err("Invalid credentials. Refused by server.".to_string());
-            }
-        }
 
         if let Err(e) = res.as_ref() {
             if e.to_string().contains("401") {
@@ -108,8 +109,11 @@ impl Session {
             }
         }
 
-        let res_body: Response<current_user_query::ResponseData> =
-            res.map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
+        let res_body: Response<login::ResponseData> = res
+            .map_err(|e| e.to_string())?
+            .json()
+            .await
+            .map_err(|e| e.to_string())?;
 
         if let Some(errors) = res_body.errors {
             let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
@@ -139,14 +143,13 @@ impl Session {
         let response = self
             .client
             .post(url)
-            .header("Authorization", self.creds.auth_header_value())
             .json(&req_body)
             .send()
             .await
             .map_err(|e| e.to_string())?;
-           
 
-        let response_body: Response<problem_query::ResponseData> = response.json().await.map_err(|e| e.to_string())?;
+        let response_body: Response<problem_query::ResponseData> =
+            response.json().await.map_err(|e| e.to_string())?;
 
         if let Some(errors) = response_body.errors {
             let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
@@ -174,12 +177,11 @@ impl Session {
             output,
             code: source,
         };
-        
+
         let req_body = JudgeProblemMutation::build_query(req_body);
         let response = self
             .client
             .post(url)
-            .header("Authorization", self.creds.auth_header_value())
             .json(&req_body)
             .send()
             .await
@@ -192,9 +194,9 @@ impl Session {
             let error_messages: Vec<String> = errors.into_iter().map(|e| e.message).collect();
             return Err(format!("GraphQL errors: {:?}", error_messages));
         }
-    
+
         let response_data = response_body.data.ok_or("No data in response")?;
-        
+
         match response_data.judge {
             judge_problem_mutation::JudgeProblemMutationJudge::JudgeErrorOutput(e) => {
                 // Error and Messages
@@ -211,7 +213,6 @@ impl Session {
         let res = self
             .client
             .post(self.server.join("/graphql").expect("Invalid GraphQL URL"))
-            .header("Authorization", self.creds.auth_header_value())
             .json(&req_body)
             .send()
             .await

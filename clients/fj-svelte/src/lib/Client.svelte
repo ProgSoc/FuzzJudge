@@ -14,7 +14,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <script lang="ts">
-  import { createQuery } from "@tanstack/svelte-query";
+  import { createMutation, createQuery } from "@tanstack/svelte-query";
   import { onDestroy, onMount } from "svelte";
   import { copyFuzz, downloadFuzz } from "../api";
   import {
@@ -25,7 +25,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     getCurrentTimeStateData,
     handleNotifications,
   } from "../clock";
-  import { ClockSubscriptionDocument, type ClockSubscriptionSubscription } from "../gql";
+  import {
+    ClockSubscriptionDocument,
+    type ClockSubscriptionSubscription,
+  } from "../gql";
   import { client, wsClient } from "../gql/sdk";
   import icons from "../icons";
   import { NOTIFICATION } from "../notifications";
@@ -42,6 +45,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   import Manual from "./admin/Manual.svelte";
   import InlineCountdown from "./counters/InlineCountdown.svelte";
   import PageCountdown from "./counters/PageCountdown.svelte";
+  import Login from "./Login.svelte";
+  import Register from "./Register.svelte";
 
   const currentUserQuery = createQuery({
     queryKey: ["username"],
@@ -54,6 +59,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     queryFn: () => client.CompetitionData(),
     select: (data) => {
       return data.data.competition.name;
+    },
+  });
+
+  const logout = createMutation({
+    mutationFn: client.Logout,
+    onSuccess: () => {
+      window.location.reload();
     },
   });
 
@@ -101,7 +113,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     }
   });
 
-  type ShowingPopout = "None" | "Scoreboard" | "CompInfo" | "Settings" | "Manual";
+  type ShowingPopout =
+    | "None"
+    | "Scoreboard"
+    | "CompInfo"
+    | "Settings"
+    | "Manual"
+    | "Login"
+    | "Register";
 
   let showingPopout: ShowingPopout = $state("None");
 
@@ -161,12 +180,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div>
       <button onclick={() => (showingPopout = "CompInfo")}>
         <span class="vertical-center">
-          <Icon icon={icons.info} /><span class="topbar-button-label"> Comp Info </span>
+          <Icon icon={icons.info} /><span class="topbar-button-label">
+            Comp Info
+          </span>
         </span>
       </button>
       <button onclick={() => (showingPopout = "Scoreboard")}>
         <span class="vertical-center">
-          <Icon icon={icons.scoreboard} /><span class="topbar-button-label"> Scoreboard </span>
+          <Icon icon={icons.scoreboard} /><span class="topbar-button-label">
+            Scoreboard
+          </span>
         </span>
       </button>
     </div>
@@ -178,12 +201,28 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     <div class="vertical-center">
       {#if $currentUserQuery.data}
         <span>
-          Logged in as <b>{$currentUserQuery.data.logn}</b>
+          Logged in as <b>{$currentUserQuery.data.username}</b>
         </span>
+        <button
+          onclick={() => $logout.mutate(undefined)}
+          title="Enter empty credentials"
+        >
+          <Icon icon={icons.logout} />
+        </button>
       {/if}
-      <a href="/void" title="Enter empty credentials">
-        <Icon icon={icons.logout} />
-      </a>
+      {#if !$currentUserQuery.data}
+        <button onclick={() => (showingPopout = "Login")}>
+          <span class="vertical-center">
+            <span class="topbar-button-label"> Login </span>
+          </span>
+        </button>
+        <button onclick={() => (showingPopout = "Register")}>
+          <span class="vertical-center">
+            <span class="topbar-button-label"> Register </span>
+          </span>
+        </button>
+      {/if}
+
       <Icon icon={icons.cog} clickAction={() => (showingPopout = "Settings")} />
     </div>
   </div>
@@ -223,20 +262,48 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   <Scoreboard />
 </Popout>
 
-<Popout shown={showingPopout === "CompInfo"} close={() => (showingPopout = "None")}>
+<Popout
+  shown={showingPopout === "CompInfo"}
+  close={() => (showingPopout = "None")}
+>
   <CompInfo />
 </Popout>
 
-<Popout shown={showingPopout === "Manual"} close={() => (showingPopout = "None")}>
+<Popout
+  shown={showingPopout === "Manual"}
+  close={() => (showingPopout = "None")}
+>
   <Manual />
 </Popout>
 
-<Popout shown={showingPopout === "Settings"} close={() => (showingPopout = "None")} title="Settings" icon={icons.cog}>
+<Popout
+  shown={showingPopout === "Settings"}
+  close={() => (showingPopout = "None")}
+  title="Settings"
+  icon={icons.cog}
+>
   <Settings />
+</Popout>
+<Popout
+  shown={showingPopout === "Login"}
+  close={() => (showingPopout = "None")}
+  title="Login"
+>
+  <Login />
+</Popout>
+<Popout
+  shown={showingPopout === "Register"}
+  close={() => (showingPopout = "None")}
+  title="Register"
+>
+  <Register />
 </Popout>
 
 {#if $NOTIFICATION !== undefined}
-  <Notification message={$NOTIFICATION} close={() => NOTIFICATION.set(undefined)} />
+  <Notification
+    message={$NOTIFICATION}
+    close={() => NOTIFICATION.set(undefined)}
+  />
 {/if}
 
 <svelte:window onkeydown={keydownHandler} />

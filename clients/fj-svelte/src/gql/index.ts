@@ -65,7 +65,10 @@ export type Mutation = {
   getAdminFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
+  login: User;
+  logout: Scalars['Boolean']['output'];
   overrideJudge: Submission;
+  register: User;
   releaseClock: Clock;
   releaseResults: Clock;
   updateTeam: Team;
@@ -85,14 +88,16 @@ export type MutationAdjustStartTimeArgs = {
 
 
 export type MutationCreateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
 };
 
 
 export type MutationCreateUserArgs = {
-  logn: Scalars['String']['input'];
+  password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username: Scalars['String']['input'];
 };
 
 
@@ -119,9 +124,22 @@ export type MutationJudgeArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
   submissionId: Scalars['Int']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -170,7 +188,7 @@ export type Query = {
   __typename?: 'Query';
   competition: Competition;
   header: Scalars['String']['output'];
-  me: User;
+  me?: Maybe<User>;
   problem: Problem;
   problems: Array<Problem>;
   submission?: Maybe<Submission>;
@@ -256,10 +274,10 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
-  logn: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
+  username: Scalars['String']['output'];
 };
 
 export enum UserRole {
@@ -280,7 +298,7 @@ export type CompetitionDataQuery = { __typename?: 'Query', competition: { __type
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', logn: string } };
+export type CurrentUserQuery = { __typename?: 'Query', me?: { __typename?: 'User', username: string } | null };
 
 export type JudgeSubmissionMutationVariables = Exact<{
   problemSlug: Scalars['String']['input'];
@@ -290,6 +308,19 @@ export type JudgeSubmissionMutationVariables = Exact<{
 
 
 export type JudgeSubmissionMutation = { __typename?: 'Mutation', judge: { __typename: 'JudgeErrorOutput', message: string, errors: string } | { __typename: 'JudgeSuccessOutput', message: string } };
+
+export type LoginMutationVariables = Exact<{
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', username: string } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type ProblemDataQueryVariables = Exact<{
   problemSlug: Scalars['String']['input'];
@@ -302,6 +333,15 @@ export type ProblemsListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProblemsListQueryQuery = { __typename?: 'Query', problems: Array<{ __typename?: 'Problem', slug: string, icon: string, points: number, solved?: boolean | null, difficulty: number, name: string }> };
+
+export type RegisterMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+}>;
+
+
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', username: string } };
 
 export type ScoreboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -329,7 +369,7 @@ export const CompetitionDataDocument = `
 export const CurrentUserDocument = `
     query CurrentUser {
   me {
-    logn
+    username
   }
 }
     `;
@@ -345,6 +385,18 @@ export const JudgeSubmissionDocument = `
       errors
     }
   }
+}
+    `;
+export const LoginDocument = `
+    mutation Login($password: String!, $username: String!) {
+  login(password: $password, username: $username) {
+    username
+  }
+}
+    `;
+export const LogoutDocument = `
+    mutation Logout {
+  logout
 }
     `;
 export const ProblemDataDocument = `
@@ -368,6 +420,13 @@ export const ProblemsListQueryDocument = `
     solved
     difficulty
     name
+  }
+}
+    `;
+export const RegisterDocument = `
+    mutation Register($name: String!, $password: String!, $username: String!) {
+  register(name: $name, password: $password, username: $username) {
+    username
   }
 }
     `;
@@ -409,11 +468,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     JudgeSubmission(variables: JudgeSubmissionMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: JudgeSubmissionMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<JudgeSubmissionMutation>(JudgeSubmissionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'JudgeSubmission', 'mutation', variables);
     },
+    Login(variables: LoginMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LoginMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Login', 'mutation', variables);
+    },
+    Logout(variables?: LogoutMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LogoutMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<LogoutMutation>(LogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Logout', 'mutation', variables);
+    },
     ProblemData(variables: ProblemDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemDataQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemDataQuery>(ProblemDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemData', 'query', variables);
     },
     ProblemsListQuery(variables?: ProblemsListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemsListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemsListQueryQuery>(ProblemsListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemsListQuery', 'query', variables);
+    },
+    Register(variables: RegisterMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: RegisterMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<RegisterMutation>(RegisterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Register', 'mutation', variables);
     },
     ScoreboardSubscription(variables?: ScoreboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ScoreboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ScoreboardSubscriptionSubscription>(ScoreboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ScoreboardSubscription', 'subscription', variables);
