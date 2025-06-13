@@ -5,10 +5,10 @@ export const clock: NonNullable<DirectiveResolvers["clock"]> = async (
 	next,
 	_parent,
 	_args,
-	context,
+	{ user },
 	_info,
 ) => {
-	if (context.c.get("user")?.role === "admin") {
+	if (user?.role === "admin") {
 		// Admins are exempt from clock protection
 		return next();
 	}

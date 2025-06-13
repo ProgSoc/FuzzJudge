@@ -3,7 +3,6 @@ import type { ProblemMapper } from './problems/schema.mappers';
 import type { ProblemScoreMapper, ScoreboardRowMapper } from './scoreboard/schema.mappers';
 import type { SubmissionMapper } from './submissions/schema.mappers';
 import type { TeamMapper } from './teams/schema.mappers';
-import type { UserMapper } from './users/schema.mappers';
 import type { GraphQLContext, AuthenticatedContext } from '@/context';
 export type Maybe<T> = T | null | undefined;
 export type InputMaybe<T> = T | null | undefined;
@@ -12,6 +11,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -70,7 +70,10 @@ export type Mutation = {
   getAdminFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
+  login: User;
+  logout: Scalars['Boolean']['output'];
   overrideJudge: Submission;
+  register: User;
   releaseClock: Clock;
   releaseResults: Clock;
   updateTeam: Team;
@@ -96,9 +99,10 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationCreateUserArgs = {
-  logn: Scalars['String']['input'];
+  password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username: Scalars['String']['input'];
 };
 
 
@@ -125,9 +129,22 @@ export type MutationJudgeArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
   submissionId: Scalars['Int']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -262,10 +279,10 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
-  logn: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
+  username: Scalars['String']['output'];
 };
 
 export type UserRole =
@@ -367,7 +384,7 @@ export type ResolversTypes = {
   Submission: ResolverTypeWrapper<SubmissionMapper>;
   Subscription: ResolverTypeWrapper<{}>;
   Team: ResolverTypeWrapper<TeamMapper>;
-  User: ResolverTypeWrapper<UserMapper>;
+  User: ResolverTypeWrapper<Omit<User, 'role' | 'team'> & { role: ResolversTypes['UserRole'], team?: Maybe<ResolversTypes['Team']> }>;
   UserRole: ResolverTypeWrapper<'competitor' | 'admin'>;
 };
 
@@ -392,7 +409,7 @@ export type ResolversParentTypes = {
   Submission: SubmissionMapper;
   Subscription: {};
   Team: TeamMapper;
-  User: UserMapper;
+  User: Omit<User, 'team'> & { team?: Maybe<ResolversParentTypes['Team']> };
 };
 
 export type AuthDirectiveArgs = {
@@ -448,13 +465,16 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustFinishTimeArgs, 'finishTime'>>;
   adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustStartTimeArgs, 'startTime'>>;
   createTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateTeamArgs, 'name'>>;
-  createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'logn' | 'role'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'password' | 'role' | 'username'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteUserArgs, 'id'>>;
   getAdminFuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationGetAdminFuzzArgs, 'slug' | 'teamId'>>;
   holdClock?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>>;
   judge?: Resolver<ResolversTypes['JudgeOutput'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationJudgeArgs, 'code' | 'output' | 'slug'>>;
+  login?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, AuthenticatedContext<ContextType>>;
   overrideJudge?: Resolver<ResolversTypes['Submission'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationOverrideJudgeArgs, 'solved' | 'submissionId'>>;
+  register?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'name' | 'password' | 'username'>>;
   releaseClock?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, Partial<MutationReleaseClockArgs>>;
   releaseResults?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>>;
   updateTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationUpdateTeamArgs, 'id'>>;
@@ -540,10 +560,10 @@ export type TeamResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  logn?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   team?: Resolver<Maybe<ResolversTypes['Team']>, ParentType, AuthenticatedContext<ContextType>>;
   teamId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -22,8 +22,9 @@ type UserCreateDialogProps = {
 };
 
 const createUserSchema = z.object({
-	logn: z.string().min(1, "Username is required"),
+	username: z.string().min(1, "Username is required"),
 	role: z.nativeEnum(UserRole),
+	password: z.string().min(6, "Password must be at least 6 characters"),
 	team: z
 		.object({
 			label: z.string(),
@@ -41,8 +42,9 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 	const onSubmit: ZodSubmitHandler<typeof createUserSchema> = async (data) => {
 		await createUserMutation.mutateAsync({
 			role: data.role,
-			username: data.logn,
+			username: data.username,
 			teamId: data.team?.value ?? null,
+			password: data.password,
 		});
 		onClose();
 	};
@@ -54,7 +56,8 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 	} = useZodForm({
 		schema: createUserSchema,
 		defaultValues: {
-			logn: "",
+			username: "",
+			password: "",
 			role: UserRole.Competitor,
 			team: null,
 		},
@@ -81,9 +84,18 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 				<Stack gap={2} mt={2}>
 					<ControlledTextField
 						control={control}
-						name="logn"
+						name="username"
 						label="Username"
 						variant="outlined"
+						fullWidth
+						required
+					/>
+					<ControlledTextField
+						control={control}
+						name="password"
+						label="Password"
+						variant="outlined"
+						type="password"
 						fullWidth
 						required
 					/>

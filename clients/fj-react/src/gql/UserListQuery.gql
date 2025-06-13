@@ -1,7 +1,7 @@
 query UserListQuery {
 	users {
 		id
-		logn
+		username
 		role
 		teamId
 	}

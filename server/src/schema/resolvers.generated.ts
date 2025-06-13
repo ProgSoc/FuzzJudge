@@ -21,7 +21,10 @@ import    { deleteUser as Mutation_deleteUser } from './users/resolvers/Mutation
 import    { getAdminFuzz as Mutation_getAdminFuzz } from './problems/resolvers/Mutation/getAdminFuzz';
 import    { holdClock as Mutation_holdClock } from './clock/resolvers/Mutation/holdClock';
 import    { judge as Mutation_judge } from './problems/resolvers/Mutation/judge';
+import    { login as Mutation_login } from './users/resolvers/Mutation/login';
+import    { logout as Mutation_logout } from './users/resolvers/Mutation/logout';
 import    { overrideJudge as Mutation_overrideJudge } from './submissions/resolvers/Mutation/overrideJudge';
+import    { register as Mutation_register } from './users/resolvers/Mutation/register';
 import    { releaseClock as Mutation_releaseClock } from './clock/resolvers/Mutation/releaseClock';
 import    { releaseResults as Mutation_releaseResults } from './clock/resolvers/Mutation/releaseResults';
 import    { updateTeam as Mutation_updateTeam } from './teams/resolvers/Mutation/updateTeam';
@@ -42,7 +45,7 @@ import    { JudgeOutput } from './problems/resolvers/JudgeOutput';
 import    { DateTimeResolver } from 'graphql-scalars';
     export const resolvers: Resolvers = {
       Query: { competition: Query_competition,header: Query_header,me: Query_me,problem: Query_problem,problems: Query_problems,submission: Query_submission,submissions: Query_submissions,team: Query_team,teams: Query_teams,user: Query_user,users: Query_users,version: Query_version },
-      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,getAdminFuzz: Mutation_getAdminFuzz,holdClock: Mutation_holdClock,judge: Mutation_judge,overrideJudge: Mutation_overrideJudge,releaseClock: Mutation_releaseClock,releaseResults: Mutation_releaseResults,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
+      Mutation: { adjustFinishTime: Mutation_adjustFinishTime,adjustStartTime: Mutation_adjustStartTime,createTeam: Mutation_createTeam,createUser: Mutation_createUser,deleteTeam: Mutation_deleteTeam,deleteUser: Mutation_deleteUser,getAdminFuzz: Mutation_getAdminFuzz,holdClock: Mutation_holdClock,judge: Mutation_judge,login: Mutation_login,logout: Mutation_logout,overrideJudge: Mutation_overrideJudge,register: Mutation_register,releaseClock: Mutation_releaseClock,releaseResults: Mutation_releaseResults,updateTeam: Mutation_updateTeam,updateUser: Mutation_updateUser },
       Subscription: { clock: Subscription_clock,scoreboard: Subscription_scoreboard },
       Clock: Clock,
 Competition: Competition,

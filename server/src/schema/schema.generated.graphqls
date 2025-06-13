@@ -41,13 +41,16 @@ type Mutation {
   adjustFinishTime(finishTime: DateTime!): Clock!
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
   createTeam(hidden: Boolean, name: String!): Team!
-  createUser(logn: String!, role: UserRole!, teamId: Int): User!
+  createUser(password: String!, role: UserRole!, teamId: Int, username: String!): User!
   deleteTeam(id: Int!): Team!
   deleteUser(id: Int!): User!
   getAdminFuzz(slug: String!, teamId: Int!): String!
   holdClock: Clock!
   judge(code: String!, output: String!, slug: String!): JudgeOutput!
+  login(password: String!, username: String!): User!
+  logout: Boolean!
   overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
+  register(name: String!, password: String!, username: String!): User!
   releaseClock(extendDuration: Boolean): Clock!
   releaseResults: Clock!
   updateTeam(hidden: Boolean, id: Int!, name: String): Team!
@@ -128,10 +131,10 @@ type Team {
 
 type User {
   id: Int!
-  logn: String!
   role: UserRole!
   team: Team
   teamId: Int
+  username: String!
 }
 
 enum UserRole {

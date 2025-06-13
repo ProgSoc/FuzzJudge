@@ -34,10 +34,9 @@ const root = competitionRoot;
 
 const competionData = await getCompetitionData(root);
 import { readdir } from "node:fs/promises";
+import { getCurrentSession } from "./auth/session";
 import { attachDirectiveResolvers } from "./directives/attachDirectiveResolvers";
 import { directiveResolvers } from "./directives/directiveResolvers";
-import { graphqlAuthMiddleware } from "./middleware/graphQLAuthMiddleware";
-import { basicAuth } from "./services/auth.service";
 
 const schema = attachDirectiveResolvers(
 	createSchema({
@@ -50,9 +49,10 @@ const schema = attachDirectiveResolvers(
 const graphqlWsMiddleware = makeWebsocketGraphQLMiddleware({
 	upgradeWebSocket,
 	schema,
-	context: ({ extra: { c } }) => ({
-		c,
-	}),
+	context: async ({ extra: { c } }) => {
+		const authenticationResult = await getCurrentSession(c);
+		return { c, ...authenticationResult };
+	},
 });
 
 const yoga = createYoga({
@@ -74,13 +74,17 @@ app.on(
 	["GET", "POST"],
 	// GraphQL endpoint
 	yoga.graphqlEndpoint,
-	graphqlAuthMiddleware({
-		verifyUser: basicAuth,
-	}),
 	// GraphQL WebSocket upgrade if the request is a WebSocket
 	graphqlWsMiddleware,
 	// GraphQL Yoga server
-	(c) => yoga.fetch(c.req.raw, { c }),
+	async (c) => {
+		const authenticationResult = await getCurrentSession(c);
+		const yogaRes = await yoga.fetch(c.req.raw, {
+			...authenticationResult,
+			c,
+		});
+		return c.newResponse(yogaRes.body, yogaRes);
+	},
 );
 
 app.use("/comp/prob/:slug/assets", async (c, next) => {

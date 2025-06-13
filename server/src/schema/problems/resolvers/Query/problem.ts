@@ -4,7 +4,6 @@ import type { QueryResolvers } from "./../../../types.generated";
 export const problem: NonNullable<QueryResolvers["problem"]> = async (
 	_parent,
 	{ slug },
-	{ c },
 ) => {
 	const problemData = await getProblemData(competitionRoot, slug);
 

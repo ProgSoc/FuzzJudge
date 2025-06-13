@@ -4,7 +4,6 @@ import type { QueryResolvers } from "./../../../types.generated";
 export const submission: NonNullable<QueryResolvers["submission"]> = async (
 	_parent,
 	{ id },
-	{ c },
 ) => {
 	const rawSubmission = await db.query.submissionTable.findFirst({
 		where: (submissionTable, { eq }) => eq(submissionTable.id, id),

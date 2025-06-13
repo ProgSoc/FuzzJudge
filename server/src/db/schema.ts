@@ -15,17 +15,33 @@ export const teamTableRelations = relations(teamTable, ({ many }) => ({
 
 export const userTable = sqliteTable("user", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	team: integer("team").references(() => teamTable.id),
-	logn: text("logn").unique().notNull(),
-	password: text("password"),
-	name: text("name"),
+	teamId: integer("team").references(() => teamTable.id),
+	username: text("logn").unique().notNull(),
+	password: text("password").notNull(),
+	name: text("name").notNull().default(""),
 	role: text("role", { enum: ["admin", "competitor"] }).notNull(),
 });
 
-export const userTableRelations = relations(userTable, ({ one }) => ({
+export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	team: one(teamTable, {
-		fields: [userTable.team],
+		fields: [userTable.teamId],
 		references: [teamTable.id],
+	}),
+	sessions: many(sessionTable),
+}));
+
+export const sessionTable = sqliteTable("session", {
+	id: text("id").primaryKey(),
+	userId: integer("user_id")
+		.references(() => userTable.id)
+		.notNull(),
+	expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+});
+
+export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
+	user: one(userTable, {
+		fields: [sessionTable.userId],
+		references: [userTable.id],
 	}),
 }));
 
@@ -61,6 +77,10 @@ export const compTable = sqliteTable("comp", {
 export type Team = typeof teamTable.$inferSelect;
 
 export type User = typeof userTable.$inferSelect;
+
+export type UserInsert = typeof userTable.$inferInsert;
+
+export type Session = typeof sessionTable.$inferSelect;
 
 export type UserRoles = User["role"];
 

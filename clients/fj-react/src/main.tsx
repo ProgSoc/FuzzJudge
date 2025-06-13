@@ -9,6 +9,7 @@ import "./main.css";
 
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/Toaster";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
@@ -67,6 +68,7 @@ if (!rootElement.innerHTML) {
 			<QueryClientProvider client={queryClient}>
 				<ThemeProvider theme={theme}>
 					<RouterProvider router={router} />
+					<Toaster />
 					<CssBaseline />
 				</ThemeProvider>
 			</QueryClientProvider>

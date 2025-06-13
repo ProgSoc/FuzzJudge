@@ -16,7 +16,7 @@
 #[derive(Debug, Clone, Default)]
 pub struct Credentials {
     pub username: String,
-    password: String,
+    pub password: String,
 }
 
 impl Credentials {
@@ -25,11 +25,5 @@ impl Credentials {
             username: username.to_string(),
             password: password.to_string(),
         }
-    }
-
-    pub fn auth_header_value(&self) -> String {
-        let raw = format!("{}:{}", self.username, self.password);
-        let encoded = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, raw);
-        format!("Basic {}", encoded)
     }
 }

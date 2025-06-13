@@ -3,8 +3,8 @@ import { GraphQLError } from "graphql";
 import type { SubmissionResolvers } from "./../../types.generated";
 export const Submission: SubmissionResolvers = {
 	/* Implement Submission resolver logic here */
-	team: async ({ teamId }, _arg, { c, user }) => {
-		if (user.team !== teamId && user.role !== "admin") {
+	team: async ({ teamId }, _arg, { user }) => {
+		if (user.teamId !== teamId && user.role !== "admin") {
 			throw new GraphQLError("You are not in this team");
 		}
 
