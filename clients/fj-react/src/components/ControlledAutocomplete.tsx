@@ -85,6 +85,7 @@ export default function ControlledAutocomplete<
 		placeholder,
 		helperText,
 		required = false,
+		onChange,
 		...rest
 	} = props;
 
@@ -121,7 +122,10 @@ export default function ControlledAutocomplete<
 				/>
 			)}
 			{...field}
-			onChange={(_, value) => field.onChange(value)}
+			onChange={(_, value) => {
+				field.onChange(value);
+				onChange?.(value);
+			}}
 			disabled={disabled}
 		/>
 	);

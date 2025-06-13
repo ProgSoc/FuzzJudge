@@ -3,6 +3,11 @@ query UserListQuery {
 		id
 		username
 		role
-		teamId
+		name
+
+		team {
+			id
+			name
+		}
 	}
 }

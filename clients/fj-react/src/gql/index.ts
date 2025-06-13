@@ -274,6 +274,7 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
@@ -312,6 +313,14 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, username: string, teamId?: number | null, role: UserRole } };
+
+export type EditUserTeamMutationVariables = Exact<{
+  userId: Scalars['Int']['input'];
+  teamId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type EditUserTeamMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null } };
 
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -370,7 +379,7 @@ export type TeamQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?:
 export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null }> };
+export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, name: string, team?: { __typename?: 'Team', id: number, name: string } | null }> };
 
 
 export const ClockSubscriptionDocument = `
@@ -411,6 +420,16 @@ export const CreateUserDocument = `
     username
     teamId
     role
+  }
+}
+    `;
+export const EditUserTeamDocument = `
+    mutation EditUserTeam($userId: Int!, $teamId: Int) {
+  updateUser(teamId: $teamId, id: $userId) {
+    id
+    username
+    role
+    teamId
   }
 }
     `;
@@ -515,7 +534,11 @@ export const UserListQueryDocument = `
     id
     username
     role
-    teamId
+    name
+    team {
+      id
+      name
+    }
   }
 }
     `;
@@ -538,6 +561,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     CreateUser(variables: CreateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateUser', 'mutation', variables);
+    },
+    EditUserTeam(variables: EditUserTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: EditUserTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<EditUserTeamMutation>(EditUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'EditUserTeam', 'mutation', variables);
     },
     LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);

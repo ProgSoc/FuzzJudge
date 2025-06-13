@@ -1,0 +1,8 @@
+mutation EditUserTeam($userId: Int!, $teamId: Int) {
+	updateUser(teamId: $teamId, id: $userId) {
+		id
+		username
+		role
+		teamId
+	}
+}

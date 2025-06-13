@@ -279,6 +279,7 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
@@ -560,6 +561,7 @@ export type TeamResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   team?: Resolver<Maybe<ResolversTypes['Team']>, ParentType, AuthenticatedContext<ContextType>>;
   teamId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;

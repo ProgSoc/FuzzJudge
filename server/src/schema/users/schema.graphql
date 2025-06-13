@@ -24,6 +24,7 @@ enum UserRole {
 }
 
 type User {
+	name: String!
 	id: Int!
 	role: UserRole!
 	teamId: Int

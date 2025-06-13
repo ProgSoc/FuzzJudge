@@ -131,6 +131,7 @@ type Team {
 
 type User {
   id: Int!
+  name: String!
   role: UserRole!
   team: Team
   teamId: Int
