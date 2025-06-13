@@ -1,6 +1,6 @@
 {
 	"name": "@progsoc/fuzzjudge-server",
-	"version": "0.4.19",
+	"version": "0.5.0",
 	"module": "main.ts",
 	"devDependencies": {
 		"@eddeee888/gcg-typescript-resolver-files": "0.12.1",
@@ -16,7 +16,12 @@
 	"engines": {
 		"bun": ">=1.2.0"
 	},
-	"files": ["dist", "migrations", "README.md", "LICENSE"],
+	"files": [
+		"dist",
+		"migrations",
+		"README.md",
+		"LICENSE"
+	],
 	"publishConfig": {
 		"access": "public"
 	},

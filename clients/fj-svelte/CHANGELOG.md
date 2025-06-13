@@ -1,5 +1,11 @@
 # @progsoc/fj-svelte
 
+## 0.5.0
+
+### Minor Changes
+
+- [#284](https://github.com/ProgSoc/FuzzJudge/pull/284) [`3cddfc2`](https://github.com/ProgSoc/FuzzJudge/commit/3cddfc27e5fa99e5cd368574ceb6260ebd0db50b) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change login to session cookies and username password
+
 ## 0.4.19
 
 ## 0.4.18
