@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { z } from "zod";
 import ControlledTextField from "./ControlledTextField";
-import { toaster } from "./Toaster";
 
 type LoginDialogProps = { onClose: () => void; open: boolean };
 
