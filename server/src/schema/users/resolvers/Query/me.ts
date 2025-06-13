@@ -11,5 +11,6 @@ export const me: NonNullable<QueryResolvers["me"]> = async (
 		role: user.role,
 		teamId: user.teamId,
 		username: user.username,
+		name: user.name,
 	};
 };

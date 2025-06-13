@@ -21,5 +21,6 @@ export const deleteUser: NonNullable<MutationResolvers["deleteUser"]> = async (
 		role: deletedUser.role,
 		teamId: deletedUser.teamId,
 		username: deletedUser.username,
+		name: deletedUser.name,
 	};
 };

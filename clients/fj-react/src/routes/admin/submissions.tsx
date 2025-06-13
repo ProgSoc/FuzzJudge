@@ -2,7 +2,6 @@ import Datatable from "@/components/Datatable";
 import { LinkButton } from "@/components/LinkButton";
 import type { SubmissionsQueryQuery } from "@/gql";
 import { submissionQueries } from "@/queries/submission.query";
-import { Stack, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -60,7 +59,6 @@ const createColumns = (teamId?: number, problemSlug?: string) => [
 
 function RouteComponent() {
 	const { teamId, problemSlug } = Route.useSearch();
-	const navigate = Route.useNavigate();
 
 	const submissionsQuery = useQuery(
 		submissionQueries.list({

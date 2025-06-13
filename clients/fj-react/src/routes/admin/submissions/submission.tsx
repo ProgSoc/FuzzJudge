@@ -1,6 +1,4 @@
 import TeamProblemFuzzTextArea from "@/components/TeamProblemFuzz";
-import { TeamProblemFuzzDocument } from "@/gql";
-import { problemQuery } from "@/queries/problem.query";
 import { submissionQueries } from "@/queries/submission.query";
 import {
 	Dialog,

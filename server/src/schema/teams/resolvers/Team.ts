@@ -12,6 +12,7 @@ export const Team: TeamResolvers = {
 			role: user.role,
 			teamId: user.teamId,
 			username: user.username,
+			name: user.name,
 		}));
 	},
 	submissions: async ({ id }, _arg) => {
