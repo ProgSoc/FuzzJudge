@@ -8,7 +8,7 @@
 		"@types/bun": "1.2.16",
 		"drizzle-kit": "0.31.1",
 		"knip": "5.61.0",
-		"tsdown": "0.12.7",
+		"tsdown": "0.12.8",
 		"typescript": "5.8.3",
 		"graphql-scalars": "1.24.2"
 	},
