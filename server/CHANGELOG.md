@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.3
+
+### Patch Changes
+
+- [`54067c8`](https://github.com/ProgSoc/FuzzJudge/commit/54067c859cd79793f7d99f4771dac9e26eb6e168) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add clock editing
+
 ## 0.5.2
 
 ## 0.5.1
