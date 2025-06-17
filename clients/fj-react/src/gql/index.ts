@@ -26,14 +26,6 @@ export type Clock = {
   start: Scalars['DateTime']['output'];
 };
 
-export enum ClockStatus {
-  After = 'after',
-  Before = 'before',
-  Freeze = 'freeze',
-  Hold = 'hold',
-  Running = 'running'
-}
-
 export type Competition = {
   __typename?: 'Competition';
   brief: Scalars['String']['output'];

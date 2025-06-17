@@ -1,3 +1,4 @@
+import Countdown from "@/components/Countdown";
 import {
 	ClockSubscriptionDocument,
 	type ClockSubscriptionSubscription,
@@ -118,7 +119,9 @@ function RouteComponent() {
 						Pause Clock
 					</Button>
 					<Button
-						onClick={() => releaseClockMutation.mutate(undefined)}
+						onClick={() =>
+							releaseClockMutation.mutate({ extendDuration: true })
+						}
 						loading={releaseClockMutation.isPending}
 					>
 						Release Clock
@@ -129,6 +132,18 @@ function RouteComponent() {
 					>
 						Release Results
 					</Button>
+				</Stack>
+				<Stack direction="row" spacing={2}>
+					{clockState?.start ? (
+						<PaddedPaper>
+							<Countdown to={scalarToDateTime(clockState?.start)} />
+						</PaddedPaper>
+					) : null}
+					{clockState?.finish ? (
+						<PaddedPaper>
+							<Countdown to={scalarToDateTime(clockState?.finish)} />
+						</PaddedPaper>
+					) : null}
 				</Stack>
 			</Stack>
 		</Container>
