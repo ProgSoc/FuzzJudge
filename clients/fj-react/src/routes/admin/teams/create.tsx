@@ -1,3 +1,5 @@
+import ControlledCheckbox from "@/components/ControlledCheckbox";
+import ControlledTextField from "@/components/ControlledTextField";
 import useCreateTeamMutation from "@/hooks/useCreateTeamMutation";
 import type { ZodSubmitHandler } from "@/hooks/useZodForm";
 import useZodForm from "@/hooks/useZodForm";
@@ -9,25 +11,25 @@ import {
 	DialogTitle,
 	Stack,
 } from "@mui/material";
-import { useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import ControlledCheckbox from "./ControlledCheckbox";
-import ControlledTextField from "./ControlledTextField";
 
-type TeamCreateDialogProps = {
-	onClose: () => void;
-	open: boolean;
-};
+export const Route = createFileRoute("/admin/teams/create")({
+	component: RouteComponent,
+});
 
 const createTeamSchema = z.object({
 	name: z.string().min(1, "Team name is required"),
 	hidden: z.boolean().default(false),
 });
 
-export function CreateTeamDialog(props: TeamCreateDialogProps) {
-	const { onClose, open } = props;
-
+function RouteComponent() {
 	const createTeamMutation = useCreateTeamMutation();
+	const navigate = Route.useNavigate();
+
+	const onClose = () => {
+		navigate({ to: "/admin/teams", replace: true });
+	};
 
 	const onSubmit: ZodSubmitHandler<typeof createTeamSchema> = async (data) => {
 		await createTeamMutation.mutateAsync({
@@ -40,7 +42,7 @@ export function CreateTeamDialog(props: TeamCreateDialogProps) {
 	const {
 		handleSubmit,
 		control,
-		formState: { errors, isSubmitting },
+		formState: { isSubmitting },
 	} = useZodForm({
 		schema: createTeamSchema,
 		defaultValues: {
@@ -49,13 +51,9 @@ export function CreateTeamDialog(props: TeamCreateDialogProps) {
 		},
 	});
 
-	useEffect(() => {
-		console.log("Form errors:", errors);
-	}, [errors]);
-
 	return (
 		<Dialog
-			open={open}
+			open
 			onClose={onClose}
 			maxWidth="md"
 			component={"form"}

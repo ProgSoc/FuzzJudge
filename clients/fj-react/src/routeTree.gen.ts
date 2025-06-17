@@ -8,204 +8,302 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProblemsRouteImport } from './routes/problems'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProblemsIndexRouteImport } from './routes/problems/index'
+import { Route as ProblemsSlugRouteImport } from './routes/problems/$slug'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminTeamsRouteImport } from './routes/admin/teams'
+import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
+import { Route as AdminClockRouteImport } from './routes/admin/clock'
+import { Route as AdminUsersCreateRouteImport } from './routes/admin/users/create'
+import { Route as AdminTeamsCreateRouteImport } from './routes/admin/teams/create'
+import { Route as AdminSubmissionsSubmissionRouteImport } from './routes/admin/submissions/submission'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as ProblemsImport } from './routes/problems'
-import { Route as LoginImport } from './routes/login'
-import { Route as LeaderboardImport } from './routes/leaderboard'
-import { Route as AdminImport } from './routes/admin'
-import { Route as IndexImport } from './routes/index'
-import { Route as ProblemsIndexImport } from './routes/problems/index'
-import { Route as AdminIndexImport } from './routes/admin/index'
-import { Route as ProblemsSlugImport } from './routes/problems/$slug'
-import { Route as AdminUsersImport } from './routes/admin/users'
-import { Route as AdminTeamsImport } from './routes/admin/teams'
-import { Route as AdminSubmissionsImport } from './routes/admin/submissions'
-import { Route as AdminClockImport } from './routes/admin/clock'
-import { Route as AdminSubmissionsSubmissionImport } from './routes/admin/submissions/submission'
-
-// Create/Update Routes
-
-const ProblemsRoute = ProblemsImport.update({
+const ProblemsRoute = ProblemsRouteImport.update({
   id: '/problems',
   path: '/problems',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LeaderboardRoute = LeaderboardImport.update({
+const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminRoute = AdminImport.update({
+const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ProblemsIndexRoute = ProblemsIndexImport.update({
+const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProblemsRoute,
 } as any)
-
-const AdminIndexRoute = AdminIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-
-const ProblemsSlugRoute = ProblemsSlugImport.update({
+const ProblemsSlugRoute = ProblemsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProblemsRoute,
 } as any)
-
-const AdminUsersRoute = AdminUsersImport.update({
+const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
-
-const AdminTeamsRoute = AdminTeamsImport.update({
+const AdminTeamsRoute = AdminTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
   getParentRoute: () => AdminRoute,
 } as any)
-
-const AdminSubmissionsRoute = AdminSubmissionsImport.update({
+const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
   id: '/submissions',
   path: '/submissions',
   getParentRoute: () => AdminRoute,
 } as any)
-
-const AdminClockRoute = AdminClockImport.update({
+const AdminClockRoute = AdminClockRouteImport.update({
   id: '/clock',
   path: '/clock',
   getParentRoute: () => AdminRoute,
 } as any)
-
-const AdminSubmissionsSubmissionRoute = AdminSubmissionsSubmissionImport.update(
-  {
+const AdminUsersCreateRoute = AdminUsersCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
+const AdminTeamsCreateRoute = AdminTeamsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminTeamsRoute,
+} as any)
+const AdminSubmissionsSubmissionRoute =
+  AdminSubmissionsSubmissionRouteImport.update({
     id: '/submission',
     path: '/submission',
     getParentRoute: () => AdminSubmissionsRoute,
-  } as any,
-)
+  } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/problems': typeof ProblemsRouteWithChildren
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
+  '/admin/teams': typeof AdminTeamsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems/': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
+  '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/users/create': typeof AdminUsersCreateRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
+  '/admin/teams': typeof AdminTeamsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
+  '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/users/create': typeof AdminUsersCreateRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/problems': typeof ProblemsRouteWithChildren
+  '/admin/clock': typeof AdminClockRoute
+  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
+  '/admin/teams': typeof AdminTeamsRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/problems/$slug': typeof ProblemsSlugRoute
+  '/problems/': typeof ProblemsIndexRoute
+  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
+  '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/users/create': typeof AdminUsersCreateRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/leaderboard'
+    | '/login'
+    | '/problems'
+    | '/admin/clock'
+    | '/admin/submissions'
+    | '/admin/teams'
+    | '/admin/users'
+    | '/problems/$slug'
+    | '/problems/'
+    | '/admin/submissions/submission'
+    | '/admin/teams/create'
+    | '/admin/users/create'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/admin'
+    | '/leaderboard'
+    | '/login'
+    | '/admin/clock'
+    | '/admin/submissions'
+    | '/admin/teams'
+    | '/admin/users'
+    | '/problems/$slug'
+    | '/problems'
+    | '/admin/submissions/submission'
+    | '/admin/teams/create'
+    | '/admin/users/create'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/leaderboard'
+    | '/login'
+    | '/problems'
+    | '/admin/clock'
+    | '/admin/submissions'
+    | '/admin/teams'
+    | '/admin/users'
+    | '/problems/$slug'
+    | '/problems/'
+    | '/admin/submissions/submission'
+    | '/admin/teams/create'
+    | '/admin/users/create'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  LeaderboardRoute: typeof LeaderboardRoute
+  LoginRoute: typeof LoginRoute
+  ProblemsRoute: typeof ProblemsRouteWithChildren
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminImport
-      parentRoute: typeof rootRoute
-    }
-    '/leaderboard': {
-      id: '/leaderboard'
-      path: '/leaderboard'
-      fullPath: '/leaderboard'
-      preLoaderRoute: typeof LeaderboardImport
-      parentRoute: typeof rootRoute
+    '/problems': {
+      id: '/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof ProblemsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/problems': {
-      id: '/problems'
-      path: '/problems'
-      fullPath: '/problems'
-      preLoaderRoute: typeof ProblemsImport
-      parentRoute: typeof rootRoute
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/clock': {
-      id: '/admin/clock'
-      path: '/clock'
-      fullPath: '/admin/clock'
-      preLoaderRoute: typeof AdminClockImport
-      parentRoute: typeof AdminImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/submissions': {
-      id: '/admin/submissions'
-      path: '/submissions'
-      fullPath: '/admin/submissions'
-      preLoaderRoute: typeof AdminSubmissionsImport
-      parentRoute: typeof AdminImport
-    }
-    '/admin/teams': {
-      id: '/admin/teams'
-      path: '/teams'
-      fullPath: '/admin/teams'
-      preLoaderRoute: typeof AdminTeamsImport
-      parentRoute: typeof AdminImport
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersImport
-      parentRoute: typeof AdminImport
-    }
-    '/problems/$slug': {
-      id: '/problems/$slug'
-      path: '/$slug'
-      fullPath: '/problems/$slug'
-      preLoaderRoute: typeof ProblemsSlugImport
-      parentRoute: typeof ProblemsImport
-    }
-    '/admin/': {
-      id: '/admin/'
+    '/': {
+      id: '/'
       path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexImport
-      parentRoute: typeof AdminImport
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/problems/': {
       id: '/problems/'
       path: '/'
       fullPath: '/problems/'
-      preLoaderRoute: typeof ProblemsIndexImport
-      parentRoute: typeof ProblemsImport
+      preLoaderRoute: typeof ProblemsIndexRouteImport
+      parentRoute: typeof ProblemsRoute
+    }
+    '/problems/$slug': {
+      id: '/problems/$slug'
+      path: '/$slug'
+      fullPath: '/problems/$slug'
+      preLoaderRoute: typeof ProblemsSlugRouteImport
+      parentRoute: typeof ProblemsRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/teams': {
+      id: '/admin/teams'
+      path: '/teams'
+      fullPath: '/admin/teams'
+      preLoaderRoute: typeof AdminTeamsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/submissions': {
+      id: '/admin/submissions'
+      path: '/submissions'
+      fullPath: '/admin/submissions'
+      preLoaderRoute: typeof AdminSubmissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clock': {
+      id: '/admin/clock'
+      path: '/clock'
+      fullPath: '/admin/clock'
+      preLoaderRoute: typeof AdminClockRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users/create': {
+      id: '/admin/users/create'
+      path: '/create'
+      fullPath: '/admin/users/create'
+      preLoaderRoute: typeof AdminUsersCreateRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
+    '/admin/teams/create': {
+      id: '/admin/teams/create'
+      path: '/create'
+      fullPath: '/admin/teams/create'
+      preLoaderRoute: typeof AdminTeamsCreateRouteImport
+      parentRoute: typeof AdminTeamsRoute
     }
     '/admin/submissions/submission': {
       id: '/admin/submissions/submission'
       path: '/submission'
       fullPath: '/admin/submissions/submission'
-      preLoaderRoute: typeof AdminSubmissionsSubmissionImport
-      parentRoute: typeof AdminSubmissionsImport
+      preLoaderRoute: typeof AdminSubmissionsSubmissionRouteImport
+      parentRoute: typeof AdminSubmissionsRoute
     }
   }
 }
-
-// Create and export the route tree
 
 interface AdminSubmissionsRouteChildren {
   AdminSubmissionsSubmissionRoute: typeof AdminSubmissionsSubmissionRoute
@@ -218,20 +316,42 @@ const AdminSubmissionsRouteChildren: AdminSubmissionsRouteChildren = {
 const AdminSubmissionsRouteWithChildren =
   AdminSubmissionsRoute._addFileChildren(AdminSubmissionsRouteChildren)
 
+interface AdminTeamsRouteChildren {
+  AdminTeamsCreateRoute: typeof AdminTeamsCreateRoute
+}
+
+const AdminTeamsRouteChildren: AdminTeamsRouteChildren = {
+  AdminTeamsCreateRoute: AdminTeamsCreateRoute,
+}
+
+const AdminTeamsRouteWithChildren = AdminTeamsRoute._addFileChildren(
+  AdminTeamsRouteChildren,
+)
+
+interface AdminUsersRouteChildren {
+  AdminUsersCreateRoute: typeof AdminUsersCreateRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersCreateRoute: AdminUsersCreateRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminClockRoute: typeof AdminClockRoute
   AdminSubmissionsRoute: typeof AdminSubmissionsRouteWithChildren
-  AdminTeamsRoute: typeof AdminTeamsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+  AdminTeamsRoute: typeof AdminTeamsRouteWithChildren
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClockRoute: AdminClockRoute,
   AdminSubmissionsRoute: AdminSubmissionsRouteWithChildren,
-  AdminTeamsRoute: AdminTeamsRoute,
-  AdminUsersRoute: AdminUsersRoute,
-  AdminIndexRoute: AdminIndexRoute,
+  AdminTeamsRoute: AdminTeamsRouteWithChildren,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -250,108 +370,6 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
   ProblemsRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/problems': typeof ProblemsRouteWithChildren
-  '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
-  '/admin/teams': typeof AdminTeamsRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/problems/$slug': typeof ProblemsSlugRoute
-  '/admin/': typeof AdminIndexRoute
-  '/problems/': typeof ProblemsIndexRoute
-  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
-  '/admin/teams': typeof AdminTeamsRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/problems/$slug': typeof ProblemsSlugRoute
-  '/admin': typeof AdminIndexRoute
-  '/problems': typeof ProblemsIndexRoute
-  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/problems': typeof ProblemsRouteWithChildren
-  '/admin/clock': typeof AdminClockRoute
-  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
-  '/admin/teams': typeof AdminTeamsRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/problems/$slug': typeof ProblemsSlugRoute
-  '/admin/': typeof AdminIndexRoute
-  '/problems/': typeof ProblemsIndexRoute
-  '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/admin'
-    | '/leaderboard'
-    | '/login'
-    | '/problems'
-    | '/admin/clock'
-    | '/admin/submissions'
-    | '/admin/teams'
-    | '/admin/users'
-    | '/problems/$slug'
-    | '/admin/'
-    | '/problems/'
-    | '/admin/submissions/submission'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/leaderboard'
-    | '/login'
-    | '/admin/clock'
-    | '/admin/submissions'
-    | '/admin/teams'
-    | '/admin/users'
-    | '/problems/$slug'
-    | '/admin'
-    | '/problems'
-    | '/admin/submissions/submission'
-  id:
-    | '__root__'
-    | '/'
-    | '/admin'
-    | '/leaderboard'
-    | '/login'
-    | '/problems'
-    | '/admin/clock'
-    | '/admin/submissions'
-    | '/admin/teams'
-    | '/admin/users'
-    | '/problems/$slug'
-    | '/admin/'
-    | '/problems/'
-    | '/admin/submissions/submission'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
-  LeaderboardRoute: typeof LeaderboardRoute
-  LoginRoute: typeof LoginRoute
-  ProblemsRoute: typeof ProblemsRouteWithChildren
-}
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -359,85 +377,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProblemsRoute: ProblemsRouteWithChildren,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/admin",
-        "/leaderboard",
-        "/login",
-        "/problems"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/admin": {
-      "filePath": "admin.tsx",
-      "children": [
-        "/admin/clock",
-        "/admin/submissions",
-        "/admin/teams",
-        "/admin/users",
-        "/admin/"
-      ]
-    },
-    "/leaderboard": {
-      "filePath": "leaderboard.tsx"
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/problems": {
-      "filePath": "problems.tsx",
-      "children": [
-        "/problems/$slug",
-        "/problems/"
-      ]
-    },
-    "/admin/clock": {
-      "filePath": "admin/clock.tsx",
-      "parent": "/admin"
-    },
-    "/admin/submissions": {
-      "filePath": "admin/submissions.tsx",
-      "parent": "/admin",
-      "children": [
-        "/admin/submissions/submission"
-      ]
-    },
-    "/admin/teams": {
-      "filePath": "admin/teams.tsx",
-      "parent": "/admin"
-    },
-    "/admin/users": {
-      "filePath": "admin/users.tsx",
-      "parent": "/admin"
-    },
-    "/problems/$slug": {
-      "filePath": "problems/$slug.tsx",
-      "parent": "/problems"
-    },
-    "/admin/": {
-      "filePath": "admin/index.tsx",
-      "parent": "/admin"
-    },
-    "/problems/": {
-      "filePath": "problems/index.tsx",
-      "parent": "/problems"
-    },
-    "/admin/submissions/submission": {
-      "filePath": "admin/submissions/submission.tsx",
-      "parent": "/admin/submissions"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

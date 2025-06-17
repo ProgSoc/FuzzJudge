@@ -1,3 +1,6 @@
+import ControlledSelect from "@/components/ControlledSelect";
+import ControlledTextField from "@/components/ControlledTextField";
+import ControlledTeamAutocomplete from "@/components/TeamAutocomplete";
 import { UserRole } from "@/gql";
 import useCreateUserMutation from "@/hooks/useCreateUserMutation";
 import type { ZodSubmitHandler } from "@/hooks/useZodForm";
@@ -10,16 +13,12 @@ import {
 	DialogTitle,
 	Stack,
 } from "@mui/material";
-import { useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import ControlledSelect from "./ControlledSelect";
-import ControlledTextField from "./ControlledTextField";
-import TeamAutocomplete from "./TeamAutocomplete";
 
-type UserCreateDialogProps = {
-	onClose: () => void;
-	open: boolean;
-};
+export const Route = createFileRoute("/admin/users/create")({
+	component: RouteComponent,
+});
 
 const createUserSchema = z.object({
 	name: z.string().min(1, "Name is required"),
@@ -35,10 +34,13 @@ const createUserSchema = z.object({
 		.nullable(),
 });
 
-export function CreateUserDialog(props: UserCreateDialogProps) {
-	const { onClose, open } = props;
-
+function RouteComponent() {
 	const createUserMutation = useCreateUserMutation();
+
+	const navigate = Route.useNavigate();
+	const onClose = () => {
+		navigate({ to: "/admin/users", replace: true });
+	};
 
 	const onSubmit: ZodSubmitHandler<typeof createUserSchema> = async (data) => {
 		await createUserMutation.mutateAsync({
@@ -54,7 +56,7 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 	const {
 		handleSubmit,
 		control,
-		formState: { errors, isSubmitting },
+		formState: { isSubmitting },
 	} = useZodForm({
 		schema: createUserSchema,
 		defaultValues: {
@@ -65,13 +67,9 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 		},
 	});
 
-	useEffect(() => {
-		console.log("Form errors:", errors);
-	}, [errors]);
-
 	return (
 		<Dialog
-			open={open}
+			open
 			onClose={onClose}
 			maxWidth="md"
 			component={"form"}
@@ -120,7 +118,7 @@ export function CreateUserDialog(props: UserCreateDialogProps) {
 							{ label: "Competitor", value: UserRole.Competitor },
 						]}
 					/>
-					<TeamAutocomplete control={control} name="team" />
+					<ControlledTeamAutocomplete control={control} name="team" />
 					<Button
 						type="submit"
 						variant="contained"

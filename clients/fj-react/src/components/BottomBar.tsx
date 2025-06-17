@@ -28,7 +28,7 @@ const baseTabs: TabItem[] = [
 const adminTabs = baseTabs.concat([
 	{
 		label: "Admin",
-		to: "/admin",
+		to: "/admin/clock",
 		icon: <MdLock />,
 	},
 ]);

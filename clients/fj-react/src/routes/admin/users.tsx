@@ -1,13 +1,11 @@
-import { CreateUserDialog } from "@/components/CreateUserDialog";
 import Datatable from "@/components/Datatable";
+import { LinkButton } from "@/components/LinkButton";
 import UserRoleSelect from "@/components/UserRoleSelect";
 import UserTeamSelect from "@/components/UserTeamSelect";
 import type { UserListQueryQuery } from "@/gql";
-import { useDisclosure } from "@/hooks/useDisclosure";
 import { userQueries } from "@/queries/user.query";
-import { Button } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 
 export const Route = createFileRoute("/admin/users")({
@@ -49,15 +47,24 @@ const columns = [
 
 function RouteComponent() {
 	const usersQuery = useQuery(userQueries.userList());
-	const { getButtonProps, getDisclosureProps } = useDisclosure();
 
 	return (
 		<>
-			<Button {...getButtonProps()} variant="contained" color="primary">
+			<LinkButton
+				to="/admin/users/create"
+				replace
+				mask={{
+					to: "/admin/users",
+					unmaskOnReload: true,
+				}}
+				variant="contained"
+				color="primary"
+			>
 				Create User
-			</Button>
-			<CreateUserDialog {...getDisclosureProps()} />
+			</LinkButton>
+
 			<Datatable columns={columns} data={usersQuery.data ?? []} />
+			<Outlet />
 		</>
 	);
 }

@@ -68,6 +68,7 @@ export default function LoginDialog(props: LoginDialogProps) {
 						variant="outlined"
 						fullWidth
 						required
+						autoComplete="username"
 					/>
 					<ControlledTextField
 						control={control}
@@ -77,6 +78,7 @@ export default function LoginDialog(props: LoginDialogProps) {
 						fullWidth
 						required
 						type="password"
+						autoComplete="current-password"
 					/>
 					<Button
 						type="submit"

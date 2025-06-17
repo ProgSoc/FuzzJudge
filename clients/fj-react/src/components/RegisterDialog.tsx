@@ -84,6 +84,7 @@ export default function RegisterDialog(props: RegisterDialogProps) {
 						variant="outlined"
 						fullWidth
 						required
+						autoComplete="name"
 					/>
 					<ControlledTextField
 						control={control}
@@ -92,6 +93,7 @@ export default function RegisterDialog(props: RegisterDialogProps) {
 						variant="outlined"
 						fullWidth
 						required
+						autoComplete="username"
 					/>
 					<ControlledTextField
 						control={control}
@@ -101,6 +103,7 @@ export default function RegisterDialog(props: RegisterDialogProps) {
 						fullWidth
 						required
 						type="password"
+						autoComplete="new-password"
 					/>
 					<ControlledTextField
 						control={control}
@@ -110,6 +113,7 @@ export default function RegisterDialog(props: RegisterDialogProps) {
 						fullWidth
 						required
 						type="password"
+						autoComplete="new-password"
 					/>
 					<Button
 						type="submit"

@@ -1,11 +1,9 @@
-import { CreateTeamDialog } from "@/components/CreateTeamDialog";
 import Datatable from "@/components/Datatable";
+import { LinkButton } from "@/components/LinkButton";
 import type { TeamQueryQuery } from "@/gql";
-import { useDisclosure } from "@/hooks/useDisclosure";
 import { teamQueries } from "@/queries/team.query";
-import { Button } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 
 export const Route = createFileRoute("/admin/teams")({
@@ -31,15 +29,23 @@ const columns = [
 
 function RouteComponent() {
 	const teamQuery = useQuery(teamQueries.list());
-	const { getButtonProps, getDisclosureProps } = useDisclosure();
 
 	return (
 		<>
-			<Button {...getButtonProps()} variant="contained" color="primary">
+			<LinkButton
+				to={"/admin/teams/create"}
+				replace
+				mask={{
+					to: "/admin/teams",
+					unmaskOnReload: true,
+				}}
+				variant="contained"
+				color="primary"
+			>
 				Create Team
-			</Button>
-			<CreateTeamDialog {...getDisclosureProps()} />
+			</LinkButton>
 			<Datatable columns={columns} data={teamQuery.data ?? []} />
+			<Outlet />
 		</>
 	);
 }

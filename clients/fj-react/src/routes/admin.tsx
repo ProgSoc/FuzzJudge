@@ -21,10 +21,6 @@ function RouteComponent() {
 			<LinkTabs
 				tabs={[
 					{
-						to: "/admin",
-						label: "Dashboard",
-					},
-					{
 						to: "/admin/clock",
 						label: "Clock",
 					},
