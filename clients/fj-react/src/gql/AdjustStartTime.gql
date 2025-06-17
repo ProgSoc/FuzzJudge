@@ -1,0 +1,7 @@
+mutation AdjustStartTime($startTime: DateTime!, $pushEndTime: Boolean) {
+	adjustStartTime(startTime: $startTime, keepDuration: $pushEndTime) {
+		finish
+		hold
+		start
+	}
+}

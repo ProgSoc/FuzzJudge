@@ -1,3 +1,5 @@
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
@@ -70,9 +72,14 @@ if (!rootElement.innerHTML) {
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
 				<ThemeProvider theme={theme}>
-					<RouterProvider router={router} />
-					<Toaster />
-					<CssBaseline />
+					<LocalizationProvider
+						dateAdapter={AdapterLuxon}
+						adapterLocale="en-au"
+					>
+						<RouterProvider router={router} />
+						<Toaster />
+						<CssBaseline />
+					</LocalizationProvider>
 				</ThemeProvider>
 			</QueryClientProvider>
 		</StrictMode>,

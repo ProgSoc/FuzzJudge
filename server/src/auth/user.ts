@@ -19,7 +19,7 @@ export async function createUser(params: UserInsert): Promise<User> {
 	return row;
 }
 
-export async function updateUserPassword(
+async function updateUserPassword(
 	userId: number,
 	password: string,
 ): Promise<void> {

@@ -1,5 +1,5 @@
 import type { DirectiveResolvers } from "@/schema/types.generated";
-import { isRunning } from "@/v1/clock";
+import { isRunning } from "@/services/clock";
 
 export const clock: NonNullable<DirectiveResolvers["clock"]> = async (
 	next,

@@ -1,0 +1,7 @@
+mutation ReleaseClock($extendDuration: Boolean) {
+	releaseClock(extendDuration: $extendDuration) {
+		finish
+		hold
+		start
+	}
+}

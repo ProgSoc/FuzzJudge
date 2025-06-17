@@ -3,8 +3,8 @@
 public = [ "client" ]
 
 [times]
-start = 2025-06-08T11:04:57.837Z
-finish = 2025-07-03T11:12:57.837Z
+start = 2025-06-17T07:00:57.837Z
+finish = 2025-06-17T14:00:57.837Z
 isReleased = true
 freeze = 5
 ---

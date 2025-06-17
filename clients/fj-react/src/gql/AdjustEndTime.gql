@@ -1,0 +1,7 @@
+mutation AdjustFinishTime($endTime: DateTime!) {
+	adjustFinishTime(finishTime: $endTime) {
+		finish
+		hold
+		start
+	}
+}

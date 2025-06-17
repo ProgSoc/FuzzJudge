@@ -36,6 +36,7 @@ export async function adjustStart(time: Date, moveDuration = false) {
 		start: time,
 		finish: newFinish,
 	});
+	cacheNow = newTimes;
 
 	pubSub.publish("clock", newTimes);
 
@@ -51,6 +52,7 @@ export async function adjustFinish(newFinish: Date) {
 	const newTimes = await writeCompetitionTimes(competitionConfig, {
 		finish: newFinish,
 	});
+	cacheNow = newTimes;
 
 	pubSub.publish("clock", newTimes);
 
@@ -67,6 +69,7 @@ export async function holdClockTime() {
 	const newTimes = await writeCompetitionTimes(competitionConfig, {
 		hold: holdDate,
 	});
+	cacheNow = newTimes;
 
 	pubSub.publish("clock", newTimes);
 

@@ -13,7 +13,7 @@ const problemScoreSpec = z.object({
 	tries: z.number(),
 });
 
-export type ProblemScore = z.infer<typeof problemScoreSpec>;
+type ProblemScore = z.infer<typeof problemScoreSpec>;
 
 const scoreboardRowSpec = z.object({
 	rank: z.number(),

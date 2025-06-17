@@ -8,14 +8,6 @@ type Clock {
   start: DateTime!
 }
 
-enum ClockStatus {
-  after
-  before
-  freeze
-  hold
-  running
-}
-
 type Competition {
   brief: String!
   instructions: String!

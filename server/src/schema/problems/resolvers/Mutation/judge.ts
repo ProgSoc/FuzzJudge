@@ -1,10 +1,10 @@
 import { competitionRoot } from "@/config";
 import { db } from "@/db";
 import { pubSub } from "@/pubsub";
+import { isFrozen } from "@/services/clock";
 import { getProblemData, judgeProblem } from "@/services/problems.service";
 import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
 import { postSubmission, solved } from "@/services/submission.service";
-import { isFrozen } from "@/v1/clock";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
 

@@ -1,4 +1,4 @@
-import { releaseClockTime } from "@/v1/clock";
+import { releaseClockTime } from "@/services/clock";
 import type { MutationResolvers } from "./../../../types.generated";
 export const releaseClock: NonNullable<
 	MutationResolvers["releaseClock"]

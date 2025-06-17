@@ -3,7 +3,7 @@ import { z } from "zod";
 import { readMarkdown } from "../lib/writeMd";
 import { parseMarkdownAttributes } from "./problems.service";
 
-export const timesSpec = z.object({
+const timesSpec = z.object({
 	start: z.coerce.date(),
 	finish: z.coerce.date(),
 	hold: z.coerce.date().nullable().optional(), // Whether the competition is currently on hold

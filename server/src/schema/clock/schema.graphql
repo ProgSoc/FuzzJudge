@@ -17,12 +17,4 @@ type Clock {
 	hold: DateTime
 }
 
-enum ClockStatus {
-	before
-	after
-	hold
-	freeze
-	running
-}
-
 directive @clock on FIELD_DEFINITION

@@ -1,0 +1,7 @@
+mutation ReleaseResults {
+	releaseResults {
+		finish
+		hold
+		start
+	}
+}

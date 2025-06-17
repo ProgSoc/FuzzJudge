@@ -1,4 +1,4 @@
-import { adjustStart } from "@/v1/clock";
+import { adjustStart } from "@/services/clock";
 import type { MutationResolvers } from "./../../../types.generated";
 export const adjustStartTime: NonNullable<
 	MutationResolvers["adjustStartTime"]

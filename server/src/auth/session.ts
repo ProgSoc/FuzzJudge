@@ -120,7 +120,7 @@ export type SessionWithUser = {
 	session: Session;
 	user: User;
 };
-export type NullSessionAndUser = {
+type NullSessionAndUser = {
 	session: null;
 	user: null;
 };

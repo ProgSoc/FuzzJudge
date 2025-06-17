@@ -1,10 +1,10 @@
 import { pubSub } from "@/pubsub";
+import { isFrozen } from "@/services/clock";
 import {
 	type ScoreboardRow,
 	calculateScoreboard,
 	getCachedScoreboard,
 } from "@/services/score";
-import { isFrozen } from "@/v1/clock";
 import { filter, map, pipe } from "graphql-yoga";
 import type { SubscriptionResolvers } from "./../../../types.generated";
 

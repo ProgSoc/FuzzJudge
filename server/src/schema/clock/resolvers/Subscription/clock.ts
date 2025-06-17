@@ -1,5 +1,5 @@
 import { pubSub } from "@/pubsub";
-import { now } from "@/v1/clock";
+import { now } from "@/services/clock";
 import type {
 	ResolversTypes,
 	SubscriptionResolvers,

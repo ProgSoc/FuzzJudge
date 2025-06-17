@@ -1,8 +1,8 @@
 import { db } from "@/db";
 import { submissionTable } from "@/db/schema";
 import { pubSub } from "@/pubsub";
+import { isFrozen } from "@/services/clock";
 import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
-import { isFrozen } from "@/v1/clock";
 import { eq } from "drizzle-orm";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";

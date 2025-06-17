@@ -1,4 +1,4 @@
-import { adjustFinish } from "@/v1/clock";
+import { adjustFinish } from "@/services/clock";
 import type { MutationResolvers } from "./../../../types.generated";
 export const adjustFinishTime: NonNullable<
 	MutationResolvers["adjustFinishTime"]

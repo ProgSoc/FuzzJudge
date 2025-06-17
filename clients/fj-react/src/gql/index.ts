@@ -294,6 +294,21 @@ export enum UserRole {
   Competitor = 'competitor'
 }
 
+export type AdjustFinishTimeMutationVariables = Exact<{
+  endTime: Scalars['DateTime']['input'];
+}>;
+
+
+export type AdjustFinishTimeMutation = { __typename?: 'Mutation', adjustFinishTime: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
+
+export type AdjustStartTimeMutationVariables = Exact<{
+  startTime: Scalars['DateTime']['input'];
+  pushEndTime?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type AdjustStartTimeMutation = { __typename?: 'Mutation', adjustStartTime: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
+
 export type ClockSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -323,6 +338,20 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', name: string, id: number, username: string, teamId?: number | null, role: UserRole } };
 
+export type DeleteTeamMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteTeamMutation = { __typename?: 'Mutation', deleteTeam: { __typename?: 'Team', id: number, name: string } };
+
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'User', id: number, name: string, username: string, role: UserRole } };
+
 export type EditUserTeamMutationVariables = Exact<{
   userId: Scalars['Int']['input'];
   teamId?: InputMaybe<Scalars['Int']['input']>;
@@ -331,6 +360,11 @@ export type EditUserTeamMutationVariables = Exact<{
 
 
 export type EditUserTeamMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null } };
+
+export type HoldClockMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type HoldClockMutation = { __typename?: 'Mutation', holdClock: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
 
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -376,6 +410,18 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', username: string, role: UserRole } };
 
+export type ReleaseClockMutationVariables = Exact<{
+  extendDuration?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type ReleaseClockMutation = { __typename?: 'Mutation', releaseClock: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
+
+export type ReleaseResultsMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReleaseResultsMutation = { __typename?: 'Mutation', releaseResults: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
+
 export type SubmissionQueryQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
@@ -419,6 +465,24 @@ export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, name: string, team?: { __typename?: 'Team', id: number, name: string } | null }> };
 
 
+export const AdjustFinishTimeDocument = `
+    mutation AdjustFinishTime($endTime: DateTime!) {
+  adjustFinishTime(finishTime: $endTime) {
+    finish
+    hold
+    start
+  }
+}
+    `;
+export const AdjustStartTimeDocument = `
+    mutation AdjustStartTime($startTime: DateTime!, $pushEndTime: Boolean) {
+  adjustStartTime(startTime: $startTime, keepDuration: $pushEndTime) {
+    finish
+    hold
+    start
+  }
+}
+    `;
 export const ClockSubscriptionDocument = `
     subscription ClockSubscription {
   clock {
@@ -462,6 +526,24 @@ export const CreateUserDocument = `
   }
 }
     `;
+export const DeleteTeamDocument = `
+    mutation DeleteTeam($id: Int!) {
+  deleteTeam(id: $id) {
+    id
+    name
+  }
+}
+    `;
+export const DeleteUserDocument = `
+    mutation DeleteUser($id: Int!) {
+  deleteUser(id: $id) {
+    id
+    name
+    username
+    role
+  }
+}
+    `;
 export const EditUserTeamDocument = `
     mutation EditUserTeam($userId: Int!, $teamId: Int, $role: UserRole) {
   updateUser(teamId: $teamId, id: $userId, role: $role) {
@@ -469,6 +551,15 @@ export const EditUserTeamDocument = `
     username
     role
     teamId
+  }
+}
+    `;
+export const HoldClockDocument = `
+    mutation HoldClock {
+  holdClock {
+    finish
+    hold
+    start
   }
 }
     `;
@@ -543,6 +634,24 @@ export const RegisterDocument = `
   register(username: $username, password: $password, name: $name) {
     username
     role
+  }
+}
+    `;
+export const ReleaseClockDocument = `
+    mutation ReleaseClock($extendDuration: Boolean) {
+  releaseClock(extendDuration: $extendDuration) {
+    finish
+    hold
+    start
+  }
+}
+    `;
+export const ReleaseResultsDocument = `
+    mutation ReleaseResults {
+  releaseResults {
+    finish
+    hold
+    start
   }
 }
     `;
@@ -623,6 +732,12 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    AdjustFinishTime(variables: AdjustFinishTimeMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: AdjustFinishTimeMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<AdjustFinishTimeMutation>(AdjustFinishTimeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'AdjustFinishTime', 'mutation', variables);
+    },
+    AdjustStartTime(variables: AdjustStartTimeMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: AdjustStartTimeMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<AdjustStartTimeMutation>(AdjustStartTimeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'AdjustStartTime', 'mutation', variables);
+    },
     ClockSubscription(variables?: ClockSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ClockSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ClockSubscriptionSubscription>(ClockSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ClockSubscription', 'subscription', variables);
     },
@@ -635,8 +750,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     CreateUser(variables: CreateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateUser', 'mutation', variables);
     },
+    DeleteTeam(variables: DeleteTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: DeleteTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<DeleteTeamMutation>(DeleteTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'DeleteTeam', 'mutation', variables);
+    },
+    DeleteUser(variables: DeleteUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: DeleteUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<DeleteUserMutation>(DeleteUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'DeleteUser', 'mutation', variables);
+    },
     EditUserTeam(variables: EditUserTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: EditUserTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<EditUserTeamMutation>(EditUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'EditUserTeam', 'mutation', variables);
+    },
+    HoldClock(variables?: HoldClockMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: HoldClockMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<HoldClockMutation>(HoldClockDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'HoldClock', 'mutation', variables);
     },
     LeaderboardSubscription(variables?: LeaderboardSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: LeaderboardSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<LeaderboardSubscriptionSubscription>(LeaderboardSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LeaderboardSubscription', 'subscription', variables);
@@ -658,6 +782,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     Register(variables: RegisterMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: RegisterMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<RegisterMutation>(RegisterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Register', 'mutation', variables);
+    },
+    ReleaseClock(variables?: ReleaseClockMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ReleaseClockMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ReleaseClockMutation>(ReleaseClockDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ReleaseClock', 'mutation', variables);
+    },
+    ReleaseResults(variables?: ReleaseResultsMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ReleaseResultsMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ReleaseResultsMutation>(ReleaseResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ReleaseResults', 'mutation', variables);
     },
     SubmissionQuery(variables: SubmissionQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: SubmissionQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<SubmissionQueryQuery>(SubmissionQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'SubmissionQuery', 'query', variables);
