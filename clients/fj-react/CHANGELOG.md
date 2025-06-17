@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.2
+
+### Patch Changes
+
+- [`01df1da`](https://github.com/ProgSoc/FuzzJudge/commit/01df1da650ad565d0fccd55a47d38c7add87229f) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add some better modals
+
 ## 0.5.1
 
 ### Patch Changes
