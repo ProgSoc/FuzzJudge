@@ -42,7 +42,7 @@
 		"@graphql-codegen/typescript-graphql-request": "6.3.0",
 		"@graphql-codegen/typescript-operations": "4.6.1",
 		"@tanstack/react-query-devtools": "5.80.7",
-		"@tanstack/router-plugin": "1.121.21",
+		"@tanstack/router-plugin": "1.121.22",
 		"@types/luxon": "3.6.2",
 		"@types/react": "19.1.8",
 		"@types/react-dom": "19.1.6",
