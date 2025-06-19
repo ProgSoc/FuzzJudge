@@ -19,6 +19,7 @@ import Typography from "@mui/material/Typography";
 import { type QueryClient, useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
+	HeadContent,
 	Outlet,
 	createRootRouteWithContext,
 	useRouterState,
@@ -258,6 +259,7 @@ export default function ResponsiveDrawer() {
 
 	return (
 		<Box sx={{ display: "flex" }}>
+			<HeadContent />
 			<AppBar
 				position="fixed"
 				sx={{
