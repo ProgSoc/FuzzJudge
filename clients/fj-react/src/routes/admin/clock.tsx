@@ -29,8 +29,6 @@ export const Route = createFileRoute("/admin/clock")({
 	component: RouteComponent,
 });
 
-const selectFn = (data: ClockSubscriptionSubscription) => data.clock;
-
 const scalarToDateTime = (date: Date | string) =>
 	typeof date === "string" ? DateTime.fromISO(date) : DateTime.fromJSDate(date);
 
@@ -42,7 +40,7 @@ const PaddedPaper = styled(Paper)(({ theme }) => ({
 function RouteComponent() {
 	const clockState = useSubscription({
 		query: ClockSubscriptionDocument,
-		select: selectFn,
+		select: (data: ClockSubscriptionSubscription) => data.clock,
 	});
 
 	const pauseClockMutation = useHoldClockMutation();

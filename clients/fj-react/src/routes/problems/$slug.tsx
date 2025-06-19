@@ -1,20 +1,12 @@
 import SubmissionArea from "@/components/SubmissionArea";
 import { problemQuery } from "@/queries/problem.query";
-import {
-	Box,
-	Button,
-	Chip,
-	Divider,
-	Stack,
-	TextField,
-	Typography,
-} from "@mui/material";
+import { Box, Button, Chip, Stack, TextField, Typography } from "@mui/material";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
 	type ErrorComponentProps,
 	createFileRoute,
 } from "@tanstack/react-router";
-import { MdCheck, MdDelete } from "react-icons/md";
+import { MdCheck } from "react-icons/md";
 import Markdown from "react-markdown";
 
 export const Route = createFileRoute("/problems/$slug")({
@@ -33,6 +25,11 @@ function ErrorComponent(props: ErrorComponentProps) {
 			<Typography variant="h5" component="h2" gutterBottom>
 				An error occurred while loading the problem.
 			</Typography>
+			{import.meta.env.DEV ? (
+				<Typography variant="body2" color="error">
+					{props.error.message}
+				</Typography>
+			) : null}
 			<Button variant="contained" onClick={reset}>
 				Retry
 			</Button>
