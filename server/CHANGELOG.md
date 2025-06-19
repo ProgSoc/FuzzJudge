@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.4
+
+### Patch Changes
+
+- [`65d4a2a`](https://github.com/ProgSoc/FuzzJudge/commit/65d4a2a883b029c6a9d8b567efffb337f1966660) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change erros from generic to graphql
+
 ## 0.5.3
 
 ### Patch Changes
