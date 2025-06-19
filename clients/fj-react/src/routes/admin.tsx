@@ -12,6 +12,10 @@ export const Route = createFileRoute("/admin")({
 				to: "/",
 			});
 		}
+
+		return {
+			getTitle: () => "Admin",
+		};
 	},
 });
 

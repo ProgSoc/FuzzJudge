@@ -82,6 +82,9 @@ export default function ResponsiveDrawer() {
 }
 
 export const Route = createFileRoute("/problems")({
+	beforeLoad: () => ({
+		getTitle: () => "Problems",
+	}),
 	component: RouteComponent,
 });
 

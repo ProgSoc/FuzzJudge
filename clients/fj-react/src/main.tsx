@@ -23,30 +23,13 @@ const router = createRouter({
 	routeTree,
 	context: {
 		queryClient,
-		getTitle: () => "FuzzJudge React Client",
+		getTitle: () => "Home",
 	},
 	defaultPreload: "intent",
 	// Since we're using React Query, we don't want loader calls to ever be stale
 	// This will ensure that the loader is always called when the route is preloaded or visited
 	defaultPreloadStaleTime: 0,
 	scrollRestoration: true,
-	// defaultViewTransition: {
-	// 	types: ({ fromLocation, toLocation, pathChanged }) => {
-	// 		if (!pathChanged) {
-	// 			return [];
-	// 		}
-	// 		let direction = "none";
-
-	// 		if (fromLocation) {
-	// 			const fromIndex = fromLocation.state.__TSR_index;
-	// 			const toIndex = toLocation.state.__TSR_index;
-
-	// 			direction = fromIndex > toIndex ? "right" : "left";
-	// 		}
-
-	// 		return [`slide-${direction}`];
-	// 	},
-	// },
 });
 
 const theme = createTheme({

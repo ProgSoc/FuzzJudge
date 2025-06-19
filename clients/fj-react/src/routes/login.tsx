@@ -6,6 +6,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
+	beforeLoad: () => ({
+		getTitle: () => "Login",
+	}),
 	component: RouteComponent,
 });
 

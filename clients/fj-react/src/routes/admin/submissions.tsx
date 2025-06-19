@@ -9,6 +9,9 @@ import { useMemo } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/admin/submissions")({
+	beforeLoad: () => ({
+		getTitle: () => "Submissions",
+	}),
 	validateSearch: z.object({
 		teamId: z.coerce.number().int().optional(),
 		problemSlug: z.string().optional(),

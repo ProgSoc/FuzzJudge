@@ -23,6 +23,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DateTime } from "luxon";
 
 export const Route = createFileRoute("/admin/clock")({
+	beforeLoad: () => ({
+		getTitle: () => "Clock Management",
+	}),
 	component: RouteComponent,
 });
 

@@ -13,6 +13,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useMemo } from "react";
 
 export const Route = createFileRoute("/leaderboard")({
+	beforeLoad: () => ({
+		getTitle: () => "Leaderboard",
+	}),
 	component: RouteComponent,
 });
 

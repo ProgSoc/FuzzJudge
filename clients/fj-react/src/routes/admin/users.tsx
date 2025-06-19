@@ -9,6 +9,9 @@ import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 
 export const Route = createFileRoute("/admin/users")({
+	beforeLoad: () => ({
+		getTitle: () => "Users",
+	}),
 	component: RouteComponent,
 });
 
