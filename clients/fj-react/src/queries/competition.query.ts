@@ -11,5 +11,6 @@ export const competitionQueries = {
 		queryOptions({
 			queryKey: competitionQueryKeys.details(),
 			queryFn: () => client.CompetitionDetailsQuery(),
+			select: (data) => data.data.competition,
 		}),
 };

@@ -9,10 +9,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-	const competitionQuery = useQuery({
-		...competitionQueries.details(),
-		select: (data) => data.data.competition,
-	});
+	const competitionQuery = useQuery(competitionQueries.details());
 
 	return (
 		<>
