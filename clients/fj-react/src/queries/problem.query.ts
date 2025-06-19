@@ -21,6 +21,7 @@ export const problemQuery = {
 		queryOptions({
 			queryKey: problemQueryKeys.list(),
 			queryFn: () => client.ProblemListQuery(),
+			select: (data) => data.data.problems,
 		}),
 	teamProblemFuzz: (slug: string, teamId: number) =>
 		queryOptions({

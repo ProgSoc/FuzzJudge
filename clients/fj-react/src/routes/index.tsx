@@ -1,5 +1,5 @@
 import { competitionQueries } from "@/queries/competition.query";
-import { Container, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
@@ -15,7 +15,7 @@ function Index() {
 	});
 
 	return (
-		<Container>
+		<>
 			<Typography variant="h3" component="h1" gutterBottom>
 				{competitionQuery.data?.name
 					? `Welcome to ${competitionQuery.data.name}!`
@@ -24,6 +24,6 @@ function Index() {
 			<ReactMarkdown>
 				{competitionQuery.data?.instructions || "No description available."}
 			</ReactMarkdown>
-		</Container>
+		</>
 	);
 }
