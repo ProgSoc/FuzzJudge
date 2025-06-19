@@ -61,11 +61,12 @@ function RouteComponent() {
 			<Box
 				sx={{ flexDirection: "row", display: "flex", gap: 2, flexWrap: "wrap" }}
 			>
-				{problemData.data.solved === true ? (
+				{problemData.data.solved ? (
 					<Chip label="Solved" color="success" icon={<MdCheck />} />
-				) : problemData.data.solved === false ? (
-					<Chip label="Not Solved" color="error" icon={<MdDelete />} />
-				) : null}
+				) : (
+					<Chip label="Unsolved" />
+				)}
+
 				<Chip label={`Points: ${problemData.data.points}`} color="primary" />
 				<Chip label={`Difficulty: ${problemData.data.difficulty}`} />
 			</Box>
