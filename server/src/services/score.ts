@@ -1,5 +1,6 @@
 import path from "node:path";
 import { competitionRoot } from "@/config";
+import { GraphQLError } from "graphql";
 import { z } from "zod";
 import { db } from "../db";
 import { getCompetitionData } from "./competition.service";
@@ -37,7 +38,7 @@ export async function calculateScoreboard(): Promise<ScoreboardRow[]> {
 
 	const startTime = competitionData.times.start;
 	if (!startTime) {
-		throw new Error("Competition start time is not defined");
+		throw new GraphQLError("Competition start time is not defined");
 	}
 	// Load the problem set
 	const problemsData = await getProblems(competitionRoot);
@@ -242,7 +243,7 @@ async function calculateTeamScore(
 	const startTime = competitionData.times.start;
 
 	if (!startTime) {
-		throw new Error("Competition start time is not defined");
+		throw new GraphQLError("Competition start time is not defined");
 	}
 
 	const team = await db.query.teamTable.findFirst({
@@ -253,7 +254,7 @@ async function calculateTeamScore(
 		},
 	});
 	if (!team) {
-		throw new Error(`Team with id ${teamId} not found`);
+		throw new GraphQLError(`Team with id ${teamId} not found`);
 	}
 
 	// Map the problems to a new object with only the slug and points

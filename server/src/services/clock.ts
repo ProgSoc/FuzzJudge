@@ -46,7 +46,7 @@ export async function adjustStart(time: Date, moveDuration = false) {
 export async function adjustFinish(newFinish: Date) {
 	const currentTimes = await now();
 	if (newFinish < currentTimes.start)
-		throw new Error("Finish time must be after start time.");
+		throw new GraphQLError("New finish time cannot be before the start time.");
 	const competitionConfig = path.join(competitionRoot, "comp.md");
 
 	const newTimes = await writeCompetitionTimes(competitionConfig, {

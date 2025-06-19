@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { GraphQLError } from "graphql";
 import { db } from "../db";
 import { type Submission, submissionTable } from "../db/schema";
 
@@ -29,7 +30,8 @@ export async function postSubmission(
 	resubmit = false,
 ): Promise<Submission> {
 	if (resubmit && ok) {
-		if (!prob || !team) throw new Error("Missing prob or team for resubmit");
+		if (!prob || !team)
+			throw new GraphQLError("Missing prob or team for resubmit");
 
 		const [submission] = await db
 			.update(submissionTable)
@@ -48,7 +50,7 @@ export async function postSubmission(
 			)
 			.returning();
 
-		if (!submission) throw new Error("Failed to update submission");
+		if (!submission) throw new GraphQLError("Failed to update submission");
 
 		return submission;
 	}
@@ -68,7 +70,7 @@ export async function postSubmission(
 		.returning()
 		.onConflictDoNothing();
 
-	if (!newSub) throw new Error("Failed to insert submission");
+	if (!newSub) throw new GraphQLError("Failed to insert submission");
 
 	return newSub;
 }

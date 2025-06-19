@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { type User, type UserInsert, userTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { GraphQLError } from "graphql";
 import { hashPassword } from "./password";
 
 export async function createUser(params: UserInsert): Promise<User> {
@@ -13,7 +14,7 @@ export async function createUser(params: UserInsert): Promise<User> {
 		.returning();
 
 	if (!row) {
-		throw new Error("Unexpected error");
+		throw new GraphQLError("Unexpected error creating user");
 	}
 
 	return row;
