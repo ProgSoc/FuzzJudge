@@ -1,7 +1,7 @@
 {
 	"name": "@progsoc/fj-admin-html",
 	"private": true,
-	"version": "0.5.5",
+	"version": "0.5.6",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",

@@ -1,5 +1,13 @@
 # @progsoc/fj-react
 
+## 0.5.6
+
+### Patch Changes
+
+- [`adb8419`](https://github.com/ProgSoc/FuzzJudge/commit/adb841956832b1d37ef7396a96236c380e7a6ed8) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Better problem error handling
+
+- [`07675ab`](https://github.com/ProgSoc/FuzzJudge/commit/07675ab26f90a9ec5ddde2cb8c90e7a18a9e3f78) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Chips and error states
+
 ## 0.5.5
 
 ### Patch Changes
