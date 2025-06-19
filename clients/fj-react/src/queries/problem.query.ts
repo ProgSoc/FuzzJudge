@@ -16,6 +16,7 @@ export const problemQuery = {
 		queryOptions({
 			queryKey: problemQueryKeys.problemDetails(slug),
 			queryFn: () => client.ProblemDetailsQuery({ slug }),
+			select: (data) => data.data.problem,
 		}),
 	problemList: () =>
 		queryOptions({
