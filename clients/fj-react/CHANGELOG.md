@@ -1,5 +1,15 @@
 # @progsoc/fj-react
 
+## 0.5.4
+
+### Patch Changes
+
+- [`3ecf7b9`](https://github.com/ProgSoc/FuzzJudge/commit/3ecf7b9a0ea4c59435f9d93491b24eeedf4bfb87) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add favicon
+
+- [`daa57a6`](https://github.com/ProgSoc/FuzzJudge/commit/daa57a65d21cd48ea4c66beaa8899d0a325f9657) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add titles to pages
+
+- [`44ee689`](https://github.com/ProgSoc/FuzzJudge/commit/44ee68986d8b24066fa31a443a36b49599509bc7) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Re-work navigation
+
 ## 0.5.3
 
 ### Patch Changes
