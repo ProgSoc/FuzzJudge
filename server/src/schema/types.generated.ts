@@ -34,7 +34,6 @@ export type Clock = {
 
 export type Competition = {
   __typename?: 'Competition';
-  brief: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
@@ -163,11 +162,10 @@ export type MutationUpdateUserArgs = {
 
 export type Problem = {
   __typename?: 'Problem';
-  brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
-  fuzz?: Maybe<Scalars['String']['output']>;
+  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
-  instructions?: Maybe<Scalars['String']['output']>;
+  instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
@@ -431,7 +429,6 @@ export type ClockResolvers<ContextType = GraphQLContext, ParentType extends Reso
 };
 
 export type CompetitionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Competition'] = ResolversParentTypes['Competition']> = {
-  brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -481,11 +478,10 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 };
 
 export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Problem'] = ResolversParentTypes['Problem']> = {
-  brief?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   difficulty?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  fuzz?: Resolver<Maybe<ResolversTypes['String']>, ParentType, AuthenticatedContext<ContextType>, Partial<ProblemFuzzArgs>>;
+  fuzz?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>, Partial<ProblemFuzzArgs>>;
   icon?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  instructions?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

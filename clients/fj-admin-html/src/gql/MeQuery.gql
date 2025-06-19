@@ -1,6 +1,6 @@
 query GetMe {
 	me {
 		id
-		logn
+		username
 	}
 }

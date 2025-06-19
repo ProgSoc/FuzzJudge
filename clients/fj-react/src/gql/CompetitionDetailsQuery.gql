@@ -2,6 +2,5 @@ query CompetitionDetailsQuery {
 	competition {
 		name
 		instructions
-		brief
 	}
 }

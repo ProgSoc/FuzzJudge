@@ -25,7 +25,6 @@ type ProblemSpec = z.infer<typeof problemSpec>;
 
 interface MarkdownAttributes {
 	title: string;
-	summary: string | undefined;
 	icon: string;
 	body: string;
 }
@@ -215,30 +214,14 @@ export function parseMarkdownAttributes(body: string) {
 	const title = ((titleHead || "") + (titleTail || ""))
 		.trim()
 		.replaceAll(/\s{+}/g, " ");
-	const summary = noCarriage.match(/^[A-Za-z].*(?:\n[A-Za-z].*)*/m)?.[0];
 	let outputBody = noCarriage.trim();
 	if (outputBody.length > 0) outputBody += "\n";
 	return {
 		title,
-		summary,
 		icon: icon ?? "",
 		body:
 			titleMatch === undefined
 				? outputBody
 				: outputBody.replace(titleMatch, ""),
-	};
-}
-
-function problemToMessage(problem: Problem): FuzzJudgeProblemMessage {
-	return {
-		slug: problem.slug,
-		doc: {
-			title: problem.attributes.title,
-			icon: problem.attributes.icon,
-			summary: problem.attributes.summary,
-			body: problem.content,
-		},
-		points: problem.problem.points,
-		difficulty: problem.problem.difficulty,
 	};
 }

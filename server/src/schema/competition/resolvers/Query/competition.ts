@@ -9,7 +9,6 @@ export const competition: NonNullable<QueryResolvers["competition"]> = async (
 	const competitionData = await getCompetitionData(competitionRoot);
 
 	return {
-		brief: competitionData.attributes.summary ?? "",
 		instructions: competitionData.attributes.body,
 		name: competitionData.attributes.title,
 	};

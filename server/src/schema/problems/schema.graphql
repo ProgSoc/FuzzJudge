@@ -25,10 +25,9 @@ type Problem @auth {
 	slug: String!
 	icon: String!
 	name: String!
-	brief: String!
 	difficulty: Int! # 1-3
 	points: Int!
-	instructions: String @clock
-	solved: Boolean @clock
-	fuzz(teamId: Int @auth(role: admin)): String @auth @clock
+	instructions: String! @clock
+	solved: Boolean
+	fuzz(teamId: Int @auth(role: admin)): String! @auth @clock
 }

@@ -9,7 +9,6 @@ type Clock {
 }
 
 type Competition {
-  brief: String!
   instructions: String!
   name: String!
 }
@@ -50,11 +49,10 @@ type Mutation {
 }
 
 type Problem {
-  brief: String!
   difficulty: Int!
-  fuzz(teamId: Int): String
+  fuzz(teamId: Int): String!
   icon: String!
-  instructions: String
+  instructions: String!
   name: String!
   points: Int!
   slug: String!

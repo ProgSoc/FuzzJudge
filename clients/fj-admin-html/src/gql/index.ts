@@ -26,17 +26,8 @@ export type Clock = {
   start: Scalars['DateTime']['output'];
 };
 
-export enum ClockStatus {
-  After = 'after',
-  Before = 'before',
-  Freeze = 'freeze',
-  Hold = 'hold',
-  Running = 'running'
-}
-
 export type Competition = {
   __typename?: 'Competition';
-  brief: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
@@ -62,11 +53,15 @@ export type Mutation = {
   createUser: User;
   deleteTeam: Team;
   deleteUser: User;
-  getFuzz: Scalars['String']['output'];
+  getAdminFuzz: Scalars['String']['output'];
   holdClock: Clock;
   judge: JudgeOutput;
+  login: User;
+  logout: Scalars['Boolean']['output'];
   overrideJudge: Submission;
+  register: User;
   releaseClock: Clock;
+  releaseResults: Clock;
   updateTeam: Team;
   updateUser: User;
 };
@@ -84,14 +79,17 @@ export type MutationAdjustStartTimeArgs = {
 
 
 export type MutationCreateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
 };
 
 
 export type MutationCreateUserArgs = {
-  logn: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username: Scalars['String']['input'];
 };
 
 
@@ -105,8 +103,9 @@ export type MutationDeleteUserArgs = {
 };
 
 
-export type MutationGetFuzzArgs = {
+export type MutationGetAdminFuzzArgs = {
   slug: Scalars['String']['input'];
+  teamId: Scalars['Int']['input'];
 };
 
 
@@ -117,9 +116,22 @@ export type MutationJudgeArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
   submissionId: Scalars['Int']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -129,27 +141,34 @@ export type MutationReleaseClockArgs = {
 
 
 export type MutationUpdateTeamArgs = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['Int']['input'];
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Problem = {
   __typename?: 'Problem';
-  brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
+  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
-  solved: Scalars['Boolean']['output'];
+  solved?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type ProblemFuzzArgs = {
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ProblemScore = {
@@ -166,7 +185,7 @@ export type Query = {
   __typename?: 'Query';
   competition: Competition;
   header: Scalars['String']['output'];
-  me: User;
+  me?: Maybe<User>;
   problem: Problem;
   problems: Array<Problem>;
   submission?: Maybe<Submission>;
@@ -220,6 +239,7 @@ export type Submission = {
   id: Scalars['Int']['output'];
   ok?: Maybe<Scalars['Boolean']['output']>;
   out?: Maybe<Scalars['String']['output']>;
+  problem: Problem;
   problemSlug: Scalars['String']['output'];
   team: Team;
   teamId: Scalars['Int']['output'];
@@ -236,9 +256,11 @@ export type Subscription = {
 
 export type Team = {
   __typename?: 'Team';
+  hidden: Scalars['Boolean']['output'];
   id: Scalars['Int']['output'];
   members: Array<User>;
   name: Scalars['String']['output'];
+  seed: Scalars['String']['output'];
   submissions: Array<Submission>;
 };
 
@@ -250,10 +272,11 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
-  logn: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
+  username: Scalars['String']['output'];
 };
 
 export enum UserRole {
@@ -264,14 +287,14 @@ export enum UserRole {
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: number, logn: string } };
+export type GetMeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string } | null };
 
 
 export const GetMeDocument = `
     query GetMe {
   me {
     id
-    logn
+    username
   }
 }
     `;

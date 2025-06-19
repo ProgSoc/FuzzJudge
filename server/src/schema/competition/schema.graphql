@@ -4,6 +4,5 @@ extend type Query {
 
 type Competition {
 	name: String!
-	brief: String!
 	instructions: String!
 }

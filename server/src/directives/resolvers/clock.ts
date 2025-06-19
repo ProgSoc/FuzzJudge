@@ -1,5 +1,6 @@
 import type { DirectiveResolvers } from "@/schema/types.generated";
 import { isRunning } from "@/services/clock";
+import { GraphQLError } from "graphql";
 
 export const clock: NonNullable<DirectiveResolvers["clock"]> = async (
 	next,
@@ -14,7 +15,16 @@ export const clock: NonNullable<DirectiveResolvers["clock"]> = async (
 	}
 	const isCompRunning = await isRunning();
 	if (!isCompRunning) {
-		return null;
+		throw new GraphQLError(
+			"Competition is not running. Please wait until it starts.",
+			{
+				extensions: {
+					http: {
+						status: 403,
+					},
+				},
+			},
+		);
 	}
 	return next();
 };

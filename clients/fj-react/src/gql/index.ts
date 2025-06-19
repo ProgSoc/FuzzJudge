@@ -28,7 +28,6 @@ export type Clock = {
 
 export type Competition = {
   __typename?: 'Competition';
-  brief: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
@@ -157,11 +156,10 @@ export type MutationUpdateUserArgs = {
 
 export type Problem = {
   __typename?: 'Problem';
-  brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
-  fuzz?: Maybe<Scalars['String']['output']>;
+  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
-  instructions?: Maybe<Scalars['String']['output']>;
+  instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
@@ -309,7 +307,7 @@ export type ClockSubscriptionSubscription = { __typename?: 'Subscription', clock
 export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string, brief: string } };
+export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string } };
 
 export type CreateTeamMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -386,7 +384,7 @@ export type ProblemDetailsQueryQueryVariables = Exact<{
 }>;
 
 
-export type ProblemDetailsQueryQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', slug: string, name: string, solved?: boolean | null, points: number, difficulty: number, fuzz?: string | null, instructions?: string | null } };
+export type ProblemDetailsQueryQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', slug: string, name: string, solved?: boolean | null, points: number, difficulty: number, fuzz: string, instructions: string } };
 
 export type ProblemListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -444,7 +442,7 @@ export type TeamProblemFuzzQueryVariables = Exact<{
 }>;
 
 
-export type TeamProblemFuzzQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz?: string | null } };
+export type TeamProblemFuzzQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz: string } };
 
 export type TeamQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -489,7 +487,6 @@ export const CompetitionDetailsQueryDocument = `
   competition {
     name
     instructions
-    brief
   }
 }
     `;

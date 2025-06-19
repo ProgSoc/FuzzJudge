@@ -26,17 +26,8 @@ export type Clock = {
   start: Scalars['DateTime']['output'];
 };
 
-export enum ClockStatus {
-  After = 'after',
-  Before = 'before',
-  Freeze = 'freeze',
-  Hold = 'hold',
-  Running = 'running'
-}
-
 export type Competition = {
   __typename?: 'Competition';
-  brief: Scalars['String']['output'];
   instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
@@ -94,6 +85,7 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationCreateUserArgs = {
+  name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: UserRole;
   teamId?: InputMaybe<Scalars['Int']['input']>;
@@ -157,21 +149,26 @@ export type MutationUpdateTeamArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Problem = {
   __typename?: 'Problem';
-  brief: Scalars['String']['output'];
   difficulty: Scalars['Int']['output'];
-  fuzz?: Maybe<Scalars['String']['output']>;
+  fuzz: Scalars['String']['output'];
   icon: Scalars['String']['output'];
-  instructions?: Maybe<Scalars['String']['output']>;
+  instructions: Scalars['String']['output'];
   name: Scalars['String']['output'];
   points: Scalars['Int']['output'];
   slug: Scalars['String']['output'];
   solved?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type ProblemFuzzArgs = {
+  teamId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ProblemScore = {
@@ -242,6 +239,7 @@ export type Submission = {
   id: Scalars['Int']['output'];
   ok?: Maybe<Scalars['Boolean']['output']>;
   out?: Maybe<Scalars['String']['output']>;
+  problem: Problem;
   problemSlug: Scalars['String']['output'];
   team: Team;
   teamId: Scalars['Int']['output'];
@@ -274,6 +272,7 @@ export type TeamSubmissionsArgs = {
 export type User = {
   __typename?: 'User';
   id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
   role: UserRole;
   team?: Maybe<Team>;
   teamId?: Maybe<Scalars['Int']['output']>;
@@ -327,7 +326,7 @@ export type ProblemDataQueryVariables = Exact<{
 }>;
 
 
-export type ProblemDataQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', solved?: boolean | null, name: string, difficulty: number, points: number, instructions?: string | null, fuzz?: string | null } };
+export type ProblemDataQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', solved?: boolean | null, name: string, difficulty: number, points: number, instructions: string, fuzz: string } };
 
 export type ProblemsListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 

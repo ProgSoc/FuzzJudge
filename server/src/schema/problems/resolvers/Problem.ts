@@ -9,7 +9,7 @@ export const Problem: ProblemResolvers = {
 		if (!user) return null;
 		const { teamId } = user;
 		if (!teamId) {
-			throw new GraphQLError("You are not in a team");
+			return null;
 		}
 
 		const problemSolved = await solved({

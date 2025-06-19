@@ -9,7 +9,6 @@ export const problems: NonNullable<QueryResolvers["problems"]> = async (
 	const problems = await getProblems(competitionRoot);
 
 	return problems.map((problemData) => ({
-		brief: problemData.attributes.summary ?? "",
 		difficulty: problemData.problem.difficulty,
 		instructions: problemData.attributes.body,
 		name: problemData.attributes.title,
