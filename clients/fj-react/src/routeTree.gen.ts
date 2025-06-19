@@ -14,7 +14,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProblemsIndexRouteImport } from './routes/problems/index'
 import { Route as ProblemsSlugRouteImport } from './routes/problems/$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTeamsRouteImport } from './routes/admin/teams'
@@ -48,11 +47,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProblemsRoute,
 } as any)
 const ProblemsSlugRoute = ProblemsSlugRouteImport.update({
   id: '/$slug',
@@ -107,7 +101,6 @@ export interface FileRoutesByFullPath {
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
-  '/problems/': typeof ProblemsIndexRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
@@ -117,12 +110,12 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/problems': typeof ProblemsRouteWithChildren
   '/admin/clock': typeof AdminClockRoute
   '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
-  '/problems': typeof ProblemsIndexRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
@@ -139,7 +132,6 @@ export interface FileRoutesById {
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
-  '/problems/': typeof ProblemsIndexRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
@@ -157,7 +149,6 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
-    | '/problems/'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/users/create'
@@ -167,12 +158,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/leaderboard'
     | '/login'
+    | '/problems'
     | '/admin/clock'
     | '/admin/submissions'
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
-    | '/problems'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/users/create'
@@ -188,7 +179,6 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
-    | '/problems/'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/users/create'
@@ -238,13 +228,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/problems/': {
-      id: '/problems/'
-      path: '/'
-      fullPath: '/problems/'
-      preLoaderRoute: typeof ProblemsIndexRouteImport
-      parentRoute: typeof ProblemsRoute
     }
     '/problems/$slug': {
       id: '/problems/$slug'
@@ -358,12 +341,10 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ProblemsRouteChildren {
   ProblemsSlugRoute: typeof ProblemsSlugRoute
-  ProblemsIndexRoute: typeof ProblemsIndexRoute
 }
 
 const ProblemsRouteChildren: ProblemsRouteChildren = {
   ProblemsSlugRoute: ProblemsSlugRoute,
-  ProblemsIndexRoute: ProblemsIndexRoute,
 }
 
 const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(

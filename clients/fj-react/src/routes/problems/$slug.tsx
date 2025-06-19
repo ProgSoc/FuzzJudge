@@ -29,6 +29,14 @@ function RouteComponent() {
 		initialData: initialProblemData,
 	});
 
+	if (!problemData.data.instructions) {
+		return (
+			<Typography variant="h5" component="h2" gutterBottom>
+				Problem instructions are not available.
+			</Typography>
+		);
+	}
+
 	return (
 		<>
 			<Typography variant="h3" component="h1" gutterBottom>

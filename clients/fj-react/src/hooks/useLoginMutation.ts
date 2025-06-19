@@ -1,6 +1,5 @@
 import { toaster } from "@/components/Toaster";
 import { client, wsClient } from "@/gql/client";
-import { userQueryKeys } from "@/queries/user.query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function useLoginMutation() {
@@ -10,9 +9,7 @@ export default function useLoginMutation() {
 		mutationFn: client.Login,
 		onSuccess: () => {
 			wsClient.terminate(); // Terminates existing WebSocket connection, will retry
-			queryClient.invalidateQueries({
-				queryKey: userQueryKeys.me(),
-			});
+			queryClient.invalidateQueries();
 			toaster.success({
 				title: "Logged in successfully!",
 			});

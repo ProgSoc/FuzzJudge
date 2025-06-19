@@ -18,7 +18,7 @@ function Index() {
 					? `Welcome to ${competitionQuery.data.name}!`
 					: "Welcome to the Competition!"}
 			</Typography>
-			<ReactMarkdown>
+			<ReactMarkdown components={{}}>
 				{competitionQuery.data?.instructions || "No description available."}
 			</ReactMarkdown>
 		</>
