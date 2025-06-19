@@ -1,5 +1,13 @@
 # @progsoc/fj-react
 
+## 0.5.5
+
+### Patch Changes
+
+- [`928c5e3`](https://github.com/ProgSoc/FuzzJudge/commit/928c5e3ef12b053f9e6e242d2e8e048e3abd1eb2) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix head
+
+- [`d1bda1e`](https://github.com/ProgSoc/FuzzJudge/commit/d1bda1e0fda2d01e3a35f8de24d3b49b2993f6b9) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Invalidate queries correctly
+
 ## 0.5.4
 
 ### Patch Changes
