@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.11
+
+### Patch Changes
+
+- [`fabaac0`](https://github.com/ProgSoc/FuzzJudge/commit/fabaac0e2a3fc2a5a51cde542d472f08708b8bd0) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Contain image
+
 ## 0.5.10
 
 ## 0.5.9
