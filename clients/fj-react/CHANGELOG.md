@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.9
+
+### Patch Changes
+
+- [`0b4dd2c`](https://github.com/ProgSoc/FuzzJudge/commit/0b4dd2c9bc8c33c0ec11a5e180fab29b46bca1ed) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add progress bar
+
 ## 0.5.8
 
 ## 0.5.7
