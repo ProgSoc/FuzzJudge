@@ -38,11 +38,11 @@ To upload a file, make sure you're logged in, then you should have a submit butt
 
 There are 2 points systems:
 
-    The team with the most answered questions wins
-    If there is a tie, the second system is used:
+The team with the most answered questions wins
+If there is a tie, the second system is used:
 
-    Each time you answer a question, you get "points" for how many minutes passed between the beginning of the competition and when you solved it
-    Out of the tied teams, the team with the lowest total "points" wins
+Each time you answer a question, you get "points" for how many minutes passed between the beginning of the competition and when you solved it
+Out of the tied teams, the team with the lowest total "points" wins
 
 ## Prizes
 
