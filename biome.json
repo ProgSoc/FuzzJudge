@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.0.2/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
@@ -7,29 +7,40 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": [
-			"./clients/fj-svelte/dist",
-			"./node_modules",
-			"./server/dist",
-			"./server/**/*.generated.ts",
-			"./clients/fj-svelte/src/gql/index.ts",
-			"./clients/fj-admin-html/src/gql/index.ts",
-			"./clients/fj-react/src/routeTree.gen.ts",
-			"./clients/fj-react/dist",
-			"./clients/fj-react/src/gql/index.ts"
+		"includes": [
+			"**",
+			"!clients/fj-svelte/dist",
+			"!node_modules",
+			"!server/dist",
+			"!server/**/*.generated.ts",
+			"!clients/fj-svelte/src/gql/index.ts",
+			"!clients/fj-admin-html/src/gql/index.ts",
+			"!clients/fj-react/src/routeTree.gen.ts",
+			"!clients/fj-react/dist",
+			"!clients/fj-react/src/gql/index.ts"
 		]
 	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab"
 	},
-	"organizeImports": {
-		"enabled": true
-	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"style": {
+				"noParameterAssign": "error",
+				"useAsConstAssertion": "error",
+				"useDefaultParameterLast": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"noUselessElse": "error"
+			}
 		}
 	},
 	"javascript": {
@@ -39,7 +50,7 @@
 	},
 	"overrides": [
 		{
-			"include": ["./server/**/*.ts"],
+			"includes": ["server/**/*.ts"],
 			"linter": {
 				"rules": {
 					"correctness": {
@@ -49,7 +60,7 @@
 			}
 		},
 		{
-			"include": ["**/*.svelte"],
+			"includes": ["**/*.svelte"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -59,7 +70,7 @@
 			}
 		},
 		{
-			"include": ["./clients/fj-admin-html/src/**/*.ts"],
+			"includes": ["clients/fj-admin-html/src/**/*.ts"],
 			"linter": {
 				"rules": {
 					"style": {

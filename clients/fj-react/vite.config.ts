@@ -1,8 +1,12 @@
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import codegen from "vite-plugin-graphql-codegen";
 import tsconfigPaths from "vite-tsconfig-paths";
+
+const ReactCompilerConfig = {
+	target: "19", // '17' | '18' | '19'
+};
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,10 +14,11 @@ export default defineConfig({
 	plugins: [
 		tsconfigPaths(),
 		codegen(),
-		TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
+		tanstackRouter({ target: "react", autoCodeSplitting: true }),
 		react({
 			babel: {
 				plugins: [
+					["babel-plugin-react-compiler", ReactCompilerConfig],
 					[
 						"@emotion/babel-plugin",
 						{
