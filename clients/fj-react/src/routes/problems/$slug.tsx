@@ -1,13 +1,13 @@
-import SubmissionArea from "@/components/SubmissionArea";
-import { problemQuery } from "@/queries/problem.query";
 import { Box, Button, Chip, Stack, TextField, Typography } from "@mui/material";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
-	type ErrorComponentProps,
 	createFileRoute,
+	type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { MdCheck } from "react-icons/md";
-import Markdown from "react-markdown";
+import SubmissionArea from "@/components/SubmissionArea";
+import { problemQuery } from "@/queries/problem.query";
+import CustomMarkdown from "@/utils/mdSettings";
 
 export const Route = createFileRoute("/problems/$slug")({
 	component: RouteComponent,
@@ -51,7 +51,7 @@ function RouteComponent() {
 	const problemData = useSuspenseQuery(problemQuery.problemDetails(slug));
 
 	return (
-		<>
+		<Stack spacing={2}>
 			<Typography variant="h3" component="h1" gutterBottom>
 				{problemData.data.name}
 			</Typography>
@@ -67,7 +67,7 @@ function RouteComponent() {
 				<Chip label={`Points: ${problemData.data.points}`} color="primary" />
 				<Chip label={`Difficulty: ${problemData.data.difficulty}`} />
 			</Box>
-			<Markdown>{problemData.data.instructions}</Markdown>
+			<CustomMarkdown>{problemData.data.instructions}</CustomMarkdown>
 			{problemData.data.fuzz ? (
 				<TextField
 					value={problemData.data.fuzz}
@@ -85,6 +85,6 @@ function RouteComponent() {
 			) : null}
 
 			<SubmissionArea problemSlug={slug} />
-		</>
+		</Stack>
 	);
 }

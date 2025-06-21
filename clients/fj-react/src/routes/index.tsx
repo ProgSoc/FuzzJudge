@@ -1,8 +1,8 @@
-import { competitionQueries } from "@/queries/competition.query";
 import { Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import ReactMarkdown from "react-markdown";
+import { competitionQueries } from "@/queries/competition.query";
+import CustomMarkdown from "@/utils/mdSettings";
 
 export const Route = createFileRoute("/")({
 	component: Index,
@@ -18,9 +18,9 @@ function Index() {
 					? `Welcome to ${competitionQuery.data.name}!`
 					: "Welcome to the Competition!"}
 			</Typography>
-			<ReactMarkdown components={{}}>
+			<CustomMarkdown>
 				{competitionQuery.data?.instructions || "No description available."}
-			</ReactMarkdown>
+			</CustomMarkdown>
 		</>
 	);
 }
