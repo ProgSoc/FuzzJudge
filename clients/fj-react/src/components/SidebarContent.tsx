@@ -9,7 +9,6 @@ import {
 	ListItemButton,
 	ListItemIcon,
 	ListItemText,
-	Paper,
 	Toolbar,
 	Typography,
 } from "@mui/material";
@@ -18,7 +17,6 @@ import AdminList from "./AdminSidebarList";
 import { LinkListItemButton } from "./LinkListItemButton";
 import ProblemList from "./ProblemSidebarList";
 import useClockCountdown, { durationToText } from "@/hooks/useClockcountdown";
-import TimerIcon from "@mui/icons-material/Timer";
 import InfoIcon from "@mui/icons-material/Info";
 import PeopleIcon from "@mui/icons-material/People";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
