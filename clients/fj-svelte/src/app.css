@@ -105,6 +105,20 @@ textarea {
 	font-family: monospace;
 }
 
+input {
+	color: var(--text-sec);
+	background-color: var(--bg-sec);
+	margin: 0.25rem;
+	border: 1px solid var(--border);
+	padding: 0.5rem;
+	font-family: monospace;
+}
+
+input:focus {
+	outline: none;
+	border: 1px solid var(--accent);
+}
+
 code,
 pre {
 	font-family: monospace;
@@ -113,6 +127,10 @@ pre {
 textarea:focus {
 	outline: none;
 	border: 2px solid var(--accent);
+}
+
+textarea {
+	border: 2px solid var(--border);
 }
 
 #instructions-md p {
@@ -170,4 +188,24 @@ th {
 img {
 	max-height: 25rem;
 	max-width: 90%;
+}
+
+.account-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+}
+
+.account-form input {
+	width: 270px;
+}
+
+.account-form button {
+	width: 120px;
+}
+
+.account-error {
+	font-size: 0.9rem;
 }

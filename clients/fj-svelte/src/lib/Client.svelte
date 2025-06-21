@@ -289,7 +289,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
   close={() => (showingPopout = "None")}
   title="Login"
 >
-  <Login />
+  <Login showRegister={() => showingPopout = "Register"} />
 </Popout>
 <Popout
   shown={showingPopout === "Register"}

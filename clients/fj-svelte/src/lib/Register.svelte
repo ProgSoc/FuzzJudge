@@ -24,6 +24,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
     let passwordConfirm = $state("");
     let name = $state("");
 
+    let registerError = $state(""); 
+
     const registerMutation = createMutation({
         mutationFn: client.Register,
     });
@@ -32,8 +34,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
         event.preventDefault();
 
         if (password !== passwordConfirm) {
-            console.error("Passwords do not match");
-            // Handle password mismatch (e.g., show an error message)
+            registerError = "Passwords do not match.";
             return;
         }
 
@@ -42,19 +43,25 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
             // Redirect to the main page or show success message
             window.location.reload();
         } catch (error) {
-            console.error("Login failed:", error);
-            // Handle login error (e.g., show an error message)
+            //@ts-ignore
+            registerError = error?.response?.errors.map(e => e.message).join("\n") 
+                ?? "Login failed. Please check your credentials.";
         }
     };
 </script>
 
-<h3>Register</h3>
-<input type="text" bind:value={name} placeholder="Name" />
-<input type="text" bind:value={username} placeholder="Username" />
-<input type="password" bind:value={password} placeholder="Password" />
-<input
-    type="password"
-    bind:value={passwordConfirm}
-    placeholder="Confirm Password"
-/>
-<button onclick={formSubmit}>Register</button>
+<div class="account-form">
+    {#if registerError}
+        <p class="account-error">{registerError}</p>
+    {/if}
+
+    <input type="text" bind:value={name} placeholder="Name" />
+    <input type="text" bind:value={username} placeholder="Username" />
+    <input type="password" bind:value={password} placeholder="Password" />
+    <input
+        type="password"
+        bind:value={passwordConfirm}
+        placeholder="Confirm Password"
+    />
+    <button onclick={formSubmit}>Register</button>
+</div>
