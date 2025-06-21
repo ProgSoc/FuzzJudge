@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.12
+
+### Patch Changes
+
+- [`6b9ea9b`](https://github.com/ProgSoc/FuzzJudge/commit/6b9ea9bb33fee3e246369a872d5730f07e9e1ce8) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add problem grouping
+
 ## 0.5.11
 
 ### Patch Changes
