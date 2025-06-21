@@ -87,6 +87,13 @@ app.on(
 	},
 );
 
+app.use(
+	"/assets/*",
+	serveStatic({
+		root,
+	}),
+);
+
 app.use("/comp/prob/:slug/assets", async (c, next) => {
 	const id = c.req.param("slug");
 	const probPath = path.join(id, "assets");
