@@ -1,5 +1,19 @@
 # @progsoc/fj-react
 
+## 0.5.7
+
+### Patch Changes
+
+- [`7107548`](https://github.com/ProgSoc/FuzzJudge/commit/7107548c312e353d741de9ab3e84e7751b191939) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Monospaced fuzz and code font
+
+- [`9c573fb`](https://github.com/ProgSoc/FuzzJudge/commit/9c573fb7f4f2ebcd19bdda77a7788d1f42836fce) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix scroll overflow for spans and syntax highlighting
+
+- [`d9838e9`](https://github.com/ProgSoc/FuzzJudge/commit/d9838e956b25ba1d0cc515056690f3c48c27d410) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Download fuzz button
+
+- [`cff5968`](https://github.com/ProgSoc/FuzzJudge/commit/cff5968e90e14b96b902cff42fc1d11aa560331a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Remove brief becuase it was superflous
+
+- [`7107548`](https://github.com/ProgSoc/FuzzJudge/commit/7107548c312e353d741de9ab3e84e7751b191939) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Clock and question protection
+
 ## 0.5.6
 
 ### Patch Changes
