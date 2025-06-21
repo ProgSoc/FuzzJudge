@@ -308,7 +308,7 @@ const AdminTeamsRouteChildren: AdminTeamsRouteChildren = {
 }
 
 const AdminTeamsRouteWithChildren = AdminTeamsRoute._addFileChildren(
-  AdminTeamsRouteChildren
+  AdminTeamsRouteChildren,
 )
 
 interface AdminUsersRouteChildren {
@@ -320,7 +320,7 @@ const AdminUsersRouteChildren: AdminUsersRouteChildren = {
 }
 
 const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
-  AdminUsersRouteChildren
+  AdminUsersRouteChildren,
 )
 
 interface AdminRouteChildren {
@@ -348,7 +348,7 @@ const ProblemsRouteChildren: ProblemsRouteChildren = {
 }
 
 const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
-  ProblemsRouteChildren
+  ProblemsRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
