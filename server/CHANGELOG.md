@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.7
+
+### Patch Changes
+
+- [`cff5968`](https://github.com/ProgSoc/FuzzJudge/commit/cff5968e90e14b96b902cff42fc1d11aa560331a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Remove brief becuase it was superflous
+
 ## 0.5.6
 
 ## 0.5.5
