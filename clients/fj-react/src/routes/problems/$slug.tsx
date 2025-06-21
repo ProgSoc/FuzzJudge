@@ -8,6 +8,8 @@ import { MdCheck } from "react-icons/md";
 import SubmissionArea from "@/components/SubmissionArea";
 import { problemQuery } from "@/queries/problem.query";
 import CustomMarkdown from "@/utils/mdSettings";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import useDownloadText from "@/hooks/useDownloadText";
 
 export const Route = createFileRoute("/problems/$slug")({
 	component: RouteComponent,
@@ -50,6 +52,9 @@ function RouteComponent() {
 
 	const problemData = useSuspenseQuery(problemQuery.problemDetails(slug));
 
+	const [, copy] = useCopyToClipboard();
+	const downloadText = useDownloadText();
+
 	return (
 		<Stack spacing={2}>
 			<Typography variant="h3" component="h1" gutterBottom>
@@ -69,19 +74,40 @@ function RouteComponent() {
 			</Box>
 			<CustomMarkdown>{problemData.data.instructions}</CustomMarkdown>
 			{problemData.data.fuzz ? (
-				<TextField
-					value={problemData.data.fuzz}
-					slotProps={{
-						input: { readOnly: true },
-					}}
-					fullWidth
-					multiline
-					label="Fuzz"
-					helperText="Fuzz is a randomly generated input that you use as the input to your code."
-					sx={{ mt: 2, mb: 2 }}
-					variant="outlined"
-					rows={4}
-				/>
+				<>
+					<TextField
+						value={problemData.data.fuzz}
+						slotProps={{
+							input: { readOnly: true },
+						}}
+						fullWidth
+						multiline
+						label="Fuzz"
+						helperText="Fuzz is a randomly generated input that you use as the input to your code."
+						sx={{ mt: 2, mb: 2 }}
+						variant="outlined"
+						rows={4}
+					/>
+					<Stack direction="row" spacing={2}>
+						<Button
+							variant="contained"
+							onClick={() => copy(problemData.data.fuzz)}
+						>
+							Copy Fuzz
+						</Button>
+						<Button
+							variant="contained"
+							onClick={() =>
+								downloadText(
+									`${problemData.data.slug}-fuzz.txt`,
+									problemData.data.fuzz,
+								)
+							}
+						>
+							Download Fuzz
+						</Button>
+					</Stack>
+				</>
 			) : null}
 
 			<SubmissionArea problemSlug={slug} />
