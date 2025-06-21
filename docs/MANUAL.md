@@ -203,7 +203,7 @@ TODO
 
 ## Scoring System
 Each problem is [worth a certain amount of points](#problem-metadata) and when a team solves that problem they are awarded that number of points.
-Teams are first sorted by their points but if there is a tie the teams with the least penalty points is placed ahead. When the team solves a problem, they receive $t + 20f$ penalty points where $t$ is the number of minuets between the start of the competition and the moment the solution is accepted and $f$ is the number of previous failed attempts at that problem.
+Teams are first sorted by their points but if there is a tie the teams with the least penalty points is placed ahead. When the team solves a problem, they receive $t + 20f$ penalty points where $t$ is the number of minutes between the start of the competition and the moment the solution is accepted and $f$ is the number of previous failed attempts at that problem.
 
 ## Static API
 The static API is a simple set of mostly JSON-less, HTML Basic auth based endpoints. For simple clients, this is all you need.
