@@ -96,7 +96,14 @@ export async function getProblems(root: string): Promise<Problem[]> {
 		problems.push(problemData);
 	}
 
-	return problems;
+	return problems.sort((a, b) => {
+		// Sort by difficulty first, then by points
+		// This ensures that problems with the same difficulty are sorted by points
+		if (a.problem.difficulty !== b.problem.difficulty) {
+			return a.problem.difficulty - b.problem.difficulty;
+		}
+		return a.problem.points - b.problem.points;
+	});
 }
 
 /**
