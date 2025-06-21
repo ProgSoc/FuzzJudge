@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { Container, useTheme } from "@mui/material";
 import rehypeShiki, { type RehypeShikiOptions } from "@shikijs/rehype";
 import { useMemo } from "react";
 import { MarkdownAsync } from "react-markdown";
@@ -40,6 +40,20 @@ export default function CustomMarkdown(props: {
 							padding: "1rem",
 						}}
 					/>
+				),
+				img: ({ node, ...props }) => (
+					<Container>
+						<img
+							alt="placeholder alternative text"
+							{...props}
+							style={{
+								maxWidth: "100%",
+								height: "auto",
+								display: "block",
+								margin: "0 auto",
+							}}
+						/>
+					</Container>
 				),
 			}}
 		>
