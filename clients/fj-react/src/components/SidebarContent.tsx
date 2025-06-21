@@ -4,6 +4,7 @@ import { userQueries } from "@/queries/user.query";
 import {
 	Collapse,
 	Divider,
+	LinearProgress,
 	List,
 	ListItem,
 	ListItemButton,
@@ -25,7 +26,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useMemo } from "react";
 
 function ClockListItem() {
-	const { duration, text } = useClockCountdown();
+	const { duration, text, progress } = useClockCountdown();
 	const primary = useMemo(
 		() =>
 			text === "Ending in" || text === "Starting in"
@@ -35,15 +36,26 @@ function ClockListItem() {
 	);
 
 	return (
-		<ListItem>
-			<ListItemText
-				primary={
-					<Typography variant="h5" sx={{ fontWeight: "bold" }}>
-						{primary}
-					</Typography>
-				}
+		<>
+			<ListItem>
+				<ListItemText
+					primary={
+						<Typography variant="h5" sx={{ fontWeight: "bold" }}>
+							{primary}
+						</Typography>
+					}
+				/>
+			</ListItem>
+			<LinearProgress
+				variant={text === "Hold" ? "indeterminate" : "determinate"}
+				value={progress * 100}
+				sx={{
+					width: "100%",
+					opacity: text === "Hold" ? 0.5 : 1,
+					transition: "opacity 0.3s ease-in-out",
+				}}
 			/>
-		</ListItem>
+		</>
 	);
 }
 

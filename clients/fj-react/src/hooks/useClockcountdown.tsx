@@ -9,12 +9,17 @@ import { useEffect, useState } from "react";
 const scalarToDateTime = (date: Date | string) =>
 	typeof date === "string" ? DateTime.fromISO(date) : DateTime.fromJSDate(date);
 
-type ReturnState =
+type AlwaysState =
 	| { text: "Starting in"; duration: Duration }
 	| { text: "Ending in"; duration: Duration }
 	| { text: "Hold"; duration: null }
 	| { text: "Ended"; duration: null }
 	| { text: "Loading"; duration: null };
+
+type ReturnState = AlwaysState & {
+	/** The percentage complete */
+	progress: number;
+};
 
 /**
  * Basically there's a few stages of a competition, the time before it starts, whether it's on hold (date or null) and the time it ends.
@@ -23,6 +28,7 @@ export default function useClockCountdown(): ReturnState {
 	const [clockReturnState, setClockReturnState] = useState<ReturnState>({
 		text: "Loading",
 		duration: null,
+		progress: 0,
 	});
 
 	const clockState = useSubscription({
@@ -36,6 +42,7 @@ export default function useClockCountdown(): ReturnState {
 				setClockReturnState({
 					text: "Loading",
 					duration: null,
+					progress: 0,
 				});
 				return;
 			}
@@ -49,6 +56,7 @@ export default function useClockCountdown(): ReturnState {
 				setClockReturnState({
 					text: "Loading",
 					duration: null,
+					progress: 0,
 				});
 				return;
 			}
@@ -57,6 +65,7 @@ export default function useClockCountdown(): ReturnState {
 				setClockReturnState({
 					text: "Hold",
 					duration: null,
+					progress: 0,
 				});
 				return;
 			}
@@ -72,6 +81,7 @@ export default function useClockCountdown(): ReturnState {
 				setClockReturnState({
 					text: "Starting in",
 					duration: timeUntilStart,
+					progress: 0,
 				});
 				return;
 			}
@@ -80,6 +90,7 @@ export default function useClockCountdown(): ReturnState {
 				setClockReturnState({
 					text: "Ended",
 					duration: null,
+					progress: 1,
 				});
 				return;
 			}
@@ -94,6 +105,10 @@ export default function useClockCountdown(): ReturnState {
 			setClockReturnState({
 				text: "Ending in",
 				duration: timeRemaining,
+				progress:
+					1 -
+					timeRemaining.as("seconds") /
+						endDateTime.diff(startDateTime).as("seconds"),
 			});
 		}, 1000);
 		return () => clearInterval(interval);

@@ -4,10 +4,9 @@ public = [ "client" ]
 
 [times]
 start = 2025-06-21T09:00:57.837Z
-finish = 2025-06-21T10:49:24.422Z
+finish = 2025-06-21T11:48:43.892Z
 isReleased = true
 freeze = 5
-hold = 2025-06-21T09:11:11.753Z
 ---
 
 # ProgComp 2023
