@@ -14,7 +14,7 @@
 		"@emotion/styled": "11.14.0",
 		"@fontsource/roboto": "5.2.6",
 		"@hookform/resolvers": "5.1.1",
-		"@mui/icons-material": "^7.1.2",
+		"@mui/icons-material": "7.1.2",
 		"@mui/material": "7.1.2",
 		"@mui/x-date-pickers": "8.5.3",
 		"@tanstack/match-sorter-utils": "8.19.4",
@@ -33,8 +33,8 @@
 		"react-hook-form": "7.58.1",
 		"react-markdown": "10.1.0",
 		"remark-gfm": "4.0.1",
-		"@shikijs/rehype": "^3.7.0",
-		"unified": "^11.0.5",
+		"@shikijs/rehype": "3.7.0",
+		"unified": "11.0.5",
 		"usehooks-ts": "3.1.1"
 	},
 	"devDependencies": {
@@ -50,7 +50,7 @@
 		"@types/react": "19.1.8",
 		"@types/react-dom": "19.1.6",
 		"@vitejs/plugin-react": "4.5.2",
-		"babel-plugin-react-compiler": "^19.1.0-rc.2",
+		"babel-plugin-react-compiler": "19.1.0-rc.2",
 		"eslint": "9.29.0",
 		"eslint-plugin-react-hooks": "5.2.0",
 		"eslint-plugin-react-refresh": "0.4.20",
