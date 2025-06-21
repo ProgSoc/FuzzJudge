@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.10
+
+### Patch Changes
+
+- [`0bfb93e`](https://github.com/ProgSoc/FuzzJudge/commit/0bfb93ea1aa6aa78aef728205844cdb4040ac8f7) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Create assets folder
+
 ## 0.5.9
 
 ## 0.5.8
