@@ -1,7 +1,9 @@
 import { IconButton } from "@mui/material";
 import { useColorScheme } from "@mui/material/styles";
 import { useCallback, useMemo } from "react";
-import { MdDarkMode, MdLightMode, MdSettingsBrightness } from "react-icons/md";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 
 const modes = ["light", "dark", "system"] as const;
 
@@ -10,14 +12,14 @@ export default function ModeSwitchButton() {
 
 	const modeIcon = useMemo(() => {
 		if (mode === "light") {
-			return <MdLightMode />;
+			return <LightModeIcon />;
 		}
 
 		if (mode === "dark") {
-			return <MdDarkMode />;
+			return <DarkModeIcon />;
 		}
 
-		return <MdSettingsBrightness />;
+		return <SettingsBrightnessIcon />;
 	}, [mode]);
 
 	const handleModeChange = useCallback(() => {

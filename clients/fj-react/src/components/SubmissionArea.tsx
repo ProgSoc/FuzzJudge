@@ -11,9 +11,7 @@ const submissionSchema = z.object({
 	code: z.string().min(1, "Code is required"),
 });
 
-export default function SubmissionArea(props: {
-	problemSlug: string;
-}) {
+export default function SubmissionArea(props: { problemSlug: string }) {
 	const { problemSlug } = props;
 
 	const {
@@ -52,6 +50,9 @@ export default function SubmissionArea(props: {
 				multiline
 				label="Code"
 				helperText="Enter the code used to solve the problem."
+				slotProps={{
+					input: { style: { fontFamily: "monospace" } },
+				}}
 			/>
 			<ControlledTextField
 				control={control}
@@ -59,6 +60,9 @@ export default function SubmissionArea(props: {
 				multiline
 				label="Code Output"
 				helperText="Enter the output that your code produced to solve the problem."
+				slotProps={{
+					input: { style: { fontFamily: "monospace" } },
+				}}
 			/>
 			<Button
 				type="submit"

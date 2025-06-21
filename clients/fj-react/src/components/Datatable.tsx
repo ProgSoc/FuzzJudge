@@ -25,7 +25,8 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import { FaArrowDown, FaArrowUp } from "react-icons/fa6";
+import ArrowDownIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpIcon from "@mui/icons-material/ArrowUpward";
 
 export interface DatatableProps<Data extends object>
 	extends TableContainerProps {
@@ -124,6 +125,7 @@ export default function Datatable<Data extends object>({
 								>
 									{header.isPlaceholder ? null : (
 										// biome-ignore lint/a11y/useKeyWithClickEvents: I'm not sure what this is
+										// biome-ignore lint/a11y/noStaticElementInteractions: I'm not sure what this is
 										<div onClick={header.column.getToggleSortingHandler()}>
 											<b>
 												{flexRender(
@@ -131,8 +133,8 @@ export default function Datatable<Data extends object>({
 													header.getContext(),
 												)}
 												{{
-													asc: <FaArrowUp fontSize={"small"} />,
-													desc: <FaArrowDown fontSize={"small"} />,
+													asc: <ArrowUpIcon fontSize={"small"} />,
+													desc: <ArrowDownIcon fontSize={"small"} />,
 												}[header.column.getIsSorted() as string] ?? null}
 											</b>
 										</div>

@@ -4,12 +4,12 @@ import {
 	createFileRoute,
 	type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { MdCheck } from "react-icons/md";
 import SubmissionArea from "@/components/SubmissionArea";
 import { problemQuery } from "@/queries/problem.query";
 import CustomMarkdown from "@/utils/mdSettings";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import useDownloadText from "@/hooks/useDownloadText";
+import CheckIcon from "@mui/icons-material/Check";
 
 export const Route = createFileRoute("/problems/$slug")({
 	component: RouteComponent,
@@ -64,7 +64,7 @@ function RouteComponent() {
 				sx={{ flexDirection: "row", display: "flex", gap: 2, flexWrap: "wrap" }}
 			>
 				{problemData.data.solved ? (
-					<Chip label="Solved" color="success" icon={<MdCheck />} />
+					<Chip label="Solved" color="success" icon={<CheckIcon />} />
 				) : (
 					<Chip label="Unsolved" />
 				)}
@@ -78,7 +78,7 @@ function RouteComponent() {
 					<TextField
 						value={problemData.data.fuzz}
 						slotProps={{
-							input: { readOnly: true },
+							input: { readOnly: true, style: { fontFamily: "monospace" } },
 						}}
 						fullWidth
 						multiline

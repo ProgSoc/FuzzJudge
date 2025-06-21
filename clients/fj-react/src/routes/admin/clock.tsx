@@ -1,10 +1,10 @@
-import Countdown from "@/components/Countdown";
 import {
 	ClockSubscriptionDocument,
 	type ClockSubscriptionSubscription,
 } from "@/gql";
 import useAdjustEndMutation from "@/hooks/useAdjustEndMutation";
 import useAdjustStartMutation from "@/hooks/useAdjustStartMutation";
+import useClockCountdown from "@/hooks/useClockcountdown";
 import useHoldClockMutation from "@/hooks/useHoldClockMutation";
 import useReleaseClockMutation from "@/hooks/useReleaseClockMutation";
 import useReleaseResults from "@/hooks/useReleaseResults";
@@ -67,6 +67,8 @@ function RouteComponent() {
 			startTime: isoDate.toISOString(),
 		});
 	};
+
+	const currentClockText = useClockCountdown();
 
 	return (
 		<Container>
@@ -133,18 +135,6 @@ function RouteComponent() {
 					>
 						Release Results
 					</Button>
-				</Stack>
-				<Stack direction="row" spacing={2}>
-					{clockState?.start ? (
-						<PaddedPaper>
-							<Countdown to={scalarToDateTime(clockState?.start)} />
-						</PaddedPaper>
-					) : null}
-					{clockState?.finish ? (
-						<PaddedPaper>
-							<Countdown to={scalarToDateTime(clockState?.finish)} />
-						</PaddedPaper>
-					) : null}
 				</Stack>
 			</Stack>
 		</Container>

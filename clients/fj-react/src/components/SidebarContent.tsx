@@ -5,17 +5,49 @@ import {
 	Collapse,
 	Divider,
 	List,
+	ListItem,
 	ListItemButton,
 	ListItemIcon,
 	ListItemText,
+	Paper,
 	Toolbar,
+	Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { FaInfoCircle } from "react-icons/fa";
-import { MdExpandLess, MdExpandMore, MdList, MdPeople } from "react-icons/md";
 import AdminList from "./AdminSidebarList";
 import { LinkListItemButton } from "./LinkListItemButton";
 import ProblemList from "./ProblemSidebarList";
+import useClockCountdown, { durationToText } from "@/hooks/useClockcountdown";
+import TimerIcon from "@mui/icons-material/Timer";
+import InfoIcon from "@mui/icons-material/Info";
+import PeopleIcon from "@mui/icons-material/People";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ListIcon from "@mui/icons-material/List";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useMemo } from "react";
+
+function ClockListItem() {
+	const { duration, text } = useClockCountdown();
+	const primary = useMemo(
+		() =>
+			text === "Ending in" || text === "Starting in"
+				? durationToText(duration)
+				: text,
+		[duration, text],
+	);
+
+	return (
+		<ListItem>
+			<ListItemText
+				primary={
+					<Typography variant="h5" sx={{ fontWeight: "bold" }}>
+						{primary}
+					</Typography>
+				}
+			/>
+		</ListItem>
+	);
+}
 
 export default function DrawerContent() {
 	const userRoleQuery = useQuery({
@@ -36,7 +68,13 @@ export default function DrawerContent() {
 		<div>
 			<Toolbar />
 			<Divider />
-			<List>
+			<List
+				sx={{
+					pt: 0,
+				}}
+			>
+				<ClockListItem />
+				<Divider />
 				<LinkListItemButton
 					to={"/"}
 					activeOptions={{
@@ -47,7 +85,7 @@ export default function DrawerContent() {
 					}}
 				>
 					<ListItemIcon>
-						<FaInfoCircle />
+						<InfoIcon />
 					</ListItemIcon>
 					<ListItemText primary="Home" />
 				</LinkListItemButton>
@@ -61,16 +99,16 @@ export default function DrawerContent() {
 					}}
 				>
 					<ListItemIcon>
-						<MdPeople />
+						<PeopleIcon />
 					</ListItemIcon>
 					<ListItemText primary="Leaderboard" />
 				</LinkListItemButton>
 				<ListItemButton {...getButtonProps()}>
 					<ListItemIcon>
-						<MdList />
+						<ListIcon />
 					</ListItemIcon>
 					<ListItemText primary="Problems" />
-					{isOpen ? <MdExpandLess /> : <MdExpandMore />}
+					{isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
 				</ListItemButton>
 				<Collapse in={isOpen} timeout="auto" unmountOnExit>
 					<ProblemList />
@@ -79,10 +117,10 @@ export default function DrawerContent() {
 					<>
 						<ListItemButton {...getAdminButtonProps()}>
 							<ListItemIcon>
-								<MdPeople />
+								<PeopleIcon />
 							</ListItemIcon>
 							<ListItemText primary="Admin" />
-							{isAdminOpen ? <MdExpandLess /> : <MdExpandMore />}
+							{isAdminOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
 						</ListItemButton>
 						<Collapse in={isAdminOpen} timeout="auto" unmountOnExit>
 							<AdminList />

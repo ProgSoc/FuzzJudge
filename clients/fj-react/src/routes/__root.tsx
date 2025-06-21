@@ -17,7 +17,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import * as React from "react";
-import { MdMenu } from "react-icons/md";
+import MenuIcon from "@mui/icons-material/Menu";
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -42,6 +42,21 @@ export const Route = createRootRouteWithContext<{
 
 const drawerWidth = 240;
 
+function TitleTypography() {
+	const matches = useRouterState({ select: (s) => s.matches });
+
+	const title = matches
+		.map((match) => match.context.getTitle?.())
+		.filter((match) => match !== undefined)
+		.at(-1);
+
+	return (
+		<Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+			{title || "FuzzJudge"}
+		</Typography>
+	);
+}
+
 export default function ResponsiveDrawer() {
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 	const [isClosing, setIsClosing] = React.useState(false);
@@ -61,13 +76,6 @@ export default function ResponsiveDrawer() {
 		}
 	};
 
-	const matches = useRouterState({ select: (s) => s.matches });
-
-	const title = matches
-		.map((match) => match.context.getTitle?.())
-		.filter((match) => match !== undefined)
-		.at(-1);
-
 	return (
 		<Box sx={{ display: "flex" }}>
 			<HeadContent />
@@ -86,11 +94,9 @@ export default function ResponsiveDrawer() {
 						onClick={handleDrawerToggle}
 						sx={{ mr: 2, display: { sm: "none" } }}
 					>
-						<MdMenu />
+						<MenuIcon />
 					</IconButton>
-					<Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-						{title || "FuzzJudge"}
-					</Typography>
+					<TitleTypography />
 					<ModeSwitchButton />
 					<ProfileButton />
 				</Toolbar>

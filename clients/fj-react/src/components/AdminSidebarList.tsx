@@ -1,6 +1,9 @@
 import { List, ListItemIcon, ListItemText } from "@mui/material";
-import { MdInbox, MdPeople, MdPerson, MdTimer } from "react-icons/md";
 import { LinkListItemButton } from "./LinkListItemButton";
+import TimerIcon from "@mui/icons-material/Timer";
+import IconPerson from "@mui/icons-material/Person";
+import PeopleIcon from "@mui/icons-material/People";
+import InboxIcon from "@mui/icons-material/Inbox";
 
 export default function AdminList() {
 	// Contains clock, users, teams, submissions
@@ -17,7 +20,7 @@ export default function AdminList() {
 				sx={{ pl: 4 }}
 			>
 				<ListItemIcon>
-					<MdTimer />
+					<TimerIcon />
 				</ListItemIcon>
 				<ListItemText primary="Clock" />
 			</LinkListItemButton>
@@ -32,7 +35,7 @@ export default function AdminList() {
 				sx={{ pl: 4 }}
 			>
 				<ListItemIcon>
-					<MdPerson />
+					<IconPerson />
 				</ListItemIcon>
 				<ListItemText primary="Users" />
 			</LinkListItemButton>
@@ -47,7 +50,7 @@ export default function AdminList() {
 				sx={{ pl: 4 }}
 			>
 				<ListItemIcon>
-					<MdPeople />
+					<PeopleIcon />
 				</ListItemIcon>
 				<ListItemText primary="Teams" />
 			</LinkListItemButton>
@@ -62,7 +65,7 @@ export default function AdminList() {
 				sx={{ pl: 4 }}
 			>
 				<ListItemIcon>
-					<MdInbox />
+					<InboxIcon />
 				</ListItemIcon>
 				<ListItemText primary="Submissions" />
 			</LinkListItemButton>

@@ -3,10 +3,10 @@ import useLogoutMutation from "@/hooks/useLogoutMutation";
 import { userQueries } from "@/queries/user.query";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useRef } from "react";
-import { MdPerson } from "react-icons/md";
+import { useId, useRef } from "react";
 import LoginDialog from "./LoginDialog";
 import RegisterDialog from "./RegisterDialog";
+import PersonIcon from "@mui/icons-material/Person";
 
 export default function ProfileButton() {
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -27,6 +27,7 @@ export default function ProfileButton() {
 		getDisclosureProps: getRegisterDisclosureProps,
 		onOpen: onRegisterOpen,
 	} = useDisclosure();
+	const id = useId();
 
 	const logoutMutation = useLogoutMutation();
 
@@ -35,19 +36,19 @@ export default function ProfileButton() {
 			<IconButton
 				ref={menuButtonRef}
 				aria-label="profile menu"
-				aria-controls={isProfileMenuOpen ? "profile-menu" : undefined}
+				aria-controls={isProfileMenuOpen ? `profile-menu-${id}` : undefined}
 				aria-haspopup="true"
 				aria-expanded={isProfileMenuOpen ? "true" : undefined}
 				color="inherit"
 				{...getProfileMenuButtonProps()}
 			>
-				<MdPerson />
+				<PersonIcon />
 			</IconButton>
 			<LoginDialog {...getLoginDisclosureProps()} />
 			<RegisterDialog {...getRegisterDisclosureProps()} />
 			<Menu
 				{...getProfileMenuDisclosureProps()}
-				id="profile-menu"
+				id={`profile-menu-${id}`}
 				anchorEl={menuButtonRef.current}
 			>
 				{meQuery.data ? (
