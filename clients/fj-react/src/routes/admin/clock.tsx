@@ -4,7 +4,6 @@ import {
 } from "@/gql";
 import useAdjustEndMutation from "@/hooks/useAdjustEndMutation";
 import useAdjustStartMutation from "@/hooks/useAdjustStartMutation";
-import useClockCountdown from "@/hooks/useClockcountdown";
 import useHoldClockMutation from "@/hooks/useHoldClockMutation";
 import useReleaseClockMutation from "@/hooks/useReleaseClockMutation";
 import useReleaseResults from "@/hooks/useReleaseResults";
@@ -67,8 +66,6 @@ function RouteComponent() {
 			startTime: isoDate.toISOString(),
 		});
 	};
-
-	const currentClockText = useClockCountdown();
 
 	return (
 		<Container>
