@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.13
+
+### Patch Changes
+
+- [#345](https://github.com/ProgSoc/FuzzJudge/pull/345) [`8cc72df`](https://github.com/ProgSoc/FuzzJudge/commit/8cc72df9ea3d0001a58d5d1d0cc204c6ab2ab6d1) Thanks [@VanillaViking](https://github.com/VanillaViking)! - fix: problem slug does not update when a different question is selected
+
 ## 0.5.12
 
 ### Patch Changes
