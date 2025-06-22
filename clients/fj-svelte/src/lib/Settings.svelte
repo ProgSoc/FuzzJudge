@@ -40,7 +40,7 @@ run(() => {
 
 <footer>
   <span>
-    &copy; 2024-{currentYear()} UTS ProgSoc. fj-svelte is provided under an LGPv3 licence.
+    &copy; 2024-{currentYear()} UTS ProgSoc. fj-svelte is provided under an LGPLv3 licence.
   </span>
   <a href="https://github.com/ProgSoc/FuzzJudge/tree/main/clients/fj-svelte"> fj-svelte source </a>
   <a href="https://github.com/ProgSoc/FuzzJudge/"> FuzzJudge source </a>
