@@ -4,6 +4,7 @@ import useJudgeProblem from "@/hooks/useJudgeProblem";
 import useZodForm, { type ZodSubmitHandler } from "@/hooks/useZodForm";
 import { z } from "zod";
 import ControlledTextField from "./ControlledTextField";
+import { useEffect } from "react";
 
 const submissionSchema = z.object({
 	slug: z.string(),
@@ -15,6 +16,7 @@ export default function SubmissionArea(props: { problemSlug: string }) {
 	const { problemSlug } = props;
 
 	const {
+		reset,
 		control,
 		handleSubmit,
 		formState: { isSubmitting },
@@ -26,6 +28,10 @@ export default function SubmissionArea(props: { problemSlug: string }) {
 			code: "",
 		},
 	});
+
+	useEffect(() => {
+		reset({ slug: problemSlug, output: "", code: "" })
+	}, [problemSlug])
 
 	const judgeMutation = useJudgeProblem();
 
