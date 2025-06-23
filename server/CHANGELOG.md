@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.19
+
+### Patch Changes
+
+- [`83e2283`](https://github.com/ProgSoc/FuzzJudge/commit/83e22834747e4ecfe5d6ad3ca8eb30ad5068cc07) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add User and Team Editing and Deletion
+
 ## 0.5.18
 
 ## 0.5.17

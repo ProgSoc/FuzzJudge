@@ -1,5 +1,13 @@
 # @progsoc/fj-react
 
+## 0.5.19
+
+### Patch Changes
+
+- [`530dc76`](https://github.com/ProgSoc/FuzzJudge/commit/530dc7664b1199d3769438dae5416a13e227154f) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add difficulty label
+
+- [`83e2283`](https://github.com/ProgSoc/FuzzJudge/commit/83e22834747e4ecfe5d6ad3ca8eb30ad5068cc07) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add User and Team Editing and Deletion
+
 ## 0.5.18
 
 ### Patch Changes
