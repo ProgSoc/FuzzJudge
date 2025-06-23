@@ -1,5 +1,15 @@
 # @progsoc/fj-react
 
+## 0.5.14
+
+### Patch Changes
+
+- [`6b22767`](https://github.com/ProgSoc/FuzzJudge/commit/6b227678d87cc409752b9fd37b6f396cbbc9a6b4) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change where problemslug is derived
+
+- [`c9ab880`](https://github.com/ProgSoc/FuzzJudge/commit/c9ab8806172a4070920bdc4de82e07f86b18ef21) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add suspense around markdown for loading state
+
+- [`6f16959`](https://github.com/ProgSoc/FuzzJudge/commit/6f16959629442770b6d1c1c8fecd229a85fa8737) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Use React Query with GraphQL-WS
+
 ## 0.5.13
 
 ### Patch Changes
