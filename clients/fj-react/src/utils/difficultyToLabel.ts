@@ -2,6 +2,8 @@ import type { Problem } from "@/gql";
 
 const difficultyToLabel = (difficulty: Problem["difficulty"]) => {
 	switch (difficulty) {
+		case 0:
+			return "Tutorial";
 		case 1:
 			return "Easy";
 		case 2:
@@ -9,7 +11,7 @@ const difficultyToLabel = (difficulty: Problem["difficulty"]) => {
 		case 3:
 			return "Hard";
 		default:
-			return "Unknown";
+			return "Other";
 	}
 };
 
