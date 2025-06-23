@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.15
+
+### Patch Changes
+
+- [`22d0494`](https://github.com/ProgSoc/FuzzJudge/commit/22d0494533332df2ee1c1de9e766e1efc1931dce) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix unused import
+
 ## 0.5.14
 
 ### Patch Changes
