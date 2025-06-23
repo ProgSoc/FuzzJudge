@@ -3,11 +3,14 @@ import { LinkButton } from "@/components/LinkButton";
 import type { LeaderboardSubscriptionSubscription } from "@/gql";
 import { leaderboardQueries } from "@/queries/leaderboard.query";
 import { problemQuery } from "@/queries/problem.query";
-import { Paper, Tooltip } from "@mui/material";
+import { IconButton, Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useMemo } from "react";
+import Done from "@mui/icons-material/Done";
+import Close from "@mui/icons-material/Close";
+import { LinkIconButton } from "@/components/LinkIconButton";
 
 export const Route = createFileRoute("/leaderboard")({
 	beforeLoad: () => ({
@@ -26,10 +29,7 @@ function RouteComponent() {
 		select: (data) => data.scoreboard,
 	});
 
-	const problemsQuery = useQuery({
-		...problemQuery.problemList(),
-		select: (data) => data.data.problems,
-	});
+	const problemsQuery = useQuery(problemQuery.problemList());
 
 	const columns = useMemo(() => {
 		// Each question is a column along with rank and team name
@@ -44,12 +44,12 @@ function RouteComponent() {
 						id: problem.slug,
 						header: () => (
 							<Tooltip title={problem.name}>
-								<LinkButton
+								<LinkIconButton
 									to="/problems/$slug"
 									params={{ slug: problem.slug }}
 								>
 									{problem.icon}
-								</LinkButton>
+								</LinkIconButton>
 							</Tooltip>
 						),
 						cell: (info) => (
@@ -60,14 +60,14 @@ function RouteComponent() {
 							>
 								{info.getValue() ? (
 									// Checkmark emoji for solved problems
-									<span role="img" aria-label="checkmark">
-										✅
-									</span>
+									<IconButton aria-label="solved" color="success">
+										<Done />
+									</IconButton>
 								) : (
 									// Cross emoji for unsolved problems
-									<span role="img" aria-label="cross">
-										❌
-									</span>
+									<IconButton aria-label="unsolved" color="error">
+										<Close />
+									</IconButton>
 								)}
 							</Tooltip>
 						),
@@ -97,7 +97,6 @@ function RouteComponent() {
 				size: 100,
 				maxSize: 100,
 			}),
-
 			...problemColumns,
 		];
 	}, [problemsQuery.data]);
