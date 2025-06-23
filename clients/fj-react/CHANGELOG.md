@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.18
+
+### Patch Changes
+
+- [`b4e8296`](https://github.com/ProgSoc/FuzzJudge/commit/b4e8296cae55441e3c01c24f070b5d24576410ed) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix solved/unsolved in table
+
 ## 0.5.17
 
 ## 0.5.16
