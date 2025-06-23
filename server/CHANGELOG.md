@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.17
+
+### Patch Changes
+
+- [`a4e156a`](https://github.com/ProgSoc/FuzzJudge/commit/a4e156a59d5c71c716bcccf6ae97ba21936f0a47) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix filtered team
+
 ## 0.5.16
 
 ### Patch Changes
