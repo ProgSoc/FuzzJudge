@@ -4,10 +4,9 @@ import useJudgeProblem from "@/hooks/useJudgeProblem";
 import useZodForm, { type ZodSubmitHandler } from "@/hooks/useZodForm";
 import { z } from "zod";
 import ControlledTextField from "./ControlledTextField";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const submissionSchema = z.object({
-	slug: z.string(),
 	output: z.string(),
 	code: z.string().min(1, "Code is required"),
 });
@@ -23,21 +22,25 @@ export default function SubmissionArea(props: { problemSlug: string }) {
 	} = useZodForm({
 		schema: submissionSchema,
 		defaultValues: {
-			slug: problemSlug,
 			output: "",
 			code: "",
 		},
 	});
 
+	const problemSlugPrev = useRef<string>(problemSlug);
+
 	useEffect(() => {
-		reset({ slug: problemSlug, output: "", code: "" })
-	}, [problemSlug])
+		if (problemSlugPrev.current === problemSlug) return;
+		problemSlugPrev.current = problemSlug;
+
+		reset({ output: "", code: "" });
+	}, [problemSlug, reset]);
 
 	const judgeMutation = useJudgeProblem();
 
 	const onSubmit: ZodSubmitHandler<typeof submissionSchema> = async (data) => {
 		await judgeMutation.mutateAsync({
-			slug: data.slug,
+			slug: problemSlug,
 			code: data.code,
 			output: data.output,
 		});
