@@ -1,5 +1,6 @@
 subscription LeaderboardSubscription {
 	scoreboard {
+		rank
 		points
 		penalty
 		teamId

@@ -352,7 +352,7 @@ export type HoldClockMutation = { __typename?: 'Mutation', holdClock: { __typena
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
+export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', rank: number, points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -581,6 +581,7 @@ export const HoldClockDocument = `
 export const LeaderboardSubscriptionDocument = `
     subscription LeaderboardSubscription {
   scoreboard {
+    rank
     points
     penalty
     teamId

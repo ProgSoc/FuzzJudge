@@ -75,6 +75,13 @@ function RouteComponent() {
 			) ?? [];
 
 		return [
+			columnHelper.accessor("rank", {
+				id: "rank",
+				header: "Rank",
+				cell: (info) => info.getValue(),
+				size: 100,
+				maxSize: 100,
+			}),
 			columnHelper.accessor("team.name", {
 				id: "teamName",
 				header: "Team Name",
