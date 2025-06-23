@@ -139,6 +139,14 @@ for (const folder of clientFolders) {
 			`/clients/${folder}/*`,
 			serveStatic({
 				root: import.meta.dir,
+				onFound(_path, c) {
+					if (c.req.path.startsWith(`/clients/${folder}/assets`)) {
+						c.header(
+							"Cache-Control",
+							`public, immutable, max-age=${60 * 60 * 24 * 365}`,
+						); // 1 year
+					}
+				},
 			}),
 		)
 		.use(
