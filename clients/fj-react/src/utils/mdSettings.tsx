@@ -1,6 +1,6 @@
 import { Container, useTheme } from "@mui/material";
 import rehypeShiki, { type RehypeShikiOptions } from "@shikijs/rehype";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { MarkdownHooks } from "react-markdown";
 import type { PluggableList } from "unified";
 import remarkGfm from "remark-gfm";
