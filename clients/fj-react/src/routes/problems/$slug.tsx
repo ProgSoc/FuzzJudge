@@ -10,6 +10,7 @@ import CustomMarkdown from "@/utils/mdSettings";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import useDownloadText from "@/hooks/useDownloadText";
 import CheckIcon from "@mui/icons-material/Check";
+import difficultyToLabel from "@/utils/difficultyToLabel";
 
 export const Route = createFileRoute("/problems/$slug")({
 	component: RouteComponent,
@@ -70,7 +71,9 @@ function RouteComponent() {
 				)}
 
 				<Chip label={`Points: ${problemData.data.points}`} color="primary" />
-				<Chip label={`Difficulty: ${problemData.data.difficulty}`} />
+				<Chip
+					label={`Difficulty: ${difficultyToLabel(problemData.data.difficulty)}`}
+				/>
 			</Box>
 			<CustomMarkdown>{problemData.data.instructions}</CustomMarkdown>
 			{problemData.data.fuzz ? (

@@ -3,20 +3,7 @@ import { List, ListItemText, ListSubheader } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { LinkListItemButton } from "./LinkListItemButton";
 import { Fragment, useMemo } from "react";
-import type { Problem } from "@/gql";
-
-const difficultyToLabel = (difficulty: Problem["difficulty"]) => {
-	switch (difficulty) {
-		case 1:
-			return "Easy";
-		case 2:
-			return "Medium";
-		case 3:
-			return "Hard";
-		default:
-			return "Unknown";
-	}
-};
+import difficultyToLabel from "@/utils/difficultyToLabel";
 
 export default function ProblemList() {
 	const problemsQuery = useQuery(problemQuery.problemList());
