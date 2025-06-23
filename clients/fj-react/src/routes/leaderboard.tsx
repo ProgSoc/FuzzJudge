@@ -1,5 +1,4 @@
 import Datatable from "@/components/Datatable";
-import { LinkButton } from "@/components/LinkButton";
 import type { LeaderboardSubscriptionSubscription } from "@/gql";
 import { leaderboardQueries } from "@/queries/leaderboard.query";
 import { problemQuery } from "@/queries/problem.query";
