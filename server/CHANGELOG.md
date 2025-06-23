@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.16
+
+### Patch Changes
+
+- [`0941ab4`](https://github.com/ProgSoc/FuzzJudge/commit/0941ab48bdf779d4ebf7e578a417b4bccb2a7e9a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add cache control header to client asset serving
+
 ## 0.5.15
 
 ## 0.5.14
