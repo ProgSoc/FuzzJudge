@@ -19,7 +19,11 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 			// Filter hidden teams if the user is not an admin
 			yield scoreboard.filter((row) => !row.teamHidden);
 		} else {
-			yield await calculateScoreboard();
+			const calculatedScoreboard = await calculateScoreboard();
+			const filteredScoreboard = calculatedScoreboard.filter(
+				(row) => isAdmin || !row.teamHidden,
+			);
+			yield filteredScoreboard;
 		}
 
 		const scoreboardUpdates = pipe(
