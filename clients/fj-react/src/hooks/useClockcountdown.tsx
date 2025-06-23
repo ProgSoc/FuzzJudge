@@ -1,8 +1,5 @@
-import {
-	ClockSubscriptionDocument,
-	type ClockSubscriptionSubscription,
-} from "@/gql";
-import useSubscription from "@/hooks/useSubscription";
+import { clockQueries } from "@/queries/clock.query";
+import { useQuery } from "@tanstack/react-query";
 import { DateTime, type Duration } from "luxon";
 import { useEffect, useState } from "react";
 
@@ -31,14 +28,14 @@ export default function useClockCountdown(): ReturnState {
 		progress: 0,
 	});
 
-	const clockState = useSubscription({
-		query: ClockSubscriptionDocument,
-		select: (data: ClockSubscriptionSubscription) => data.clock,
+	const clockState = useQuery({
+		...clockQueries.clockSubscription(),
+		select: (data) => data.clock,
 	});
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (!clockState) {
+			if (!clockState.data) {
 				setClockReturnState({
 					text: "Loading",
 					duration: null,
@@ -47,10 +44,12 @@ export default function useClockCountdown(): ReturnState {
 				return;
 			}
 			const currentTime = DateTime.now();
-			const startDateTime = scalarToDateTime(clockState.start);
-			const endDateTime = scalarToDateTime(clockState.finish);
+			const startDateTime = scalarToDateTime(clockState.data.start);
+			const endDateTime = scalarToDateTime(clockState.data.finish);
 			/** The time when the competition was paused */
-			const hold = clockState?.hold ? scalarToDateTime(clockState?.hold) : null;
+			const hold = clockState.data?.hold
+				? scalarToDateTime(clockState.data?.hold)
+				: null;
 
 			if (!startDateTime || !endDateTime) {
 				setClockReturnState({

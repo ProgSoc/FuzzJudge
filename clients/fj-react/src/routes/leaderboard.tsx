@@ -1,10 +1,7 @@
 import Datatable from "@/components/Datatable";
 import { LinkButton } from "@/components/LinkButton";
-import {
-	LeaderboardSubscriptionDocument,
-	type LeaderboardSubscriptionSubscription,
-} from "@/gql";
-import useSubscription from "@/hooks/useSubscription";
+import type { LeaderboardSubscriptionSubscription } from "@/gql";
+import { leaderboardQueries } from "@/queries/leaderboard.query";
 import { problemQuery } from "@/queries/problem.query";
 import { Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -23,13 +20,10 @@ type LeaderboardRow = LeaderboardSubscriptionSubscription["scoreboard"][number];
 
 const columnHelper = createColumnHelper<LeaderboardRow>();
 
-const selectScoreboard = (data: LeaderboardSubscriptionSubscription) =>
-	data.scoreboard;
-
 function RouteComponent() {
-	const leaderboardState = useSubscription({
-		query: LeaderboardSubscriptionDocument,
-		select: selectScoreboard,
+	const leaderboardState = useQuery({
+		...leaderboardQueries.leaderboardSubscription(),
+		select: (data) => data.scoreboard,
 	});
 
 	const problemsQuery = useQuery({
@@ -116,7 +110,7 @@ function RouteComponent() {
 		<Datatable
 			component={Paper}
 			columns={columns}
-			data={leaderboardState ?? []}
+			data={leaderboardState.data ?? []}
 		/>
 	);
 }

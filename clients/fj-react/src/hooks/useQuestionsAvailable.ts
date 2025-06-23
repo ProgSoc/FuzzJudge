@@ -1,9 +1,5 @@
-import {
-	ClockSubscriptionDocument,
-	UserRole,
-	type ClockSubscriptionSubscription,
-} from "@/gql";
-import useSubscription from "@/hooks/useSubscription";
+import { UserRole } from "@/gql";
+import { clockQueries } from "@/queries/clock.query";
 import { userQueries } from "@/queries/user.query";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime, type Duration } from "luxon";
@@ -20,9 +16,9 @@ type ReturnState = boolean;
 export default function useQuestionsAvailable(): ReturnState {
 	const [clockReturnState, setClockReturnState] = useState<ReturnState>(false);
 
-	const clockState = useSubscription({
-		query: ClockSubscriptionDocument,
-		select: (data: ClockSubscriptionSubscription) => data.clock,
+	const clockState = useQuery({
+		...clockQueries.clockSubscription(),
+		select: (data) => data.clock,
 	});
 
 	const roleQuery = useQuery({
@@ -37,15 +33,17 @@ export default function useQuestionsAvailable(): ReturnState {
 				return;
 			}
 
-			if (!clockState) {
+			if (!clockState.data) {
 				setClockReturnState(false);
 				return;
 			}
 			const currentTime = DateTime.now();
-			const startDateTime = scalarToDateTime(clockState.start);
-			const endDateTime = scalarToDateTime(clockState.finish);
+			const startDateTime = scalarToDateTime(clockState.data.start);
+			const endDateTime = scalarToDateTime(clockState.data.finish);
 			/** The time when the competition was paused */
-			const hold = clockState?.hold ? scalarToDateTime(clockState?.hold) : null;
+			const hold = clockState.data?.hold
+				? scalarToDateTime(clockState.data?.hold)
+				: null;
 
 			// if between start and end time, and not on hold
 			if (currentTime >= startDateTime && currentTime <= endDateTime && !hold) {

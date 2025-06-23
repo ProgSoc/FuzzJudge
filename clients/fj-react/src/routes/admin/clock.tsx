@@ -1,13 +1,9 @@
-import {
-	ClockSubscriptionDocument,
-	type ClockSubscriptionSubscription,
-} from "@/gql";
 import useAdjustEndMutation from "@/hooks/useAdjustEndMutation";
 import useAdjustStartMutation from "@/hooks/useAdjustStartMutation";
 import useHoldClockMutation from "@/hooks/useHoldClockMutation";
 import useReleaseClockMutation from "@/hooks/useReleaseClockMutation";
 import useReleaseResults from "@/hooks/useReleaseResults";
-import useSubscription from "@/hooks/useSubscription";
+import { clockQueries } from "@/queries/clock.query";
 import {
 	Button,
 	Container,
@@ -18,6 +14,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import type { PickerValue } from "@mui/x-date-pickers/internals";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { DateTime } from "luxon";
 
@@ -37,9 +34,9 @@ const PaddedPaper = styled(Paper)(({ theme }) => ({
 }));
 
 function RouteComponent() {
-	const clockState = useSubscription({
-		query: ClockSubscriptionDocument,
-		select: (data: ClockSubscriptionSubscription) => data.clock,
+	const clockStateQuery = useQuery({
+		...clockQueries.clockSubscription(),
+		select: (data) => data.clock,
 	});
 
 	const pauseClockMutation = useHoldClockMutation();
@@ -71,13 +68,13 @@ function RouteComponent() {
 		<Container>
 			<Stack spacing={2}>
 				<Stack direction="row" spacing={2}>
-					{clockState?.start ? (
+					{clockStateQuery.data?.start ? (
 						<PaddedPaper>
 							<Typography variant="h6" component="h6">
 								Start Time
 							</Typography>
 							<DateTimePicker
-								value={scalarToDateTime(clockState.start)}
+								value={scalarToDateTime(clockStateQuery.data.start)}
 								onChange={handleStartTimeChange}
 								loading={adjustStartMutation.isPending}
 							/>
@@ -85,13 +82,13 @@ function RouteComponent() {
 					) : (
 						<PaddedPaper>Clock not started</PaddedPaper>
 					)}
-					{clockState?.finish ? (
+					{clockStateQuery.data?.finish ? (
 						<PaddedPaper>
 							<Typography variant="h6" component="h6">
 								Finish Time
 							</Typography>
 							<DateTimePicker
-								value={scalarToDateTime(clockState.finish)}
+								value={scalarToDateTime(clockStateQuery.data.finish)}
 								onChange={handleEndTimeChange}
 								loading={adjustEndMutation.isPending}
 							/>
@@ -101,10 +98,10 @@ function RouteComponent() {
 					)}
 				</Stack>
 
-				{clockState?.hold ? (
+				{clockStateQuery.data?.hold ? (
 					<PaddedPaper>
 						Clock is paused at{" "}
-						{scalarToDateTime(clockState.hold).toLocaleString(
+						{scalarToDateTime(clockStateQuery.data.hold).toLocaleString(
 							DateTime.DATETIME_MED,
 						)}
 					</PaddedPaper>

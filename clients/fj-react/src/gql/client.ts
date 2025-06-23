@@ -1,6 +1,10 @@
 import { GraphQLClient } from "graphql-request";
 import { createClient } from "graphql-ws";
-import { getSdk } from ".";
+import {
+	ClockSubscriptionDocument,
+	type ClockSubscriptionSubscription,
+	getSdk,
+} from ".";
 
 const graphQLClient = new GraphQLClient(`${window.location.origin}/graphql`);
 
