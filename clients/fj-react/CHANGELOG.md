@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.20
+
+### Patch Changes
+
+- [`7586ad0`](https://github.com/ProgSoc/FuzzJudge/commit/7586ad07f98cac41ffac8a1a01cfabdb81abb215) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Make password optional
+
 ## 0.5.19
 
 ### Patch Changes
