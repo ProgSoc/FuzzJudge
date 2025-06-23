@@ -19,7 +19,9 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTeamsRouteImport } from './routes/admin/teams'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
 import { Route as AdminClockRouteImport } from './routes/admin/clock'
+import { Route as AdminUsersEditRouteImport } from './routes/admin/users/edit'
 import { Route as AdminUsersCreateRouteImport } from './routes/admin/users/create'
+import { Route as AdminTeamsEditRouteImport } from './routes/admin/teams/edit'
 import { Route as AdminTeamsCreateRouteImport } from './routes/admin/teams/create'
 import { Route as AdminSubmissionsSubmissionRouteImport } from './routes/admin/submissions/submission'
 
@@ -73,10 +75,20 @@ const AdminClockRoute = AdminClockRouteImport.update({
   path: '/clock',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersEditRoute = AdminUsersEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 const AdminUsersCreateRoute = AdminUsersCreateRouteImport.update({
   id: '/create',
   path: '/create',
   getParentRoute: () => AdminUsersRoute,
+} as any)
+const AdminTeamsEditRoute = AdminTeamsEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AdminTeamsRoute,
 } as any)
 const AdminTeamsCreateRoute = AdminTeamsCreateRouteImport.update({
   id: '/create',
@@ -103,7 +115,9 @@ export interface FileRoutesByFullPath {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/teams/edit': typeof AdminTeamsEditRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
+  '/admin/users/edit': typeof AdminUsersEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,7 +132,9 @@ export interface FileRoutesByTo {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/teams/edit': typeof AdminTeamsEditRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
+  '/admin/users/edit': typeof AdminUsersEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,7 +150,9 @@ export interface FileRoutesById {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
+  '/admin/teams/edit': typeof AdminTeamsEditRoute
   '/admin/users/create': typeof AdminUsersCreateRoute
+  '/admin/users/edit': typeof AdminUsersEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,7 +169,9 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
+    | '/admin/teams/edit'
     | '/admin/users/create'
+    | '/admin/users/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,7 +186,9 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
+    | '/admin/teams/edit'
     | '/admin/users/create'
+    | '/admin/users/edit'
   id:
     | '__root__'
     | '/'
@@ -181,7 +203,9 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
+    | '/admin/teams/edit'
     | '/admin/users/create'
+    | '/admin/users/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,12 +288,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClockRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users/edit': {
+      id: '/admin/users/edit'
+      path: '/edit'
+      fullPath: '/admin/users/edit'
+      preLoaderRoute: typeof AdminUsersEditRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
     '/admin/users/create': {
       id: '/admin/users/create'
       path: '/create'
       fullPath: '/admin/users/create'
       preLoaderRoute: typeof AdminUsersCreateRouteImport
       parentRoute: typeof AdminUsersRoute
+    }
+    '/admin/teams/edit': {
+      id: '/admin/teams/edit'
+      path: '/edit'
+      fullPath: '/admin/teams/edit'
+      preLoaderRoute: typeof AdminTeamsEditRouteImport
+      parentRoute: typeof AdminTeamsRoute
     }
     '/admin/teams/create': {
       id: '/admin/teams/create'
@@ -301,10 +339,12 @@ const AdminSubmissionsRouteWithChildren =
 
 interface AdminTeamsRouteChildren {
   AdminTeamsCreateRoute: typeof AdminTeamsCreateRoute
+  AdminTeamsEditRoute: typeof AdminTeamsEditRoute
 }
 
 const AdminTeamsRouteChildren: AdminTeamsRouteChildren = {
   AdminTeamsCreateRoute: AdminTeamsCreateRoute,
+  AdminTeamsEditRoute: AdminTeamsEditRoute,
 }
 
 const AdminTeamsRouteWithChildren = AdminTeamsRoute._addFileChildren(
@@ -313,10 +353,12 @@ const AdminTeamsRouteWithChildren = AdminTeamsRoute._addFileChildren(
 
 interface AdminUsersRouteChildren {
   AdminUsersCreateRoute: typeof AdminUsersCreateRoute
+  AdminUsersEditRoute: typeof AdminUsersEditRoute
 }
 
 const AdminUsersRouteChildren: AdminUsersRouteChildren = {
   AdminUsersCreateRoute: AdminUsersCreateRoute,
+  AdminUsersEditRoute: AdminUsersEditRoute,
 }
 
 const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(

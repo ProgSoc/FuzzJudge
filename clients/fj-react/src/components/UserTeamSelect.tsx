@@ -1,5 +1,5 @@
 import type { UserListQueryQuery } from "@/gql";
-import useEditUserTeamMutation from "@/hooks/useEditUserTeamMutation";
+import useUpdateUserMutation from "@/hooks/useUpdateUserMutation";
 import { teamQueries } from "@/queries/team.query";
 import { Autocomplete, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +28,7 @@ export default function UserTeamSelect(props: {
 			})),
 	});
 
-	const editUserMutation = useEditUserTeamMutation();
+	const editUserMutation = useUpdateUserMutation();
 
 	const [value, setValue] = useState<{ label: string; value: number } | null>(
 		valueLabel,

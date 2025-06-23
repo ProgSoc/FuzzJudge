@@ -4,7 +4,7 @@ import { client } from "../gql/client";
 export const userQueryKeys = {
 	root: ["users"],
 	me: () => [...userQueryKeys.root, "me", "details"],
-	user: (id: number) => [...userQueryKeys.root, "user", id, "details"],
+	detail: (id: number) => [...userQueryKeys.root, "user", id, "details"],
 	list: () => [...userQueryKeys.root, "list"],
 };
 
@@ -14,6 +14,12 @@ export const userQueries = {
 			queryKey: userQueryKeys.me(),
 			queryFn: () => client.MeQuery(),
 			select: (data) => data.data.me,
+		}),
+	detail: (id: number) =>
+		queryOptions({
+			queryKey: userQueryKeys.detail(id),
+			queryFn: () => client.UserQuery({ id }),
+			select: (data) => data.data.user,
 		}),
 	userList: () =>
 		queryOptions({

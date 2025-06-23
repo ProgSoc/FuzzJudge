@@ -1,0 +1,5 @@
+mutation OverrideSubmission($submissionId: Int!, $solved: Boolean!) {
+	overrideJudge(submissionId: $submissionId, solved: $solved) {
+		id
+	}
+}

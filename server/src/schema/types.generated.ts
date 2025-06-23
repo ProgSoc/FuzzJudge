@@ -156,8 +156,10 @@ export type MutationUpdateTeamArgs = {
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Problem = {

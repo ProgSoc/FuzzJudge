@@ -12,8 +12,14 @@ extend type Mutation {
 		role: UserRole!
 		teamId: Int
 	): User! @auth(role: admin)
-	updateUser(id: Int!, role: UserRole, teamId: Int, name: String): User!
-		@auth(role: admin)
+	updateUser(
+		id: Int!
+		role: UserRole
+		teamId: Int
+		name: String
+		username: String
+		password: String
+	): User! @auth(role: admin)
 	deleteUser(id: Int!): User! @auth(role: admin)
 	login(username: String!, password: String!): User!
 	register(username: String!, password: String!, name: String!): User!

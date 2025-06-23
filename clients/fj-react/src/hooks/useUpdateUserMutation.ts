@@ -3,10 +3,10 @@ import { client } from "@/gql/client";
 import { userQueryKeys } from "@/queries/user.query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function useEditUserTeamMutation() {
+export default function useUpdateUserMutation() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: client.EditUserTeam,
+		mutationFn: client.UpdateUser,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: userQueryKeys.list() });
 			toaster.success({

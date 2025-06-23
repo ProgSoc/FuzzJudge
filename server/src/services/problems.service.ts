@@ -29,18 +29,6 @@ interface MarkdownAttributes {
 	body: string;
 }
 
-type FuzzJudgeProblemMessage = {
-	slug: string;
-	doc: {
-		title: string;
-		icon?: string;
-		summary?: string;
-		body: string;
-	};
-	points: number;
-	difficulty: number;
-};
-
 export async function getProblemData(root: string, slug: string) {
 	const probPath = path.join(root, slug, "prob.md");
 

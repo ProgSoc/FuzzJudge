@@ -150,8 +150,10 @@ export type MutationUpdateTeamArgs = {
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Problem = {
@@ -342,15 +344,6 @@ export type DeleteUserMutationVariables = Exact<{
 
 export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'User', id: number, name: string, username: string, role: UserRole } };
 
-export type EditUserTeamMutationVariables = Exact<{
-  userId: Scalars['Int']['input'];
-  teamId?: InputMaybe<Scalars['Int']['input']>;
-  role?: InputMaybe<UserRole>;
-}>;
-
-
-export type EditUserTeamMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null } };
-
 export type HoldClockMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -378,6 +371,14 @@ export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', username: string, role: UserRole } | null };
+
+export type OverrideSubmissionMutationVariables = Exact<{
+  submissionId: Scalars['Int']['input'];
+  solved: Scalars['Boolean']['input'];
+}>;
+
+
+export type OverrideSubmissionMutation = { __typename?: 'Mutation', overrideJudge: { __typename?: 'Submission', id: number } };
 
 export type ProblemDetailsQueryQueryVariables = Exact<{
   slug: Scalars['String']['input'];
@@ -444,15 +445,50 @@ export type TeamProblemFuzzQueryVariables = Exact<{
 
 export type TeamProblemFuzzQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz: string } };
 
-export type TeamQueryQueryVariables = Exact<{ [key: string]: never; }>;
+export type TeamQueryQueryVariables = Exact<{
+  teamId: Scalars['Int']['input'];
+}>;
 
 
-export type TeamQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, id: number, seed: string, hidden: boolean }> };
+export type TeamQueryQuery = { __typename?: 'Query', team: { __typename?: 'Team', id: number, name: string, hidden: boolean } };
+
+export type TeamsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TeamsQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, id: number, seed: string, hidden: boolean }> };
+
+export type UpdateTeamMutationVariables = Exact<{
+  teamId: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type UpdateTeamMutation = { __typename?: 'Mutation', updateTeam: { __typename?: 'Team', id: number } };
+
+export type UpdateUserMutationVariables = Exact<{
+  userId: Scalars['Int']['input'];
+  teamId?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<UserRole>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null } };
 
 export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, name: string, team?: { __typename?: 'Team', id: number, name: string } | null }> };
+
+export type UserQueryQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type UserQueryQuery = { __typename?: 'Query', user: { __typename?: 'User', id: number, name: string, role: UserRole, username: string, team?: { __typename?: 'Team', id: number, name: string } | null } };
 
 
 export const AdjustFinishTimeDocument = `
@@ -533,16 +569,6 @@ export const DeleteUserDocument = `
   }
 }
     `;
-export const EditUserTeamDocument = `
-    mutation EditUserTeam($userId: Int!, $teamId: Int, $role: UserRole) {
-  updateUser(teamId: $teamId, id: $userId, role: $role) {
-    id
-    username
-    role
-    teamId
-  }
-}
-    `;
 export const HoldClockDocument = `
     mutation HoldClock {
   holdClock {
@@ -590,6 +616,13 @@ export const MeQueryDocument = `
   me {
     username
     role
+  }
+}
+    `;
+export const OverrideSubmissionDocument = `
+    mutation OverrideSubmission($submissionId: Int!, $solved: Boolean!) {
+  overrideJudge(submissionId: $submissionId, solved: $solved) {
+    id
   }
 }
     `;
@@ -690,12 +723,45 @@ export const TeamProblemFuzzDocument = `
 }
     `;
 export const TeamQueryDocument = `
-    query TeamQuery {
+    query TeamQuery($teamId: Int!) {
+  team(id: $teamId) {
+    id
+    name
+    hidden
+  }
+}
+    `;
+export const TeamsQueryDocument = `
+    query TeamsQuery {
   teams {
     name
     id
     seed
     hidden
+  }
+}
+    `;
+export const UpdateTeamDocument = `
+    mutation UpdateTeam($teamId: Int!, $name: String, $hidden: Boolean) {
+  updateTeam(id: $teamId, name: $name, hidden: $hidden) {
+    id
+  }
+}
+    `;
+export const UpdateUserDocument = `
+    mutation UpdateUser($userId: Int!, $teamId: Int, $role: UserRole, $username: String, $name: String, $password: String) {
+  updateUser(
+    teamId: $teamId
+    id: $userId
+    role: $role
+    name: $name
+    username: $username
+    password: $password
+  ) {
+    id
+    username
+    role
+    teamId
   }
 }
     `;
@@ -710,6 +776,20 @@ export const UserListQueryDocument = `
       id
       name
     }
+  }
+}
+    `;
+export const UserQueryDocument = `
+    query UserQuery($id: Int!) {
+  user(id: $id) {
+    id
+    name
+    role
+    team {
+      id
+      name
+    }
+    username
   }
 }
     `;
@@ -745,9 +825,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     DeleteUser(variables: DeleteUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: DeleteUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<DeleteUserMutation>(DeleteUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'DeleteUser', 'mutation', variables);
     },
-    EditUserTeam(variables: EditUserTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: EditUserTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
-        return withWrapper((wrappedRequestHeaders) => client.rawRequest<EditUserTeamMutation>(EditUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'EditUserTeam', 'mutation', variables);
-    },
     HoldClock(variables?: HoldClockMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: HoldClockMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<HoldClockMutation>(HoldClockDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'HoldClock', 'mutation', variables);
     },
@@ -762,6 +839,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     MeQuery(variables?: MeQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: MeQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<MeQueryQuery>(MeQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'MeQuery', 'query', variables);
+    },
+    OverrideSubmission(variables: OverrideSubmissionMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: OverrideSubmissionMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<OverrideSubmissionMutation>(OverrideSubmissionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'OverrideSubmission', 'mutation', variables);
     },
     ProblemDetailsQuery(variables: ProblemDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ProblemDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ProblemDetailsQueryQuery>(ProblemDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProblemDetailsQuery', 'query', variables);
@@ -790,11 +870,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     TeamProblemFuzz(variables: TeamProblemFuzzQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamProblemFuzzQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamProblemFuzzQuery>(TeamProblemFuzzDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamProblemFuzz', 'query', variables);
     },
-    TeamQuery(variables?: TeamQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+    TeamQuery(variables: TeamQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamQueryQuery>(TeamQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamQuery', 'query', variables);
+    },
+    TeamsQuery(variables?: TeamsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: TeamsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<TeamsQueryQuery>(TeamsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TeamsQuery', 'query', variables);
+    },
+    UpdateTeam(variables: UpdateTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UpdateTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<UpdateTeamMutation>(UpdateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateTeam', 'mutation', variables);
+    },
+    UpdateUser(variables: UpdateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UpdateUserMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<UpdateUserMutation>(UpdateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateUser', 'mutation', variables);
     },
     UserListQuery(variables?: UserListQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UserListQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<UserListQueryQuery>(UserListQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UserListQuery', 'query', variables);
+    },
+    UserQuery(variables: UserQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: UserQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<UserQueryQuery>(UserQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UserQuery', 'query', variables);
     }
   };
 }

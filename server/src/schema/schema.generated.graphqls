@@ -45,7 +45,7 @@ type Mutation {
   releaseClock(extendDuration: Boolean): Clock!
   releaseResults: Clock!
   updateTeam(hidden: Boolean, id: Int!, name: String): Team!
-  updateUser(id: Int!, name: String, role: UserRole, teamId: Int): User!
+  updateUser(id: Int!, name: String, password: String, role: UserRole, teamId: Int, username: String): User!
 }
 
 type Problem {

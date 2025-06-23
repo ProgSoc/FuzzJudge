@@ -48,7 +48,13 @@ export default function ControlledCheckbox<
 		<FormControl error={!!fieldState.error}>
 			<FormControlLabel
 				disabled={field.disabled}
-				control={<Checkbox {...field} />}
+				control={
+					<Checkbox
+						{...field}
+						checked={field.value}
+						onChange={(_evt, v) => field.onChange(v)}
+					/>
+				}
 				{...rest}
 			/>
 			{fieldState.error ? (

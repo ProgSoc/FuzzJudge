@@ -1,5 +1,5 @@
 import { UserRole } from "@/gql";
-import useEditUserTeamMutation from "@/hooks/useEditUserTeamMutation";
+import useUpdateUserMutation from "@/hooks/useUpdateUserMutation";
 import { MenuItem, TextField } from "@mui/material";
 import { useState } from "react";
 
@@ -7,7 +7,7 @@ export default function UserRoleSelect(props: {
 	role: UserRole;
 	userId: number;
 }) {
-	const editUserMutation = useEditUserTeamMutation();
+	const editUserMutation = useUpdateUserMutation();
 
 	const [value, setValue] = useState<UserRole>(props.role);
 

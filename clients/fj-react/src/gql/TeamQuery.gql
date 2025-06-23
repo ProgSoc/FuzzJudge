@@ -1,8 +1,7 @@
-query TeamQuery {
-	teams {
-		name
+query TeamQuery($teamId: Int!) {
+	team(id: $teamId) {
 		id
-		seed
+		name
 		hidden
 	}
 }
