@@ -128,7 +128,7 @@ function RouteComponent() {
 						autoComplete="new-password"
 						variant="outlined"
 						fullWidth
-						required
+						helperText="Leave empty to keep the current password"
 					/>
 					<ControlledSelect
 						control={control}
