@@ -8,8 +8,8 @@ export default function useLoginMutation() {
 	return useMutation({
 		mutationFn: client.Login,
 		onSuccess: () => {
-			wsClient.terminate(); // Terminates existing WebSocket connection, will retry
 			queryClient.invalidateQueries();
+			wsClient.terminate(); // Terminates existing WebSocket connection, will retry
 			toaster.success({
 				title: "Logged in successfully!",
 			});

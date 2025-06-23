@@ -12,9 +12,8 @@ import type { SubscriptionResolvers } from "./../../../types.generated";
 export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 	subscribe: async function* (_parent, _arg, { user: potentialUser }) {
 		const isAdmin = potentialUser?.role === "admin";
-		const isCurrentlyFrozen = await isFrozen();
 		// If they're an admin, or if the scoreboard is not frozen, calculate the scoreboard
-		if (isCurrentlyFrozen && !isAdmin) {
+		if ((await isFrozen()) && !isAdmin) {
 			// return a cached scoreboard if the scoreboard is frozen and the user is not an admin
 			const scoreboard = await getCachedScoreboard();
 			// Filter hidden teams if the user is not an admin
@@ -26,8 +25,7 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 		const scoreboardUpdates = pipe(
 			pubSub.subscribe("scoreboard"),
 			filter(async () => {
-				const isCurrentlyFrozen = await isFrozen(); // Get the frozen status
-				return !isCurrentlyFrozen || isAdmin; // Only allow updates if not frozen or user is admin
+				return !(await isFrozen()) || isAdmin; // Only allow updates if not frozen or user is admin
 			}),
 			map((payload) => payload.filter((row) => isAdmin || !row.teamHidden)),
 		);

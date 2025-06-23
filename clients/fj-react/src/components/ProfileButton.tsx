@@ -14,7 +14,6 @@ export default function ProfileButton() {
 	const meQuery = useQuery(userQueries.me());
 
 	const {
-		getDisclosureProps: getProfileMenuDisclosureProps,
 		getButtonProps: getProfileMenuButtonProps,
 		isOpen: isProfileMenuOpen,
 		onClose: onProfileMenuClose,
@@ -47,7 +46,8 @@ export default function ProfileButton() {
 			<LoginDialog {...getLoginDisclosureProps()} />
 			<RegisterDialog {...getRegisterDisclosureProps()} />
 			<Menu
-				{...getProfileMenuDisclosureProps()}
+				onClose={onProfileMenuClose}
+				open={isProfileMenuOpen}
 				id={`profile-menu-${id}`}
 				anchorEl={menuButtonRef.current}
 			>
@@ -61,7 +61,7 @@ export default function ProfileButton() {
 						Logout
 					</MenuItem>
 				) : (
-					<>
+					<div>
 						<MenuItem
 							onClick={() => {
 								onLoginOpen();
@@ -78,7 +78,7 @@ export default function ProfileButton() {
 						>
 							Register
 						</MenuItem>
-					</>
+					</div>
 				)}
 			</Menu>
 		</>
