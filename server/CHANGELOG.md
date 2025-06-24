@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.22
+
+### Patch Changes
+
+- [`b976aff`](https://github.com/ProgSoc/FuzzJudge/commit/b976affa55563ce02109c1c7effb8d9f89dacbb7) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Improved docker file
+
 ## 0.5.21
 
 ### Patch Changes

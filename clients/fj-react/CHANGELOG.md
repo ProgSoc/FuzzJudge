@@ -1,5 +1,7 @@
 # @progsoc/fj-react
 
+## 0.5.22
+
 ## 0.5.21
 
 ### Patch Changes
