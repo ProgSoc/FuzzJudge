@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.23
+
+### Patch Changes
+
+- [`edb6f7a`](https://github.com/ProgSoc/FuzzJudge/commit/edb6f7ad72d9b3699770afd178a7877f7dd5c439) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Test release (testing caching)
+
 ## 0.5.22
 
 ### Patch Changes
