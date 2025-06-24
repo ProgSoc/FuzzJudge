@@ -17,7 +17,6 @@ const problemScoreSpec = z.object({
 type ProblemScore = z.infer<typeof problemScoreSpec>;
 
 const scoreboardRowSpec = z.object({
-	rank: z.number(),
 	teamId: z.number(),
 	teamHidden: z.boolean(),
 	points: z.number(),
@@ -159,16 +158,8 @@ export async function calculateScoreboard(): Promise<ScoreboardRow[]> {
 	 * Sort the teams by score
 	 * The teams are sorted by points, then by penalty
 	 */
-	const scoreboard = teamScore
-		.sort((teamA, teamB) => {
-			if (teamB.points !== teamA.points) {
-				return teamB.points - teamA.points; // Sort by points descending
-			}
-			return teamA.penalty - teamB.penalty; // If points are equal, sort by penalty ascending
-		})
-		.map(({ points, penalty, problems, teamId, teamHidden }, index) => ({
-			/** Rank of the team */
-			rank: index + 1,
+	const scoreboard = teamScore.map(
+		({ points, penalty, problems, teamId, teamHidden }) => ({
 			/** Team Name */
 			teamId,
 			/** Team Hidden */
@@ -179,7 +170,8 @@ export async function calculateScoreboard(): Promise<ScoreboardRow[]> {
 			penalty,
 			/** Problem Score Breakdown */
 			problems,
-		}));
+		}),
+	);
 
 	return scoreboard;
 }

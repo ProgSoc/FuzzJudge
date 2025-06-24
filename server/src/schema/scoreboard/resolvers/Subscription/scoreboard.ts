@@ -38,5 +38,19 @@ export const scoreboard: NonNullable<SubscriptionResolvers["scoreboard"]> = {
 			yield payload;
 		}
 	},
-	resolve: (payload: ScoreboardRow[]) => payload,
+	resolve: (payload: ScoreboardRow[]) => {
+		// rank the scoreboard
+		const rankedScoreboard = payload
+			.sort((teamA, teamB) => {
+				if (teamB.points !== teamA.points) {
+					return teamB.points - teamA.points; // Sort by points descending
+				}
+				return teamA.penalty - teamB.penalty; // If points are equal, sort by penalty ascending
+			})
+			.map((team, index) => ({
+				...team,
+				rank: index + 1, // Assign rank based on index
+			}));
+		return rankedScoreboard;
+	},
 };
