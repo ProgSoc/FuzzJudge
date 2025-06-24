@@ -2,6 +2,12 @@ directive @auth(role: UserRole = competitor) on ARGUMENT_DEFINITION | FIELD_DEFI
 
 directive @clock on FIELD_DEFINITION
 
+type Broadcast {
+  content: String!
+  id: ID!
+  title: String!
+}
+
 type Clock {
   finish: DateTime!
   hold: DateTime
@@ -31,6 +37,7 @@ type JudgeSuccessOutput {
 type Mutation {
   adjustFinishTime(finishTime: DateTime!): Clock!
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
+  createBroadcast(content: String!, title: String!): Broadcast!
   createTeam(hidden: Boolean, name: String!): Team!
   createUser(name: String!, password: String!, role: UserRole!, teamId: Int, username: String!): User!
   deleteTeam(id: Int!): Team!
@@ -107,6 +114,7 @@ type Submission {
 }
 
 type Subscription {
+  broadcasts: Broadcast!
   clock: Clock!
   scoreboard: [ScoreboardRow!]!
 }

@@ -24,6 +24,7 @@ import { Route as AdminUsersCreateRouteImport } from './routes/admin/users/creat
 import { Route as AdminTeamsEditRouteImport } from './routes/admin/teams/edit'
 import { Route as AdminTeamsCreateRouteImport } from './routes/admin/teams/create'
 import { Route as AdminSubmissionsSubmissionRouteImport } from './routes/admin/submissions/submission'
+import { Route as AdminClockBroadcastRouteImport } from './routes/admin/clock/broadcast'
 
 const ProblemsRoute = ProblemsRouteImport.update({
   id: '/problems',
@@ -101,6 +102,11 @@ const AdminSubmissionsSubmissionRoute =
     path: '/submission',
     getParentRoute: () => AdminSubmissionsRoute,
   } as any)
+const AdminClockBroadcastRoute = AdminClockBroadcastRouteImport.update({
+  id: '/broadcast',
+  path: '/broadcast',
+  getParentRoute: () => AdminClockRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -108,11 +114,12 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
-  '/admin/clock': typeof AdminClockRoute
+  '/admin/clock': typeof AdminClockRouteWithChildren
   '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin/clock/broadcast': typeof AdminClockBroadcastRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/teams/edit': typeof AdminTeamsEditRoute
@@ -125,11 +132,12 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
-  '/admin/clock': typeof AdminClockRoute
+  '/admin/clock': typeof AdminClockRouteWithChildren
   '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin/clock/broadcast': typeof AdminClockBroadcastRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/teams/edit': typeof AdminTeamsEditRoute
@@ -143,11 +151,12 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/problems': typeof ProblemsRouteWithChildren
-  '/admin/clock': typeof AdminClockRoute
+  '/admin/clock': typeof AdminClockRouteWithChildren
   '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/admin/teams': typeof AdminTeamsRouteWithChildren
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/problems/$slug': typeof ProblemsSlugRoute
+  '/admin/clock/broadcast': typeof AdminClockBroadcastRoute
   '/admin/submissions/submission': typeof AdminSubmissionsSubmissionRoute
   '/admin/teams/create': typeof AdminTeamsCreateRoute
   '/admin/teams/edit': typeof AdminTeamsEditRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
+    | '/admin/clock/broadcast'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/teams/edit'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
+    | '/admin/clock/broadcast'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/teams/edit'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/admin/teams'
     | '/admin/users'
     | '/problems/$slug'
+    | '/admin/clock/broadcast'
     | '/admin/submissions/submission'
     | '/admin/teams/create'
     | '/admin/teams/edit'
@@ -323,8 +335,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSubmissionsSubmissionRouteImport
       parentRoute: typeof AdminSubmissionsRoute
     }
+    '/admin/clock/broadcast': {
+      id: '/admin/clock/broadcast'
+      path: '/broadcast'
+      fullPath: '/admin/clock/broadcast'
+      preLoaderRoute: typeof AdminClockBroadcastRouteImport
+      parentRoute: typeof AdminClockRoute
+    }
   }
 }
+
+interface AdminClockRouteChildren {
+  AdminClockBroadcastRoute: typeof AdminClockBroadcastRoute
+}
+
+const AdminClockRouteChildren: AdminClockRouteChildren = {
+  AdminClockBroadcastRoute: AdminClockBroadcastRoute,
+}
+
+const AdminClockRouteWithChildren = AdminClockRoute._addFileChildren(
+  AdminClockRouteChildren
+)
 
 interface AdminSubmissionsRouteChildren {
   AdminSubmissionsSubmissionRoute: typeof AdminSubmissionsSubmissionRoute
@@ -366,14 +397,14 @@ const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
-  AdminClockRoute: typeof AdminClockRoute
+  AdminClockRoute: typeof AdminClockRouteWithChildren
   AdminSubmissionsRoute: typeof AdminSubmissionsRouteWithChildren
   AdminTeamsRoute: typeof AdminTeamsRouteWithChildren
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminClockRoute: AdminClockRoute,
+  AdminClockRoute: AdminClockRouteWithChildren,
   AdminSubmissionsRoute: AdminSubmissionsRouteWithChildren,
   AdminTeamsRoute: AdminTeamsRouteWithChildren,
   AdminUsersRoute: AdminUsersRouteWithChildren,

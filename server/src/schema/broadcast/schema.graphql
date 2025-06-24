@@ -1,0 +1,13 @@
+extend type Subscription {
+	broadcasts: Broadcast!
+}
+extend type Mutation {
+	createBroadcast(title: String!, content: String!): Broadcast!
+		@auth(role: admin)
+}
+
+type Broadcast {
+	id: ID!
+	title: String!
+	content: String!
+}

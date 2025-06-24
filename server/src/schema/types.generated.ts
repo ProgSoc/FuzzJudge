@@ -16,13 +16,20 @@ export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: Non
 export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
+  ID: { input: string; output: string | number; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: Date | string; output: Date | string; }
   File: { input: File; output: File; }
+};
+
+export type Broadcast = {
+  __typename?: 'Broadcast';
+  content: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
 };
 
 export type Clock = {
@@ -55,6 +62,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   adjustFinishTime: Clock;
   adjustStartTime: Clock;
+  createBroadcast: Broadcast;
   createTeam: Team;
   createUser: User;
   deleteTeam: Team;
@@ -81,6 +89,12 @@ export type MutationAdjustFinishTimeArgs = {
 export type MutationAdjustStartTimeArgs = {
   keepDuration?: InputMaybe<Scalars['Boolean']['input']>;
   startTime: Scalars['DateTime']['input'];
+};
+
+
+export type MutationCreateBroadcastArgs = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
 };
 
 
@@ -258,6 +272,7 @@ export type Submission = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  broadcasts: Broadcast;
   clock: Clock;
   scoreboard: Array<ScoreboardRow>;
 };
@@ -366,9 +381,11 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  Broadcast: ResolverTypeWrapper<Broadcast>;
+  String: ResolverTypeWrapper<Scalars['String']['output']>;
+  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Clock: ResolverTypeWrapper<Clock>;
   Competition: ResolverTypeWrapper<Competition>;
-  String: ResolverTypeWrapper<Scalars['String']['output']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   File: ResolverTypeWrapper<Scalars['File']['output']>;
   JudgeErrorOutput: ResolverTypeWrapper<JudgeErrorOutput>;
@@ -391,9 +408,11 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  Broadcast: Broadcast;
+  String: Scalars['String']['output'];
+  ID: Scalars['ID']['output'];
   Clock: Clock;
   Competition: Competition;
-  String: Scalars['String']['output'];
   DateTime: Scalars['DateTime']['output'];
   File: Scalars['File']['output'];
   JudgeErrorOutput: JudgeErrorOutput;
@@ -422,6 +441,13 @@ export type AuthDirectiveResolver<Result, Parent, ContextType = GraphQLContext, 
 export type ClockDirectiveArgs = { };
 
 export type ClockDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = ClockDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type BroadcastResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Broadcast'] = ResolversParentTypes['Broadcast']> = {
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type ClockResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Clock'] = ResolversParentTypes['Clock']> = {
   finish?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -462,6 +488,7 @@ export type JudgeSuccessOutputResolvers<ContextType = GraphQLContext, ParentType
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   adjustFinishTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustFinishTimeArgs, 'finishTime'>>;
   adjustStartTime?: Resolver<ResolversTypes['Clock'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationAdjustStartTimeArgs, 'startTime'>>;
+  createBroadcast?: Resolver<ResolversTypes['Broadcast'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateBroadcastArgs, 'content' | 'title'>>;
   createTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateTeamArgs, 'name'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationCreateUserArgs, 'name' | 'password' | 'role' | 'username'>>;
   deleteTeam?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>, RequireFields<MutationDeleteTeamArgs, 'id'>>;
@@ -542,6 +569,7 @@ export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends
 };
 
 export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  broadcasts?: SubscriptionResolver<ResolversTypes['Broadcast'], "broadcasts", ParentType, ContextType>;
   clock?: SubscriptionResolver<ResolversTypes['Clock'], "clock", ParentType, ContextType>;
   scoreboard?: SubscriptionResolver<Array<ResolversTypes['ScoreboardRow']>, "scoreboard", ParentType, ContextType>;
 };
@@ -569,6 +597,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
 export type UserRoleResolvers = EnumResolverSignature<{ admin?: any, competitor?: any }, ResolversTypes['UserRole']>;
 
 export type Resolvers<ContextType = GraphQLContext> = {
+  Broadcast?: BroadcastResolvers<ContextType>;
   Clock?: ClockResolvers<ContextType>;
   Competition?: CompetitionResolvers<ContextType>;
   DateTime?: GraphQLScalarType;

@@ -19,6 +19,13 @@ export type Scalars = {
   File: { input: File; output: File; }
 };
 
+export type Broadcast = {
+  __typename?: 'Broadcast';
+  content: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
 export type Clock = {
   __typename?: 'Clock';
   finish: Scalars['DateTime']['output'];
@@ -49,6 +56,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   adjustFinishTime: Clock;
   adjustStartTime: Clock;
+  createBroadcast: Broadcast;
   createTeam: Team;
   createUser: User;
   deleteTeam: Team;
@@ -75,6 +83,12 @@ export type MutationAdjustFinishTimeArgs = {
 export type MutationAdjustStartTimeArgs = {
   keepDuration?: InputMaybe<Scalars['Boolean']['input']>;
   startTime: Scalars['DateTime']['input'];
+};
+
+
+export type MutationCreateBroadcastArgs = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
 };
 
 
@@ -252,6 +266,7 @@ export type Submission = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  broadcasts: Broadcast;
   clock: Clock;
   scoreboard: Array<ScoreboardRow>;
 };
@@ -301,6 +316,11 @@ export type AdjustStartTimeMutationVariables = Exact<{
 
 export type AdjustStartTimeMutation = { __typename?: 'Mutation', adjustStartTime: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
 
+export type BroadcastSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BroadcastSubscriptionSubscription = { __typename?: 'Subscription', broadcasts: { __typename?: 'Broadcast', id: string, content: string, title: string } };
+
 export type ClockSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -310,6 +330,14 @@ export type CompetitionDetailsQueryQueryVariables = Exact<{ [key: string]: never
 
 
 export type CompetitionDetailsQueryQuery = { __typename?: 'Query', competition: { __typename?: 'Competition', name: string, instructions: string } };
+
+export type CreateBroadcastMutationVariables = Exact<{
+  title: Scalars['String']['input'];
+  content: Scalars['String']['input'];
+}>;
+
+
+export type CreateBroadcastMutation = { __typename?: 'Mutation', createBroadcast: { __typename?: 'Broadcast', id: string, title: string, content: string } };
 
 export type CreateTeamMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -509,6 +537,15 @@ export const AdjustStartTimeDocument = `
   }
 }
     `;
+export const BroadcastSubscriptionDocument = `
+    subscription BroadcastSubscription {
+  broadcasts {
+    id
+    content
+    title
+  }
+}
+    `;
 export const ClockSubscriptionDocument = `
     subscription ClockSubscription {
   clock {
@@ -523,6 +560,15 @@ export const CompetitionDetailsQueryDocument = `
   competition {
     name
     instructions
+  }
+}
+    `;
+export const CreateBroadcastDocument = `
+    mutation CreateBroadcast($title: String!, $content: String!) {
+  createBroadcast(title: $title, content: $content) {
+    id
+    title
+    content
   }
 }
     `;
@@ -808,11 +854,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     AdjustStartTime(variables: AdjustStartTimeMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: AdjustStartTimeMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<AdjustStartTimeMutation>(AdjustStartTimeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'AdjustStartTime', 'mutation', variables);
     },
+    BroadcastSubscription(variables?: BroadcastSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: BroadcastSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<BroadcastSubscriptionSubscription>(BroadcastSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'BroadcastSubscription', 'subscription', variables);
+    },
     ClockSubscription(variables?: ClockSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ClockSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ClockSubscriptionSubscription>(ClockSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ClockSubscription', 'subscription', variables);
     },
     CompetitionDetailsQuery(variables?: CompetitionDetailsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CompetitionDetailsQueryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CompetitionDetailsQueryQuery>(CompetitionDetailsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CompetitionDetailsQuery', 'query', variables);
+    },
+    CreateBroadcast(variables: CreateBroadcastMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateBroadcastMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateBroadcastMutation>(CreateBroadcastDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateBroadcast', 'mutation', variables);
     },
     CreateTeam(variables: CreateTeamMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: CreateTeamMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<CreateTeamMutation>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateTeam', 'mutation', variables);

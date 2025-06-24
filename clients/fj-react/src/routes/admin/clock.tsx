@@ -1,3 +1,4 @@
+import { LinkButton } from "@/components/LinkButton";
 import useAdjustEndMutation from "@/hooks/useAdjustEndMutation";
 import useAdjustStartMutation from "@/hooks/useAdjustStartMutation";
 import useHoldClockMutation from "@/hooks/useHoldClockMutation";
@@ -15,7 +16,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers";
 import type { PickerValue } from "@mui/x-date-pickers/internals";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { DateTime } from "luxon";
 
 export const Route = createFileRoute("/admin/clock")({
@@ -129,8 +130,20 @@ function RouteComponent() {
 					>
 						Release Results
 					</Button>
+					<LinkButton
+						to="/admin/clock/broadcast"
+						variant="contained"
+						color="primary"
+						replace
+						mask={{
+							to: "/admin/clock",
+						}}
+					>
+						Create Broadcast
+					</LinkButton>
 				</Stack>
 			</Stack>
+			<Outlet />
 		</Container>
 	);
 }

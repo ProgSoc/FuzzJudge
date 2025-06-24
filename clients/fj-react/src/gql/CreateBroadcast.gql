@@ -1,0 +1,7 @@
+mutation CreateBroadcast($title: String!, $content: String!) {
+	createBroadcast(title: $title, content: $content) {
+		id
+		title
+		content
+	}
+}

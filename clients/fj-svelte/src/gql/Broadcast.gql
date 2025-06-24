@@ -1,0 +1,7 @@
+subscription Broadcast {
+	broadcasts {
+		id
+		title
+		content
+	}
+}

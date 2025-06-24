@@ -19,6 +19,13 @@ export type Scalars = {
   File: { input: File; output: File; }
 };
 
+export type Broadcast = {
+  __typename?: 'Broadcast';
+  content: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
 export type Clock = {
   __typename?: 'Clock';
   finish: Scalars['DateTime']['output'];
@@ -49,6 +56,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   adjustFinishTime: Clock;
   adjustStartTime: Clock;
+  createBroadcast: Broadcast;
   createTeam: Team;
   createUser: User;
   deleteTeam: Team;
@@ -75,6 +83,12 @@ export type MutationAdjustFinishTimeArgs = {
 export type MutationAdjustStartTimeArgs = {
   keepDuration?: InputMaybe<Scalars['Boolean']['input']>;
   startTime: Scalars['DateTime']['input'];
+};
+
+
+export type MutationCreateBroadcastArgs = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
 };
 
 
@@ -150,8 +164,10 @@ export type MutationUpdateTeamArgs = {
 export type MutationUpdateUserArgs = {
   id: Scalars['Int']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   teamId?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Problem = {
@@ -250,6 +266,7 @@ export type Submission = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  broadcasts: Broadcast;
   clock: Clock;
   scoreboard: Array<ScoreboardRow>;
 };
@@ -283,6 +300,11 @@ export enum UserRole {
   Admin = 'admin',
   Competitor = 'competitor'
 }
+
+export type BroadcastSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BroadcastSubscription = { __typename?: 'Subscription', broadcasts: { __typename?: 'Broadcast', id: string, title: string, content: string } };
 
 export type ClockSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -348,6 +370,15 @@ export type ScoreboardSubscriptionSubscriptionVariables = Exact<{ [key: string]:
 export type ScoreboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', rank: number, points: number, penalty: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', points: number, penalty: number, tries: number, solved: boolean }> }> };
 
 
+export const BroadcastDocument = `
+    subscription Broadcast {
+  broadcasts {
+    id
+    title
+    content
+  }
+}
+    `;
 export const ClockSubscriptionDocument = `
     subscription ClockSubscription {
   clock {
@@ -455,6 +486,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    Broadcast(variables?: BroadcastSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: BroadcastSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<BroadcastSubscription>(BroadcastDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Broadcast', 'subscription', variables);
+    },
     ClockSubscription(variables?: ClockSubscriptionSubscriptionVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ClockSubscriptionSubscription; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<ClockSubscriptionSubscription>(ClockSubscriptionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ClockSubscription', 'subscription', variables);
     },

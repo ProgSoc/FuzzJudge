@@ -1,4 +1,10 @@
-import { Alert, AlertTitle, Button } from "@mui/material";
+import {
+	BroadcastSubscriptionDocument,
+	type BroadcastSubscriptionSubscription,
+} from "@/gql";
+import { wsClient } from "@/gql/client";
+import CustomMarkdown from "@/utils/mdSettings";
+import { Alert, AlertTitle } from "@mui/material";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import * as toast from "@zag-js/toast";
 import { useId } from "react";
@@ -8,6 +14,31 @@ export const toaster = toast.createStore({
 	overlap: true,
 	placement: "bottom-start",
 });
+
+wsClient.subscribe<BroadcastSubscriptionSubscription>(
+	{
+		query: BroadcastSubscriptionDocument,
+	},
+	{
+		next: ({ data }) => {
+			if (!data?.broadcasts) return;
+			toaster.create({
+				title: data.broadcasts.title,
+				description: data.broadcasts.content,
+				id: data.broadcasts.id,
+				closable: true,
+				type: "info",
+				duration: Number.POSITIVE_INFINITY,
+			});
+		},
+		error: (error) => {
+			console.error("Error in broadcast subscription:", error);
+		},
+		complete: () => {
+			console.log("Broadcast subscription completed");
+		},
+	},
+);
 
 interface ToastProps {
 	actor: toast.Options<React.ReactNode>;
@@ -34,13 +65,10 @@ function Toast(props: ToastProps) {
 		<Alert
 			onClose={api.dismiss}
 			severity={api.type !== "loading" ? (api.type as "success") : "info"}
-			action={
-				<Button size="small" {...api.getActionTriggerProps()} color="inherit" />
-			}
 			sx={{ width: "100%" }}
 		>
 			{api.title ? <AlertTitle>{api.title}</AlertTitle> : null}
-			{api.description}
+			<CustomMarkdown>{api.description}</CustomMarkdown>
 		</Alert>
 	);
 }
