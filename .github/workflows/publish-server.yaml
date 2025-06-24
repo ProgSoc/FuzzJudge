@@ -133,6 +133,7 @@ jobs:
         with:
           tags: ${{ steps.meta-release.outputs.tags }}
           push: true
+          context: .
           target: release
           labels: ${{ steps.meta-release.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:latest
@@ -142,6 +143,7 @@ jobs:
         with:
           tags: ${{ steps.meta-release-runtimes.outputs.tags }}
           push: true
+          context: .
           target: release-runtimes
           labels: ${{ steps.meta-release-runtimes.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE }}:runtimes-latest
