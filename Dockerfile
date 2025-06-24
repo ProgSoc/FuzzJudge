@@ -44,9 +44,9 @@ RUN apk add --no-cache \
     g++ \
     make \
     deno
-
+USER bun
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-
+USER root
 COPY --from=install-prod /temp/prod/node_modules node_modules
 COPY ./server/dist server/dist
 COPY ./server/migrations server/migrations
