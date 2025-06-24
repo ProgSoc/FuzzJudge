@@ -11,13 +11,30 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import useDownloadText from "@/hooks/useDownloadText";
 import CheckIcon from "@mui/icons-material/Check";
 import difficultyToLabel from "@/utils/difficultyToLabel";
+import { userQueries } from "@/queries/user.query";
+import { clockQueryKeys } from "@/queries/clock.query";
+import type { ClockSubscriptionSubscription } from "@/gql";
+import { isQuestionsAvailable } from "@/hooks/useQuestionsAvailable";
 
 export const Route = createFileRoute("/problems/$slug")({
 	component: RouteComponent,
 	pendingComponent: PendingComponent,
 	errorComponent: ErrorComponent,
 	loader: async ({ params, context: { queryClient } }) => {
-		queryClient.prefetchQuery(problemQuery.problemDetails(params.slug));
+		const [currentUser, clockData] = await Promise.all([
+			queryClient.ensureQueryData(userQueries.me()),
+			queryClient.getQueryData<ClockSubscriptionSubscription>(
+				clockQueryKeys.subscription(),
+			),
+		]);
+
+		const isAvailable = isQuestionsAvailable(
+			clockData?.clock,
+			currentUser?.data?.me?.role,
+		);
+
+		if (isAvailable)
+			queryClient.prefetchQuery(problemQuery.problemDetails(params.slug));
 	},
 });
 
