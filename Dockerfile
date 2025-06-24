@@ -62,11 +62,7 @@ RUN apk add --no-cache \
     make \
     deno
 
-USER bun
-
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-
-
 
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/server/dist server/dist
@@ -74,10 +70,7 @@ COPY --from=prerelease /usr/src/app/server/migrations server/migrations
 COPY --from=prerelease /usr/src/app/package.json package.json
 COPY --from=prerelease /usr/src/app/server/package.json server/package.json
 
-# run the app
-USER bun
-
 ENV PATH="/home/bun/.cargo/bin:$PATH"
-
+USER bun
 EXPOSE 1989/tcp
 ENTRYPOINT [ "bun", "run", "start" ]
