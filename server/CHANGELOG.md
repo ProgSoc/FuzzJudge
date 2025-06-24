@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.26
+
+### Patch Changes
+
+- [`476bf85`](https://github.com/ProgSoc/FuzzJudge/commit/476bf85e7dff6b899448d16c3475e51bf47b9817) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Path Context
+
 ## 0.5.25
 
 ### Patch Changes
