@@ -18,7 +18,7 @@
     },
     "clients/fj-admin-html": {
       "name": "@progsoc/fj-admin-html",
-      "version": "0.5.20",
+      "version": "0.5.26",
       "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
@@ -33,7 +33,7 @@
     },
     "clients/fj-react": {
       "name": "@progsoc/fj-react",
-      "version": "0.5.20",
+      "version": "0.5.26",
       "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.0",
@@ -84,13 +84,13 @@
         "typescript": "5.8.3",
         "typescript-eslint": "8.35.0",
         "vite": "6.3.5",
-        "vite-plugin-graphql-codegen": "3.6.1",
+        "vite-plugin-graphql-codegen": "3.6.2",
         "vite-tsconfig-paths": "5.1.4",
       },
     },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
-      "version": "0.5.20",
+      "version": "0.5.26",
       "dependencies": {
         "@tanstack/svelte-query": "5.81.2",
         "@tanstack/svelte-query-devtools": "5.81.2",
@@ -117,7 +117,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.5.20",
+      "version": "0.5.26",
       "bin": "dist/index.js",
       "dependencies": {
         "@graphql-tools/utils": "10.8.6",
@@ -1918,7 +1918,7 @@
 
     "vite": ["vite@6.3.5", "", { "dependencies": { "esbuild": "^0.25.0", "fdir": "^6.4.4", "picomatch": "^4.0.2", "postcss": "^8.5.3", "rollup": "^4.34.9", "tinyglobby": "^0.2.13" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "peerDependencies": { "@types/node": "^18.0.0 || ^20.0.0 || >=22.0.0", "jiti": ">=1.21.0", "less": "*", "lightningcss": "^1.21.0", "sass": "*", "sass-embedded": "*", "stylus": "*", "sugarss": "*", "terser": "^5.16.0", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["@types/node", "jiti", "less", "lightningcss", "sass", "sass-embedded", "stylus", "sugarss", "terser", "tsx", "yaml"], "bin": { "vite": "bin/vite.js" } }, "sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ=="],
 
-    "vite-plugin-graphql-codegen": ["vite-plugin-graphql-codegen@3.6.1", "", { "peerDependencies": { "@graphql-codegen/cli": ">=1.0.0 <6.0.0", "graphql": ">=14.0.0 <17.0.0", "vite": ">=2.7.0 <7.0.0" } }, "sha512-6uTRv8jD1pp9kt6StjOL6BGj166qVXmRwe06m9I1qtxjIVf+i7aF95gFv0NKxhEXXaDr1hFVlpp+3Ts+SQAy4g=="],
+    "vite-plugin-graphql-codegen": ["vite-plugin-graphql-codegen@3.6.2", "", { "peerDependencies": { "@graphql-codegen/cli": ">=1.0.0 <6.0.0", "graphql": ">=14.0.0 <17.0.0", "vite": ">=2.7.0 <8.0.0" } }, "sha512-vqgfRnFJRflFVFpLfPL7jp3IuLmKAMmW5QcfUfM/+1dUCIe45b/3Ss600JS/JE40HoByqVlJq7KlIoLX9m0lPg=="],
 
     "vite-tsconfig-paths": ["vite-tsconfig-paths@5.1.4", "", { "dependencies": { "debug": "^4.1.1", "globrex": "^0.1.2", "tsconfck": "^3.0.3" }, "peerDependencies": { "vite": "*" }, "optionalPeers": ["vite"] }, "sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w=="],
 
