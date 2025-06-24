@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.25
+
+### Patch Changes
+
+- [`c96c64f`](https://github.com/ProgSoc/FuzzJudge/commit/c96c64ff80f959420d01ec2c0dcf523119b9e30d) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Try again
+
 ## 0.5.24
 
 ### Patch Changes
