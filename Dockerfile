@@ -5,14 +5,7 @@ WORKDIR /usr/src/app
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lock /temp/dev/
-COPY clients/fj-admin-html/package.json /temp/dev/clients/fj-admin-html/
-COPY clients/fj-svelte/package.json /temp/dev/clients/fj-svelte/
-COPY clients/fj-react/package.json /temp/dev/clients/fj-react/
-COPY server/package.json /temp/dev/server/
-RUN cd /temp/dev && bun install --frozen-lockfile
+FROM base AS install-prod
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
@@ -23,23 +16,13 @@ COPY clients/fj-svelte/package.json /temp/prod/clients/fj-svelte/
 COPY clients/fj-react/package.json /temp/prod/clients/fj-react/
 RUN cd /temp/prod && bun install --frozen-lockfile --production --filter @progsoc/fuzzjudge-server
 
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
-
-# [optional] tests & build
-ENV NODE_ENV=production
-RUN bun run -F @progsoc/* build
-
 # copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/server/dist server/dist
-COPY --from=prerelease /usr/src/app/server/migrations server/migrations
-COPY --from=prerelease /usr/src/app/package.json package.json
-COPY --from=prerelease /usr/src/app/server/package.json server/package.json
+COPY --from=install-prod /temp/prod/node_modules node_modules
+COPY server/dist server/dist
+COPY server/migrations server/migrations
+COPY package.json package.json
+COPY server/package.json server/package.json
 
 # run the app
 USER bun
@@ -64,11 +47,11 @@ RUN apk add --no-cache \
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
 
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/server/dist server/dist
-COPY --from=prerelease /usr/src/app/server/migrations server/migrations
-COPY --from=prerelease /usr/src/app/package.json package.json
-COPY --from=prerelease /usr/src/app/server/package.json server/package.json
+COPY --from=install-prod /temp/prod/node_modules node_modules
+COPY server/dist server/dist
+COPY server/migrations server/migrations
+COPY package.json package.json
+COPY server/package.json server/package.json
 
 ENV PATH="/home/bun/.cargo/bin:$PATH"
 USER bun

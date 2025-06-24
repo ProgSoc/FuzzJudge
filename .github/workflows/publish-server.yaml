@@ -76,9 +76,19 @@ jobs:
     env:
       IMAGE: ghcr.io/progsoc/fuzzjudge
       REGISTRY: ghcr.io
+      NODE_ENV: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+      - name: Build
+        run: bun run -F @progsoc/* build
 
       - name: Docker Meta Release
         id: meta-release
