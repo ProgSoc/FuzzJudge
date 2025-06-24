@@ -5,11 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 export default function useCreateBroadcast() {
 	return useMutation({
 		mutationFn: client.CreateBroadcast,
-		onSuccess: () => {
-			toaster.success({
-				description: "Broadcast created successfully!",
-			});
-		},
+		onSuccess: () => {},
 		onError: (error) => {
 			toaster.error({
 				description: `Failed to create broadcast: ${error.message}`,
