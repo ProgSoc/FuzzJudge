@@ -1,5 +1,7 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.27
+
 ## 0.5.26
 
 ### Patch Changes
