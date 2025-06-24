@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.24
+
+### Patch Changes
+
+- [`1ae89f1`](https://github.com/ProgSoc/FuzzJudge/commit/1ae89f1f7832bf4eabbf6ceee29e1391786118ff) Thanks [@sebasptsch](https://github.com/sebasptsch)! - much improved build process (build in runner)
+
 ## 0.5.23
 
 ### Patch Changes
