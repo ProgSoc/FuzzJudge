@@ -8,6 +8,7 @@ import {
 import { getUserFromUsername, getUserPasswordHash } from "@/auth/user";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
+
 export const login: NonNullable<MutationResolvers["login"]> = async (
 	_parent,
 	{ username, password },

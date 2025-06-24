@@ -90,17 +90,35 @@ export class Throttler<_Key> {
 	}
 }
 
+/**
+ * A token bucket that expires after a certain time.
+ * It is useful for rate limiting actions that should not be allowed
+ * to be performed more than a certain number of times in a given time frame.
+ */
 export class ExpiringTokenBucket<_Key> {
 	public max: number;
 	public expiresInSeconds: number;
 
 	private storage = new Map<_Key, ExpiringBucket>();
 
+	/**
+	 * Creates a new ExpiringTokenBucket.
+	 * @param max maximum number of tokens in the bucket
+	 * @param expiresInSeconds time in seconds after which the bucket expires and is reset
+	 */
 	constructor(max: number, expiresInSeconds: number) {
 		this.max = max;
 		this.expiresInSeconds = expiresInSeconds;
 	}
 
+	/**
+	 * Checks if the bucket has enough tokens to consume a certain cost.
+	 * If the bucket does not exist, it is considered valid.
+	 * If the bucket has expired, it is also considered valid.
+	 * @param key unique identifier for the bucket
+	 * @param cost number of tokens to check
+	 * @returns true if the bucket has enough tokens, false otherwise
+	 */
 	public check(key: _Key, cost: number): boolean {
 		const bucket = this.storage.get(key) ?? null;
 		const now = Date.now();
@@ -113,6 +131,14 @@ export class ExpiringTokenBucket<_Key> {
 		return bucket.count >= cost;
 	}
 
+	/**
+	 * Consumes a certain number of tokens from the bucket.
+	 * If the bucket does not exist, it is created with the maximum number of tokens minus the cost.
+	 * If the bucket has expired, it is reset to the maximum number of tokens.
+	 * @param key unique identifier for the bucket
+	 * @param cost number of tokens to consume
+	 * @returns true if the tokens were successfully consumed, false otherwise
+	 */
 	public consume(key: _Key, cost: number): boolean {
 		let bucket = this.storage.get(key) ?? null;
 		const now = Date.now();
@@ -135,6 +161,10 @@ export class ExpiringTokenBucket<_Key> {
 		return true;
 	}
 
+	/**
+	 * Resets the bucket, removing it from storage.
+	 * @param key unique identifier for the bucket
+	 */
 	public reset(key: _Key): void {
 		this.storage.delete(key);
 	}

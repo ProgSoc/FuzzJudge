@@ -7,6 +7,10 @@ import { calculateScoreboard, writeScoreboardToFile } from "@/services/score";
 import { postSubmission, solved } from "@/services/submission.service";
 import { GraphQLError } from "graphql";
 import type { MutationResolvers } from "./../../../types.generated";
+import { ExpiringTokenBucket } from "@/lib/rate-limit";
+
+// you can submit 5 times every 30 seconds
+const judgingTokenBucket = new ExpiringTokenBucket<number>(5, 30);
 
 export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	_parent,
@@ -27,8 +31,12 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 		throw new GraphQLError("You are not in a team");
 	}
 
-	if (await solved({ team: userTeam.id, prob: slug })) {
+	if (await solved({ team: teamId, prob: slug })) {
 		throw new GraphQLError("You already solved this problem");
+	}
+
+	if (!judgingTokenBucket.check(teamId, 1)) {
+		throw new GraphQLError("You are submitting too fast, please wait a bit");
 	}
 
 	const time = new Date();
@@ -42,6 +50,10 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 		throw new GraphQLError("Problem not found");
 	}
 
+	if (!judgingTokenBucket.consume(teamId, 1)) {
+		throw new GraphQLError("You are submitting too fast, please wait a bit");
+	}
+
 	const t0 = performance.now();
 	const judgedProblem = await judgeProblem(competitionRoot, slug, seed, output);
 	const t1 = performance.now();
@@ -50,7 +62,7 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 
 	if (correct) {
 		const submission = await postSubmission({
-			team: userTeam.id,
+			team: teamId,
 			prob: slug,
 			time: time.toString(),
 			out: output,
@@ -59,6 +71,8 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 			vler: "",
 			vlms: t1 - t0,
 		});
+
+		judgingTokenBucket.reset(teamId);
 
 		console.log(`✅ Problem ${submission.id} solved by ${user.name}`);
 
@@ -79,7 +93,7 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	const { errors } = judgedProblem;
 
 	const submission = await postSubmission({
-		team: userTeam.id,
+		team: teamId,
 		prob: slug,
 		time: time.toString(),
 		out: output,
