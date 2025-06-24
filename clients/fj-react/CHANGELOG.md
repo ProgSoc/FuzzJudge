@@ -1,5 +1,11 @@
 # @progsoc/fj-react
 
+## 0.5.27
+
+### Patch Changes
+
+- [#368](https://github.com/ProgSoc/FuzzJudge/pull/368) [`d142425`](https://github.com/ProgSoc/FuzzJudge/commit/d1424259e6431350f4783c69dc914611d901bcd5) Thanks [@renovate](https://github.com/apps/renovate)! - fix(deps): update zag-js monorepo to v1.17.1
+
 ## 0.5.26
 
 ## 0.5.25
