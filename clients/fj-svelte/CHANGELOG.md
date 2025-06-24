@@ -1,5 +1,11 @@
 # @progsoc/fj-svelte
 
+## 0.5.21
+
+### Patch Changes
+
+- [`04c1fc0`](https://github.com/ProgSoc/FuzzJudge/commit/04c1fc073c116db77af70518facf0a9d1a08716c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add broadcasts
+
 ## 0.5.20
 
 ## 0.5.19

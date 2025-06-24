@@ -1,5 +1,15 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.21
+
+### Patch Changes
+
+- [`4b4e6cf`](https://github.com/ProgSoc/FuzzJudge/commit/4b4e6cff00e1c9674c8cbcbe82531f0e2a4d8d10) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Only rank returned scoreboard rows
+
+- [`e3a691d`](https://github.com/ProgSoc/FuzzJudge/commit/e3a691d4616fa6bc6e2d27bbdf3dc33805f9c0a3) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Rate limit judging
+
+- [`04c1fc0`](https://github.com/ProgSoc/FuzzJudge/commit/04c1fc073c116db77af70518facf0a9d1a08716c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add broadcasts
+
 ## 0.5.20
 
 ## 0.5.19
