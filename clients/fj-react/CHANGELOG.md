@@ -1,5 +1,13 @@
 # @progsoc/fj-react
 
+## 0.5.21
+
+### Patch Changes
+
+- [`540925b`](https://github.com/ProgSoc/FuzzJudge/commit/540925bd4e339903afa66d27068e30307785bcc1) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix loading state for problems
+
+- [`04c1fc0`](https://github.com/ProgSoc/FuzzJudge/commit/04c1fc073c116db77af70518facf0a9d1a08716c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add broadcasts
+
 ## 0.5.20
 
 ### Patch Changes
