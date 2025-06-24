@@ -9,20 +9,20 @@ FROM base AS install-prod
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
-COPY package.json bun.lock /temp/prod/
-COPY server/package.json /temp/prod/server/
-COPY clients/fj-admin-html/package.json /temp/prod/clients/fj-admin-html/
-COPY clients/fj-svelte/package.json /temp/prod/clients/fj-svelte/
-COPY clients/fj-react/package.json /temp/prod/clients/fj-react/
+COPY ./package.json bun.lock /temp/prod/
+COPY ./server/package.json /temp/prod/server/
+COPY ./clients/fj-admin-html/package.json /temp/prod/clients/fj-admin-html/
+COPY ./clients/fj-svelte/package.json /temp/prod/clients/fj-svelte/
+COPY ./clients/fj-react/package.json /temp/prod/clients/fj-react/
 RUN cd /temp/prod && bun install --frozen-lockfile --production --filter @progsoc/fuzzjudge-server
 
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install-prod /temp/prod/node_modules node_modules
-COPY server/dist server/dist
-COPY server/migrations server/migrations
-COPY package.json package.json
-COPY server/package.json server/package.json
+COPY ./server/dist server/dist
+COPY ./server/migrations server/migrations
+COPY ./package.json package.json
+COPY ./server/package.json server/package.json
 
 # run the app
 USER bun
@@ -48,10 +48,10 @@ RUN apk add --no-cache \
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
 
 COPY --from=install-prod /temp/prod/node_modules node_modules
-COPY server/dist server/dist
-COPY server/migrations server/migrations
-COPY package.json package.json
-COPY server/package.json server/package.json
+COPY ./server/dist server/dist
+COPY ./server/migrations server/migrations
+COPY ./package.json package.json
+COPY ./server/package.json server/package.json
 
 ENV PATH="/home/bun/.cargo/bin:$PATH"
 USER bun
