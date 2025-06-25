@@ -1,5 +1,11 @@
 # @progsoc/fuzzjudge-server
 
+## 0.5.28
+
+### Patch Changes
+
+- [`439e32e`](https://github.com/ProgSoc/FuzzJudge/commit/439e32e2a4b1e7ac80f93e04a034f657ecc61b92) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix password hashing issue
+
 ## 0.5.27
 
 ## 0.5.26
