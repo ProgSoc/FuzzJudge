@@ -6,9 +6,10 @@ import { IconButton, Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Fragment, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Done from "@mui/icons-material/Done";
 import { LinkIconButton } from "@/components/LinkIconButton";
+import Close from "@mui/icons-material/Close";
 
 export const Route = createFileRoute("/leaderboard")({
 	beforeLoad: () => ({
@@ -62,7 +63,9 @@ function RouteComponent() {
 										<Done />
 									</IconButton>
 								) : (
-									<Fragment />
+									<IconButton aria-label="solved" color="inherit">
+										<Close />
+									</IconButton>
 								)}
 							</Tooltip>
 						),
