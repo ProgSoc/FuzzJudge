@@ -59,6 +59,7 @@ export default function SubmissionArea(props: { problemSlug: string }) {
 				multiline
 				label="Code"
 				helperText="Enter the code used to solve the problem."
+				maxRows={10}
 				slotProps={{
 					input: { style: { fontFamily: "monospace" } },
 				}}
@@ -69,6 +70,7 @@ export default function SubmissionArea(props: { problemSlug: string }) {
 				multiline
 				label="Code Output"
 				helperText="Enter the output that your code produced to solve the problem."
+				maxRows={4}
 				slotProps={{
 					input: { style: { fontFamily: "monospace" } },
 				}}

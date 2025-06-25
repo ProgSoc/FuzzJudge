@@ -6,19 +6,31 @@ import { submissionQueries } from "@/queries/submission.query";
 import { teamQueries } from "@/queries/team.query";
 import { MenuItem, Stack, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import {
+	Outlet,
+	createFileRoute,
+	stripSearchParams,
+} from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { z } from "zod";
+import { fallback } from "@tanstack/zod-adapter";
 
 export const Route = createFileRoute("/admin/submissions")({
 	beforeLoad: () => ({
 		getTitle: () => "Submissions",
 	}),
 	validateSearch: z.object({
-		teamId: z.coerce.number().int().optional(),
-		problemSlug: z.string().optional(),
+		teamId: fallback(z.coerce.number().optional(), undefined),
+		problemSlug: fallback(z.string().optional(), undefined),
 	}),
+	search: {
+		middlewares: [
+			stripSearchParams({
+				problemSlug: "",
+			}),
+		],
+	},
 	component: RouteComponent,
 });
 
@@ -77,16 +89,19 @@ function TeamSelect() {
 			value={teamId ?? ""}
 			helperText="Select a team to filter submissions"
 			onChange={(e) => {
-				const newTeamId = e.target.value
-					? Number.parseInt(e.target.value)
-					: undefined;
+				try {
+					const newTeamId =
+						e.target.value !== "" ? Number.parseInt(e.target.value) : undefined;
 
-				navigate({
-					search: (prev) => ({
-						...prev,
-						teamId: newTeamId,
-					}),
-				});
+					navigate({
+						search: (prev) => ({
+							...prev,
+							teamId: newTeamId,
+						}),
+					});
+				} catch (error) {
+					console.error("Error parsing team ID:", error);
+				}
 			}}
 		>
 			<MenuItem value="">
@@ -118,7 +133,7 @@ function ProblemSelect() {
 				navigate({
 					search: (prev) => ({
 						...prev,
-						problemSlug: newProblemSlug,
+						problemSlug: newProblemSlug !== "" ? newProblemSlug : undefined,
 					}),
 				});
 			}}

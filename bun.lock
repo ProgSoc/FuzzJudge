@@ -18,7 +18,7 @@
     },
     "clients/fj-admin-html": {
       "name": "@progsoc/fj-admin-html",
-      "version": "0.5.26",
+      "version": "0.5.28",
       "devDependencies": {
         "@graphql-codegen/cli": "5.0.7",
         "@graphql-codegen/typescript": "4.1.6",
@@ -33,7 +33,7 @@
     },
     "clients/fj-react": {
       "name": "@progsoc/fj-react",
-      "version": "0.5.26",
+      "version": "0.5.28",
       "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.0",
@@ -48,6 +48,7 @@
         "@tanstack/react-router": "1.121.34",
         "@tanstack/react-router-devtools": "1.121.34",
         "@tanstack/react-table": "8.21.3",
+        "@tanstack/zod-adapter": "^1.121.34",
         "@zag-js/react": "1.17.1",
         "@zag-js/toast": "1.17.1",
         "graphql": "16.11.0",
@@ -90,7 +91,7 @@
     },
     "clients/fj-svelte": {
       "name": "@progsoc/fj-svelte",
-      "version": "0.5.26",
+      "version": "0.5.28",
       "dependencies": {
         "@tanstack/svelte-query": "5.81.2",
         "@tanstack/svelte-query-devtools": "5.81.2",
@@ -117,7 +118,7 @@
     },
     "server": {
       "name": "@progsoc/fuzzjudge-server",
-      "version": "0.5.26",
+      "version": "0.5.28",
       "bin": "dist/index.js",
       "dependencies": {
         "@graphql-tools/utils": "10.8.6",
@@ -759,6 +760,8 @@
     "@tanstack/table-core": ["@tanstack/table-core@8.21.3", "", {}, "sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg=="],
 
     "@tanstack/virtual-file-routes": ["@tanstack/virtual-file-routes@1.121.21", "", {}, "sha512-3nuYsTyaq6ZN7jRZ9z6Gj3GXZqBOqOT0yzd/WZ33ZFfv4yVNIvsa5Lw+M1j3sgyEAxKMqGu/FaNi7FCjr3yOdw=="],
+
+    "@tanstack/zod-adapter": ["@tanstack/zod-adapter@1.121.34", "", { "peerDependencies": { "@tanstack/react-router": ">=1.43.2", "zod": "^3.23.8" } }, "sha512-tUFjmJL4e3S6Au1KH0xCM12OejsnnPUS8dTfKlzYCnYmwMLHoXGOKKwBYtOvypZqi4EXrtoajI7CSneVA7bl0A=="],
 
     "@ts-morph/common": ["@ts-morph/common@0.23.0", "", { "dependencies": { "fast-glob": "^3.3.2", "minimatch": "^9.0.3", "mkdirp": "^3.0.1", "path-browserify": "^1.0.1" } }, "sha512-m7Lllj9n/S6sOkCkRftpM7L24uvmfXQFedlW/4hENcuJH1HHm9u5EgxZb9uVjQSCGrbBWBkOGgcTxNg36r6ywA=="],
 

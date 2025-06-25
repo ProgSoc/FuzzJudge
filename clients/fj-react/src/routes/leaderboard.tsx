@@ -8,7 +8,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Fragment, useEffect, useMemo } from "react";
 import Done from "@mui/icons-material/Done";
-import Close from "@mui/icons-material/Close";
 import { LinkIconButton } from "@/components/LinkIconButton";
 
 export const Route = createFileRoute("/leaderboard")({
