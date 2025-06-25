@@ -1,5 +1,13 @@
 # @progsoc/fj-react
 
+## 0.5.29
+
+### Patch Changes
+
+- [`e61f555`](https://github.com/ProgSoc/FuzzJudge/commit/e61f555095ab6d8ff05598104321727b8d514ee1) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix multiline
+
+- [`6778911`](https://github.com/ProgSoc/FuzzJudge/commit/67789110b0906c921e91d63648ac379a0388196c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Bump Leaderboard
+
 ## 0.5.28
 
 ## 0.5.27
