@@ -1,7 +1,10 @@
 import Datatable from "@/components/Datatable";
 import { LinkButton } from "@/components/LinkButton";
 import type { SubmissionsQueryQuery } from "@/gql";
+import { problemQuery } from "@/queries/problem.query";
 import { submissionQueries } from "@/queries/submission.query";
+import { teamQueries } from "@/queries/team.query";
+import { MenuItem, Stack, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -60,6 +63,78 @@ const createColumns = (teamId?: number, problemSlug?: string) => [
 	}),
 ];
 
+function TeamSelect() {
+	const teamId = Route.useSearch({ select: (s) => s.teamId });
+
+	const teamsQuery = useQuery(teamQueries.list());
+
+	const navigate = Route.useNavigate();
+
+	return (
+		<TextField
+			select
+			label="Team"
+			value={teamId ?? ""}
+			helperText="Select a team to filter submissions"
+			onChange={(e) => {
+				const newTeamId = e.target.value
+					? Number.parseInt(e.target.value)
+					: undefined;
+
+				navigate({
+					search: (prev) => ({
+						...prev,
+						teamId: newTeamId,
+					}),
+				});
+			}}
+		>
+			<MenuItem value="">
+				<em>All Teams</em>
+			</MenuItem>
+			{teamsQuery.data?.map((team) => (
+				<MenuItem key={team.id} value={team.id}>
+					{team.name}
+				</MenuItem>
+			))}
+		</TextField>
+	);
+}
+
+function ProblemSelect() {
+	const problemSlug = Route.useSearch({ select: (s) => s.problemSlug });
+	const problemsQuery = useQuery(problemQuery.problemList());
+	const navigate = Route.useNavigate();
+
+	return (
+		<TextField
+			select
+			label="Problem"
+			value={problemSlug ?? ""}
+			helperText="Select a problem to filter submissions"
+			onChange={(e) => {
+				const newProblemSlug = e.target.value || undefined;
+
+				navigate({
+					search: (prev) => ({
+						...prev,
+						problemSlug: newProblemSlug,
+					}),
+				});
+			}}
+		>
+			<MenuItem value="">
+				<em>All Problems</em>
+			</MenuItem>
+			{problemsQuery.data?.map((problem) => (
+				<MenuItem key={problem.slug} value={problem.slug}>
+					{problem.name}
+				</MenuItem>
+			))}
+		</TextField>
+	);
+}
+
 function RouteComponent() {
 	const { teamId, problemSlug } = Route.useSearch();
 
@@ -77,6 +152,10 @@ function RouteComponent() {
 
 	return (
 		<>
+			<Stack direction="row" spacing={2} mb={2}>
+				<TeamSelect />
+				<ProblemSelect />
+			</Stack>
 			<Datatable columns={columns} data={submissionsQuery.data ?? []} />
 			<Outlet />
 		</>

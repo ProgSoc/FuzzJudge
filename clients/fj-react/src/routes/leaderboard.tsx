@@ -6,7 +6,7 @@ import { IconButton, Paper, Tooltip } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import Done from "@mui/icons-material/Done";
 import Close from "@mui/icons-material/Close";
 import { LinkIconButton } from "@/components/LinkIconButton";
@@ -63,10 +63,7 @@ function RouteComponent() {
 										<Done />
 									</IconButton>
 								) : (
-									// Cross emoji for unsolved problems
-									<IconButton aria-label="unsolved" color="error">
-										<Close />
-									</IconButton>
+									<Fragment />
 								)}
 							</Tooltip>
 						),
