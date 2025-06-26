@@ -183,7 +183,7 @@ Important things to remember when preparing problems:
 
 ### Handling Disputes
 When a team has a dispute, there are a few things that should be considered:
-1. If a competitor has been working to solved a problem for a long time and now believes the problem's implementation is incorrect, they will be extremely frustrated regardless of who is at fault.
+1. If a competitor has been working to solve a problem for a long time and now believes the problem's implementation is incorrect, they will be extremely frustrated regardless of who is at fault.
 1. The competitor's head is probably still deep in the problem itself and not thinking about the hours of volunteer work that went into creating it.
 
 As an organiser, it's your responsibility to be empathetic towards the competitor's frustration and give them some leniency. If possible, manually review their solution being generous about other little mistakes and try your hardest to award them the points.
