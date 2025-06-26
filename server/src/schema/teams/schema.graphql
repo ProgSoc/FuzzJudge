@@ -1,19 +1,53 @@
 extend type Query {
+	"""
+	Fetch a list of all teams.
+	"""
 	teams: [Team!]! @auth(role: admin)
+	"""
+	Get a specific team by it's ID.
+	"""
 	team(id: Int!): Team! @auth(role: admin)
 }
 
 extend type Mutation {
+	"""
+	Create a new team with a name and an optional hidden status.
+	"""
 	createTeam(name: String!, hidden: Boolean): Team! @auth(role: admin)
+	"""
+	Update an existing team by its ID.
+	You can change the name and hidden status of the team.
+	"""
 	updateTeam(id: Int!, name: String, hidden: Boolean): Team! @auth(role: admin)
+	"""
+	Delete a team by it's ID.
+	"""
 	deleteTeam(id: Int!): Team! @auth(role: admin)
 }
 
 type Team {
+	"""
+	The unique identifier for the team.
+	"""
 	id: Int!
+	"""
+	The name of the team.
+	"""
 	name: String!
+	"""
+	The submissions linked to the team
+	"""
 	submissions(problemSlug: String): [Submission!]! @auth(role: admin)
+	"""
+	The members of the team.
+	"""
 	members: [User!]!
+	"""
+	Whether the team is hidden from the scoreboard.
+	"""
 	hidden: Boolean!
+	"""
+	The randomly generated seed for the team, used for fuzzing.
+	"""
 	seed: String! @auth(role: admin)
 }

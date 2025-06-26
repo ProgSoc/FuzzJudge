@@ -1,13 +1,29 @@
 extend type Subscription {
+	"""
+	Subscribe to receive updates about broadcasts and annoucements.
+	"""
 	broadcasts: Broadcast!
 }
 extend type Mutation {
+	"""
+	Create a new broadcast with a title and content.
+	This can be used to announce important information to all users.
+	"""
 	createBroadcast(title: String!, content: String!): Broadcast!
 		@auth(role: admin)
 }
 
 type Broadcast {
+	"""
+	The randomly generated ID of the broadcast.
+	"""
 	id: ID!
+	"""
+	The title of the broadcast
+	"""
 	title: String!
+	"""
+	The content of the broadcast.
+	"""
 	content: String!
 }

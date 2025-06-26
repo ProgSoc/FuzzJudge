@@ -1,8 +1,17 @@
 extend type Query {
+	"""
+	Fetch the current competition details.
+	"""
 	competition: Competition!
 }
 
 type Competition {
+	"""
+	The name of the competition
+	"""
 	name: String!
+	"""
+	The description of the competition
+	"""
 	instructions: String!
 }

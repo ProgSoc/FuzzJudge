@@ -1,10 +1,22 @@
 extend type Query {
+	"""
+	Get a list of all users in the system.
+	"""
 	users: [User!]! @auth(role: admin)
+	"""
+	Get a specific user by their ID.
+	"""
 	user(id: Int!): User! @auth(role: admin)
+	"""
+	Get the currently logged-in user.
+	"""
 	me: User
 }
 
 extend type Mutation {
+	"""
+	Create a new user with a name, username, password, role, and optional team ID.
+	"""
 	createUser(
 		name: String!
 		username: String!
@@ -12,6 +24,9 @@ extend type Mutation {
 		role: UserRole!
 		teamId: Int
 	): User! @auth(role: admin)
+	"""
+	Update an existing user by their ID.
+	"""
 	updateUser(
 		id: Int!
 		role: UserRole
@@ -20,23 +35,59 @@ extend type Mutation {
 		username: String
 		password: String
 	): User! @auth(role: admin)
+	"""
+	Delete a user by their ID.
+	"""
 	deleteUser(id: Int!): User! @auth(role: admin)
+	"""
+	Login to an account with a username and password.
+	"""
 	login(username: String!, password: String!): User!
+	"""
+	Register a new user with a username, password, and name.
+	"""
 	register(username: String!, password: String!, name: String!): User!
+	"""
+	Logout the currently logged-in user.
+	"""
 	logout: Boolean! @auth(role: competitor)
 }
 
 enum UserRole {
+	"""
+	Regular user, typically a competitor in the competition.
+	"""
 	competitor
+	"""
+	Administrator with elevated privileges, can manage users and teams.
+	"""
 	admin
 }
 
 type User {
+	"""
+	The name of the user. (Full name or display name)
+	"""
 	name: String!
+	"""
+	The unique identifier for the user.
+	"""
 	id: Int!
+	"""
+	The role of the user
+	"""
 	role: UserRole!
+	"""
+	The ID of the team that the user is associated with, if any.
+	"""
 	teamId: Int
+	"""
+	The team that the user is associated with, if any.
+	"""
 	team: Team @auth
+	"""
+	The username of the user, used for login.
+	"""
 	username: String!
 }
 

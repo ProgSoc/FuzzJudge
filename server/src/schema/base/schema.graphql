@@ -8,7 +8,13 @@ scalar File
 directive @deprecated(reason: String) on FIELD_DEFINITION | ENUM_VALUE
 
 extend type Query {
+	"""
+	Fetch the current version of the application.
+	"""
 	version: String!
 
+	"""
+	The liscense under which the application is distributed.
+	"""
 	header: String!
 }

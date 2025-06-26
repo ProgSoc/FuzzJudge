@@ -3,19 +3,32 @@ directive @auth(role: UserRole = competitor) on ARGUMENT_DEFINITION | FIELD_DEFI
 directive @clock on FIELD_DEFINITION
 
 type Broadcast {
+  """The content of the broadcast."""
   content: String!
+
+  """The randomly generated ID of the broadcast."""
   id: ID!
+
+  """The title of the broadcast"""
   title: String!
 }
 
 type Clock {
+  """The finish time of the competition clock"""
   finish: DateTime!
+
+  """The datetime when the clock was put on hold."""
   hold: DateTime
+
+  """The start time of the competition clock."""
   start: DateTime!
 }
 
 type Competition {
+  """The description of the competition"""
   instructions: String!
+
+  """The name of the competition"""
   name: String!
 }
 
@@ -24,120 +37,293 @@ scalar DateTime
 scalar File
 
 type JudgeErrorOutput {
+  """Additional errors to help diagnose the issue."""
   errors: String!
+
+  """
+  An error message indicating what went wrong during the judge operation.
+  """
   message: String!
 }
 
 union JudgeOutput = JudgeErrorOutput | JudgeSuccessOutput
 
 type JudgeSuccessOutput {
+  """A message indicating the success of the judge operation."""
   message: String!
 }
 
 type Mutation {
+  """Adjust the finish time of the competition clock."""
   adjustFinishTime(finishTime: DateTime!): Clock!
+
+  """Adjust the start time of the competition clock."""
   adjustStartTime(keepDuration: Boolean, startTime: DateTime!): Clock!
+
+  """
+  Create a new broadcast with a title and content.
+  This can be used to announce important information to all users.
+  """
   createBroadcast(content: String!, title: String!): Broadcast!
+
+  """Create a new team with a name and an optional hidden status."""
   createTeam(hidden: Boolean, name: String!): Team!
+
+  """
+  Create a new user with a name, username, password, role, and optional team ID.
+  """
   createUser(name: String!, password: String!, role: UserRole!, teamId: Int, username: String!): User!
+
+  """Delete a team by it's ID."""
   deleteTeam(id: Int!): Team!
+
+  """Delete a user by their ID."""
   deleteUser(id: Int!): User!
+
+  """Get a team's fuzz for a specific problem"""
   getAdminFuzz(slug: String!, teamId: Int!): String!
+
+  """
+  Pause the competition clock.
+  This can be used to temporarily stop the clock, for example during a break.
+  """
   holdClock: Clock!
+
+  """Submit a solution to a problem."""
   judge(code: String!, output: String!, slug: String!): JudgeOutput!
+
+  """Login to an account with a username and password."""
   login(password: String!, username: String!): User!
+
+  """Logout the currently logged-in user."""
   logout: Boolean!
+
+  """Override the judgement of a submission"""
   overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
+
+  """Register a new user with a username, password, and name."""
   register(name: String!, password: String!, username: String!): User!
+
+  """Resume the competition clock after it has been put on hold."""
   releaseClock(extendDuration: Boolean): Clock!
+
+  """Release the results for after the Competition ends."""
   releaseResults: Clock!
+
+  """
+  Update an existing team by its ID.
+  You can change the name and hidden status of the team.
+  """
   updateTeam(hidden: Boolean, id: Int!, name: String): Team!
+
+  """Update an existing user by their ID."""
   updateUser(id: Int!, name: String, password: String, role: UserRole, teamId: Int, username: String): User!
 }
 
 type Problem {
+  """
+  The difficulty level of the problem, represented as an integer from 0 to 3.
+  Tutorials are 0, easy problems are 1, medium problems are 2, and hard problems are 3.
+  """
   difficulty: Int!
+
+  """
+  Get the fuzz for a specific team.
+  This is used to provide a unique identifier for the team to use in their solution.
+  """
   fuzz(teamId: Int): String!
+
+  """A single emoji that represents the problem."""
   icon: String!
+
+  """
+  The instructions for the problem, contextualizing the problem and providing necessary details.
+  """
   instructions: String!
+
+  """The name of the problem."""
   name: String!
+
+  """The number of points awarded for solving the problem."""
   points: Int!
+
+  """The unique identifier for the problem, suitable for use in urls."""
   slug: String!
+
+  """The status of whether the problem has been solved by the team."""
   solved: Boolean
 }
 
 type ProblemScore {
+  """The total penalty time for the problem."""
   penalty: Float!
+
+  """The number of points awarded for solving the problem."""
   points: Int!
+
+  """The problem that the score is linked to."""
   problem: Problem!
+
+  """The slug of the problem, suitable for use in URLs."""
   slug: String!
+
+  """Whether the problem has been solved by the team."""
   solved: Boolean!
+
+  """The number of attempts made by the team to solve the problem."""
   tries: Int!
 }
 
 type Query {
+  """Fetch the current competition details."""
   competition: Competition!
+
+  """The liscense under which the application is distributed."""
   header: String!
+
+  """Get the currently logged-in user."""
   me: User
+
+  """Get a specific problem by its slug"""
   problem(slug: String!): Problem!
+
+  """Get a list of all problems"""
   problems: [Problem!]!
+
+  """Get a specific submission by its ID"""
   submission(id: Int!): Submission
+
+  """List all submissions"""
   submissions(problemSlug: String, teamId: Int): [Submission!]!
+
+  """Get a specific team by it's ID."""
   team(id: Int!): Team!
+
+  """Fetch a list of all teams."""
   teams: [Team!]!
+
+  """Get a specific user by their ID."""
   user(id: Int!): User!
+
+  """Get a list of all users in the system."""
   users: [User!]!
+
+  """Fetch the current version of the application."""
   version: String!
 }
 
 type ScoreboardRow {
+  """The total penalty time for the team"""
   penalty: Float!
+
+  """The total points scored by the team"""
   points: Int!
+
+  """The list of problems, number of tries, and scores for each problem"""
   problems: [ProblemScore!]!
+
+  """The rank of the team on the scoreboard"""
   rank: Int!
+
+  """The team that this row is linked to"""
   team: Team!
+
+  """The Id of the team"""
   teamId: Int!
 }
 
 type Submission {
+  """The source code submitted with the solution."""
   code: String
+
+  """The unique identifier for the submission."""
   id: Int!
+
+  """
+  The result of the submission, indicating whether it was successful or not.
+  """
   ok: Boolean
+
+  """The output of the submission, if any."""
   out: String
+
+  """The problem that was attempted in the submission."""
   problem: Problem!
+
+  """The slug of the problem that the submission is for."""
   problemSlug: String!
+
+  """The team that made the submission."""
   team: Team!
+
+  """The ID of the team that made the submission."""
   teamId: Int!
+
+  """The time that the submission was made."""
   time: DateTime!
+
+  """The error output of the submission"""
   vler: String
+
+  """The amount of time taken the process the submission using the fuzzer."""
   vlms: Float
 }
 
 type Subscription {
+  """Subscribe to receive updates about broadcasts and annoucements."""
   broadcasts: Broadcast!
+
+  """Subscribe to updates about the competition clock updates."""
   clock: Clock!
+
+  """Subscribe to updates about the scoreboard."""
   scoreboard: [ScoreboardRow!]!
 }
 
 type Team {
+  """Whether the team is hidden from the scoreboard."""
   hidden: Boolean!
+
+  """The unique identifier for the team."""
   id: Int!
+
+  """The members of the team."""
   members: [User!]!
+
+  """The name of the team."""
   name: String!
+
+  """The randomly generated seed for the team, used for fuzzing."""
   seed: String!
+
+  """The submissions linked to the team"""
   submissions(problemSlug: String): [Submission!]!
 }
 
 type User {
+  """The unique identifier for the user."""
   id: Int!
+
+  """The name of the user. (Full name or display name)"""
   name: String!
+
+  """The role of the user"""
   role: UserRole!
+
+  """The team that the user is associated with, if any."""
   team: Team
+
+  """The ID of the team that the user is associated with, if any."""
   teamId: Int
+
+  """The username of the user, used for login."""
   username: String!
 }
 
 enum UserRole {
+  """Administrator with elevated privileges, can manage users and teams."""
   admin
+
+  """Regular user, typically a competitor in the competition."""
   competitor
 }

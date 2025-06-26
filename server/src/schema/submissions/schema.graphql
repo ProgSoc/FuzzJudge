@@ -1,24 +1,66 @@
 extend type Query {
+	"""
+	List all submissions
+	"""
 	submissions(teamId: Int, problemSlug: String): [Submission!]!
 		@auth(role: admin)
+	"""
+	Get a specific submission by its ID
+	"""
 	submission(id: Int!): Submission @auth(role: admin)
 }
 
 extend type Mutation {
+	"""
+	Override the judgement of a submission
+	"""
 	overrideJudge(submissionId: Int!, solved: Boolean!): Submission!
 		@auth(role: admin)
 }
 
 type Submission @auth(role: admin) {
+	"""
+	The unique identifier for the submission.
+	"""
 	id: Int!
+	"""
+	The ID of the team that made the submission.
+	"""
 	teamId: Int!
+	"""
+	The slug of the problem that the submission is for.
+	"""
 	problemSlug: String!
+	"""
+	The time that the submission was made.
+	"""
 	time: DateTime!
+	"""
+	The output of the submission, if any.
+	"""
 	out: String
+	"""
+	The source code submitted with the solution.
+	"""
 	code: String
+	"""
+	The result of the submission, indicating whether it was successful or not.
+	"""
 	ok: Boolean
+	"""
+	The error output of the submission
+	"""
 	vler: String
+	"""
+	The amount of time taken the process the submission using the fuzzer.
+	"""
 	vlms: Float
+	"""
+	The team that made the submission.
+	"""
 	team: Team! @auth
+	"""
+	The problem that was attempted in the submission.
+	"""
 	problem: Problem! @auth
 }

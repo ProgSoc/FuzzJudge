@@ -1,19 +1,47 @@
 extend type Subscription {
+	"""
+	Subscribe to updates about the competition clock updates.
+	"""
 	clock: Clock!
 }
 
 extend type Mutation {
+	"""
+	Pause the competition clock.
+	This can be used to temporarily stop the clock, for example during a break.
+	"""
 	holdClock: Clock! @auth(role: admin)
+	"""
+	Resume the competition clock after it has been put on hold.
+	"""
 	releaseClock(extendDuration: Boolean): Clock! @auth(role: admin)
+	"""
+	Adjust the start time of the competition clock.
+	"""
 	adjustStartTime(startTime: DateTime!, keepDuration: Boolean): Clock!
 		@auth(role: admin)
+	"""
+	Adjust the finish time of the competition clock.
+	"""
 	adjustFinishTime(finishTime: DateTime!): Clock! @auth(role: admin)
+	"""
+	Release the results for after the Competition ends.
+	"""
 	releaseResults: Clock! @auth(role: admin)
 }
 
 type Clock {
+	"""
+	The start time of the competition clock.
+	"""
 	start: DateTime!
+	"""
+	The finish time of the competition clock
+	"""
 	finish: DateTime!
+	"""
+	The datetime when the clock was put on hold.
+	"""
 	hold: DateTime
 }
 
