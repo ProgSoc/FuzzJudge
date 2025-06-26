@@ -23,7 +23,7 @@
 		"@tanstack/react-router": "1.121.34",
 		"@tanstack/react-router-devtools": "1.121.34",
 		"@tanstack/react-table": "8.21.3",
-		"@tanstack/zod-adapter": "^1.121.34",
+		"@tanstack/zod-adapter": "1.121.34",
 		"@zag-js/react": "1.17.1",
 		"@zag-js/toast": "1.17.1",
 		"graphql": "16.11.0",
