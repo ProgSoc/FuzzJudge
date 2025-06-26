@@ -1,5 +1,11 @@
 # @progsoc/fj-admin-html
 
+## 0.6.0
+
+### Minor Changes
+
+- [`aec3af6`](https://github.com/ProgSoc/FuzzJudge/commit/aec3af657103588b0b8fe3a40c61e2e93ce566a4) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change all Ids to strings and ulids
+
 ## 0.5.29
 
 ## 0.5.28
