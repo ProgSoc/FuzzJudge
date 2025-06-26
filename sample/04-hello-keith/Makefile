@@ -1,5 +1,5 @@
-prob.exe: prob.cpp
+prob: prob.cpp
 	g++ prob.cpp -o prob
 
-run: prob.exe
+run: prob
 	./prob $(METHOD) $(SEED)
