@@ -4,7 +4,7 @@ exec = ["run", "fuzz"]
 env = {}
 
 [judge]
-exec = ["run" "judge"]
+exec = ["run", "judge"]
 
 [problem]
 points = 2
