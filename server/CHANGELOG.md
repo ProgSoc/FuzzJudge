@@ -1,5 +1,15 @@
 # @progsoc/fuzzjudge-server
 
+## 0.6.0
+
+### Minor Changes
+
+- [`aec3af6`](https://github.com/ProgSoc/FuzzJudge/commit/aec3af657103588b0b8fe3a40c61e2e93ce566a4) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Change all Ids to strings and ulids
+
+### Patch Changes
+
+- [`b62b601`](https://github.com/ProgSoc/FuzzJudge/commit/b62b60125ba0047b435b56a16c179e1dee6b4fd8) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add comments to the graphql API definition
+
 ## 0.5.29
 
 ## 0.5.28
