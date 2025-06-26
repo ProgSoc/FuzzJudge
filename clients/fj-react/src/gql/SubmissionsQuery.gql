@@ -1,4 +1,4 @@
-query SubmissionsQuery($problemSlug: String, $teamId: Int) {
+query SubmissionsQuery($problemSlug: ID, $teamId: ID) {
 	submissions(problemSlug: $problemSlug, teamId: $teamId) {
 		id
 		ok

@@ -6,20 +6,18 @@ extend type Query {
 	"""
 	Get a specific problem by its slug
 	"""
-	problem(slug: String!): Problem!
+	problem(slug: ID!): Problem!
 }
 
 extend type Mutation {
 	"""
 	Submit a solution to a problem.
 	"""
-	judge(slug: String!, code: String!, output: String!): JudgeOutput!
-		@auth
-		@clock
+	judge(slug: ID!, code: String!, output: String!): JudgeOutput! @auth @clock
 	"""
 	Get a team's fuzz for a specific problem
 	"""
-	getAdminFuzz(slug: String!, teamId: Int!): String! @auth(role: admin)
+	getAdminFuzz(slug: ID!, teamId: ID!): String! @auth(role: admin)
 }
 
 union JudgeOutput = JudgeSuccessOutput | JudgeErrorOutput
@@ -46,7 +44,7 @@ type Problem @auth {
 	"""
 	The unique identifier for the problem, suitable for use in urls.
 	"""
-	slug: String!
+	slug: ID!
 	"""
 	A single emoji that represents the problem.
 	"""
@@ -76,5 +74,5 @@ type Problem @auth {
 	Get the fuzz for a specific team.
 	This is used to provide a unique identifier for the team to use in their solution.
 	"""
-	fuzz(teamId: Int @auth(role: admin)): String! @auth @clock
+	fuzz(teamId: ID @auth(role: admin)): String! @auth @clock
 }

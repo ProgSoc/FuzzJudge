@@ -1,4 +1,4 @@
-mutation DeleteTeam($id: Int!) {
+mutation DeleteTeam($id: ID!) {
 	deleteTeam(id: $id) {
 		id
 		name

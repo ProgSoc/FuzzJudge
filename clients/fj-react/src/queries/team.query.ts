@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 export const teamQueryKeys = {
 	root: ["team"],
 	list: () => [...teamQueryKeys.root, "list"],
-	detail: (teamId: number) => [...teamQueryKeys.root, "detail", teamId],
+	detail: (teamId: string) => [...teamQueryKeys.root, "detail", teamId],
 };
 
 export const teamQueries = {
@@ -14,7 +14,7 @@ export const teamQueries = {
 			queryFn: () => client.TeamsQuery(),
 			select: (data) => data.data.teams,
 		}),
-	detail: (teamId: number) =>
+	detail: (teamId: string) =>
 		queryOptions({
 			queryKey: teamQueryKeys.detail(teamId),
 			queryFn: () => client.TeamQuery({ teamId }),

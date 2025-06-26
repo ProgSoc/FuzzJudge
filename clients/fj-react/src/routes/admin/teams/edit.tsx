@@ -18,7 +18,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/admin/teams/edit")({
 	validateSearch: z.object({
-		teamId: z.coerce.number(),
+		teamId: z.string(),
 	}),
 	pendingComponent: PendingComponent,
 	component: RouteComponent,

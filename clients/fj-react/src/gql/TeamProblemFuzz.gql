@@ -1,4 +1,4 @@
-query TeamProblemFuzz($teamId: Int!, $slug: String!) {
+query TeamProblemFuzz($teamId: ID!, $slug: ID!) {
 	problem(slug: $slug) {
 		fuzz(teamId: $teamId)
 	}

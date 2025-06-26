@@ -6,11 +6,11 @@ export const submissionQueryKeys = {
 	root: ["submission"] as const,
 	list: (vars?: SubmissionsQueryQueryVariables) =>
 		[...submissionQueryKeys.root, "list", vars] as const,
-	submission: (submissionId: number) => [
+	submission: (submissionId: string) => [
 		...submissionQueryKeys.root,
 		submissionId,
 	],
-	submissionDetails: (submissionId: number) => [
+	submissionDetails: (submissionId: string) => [
 		...submissionQueryKeys.submission(submissionId),
 		"details",
 	],
@@ -23,7 +23,7 @@ export const submissionQueries = {
 			queryFn: () => client.SubmissionsQuery(vars),
 			select: (data) => data.data.submissions,
 		}),
-	submission: (submissionId: number) =>
+	submission: (submissionId: string) =>
 		queryOptions({
 			queryKey: submissionQueryKeys.submissionDetails(submissionId),
 			queryFn: () => client.SubmissionQuery({ id: submissionId }),

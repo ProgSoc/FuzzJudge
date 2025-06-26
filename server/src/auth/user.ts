@@ -21,7 +21,7 @@ export async function createUser(params: UserInsert): Promise<User> {
 }
 
 async function updateUserPassword(
-	userId: number,
+	userId: string,
 	password: string,
 ): Promise<void> {
 	const passwordHash = await hashPassword(password);
@@ -44,7 +44,7 @@ export const getUserFromUsername = async (
 	return userRow;
 };
 
-export async function getUserPasswordHash(userId: number): Promise<string> {
+export async function getUserPasswordHash(userId: string): Promise<string> {
 	const userRow = await db.query.userTable.findFirst({
 		where: eq(userTable.id, userId),
 		columns: {

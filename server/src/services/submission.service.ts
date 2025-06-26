@@ -10,13 +10,13 @@ interface SubmissionParams extends Omit<Submission, "out" | "code" | "vler"> {
 }
 
 export async function solved(params: {
-	team: number;
+	team: string;
 	prob: string;
 }): Promise<boolean> {
 	const solved = await db.query.submissionTable.findFirst({
 		where: (table, { and }) =>
 			and(
-				eq(table.team, params.team),
+				eq(table.teamId, params.team),
 				eq(table.prob, params.prob),
 				eq(table.ok, true),
 			),
@@ -26,11 +26,20 @@ export async function solved(params: {
 }
 
 export async function postSubmission(
-	{ code, ok, out, prob, team, time, vler, vlms }: Omit<SubmissionParams, "id">,
+	{
+		code,
+		ok,
+		out,
+		prob,
+		teamId,
+		time,
+		vler,
+		vlms,
+	}: Omit<SubmissionParams, "id">,
 	resubmit = false,
 ): Promise<Submission> {
 	if (resubmit && ok) {
-		if (!prob || !team)
+		if (!prob || !teamId)
 			throw new GraphQLError("Missing prob or team for resubmit");
 
 		const [submission] = await db
@@ -44,7 +53,7 @@ export async function postSubmission(
 			.where(
 				and(
 					eq(submissionTable.prob, prob),
-					eq(submissionTable.team, team),
+					eq(submissionTable.teamId, teamId),
 					eq(submissionTable.ok, true),
 				),
 			)
@@ -58,7 +67,7 @@ export async function postSubmission(
 	const [newSub] = await db
 		.insert(submissionTable)
 		.values({
-			team,
+			teamId,
 			prob,
 			time,
 			out,

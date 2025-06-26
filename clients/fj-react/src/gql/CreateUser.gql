@@ -1,7 +1,7 @@
 mutation CreateUser(
 	$username: String!
 	$password: String!
-	$teamId: Int
+	$teamId: ID
 	$role: UserRole!
 	$name: String!
 ) {

@@ -17,7 +17,7 @@ export const Team: TeamResolvers = {
 	},
 	submissions: async ({ id }, _arg) => {
 		const submission = await db.query.submissionTable.findMany({
-			where: (submissionTable, { eq }) => eq(submissionTable.team, id),
+			where: (submissionTable, { eq }) => eq(submissionTable.teamId, id),
 		});
 
 		return submission.map((rawSubmission) => ({
@@ -28,7 +28,7 @@ export const Team: TeamResolvers = {
 			out: rawSubmission.out ?? undefined,
 			code: rawSubmission.code ?? undefined,
 			vler: rawSubmission.vler ?? undefined,
-			teamId: rawSubmission.team,
+			teamId: rawSubmission.teamId,
 		}));
 	},
 };

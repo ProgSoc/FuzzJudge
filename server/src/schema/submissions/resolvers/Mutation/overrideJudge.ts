@@ -32,7 +32,7 @@ export const overrideJudge: NonNullable<
 		id: updated.id,
 		ok: updated.ok ?? undefined,
 		problemSlug: updated.prob,
-		teamId: updated.team,
+		teamId: updated.teamId,
 		time: updated.time,
 		code: updated.code ?? undefined,
 		out: updated.out ?? undefined,

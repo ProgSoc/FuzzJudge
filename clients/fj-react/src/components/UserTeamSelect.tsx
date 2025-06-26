@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 
 export default function UserTeamSelect(props: {
 	team: UserListQueryQuery["users"][number]["team"];
-	userId: number;
+	userId: string;
 }) {
 	const { team } = props;
 
@@ -30,7 +30,7 @@ export default function UserTeamSelect(props: {
 
 	const editUserMutation = useUpdateUserMutation();
 
-	const [value, setValue] = useState<{ label: string; value: number } | null>(
+	const [value, setValue] = useState<{ label: string; value: string } | null>(
 		valueLabel,
 	);
 

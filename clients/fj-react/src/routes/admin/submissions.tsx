@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin/submissions")({
 		getTitle: () => "Submissions",
 	}),
 	validateSearch: z.object({
-		teamId: fallback(z.coerce.number().optional(), undefined),
+		teamId: fallback(z.string().optional(), undefined),
 		problemSlug: fallback(z.string().optional(), undefined),
 	}),
 	search: {
@@ -38,7 +38,7 @@ type SubmissionRow = SubmissionsQueryQuery["submissions"][number];
 
 const columnHelper = createColumnHelper<SubmissionRow>();
 
-const createColumns = (teamId?: number, problemSlug?: string) => [
+const createColumns = (teamId?: string, problemSlug?: string) => [
 	columnHelper.accessor("id", {
 		header: "Submission ID",
 	}),
@@ -90,8 +90,7 @@ function TeamSelect() {
 			helperText="Select a team to filter submissions"
 			onChange={(e) => {
 				try {
-					const newTeamId =
-						e.target.value !== "" ? Number.parseInt(e.target.value) : undefined;
+					const newTeamId = e.target.value !== "" ? e.target.value : undefined;
 
 					navigate({
 						search: (prev) => ({

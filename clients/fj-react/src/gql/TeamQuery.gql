@@ -1,4 +1,4 @@
-query TeamQuery($teamId: Int!) {
+query TeamQuery($teamId: ID!) {
 	team(id: $teamId) {
 		id
 		name

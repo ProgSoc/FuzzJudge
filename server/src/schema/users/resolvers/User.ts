@@ -14,7 +14,7 @@ export const User: UserResolvers = {
 		}
 
 		const team = await db.query.teamTable.findFirst({
-			where: (teamTable, { eq }) => eq(teamTable.id, teamId),
+			where: (teamTable, { eq }) => eq(teamTable.id, teamId.toString()),
 			columns: {
 				id: true,
 				name: true,

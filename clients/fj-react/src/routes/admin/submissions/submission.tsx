@@ -14,7 +14,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/admin/submissions/submission")({
 	validateSearch: z.object({
-		submissionId: z.coerce.number().int(),
+		submissionId: z.string(),
 	}),
 	loaderDeps: ({ search }) => search,
 	loader: async ({ deps, context: { queryClient } }) => {

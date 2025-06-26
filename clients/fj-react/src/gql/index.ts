@@ -21,27 +21,37 @@ export type Scalars = {
 
 export type Broadcast = {
   __typename?: 'Broadcast';
+  /** The content of the broadcast. */
   content: Scalars['String']['output'];
+  /** The randomly generated ID of the broadcast. */
   id: Scalars['ID']['output'];
+  /** The title of the broadcast */
   title: Scalars['String']['output'];
 };
 
 export type Clock = {
   __typename?: 'Clock';
+  /** The finish time of the competition clock */
   finish: Scalars['DateTime']['output'];
+  /** The datetime when the clock was put on hold. */
   hold?: Maybe<Scalars['DateTime']['output']>;
+  /** The start time of the competition clock. */
   start: Scalars['DateTime']['output'];
 };
 
 export type Competition = {
   __typename?: 'Competition';
+  /** The description of the competition */
   instructions: Scalars['String']['output'];
+  /** The name of the competition */
   name: Scalars['String']['output'];
 };
 
 export type JudgeErrorOutput = {
   __typename?: 'JudgeErrorOutput';
+  /** Additional errors to help diagnose the issue. */
   errors: Scalars['String']['output'];
+  /** An error message indicating what went wrong during the judge operation. */
   message: Scalars['String']['output'];
 };
 
@@ -49,28 +59,56 @@ export type JudgeOutput = JudgeErrorOutput | JudgeSuccessOutput;
 
 export type JudgeSuccessOutput = {
   __typename?: 'JudgeSuccessOutput';
+  /** A message indicating the success of the judge operation. */
   message: Scalars['String']['output'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Adjust the finish time of the competition clock. */
   adjustFinishTime: Clock;
+  /** Adjust the start time of the competition clock. */
   adjustStartTime: Clock;
+  /**
+   * Create a new broadcast with a title and content.
+   * This can be used to announce important information to all users.
+   */
   createBroadcast: Broadcast;
+  /** Create a new team with a name and an optional hidden status. */
   createTeam: Team;
+  /** Create a new user with a name, username, password, role, and optional team ID. */
   createUser: User;
+  /** Delete a team by it's ID. */
   deleteTeam: Team;
+  /** Delete a user by their ID. */
   deleteUser: User;
+  /** Get a team's fuzz for a specific problem */
   getAdminFuzz: Scalars['String']['output'];
+  /**
+   * Pause the competition clock.
+   * This can be used to temporarily stop the clock, for example during a break.
+   */
   holdClock: Clock;
+  /** Submit a solution to a problem. */
   judge: JudgeOutput;
+  /** Login to an account with a username and password. */
   login: User;
+  /** Logout the currently logged-in user. */
   logout: Scalars['Boolean']['output'];
+  /** Override the judgement of a submission */
   overrideJudge: Submission;
+  /** Register a new user with a username, password, and name. */
   register: User;
+  /** Resume the competition clock after it has been put on hold. */
   releaseClock: Clock;
+  /** Release the results for after the Competition ends. */
   releaseResults: Clock;
+  /**
+   * Update an existing team by its ID.
+   * You can change the name and hidden status of the team.
+   */
   updateTeam: Team;
+  /** Update an existing user by their ID. */
   updateUser: User;
 };
 
@@ -102,31 +140,31 @@ export type MutationCreateUserArgs = {
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: UserRole;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   username: Scalars['String']['input'];
 };
 
 
 export type MutationDeleteTeamArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationGetAdminFuzzArgs = {
-  slug: Scalars['String']['input'];
-  teamId: Scalars['Int']['input'];
+  slug: Scalars['ID']['input'];
+  teamId: Scalars['ID']['input'];
 };
 
 
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
 };
 
 
@@ -138,7 +176,7 @@ export type MutationLoginArgs = {
 
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
-  submissionId: Scalars['Int']['input'];
+  submissionId: Scalars['ID']['input'];
 };
 
 
@@ -156,148 +194,214 @@ export type MutationReleaseClockArgs = {
 
 export type MutationUpdateTeamArgs = {
   hidden?: InputMaybe<Scalars['Boolean']['input']>;
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationUpdateUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Problem = {
   __typename?: 'Problem';
+  /**
+   * The difficulty level of the problem, represented as an integer from 0 to 3.
+   * Tutorials are 0, easy problems are 1, medium problems are 2, and hard problems are 3.
+   */
   difficulty: Scalars['Int']['output'];
+  /**
+   * Get the fuzz for a specific team.
+   * This is used to provide a unique identifier for the team to use in their solution.
+   */
   fuzz: Scalars['String']['output'];
+  /** A single emoji that represents the problem. */
   icon: Scalars['String']['output'];
+  /** The instructions for the problem, contextualizing the problem and providing necessary details. */
   instructions: Scalars['String']['output'];
+  /** The name of the problem. */
   name: Scalars['String']['output'];
+  /** The number of points awarded for solving the problem. */
   points: Scalars['Int']['output'];
-  slug: Scalars['String']['output'];
+  /** The unique identifier for the problem, suitable for use in urls. */
+  slug: Scalars['ID']['output'];
+  /** The status of whether the problem has been solved by the team. */
   solved?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
 export type ProblemFuzzArgs = {
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type ProblemScore = {
   __typename?: 'ProblemScore';
+  /** The total penalty time for the problem. */
   penalty: Scalars['Float']['output'];
+  /** The number of points awarded for solving the problem. */
   points: Scalars['Int']['output'];
+  /** The problem that the score is linked to. */
   problem: Problem;
-  slug: Scalars['String']['output'];
+  /** The slug of the problem, suitable for use in URLs. */
+  slug: Scalars['ID']['output'];
+  /** Whether the problem has been solved by the team. */
   solved: Scalars['Boolean']['output'];
+  /** The number of attempts made by the team to solve the problem. */
   tries: Scalars['Int']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  /** Fetch the current competition details. */
   competition: Competition;
+  /** The liscense under which the application is distributed. */
   header: Scalars['String']['output'];
+  /** Get the currently logged-in user. */
   me?: Maybe<User>;
+  /** Get a specific problem by its slug */
   problem: Problem;
+  /** Get a list of all problems */
   problems: Array<Problem>;
+  /** Get a specific submission by its ID */
   submission?: Maybe<Submission>;
+  /** List all submissions */
   submissions: Array<Submission>;
+  /** Get a specific team by it's ID. */
   team: Team;
+  /** Fetch a list of all teams. */
   teams: Array<Team>;
+  /** Get a specific user by their ID. */
   user: User;
+  /** Get a list of all users in the system. */
   users: Array<User>;
+  /** Fetch the current version of the application. */
   version: Scalars['String']['output'];
 };
 
 
 export type QueryProblemArgs = {
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
 };
 
 
 export type QuerySubmissionArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QuerySubmissionsArgs = {
-  problemSlug?: InputMaybe<Scalars['String']['input']>;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  problemSlug?: InputMaybe<Scalars['ID']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
 export type QueryTeamArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 export type ScoreboardRow = {
   __typename?: 'ScoreboardRow';
+  /** The total penalty time for the team */
   penalty: Scalars['Float']['output'];
+  /** The total points scored by the team */
   points: Scalars['Int']['output'];
+  /** The list of problems, number of tries, and scores for each problem */
   problems: Array<ProblemScore>;
+  /** The rank of the team on the scoreboard */
   rank: Scalars['Int']['output'];
+  /** The team that this row is linked to */
   team: Team;
-  teamId: Scalars['Int']['output'];
+  /** The Id of the team */
+  teamId: Scalars['ID']['output'];
 };
 
 export type Submission = {
   __typename?: 'Submission';
+  /** The source code submitted with the solution. */
   code?: Maybe<Scalars['String']['output']>;
-  id: Scalars['Int']['output'];
+  /** The unique identifier for the submission. */
+  id: Scalars['ID']['output'];
+  /** The result of the submission, indicating whether it was successful or not. */
   ok?: Maybe<Scalars['Boolean']['output']>;
+  /** The output of the submission, if any. */
   out?: Maybe<Scalars['String']['output']>;
+  /** The problem that was attempted in the submission. */
   problem: Problem;
-  problemSlug: Scalars['String']['output'];
+  /** The slug of the problem that the submission is for. */
+  problemSlug: Scalars['ID']['output'];
+  /** The team that made the submission. */
   team: Team;
-  teamId: Scalars['Int']['output'];
+  /** The ID of the team that made the submission. */
+  teamId: Scalars['ID']['output'];
+  /** The time that the submission was made. */
   time: Scalars['DateTime']['output'];
+  /** The error output of the submission */
   vler?: Maybe<Scalars['String']['output']>;
+  /** The amount of time taken the process the submission using the fuzzer. */
   vlms?: Maybe<Scalars['Float']['output']>;
 };
 
 export type Subscription = {
   __typename?: 'Subscription';
+  /** Subscribe to receive updates about broadcasts and annoucements. */
   broadcasts: Broadcast;
+  /** Subscribe to updates about the competition clock updates. */
   clock: Clock;
+  /** Subscribe to updates about the scoreboard. */
   scoreboard: Array<ScoreboardRow>;
 };
 
 export type Team = {
   __typename?: 'Team';
+  /** Whether the team is hidden from the scoreboard. */
   hidden: Scalars['Boolean']['output'];
-  id: Scalars['Int']['output'];
+  /** The unique identifier for the team. */
+  id: Scalars['ID']['output'];
+  /** The members of the team. */
   members: Array<User>;
+  /** The name of the team. */
   name: Scalars['String']['output'];
+  /** The randomly generated seed for the team, used for fuzzing. */
   seed: Scalars['String']['output'];
+  /** The submissions linked to the team */
   submissions: Array<Submission>;
 };
 
 
 export type TeamSubmissionsArgs = {
-  problemSlug?: InputMaybe<Scalars['String']['input']>;
+  problemSlug?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['Int']['output'];
+  /** The unique identifier for the user. */
+  id: Scalars['ID']['output'];
+  /** The name of the user. (Full name or display name) */
   name: Scalars['String']['output'];
+  /** The role of the user */
   role: UserRole;
+  /** The team that the user is associated with, if any. */
   team?: Maybe<Team>;
-  teamId?: Maybe<Scalars['Int']['output']>;
+  /** The ID of the team that the user is associated with, if any. */
+  teamId?: Maybe<Scalars['ID']['output']>;
+  /** The username of the user, used for login. */
   username: Scalars['String']['output'];
 };
 
 export enum UserRole {
+  /** Administrator with elevated privileges, can manage users and teams. */
   Admin = 'admin',
+  /** Regular user, typically a competitor in the competition. */
   Competitor = 'competitor'
 }
 
@@ -345,32 +449,32 @@ export type CreateTeamMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: number, name: string } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, name: string } };
 
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
   password: Scalars['String']['input'];
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   role: UserRole;
   name: Scalars['String']['input'];
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', name: string, id: number, username: string, teamId?: number | null, role: UserRole } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', name: string, id: string, username: string, teamId?: string | null, role: UserRole } };
 
 export type DeleteTeamMutationVariables = Exact<{
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteTeamMutation = { __typename?: 'Mutation', deleteTeam: { __typename?: 'Team', id: number, name: string } };
+export type DeleteTeamMutation = { __typename?: 'Mutation', deleteTeam: { __typename?: 'Team', id: string, name: string } };
 
 export type DeleteUserMutationVariables = Exact<{
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'User', id: number, name: string, username: string, role: UserRole } };
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'User', id: string, name: string, username: string, role: UserRole } };
 
 export type HoldClockMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -380,7 +484,7 @@ export type HoldClockMutation = { __typename?: 'Mutation', holdClock: { __typena
 export type LeaderboardSubscriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', rank: number, points: number, penalty: number, teamId: number, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
+export type LeaderboardSubscriptionSubscription = { __typename?: 'Subscription', scoreboard: Array<{ __typename?: 'ScoreboardRow', rank: number, points: number, penalty: number, teamId: string, team: { __typename?: 'Team', name: string }, problems: Array<{ __typename?: 'ProblemScore', solved: boolean, slug: string, problem: { __typename?: 'Problem', icon: string, name: string } }> }> };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -401,15 +505,15 @@ export type MeQueryQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', username: string, role: UserRole } | null };
 
 export type OverrideSubmissionMutationVariables = Exact<{
-  submissionId: Scalars['Int']['input'];
+  submissionId: Scalars['ID']['input'];
   solved: Scalars['Boolean']['input'];
 }>;
 
 
-export type OverrideSubmissionMutation = { __typename?: 'Mutation', overrideJudge: { __typename?: 'Submission', id: number } };
+export type OverrideSubmissionMutation = { __typename?: 'Mutation', overrideJudge: { __typename?: 'Submission', id: string } };
 
 export type ProblemDetailsQueryQueryVariables = Exact<{
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
 }>;
 
 
@@ -442,23 +546,23 @@ export type ReleaseResultsMutationVariables = Exact<{ [key: string]: never; }>;
 export type ReleaseResultsMutation = { __typename?: 'Mutation', releaseResults: { __typename?: 'Clock', finish: Date | string, hold?: Date | string | null, start: Date | string } };
 
 export type SubmissionQueryQueryVariables = Exact<{
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type SubmissionQueryQuery = { __typename?: 'Query', submission?: { __typename?: 'Submission', ok?: boolean | null, out?: string | null, time: Date | string, vler?: string | null, code?: string | null, teamId: number, problemSlug: string } | null };
+export type SubmissionQueryQuery = { __typename?: 'Query', submission?: { __typename?: 'Submission', ok?: boolean | null, out?: string | null, time: Date | string, vler?: string | null, code?: string | null, teamId: string, problemSlug: string } | null };
 
 export type SubmissionsQueryQueryVariables = Exact<{
-  problemSlug?: InputMaybe<Scalars['String']['input']>;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  problemSlug?: InputMaybe<Scalars['ID']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type SubmissionsQueryQuery = { __typename?: 'Query', submissions: Array<{ __typename?: 'Submission', id: number, ok?: boolean | null, problemSlug: string, teamId: number, time: Date | string }> };
+export type SubmissionsQueryQuery = { __typename?: 'Query', submissions: Array<{ __typename?: 'Submission', id: string, ok?: boolean | null, problemSlug: string, teamId: string, time: Date | string }> };
 
 export type SubmitProblemMutationVariables = Exact<{
   code: Scalars['String']['input'];
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
   output: Scalars['String']['input'];
 }>;
 
@@ -466,37 +570,37 @@ export type SubmitProblemMutationVariables = Exact<{
 export type SubmitProblemMutation = { __typename?: 'Mutation', judge: { __typename: 'JudgeErrorOutput', message: string, errors: string } | { __typename: 'JudgeSuccessOutput', message: string } };
 
 export type TeamProblemFuzzQueryVariables = Exact<{
-  teamId: Scalars['Int']['input'];
-  slug: Scalars['String']['input'];
+  teamId: Scalars['ID']['input'];
+  slug: Scalars['ID']['input'];
 }>;
 
 
 export type TeamProblemFuzzQuery = { __typename?: 'Query', problem: { __typename?: 'Problem', fuzz: string } };
 
 export type TeamQueryQueryVariables = Exact<{
-  teamId: Scalars['Int']['input'];
+  teamId: Scalars['ID']['input'];
 }>;
 
 
-export type TeamQueryQuery = { __typename?: 'Query', team: { __typename?: 'Team', id: number, name: string, hidden: boolean } };
+export type TeamQueryQuery = { __typename?: 'Query', team: { __typename?: 'Team', id: string, name: string, hidden: boolean } };
 
 export type TeamsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TeamsQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, id: number, seed: string, hidden: boolean }> };
+export type TeamsQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, id: string, seed: string, hidden: boolean }> };
 
 export type UpdateTeamMutationVariables = Exact<{
-  teamId: Scalars['Int']['input'];
+  teamId: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   hidden?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
-export type UpdateTeamMutation = { __typename?: 'Mutation', updateTeam: { __typename?: 'Team', id: number } };
+export type UpdateTeamMutation = { __typename?: 'Mutation', updateTeam: { __typename?: 'Team', id: string } };
 
 export type UpdateUserMutationVariables = Exact<{
-  userId: Scalars['Int']['input'];
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['ID']['input'];
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   role?: InputMaybe<UserRole>;
   username?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -504,19 +608,19 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, username: string, role: UserRole, teamId?: number | null } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, username: string, role: UserRole, teamId?: string | null } };
 
 export type UserListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, username: string, role: UserRole, name: string, team?: { __typename?: 'Team', id: number, name: string } | null }> };
+export type UserListQueryQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, username: string, role: UserRole, name: string, team?: { __typename?: 'Team', id: string, name: string } | null }> };
 
 export type UserQueryQueryVariables = Exact<{
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type UserQueryQuery = { __typename?: 'Query', user: { __typename?: 'User', id: number, name: string, role: UserRole, username: string, team?: { __typename?: 'Team', id: number, name: string } | null } };
+export type UserQueryQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, name: string, role: UserRole, username: string, team?: { __typename?: 'Team', id: string, name: string } | null } };
 
 
 export const AdjustFinishTimeDocument = `
@@ -581,7 +685,7 @@ export const CreateTeamDocument = `
 }
     `;
 export const CreateUserDocument = `
-    mutation CreateUser($username: String!, $password: String!, $teamId: Int, $role: UserRole!, $name: String!) {
+    mutation CreateUser($username: String!, $password: String!, $teamId: ID, $role: UserRole!, $name: String!) {
   createUser(
     username: $username
     teamId: $teamId
@@ -598,7 +702,7 @@ export const CreateUserDocument = `
 }
     `;
 export const DeleteTeamDocument = `
-    mutation DeleteTeam($id: Int!) {
+    mutation DeleteTeam($id: ID!) {
   deleteTeam(id: $id) {
     id
     name
@@ -606,7 +710,7 @@ export const DeleteTeamDocument = `
 }
     `;
 export const DeleteUserDocument = `
-    mutation DeleteUser($id: Int!) {
+    mutation DeleteUser($id: ID!) {
   deleteUser(id: $id) {
     id
     name
@@ -667,14 +771,14 @@ export const MeQueryDocument = `
 }
     `;
 export const OverrideSubmissionDocument = `
-    mutation OverrideSubmission($submissionId: Int!, $solved: Boolean!) {
+    mutation OverrideSubmission($submissionId: ID!, $solved: Boolean!) {
   overrideJudge(submissionId: $submissionId, solved: $solved) {
     id
   }
 }
     `;
 export const ProblemDetailsQueryDocument = `
-    query ProblemDetailsQuery($slug: String!) {
+    query ProblemDetailsQuery($slug: ID!) {
   problem(slug: $slug) {
     slug
     name
@@ -725,7 +829,7 @@ export const ReleaseResultsDocument = `
 }
     `;
 export const SubmissionQueryDocument = `
-    query SubmissionQuery($id: Int!) {
+    query SubmissionQuery($id: ID!) {
   submission(id: $id) {
     ok
     out
@@ -738,7 +842,7 @@ export const SubmissionQueryDocument = `
 }
     `;
 export const SubmissionsQueryDocument = `
-    query SubmissionsQuery($problemSlug: String, $teamId: Int) {
+    query SubmissionsQuery($problemSlug: ID, $teamId: ID) {
   submissions(problemSlug: $problemSlug, teamId: $teamId) {
     id
     ok
@@ -749,7 +853,7 @@ export const SubmissionsQueryDocument = `
 }
     `;
 export const SubmitProblemDocument = `
-    mutation SubmitProblem($code: String!, $slug: String!, $output: String!) {
+    mutation SubmitProblem($code: String!, $slug: ID!, $output: String!) {
   judge(code: $code, slug: $slug, output: $output) {
     __typename
     ... on JudgeErrorOutput {
@@ -763,14 +867,14 @@ export const SubmitProblemDocument = `
 }
     `;
 export const TeamProblemFuzzDocument = `
-    query TeamProblemFuzz($teamId: Int!, $slug: String!) {
+    query TeamProblemFuzz($teamId: ID!, $slug: ID!) {
   problem(slug: $slug) {
     fuzz(teamId: $teamId)
   }
 }
     `;
 export const TeamQueryDocument = `
-    query TeamQuery($teamId: Int!) {
+    query TeamQuery($teamId: ID!) {
   team(id: $teamId) {
     id
     name
@@ -789,14 +893,14 @@ export const TeamsQueryDocument = `
 }
     `;
 export const UpdateTeamDocument = `
-    mutation UpdateTeam($teamId: Int!, $name: String, $hidden: Boolean) {
+    mutation UpdateTeam($teamId: ID!, $name: String, $hidden: Boolean) {
   updateTeam(id: $teamId, name: $name, hidden: $hidden) {
     id
   }
 }
     `;
 export const UpdateUserDocument = `
-    mutation UpdateUser($userId: Int!, $teamId: Int, $role: UserRole, $username: String, $name: String, $password: String) {
+    mutation UpdateUser($userId: ID!, $teamId: ID, $role: UserRole, $username: String, $name: String, $password: String) {
   updateUser(
     teamId: $teamId
     id: $userId
@@ -827,7 +931,7 @@ export const UserListQueryDocument = `
 }
     `;
 export const UserQueryDocument = `
-    query UserQuery($id: Int!) {
+    query UserQuery($id: ID!) {
   user(id: $id) {
     id
     name

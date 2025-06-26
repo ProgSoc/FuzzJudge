@@ -5,12 +5,12 @@ import type { QueryResolvers } from "./../../../types.generated";
 export const submissions: NonNullable<QueryResolvers["submissions"]> = async (
 	_parent,
 	{ teamId, problemSlug },
-	{ user },
+	_context,
 ) => {
 	const conditions: SQL[] = [];
 
 	if (teamId) {
-		conditions.push(eq(submissionTable.team, teamId));
+		conditions.push(eq(submissionTable.teamId, teamId));
 	}
 
 	if (problemSlug) {
@@ -29,6 +29,6 @@ export const submissions: NonNullable<QueryResolvers["submissions"]> = async (
 		out: submission.out ?? undefined,
 		code: submission.code ?? undefined,
 		vler: submission.vler ?? undefined,
-		teamId: submission.team,
+		teamId: submission.teamId,
 	}));
 };

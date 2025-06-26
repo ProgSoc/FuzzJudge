@@ -26,7 +26,7 @@ type TableRow = UserListQueryQuery["users"][number];
 const columnHelper = createColumnHelper<TableRow>();
 
 interface UserEditMenuProps {
-	userId: number;
+	userId: string;
 }
 
 function UserEditMenu(props: UserEditMenuProps) {

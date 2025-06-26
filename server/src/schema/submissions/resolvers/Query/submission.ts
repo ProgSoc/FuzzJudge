@@ -21,6 +21,6 @@ export const submission: NonNullable<QueryResolvers["submission"]> = async (
 		out: rawSubmission.out ?? undefined,
 		code: rawSubmission.code ?? undefined,
 		vler: rawSubmission.vler ?? undefined,
-		teamId: rawSubmission.team,
+		teamId: rawSubmission.teamId,
 	};
 };

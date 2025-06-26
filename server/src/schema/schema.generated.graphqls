@@ -72,16 +72,16 @@ type Mutation {
   """
   Create a new user with a name, username, password, role, and optional team ID.
   """
-  createUser(name: String!, password: String!, role: UserRole!, teamId: Int, username: String!): User!
+  createUser(name: String!, password: String!, role: UserRole!, teamId: ID, username: String!): User!
 
   """Delete a team by it's ID."""
-  deleteTeam(id: Int!): Team!
+  deleteTeam(id: ID!): Team!
 
   """Delete a user by their ID."""
-  deleteUser(id: Int!): User!
+  deleteUser(id: ID!): User!
 
   """Get a team's fuzz for a specific problem"""
-  getAdminFuzz(slug: String!, teamId: Int!): String!
+  getAdminFuzz(slug: ID!, teamId: ID!): String!
 
   """
   Pause the competition clock.
@@ -90,7 +90,7 @@ type Mutation {
   holdClock: Clock!
 
   """Submit a solution to a problem."""
-  judge(code: String!, output: String!, slug: String!): JudgeOutput!
+  judge(code: String!, output: String!, slug: ID!): JudgeOutput!
 
   """Login to an account with a username and password."""
   login(password: String!, username: String!): User!
@@ -99,7 +99,7 @@ type Mutation {
   logout: Boolean!
 
   """Override the judgement of a submission"""
-  overrideJudge(solved: Boolean!, submissionId: Int!): Submission!
+  overrideJudge(solved: Boolean!, submissionId: ID!): Submission!
 
   """Register a new user with a username, password, and name."""
   register(name: String!, password: String!, username: String!): User!
@@ -114,10 +114,10 @@ type Mutation {
   Update an existing team by its ID.
   You can change the name and hidden status of the team.
   """
-  updateTeam(hidden: Boolean, id: Int!, name: String): Team!
+  updateTeam(hidden: Boolean, id: ID!, name: String): Team!
 
   """Update an existing user by their ID."""
-  updateUser(id: Int!, name: String, password: String, role: UserRole, teamId: Int, username: String): User!
+  updateUser(id: ID!, name: String, password: String, role: UserRole, teamId: ID, username: String): User!
 }
 
 type Problem {
@@ -131,7 +131,7 @@ type Problem {
   Get the fuzz for a specific team.
   This is used to provide a unique identifier for the team to use in their solution.
   """
-  fuzz(teamId: Int): String!
+  fuzz(teamId: ID): String!
 
   """A single emoji that represents the problem."""
   icon: String!
@@ -148,7 +148,7 @@ type Problem {
   points: Int!
 
   """The unique identifier for the problem, suitable for use in urls."""
-  slug: String!
+  slug: ID!
 
   """The status of whether the problem has been solved by the team."""
   solved: Boolean
@@ -165,7 +165,7 @@ type ProblemScore {
   problem: Problem!
 
   """The slug of the problem, suitable for use in URLs."""
-  slug: String!
+  slug: ID!
 
   """Whether the problem has been solved by the team."""
   solved: Boolean!
@@ -185,25 +185,25 @@ type Query {
   me: User
 
   """Get a specific problem by its slug"""
-  problem(slug: String!): Problem!
+  problem(slug: ID!): Problem!
 
   """Get a list of all problems"""
   problems: [Problem!]!
 
   """Get a specific submission by its ID"""
-  submission(id: Int!): Submission
+  submission(id: ID!): Submission
 
   """List all submissions"""
-  submissions(problemSlug: String, teamId: Int): [Submission!]!
+  submissions(problemSlug: ID, teamId: ID): [Submission!]!
 
   """Get a specific team by it's ID."""
-  team(id: Int!): Team!
+  team(id: ID!): Team!
 
   """Fetch a list of all teams."""
   teams: [Team!]!
 
   """Get a specific user by their ID."""
-  user(id: Int!): User!
+  user(id: ID!): User!
 
   """Get a list of all users in the system."""
   users: [User!]!
@@ -229,7 +229,7 @@ type ScoreboardRow {
   team: Team!
 
   """The Id of the team"""
-  teamId: Int!
+  teamId: ID!
 }
 
 type Submission {
@@ -237,7 +237,7 @@ type Submission {
   code: String
 
   """The unique identifier for the submission."""
-  id: Int!
+  id: ID!
 
   """
   The result of the submission, indicating whether it was successful or not.
@@ -251,13 +251,13 @@ type Submission {
   problem: Problem!
 
   """The slug of the problem that the submission is for."""
-  problemSlug: String!
+  problemSlug: ID!
 
   """The team that made the submission."""
   team: Team!
 
   """The ID of the team that made the submission."""
-  teamId: Int!
+  teamId: ID!
 
   """The time that the submission was made."""
   time: DateTime!
@@ -285,7 +285,7 @@ type Team {
   hidden: Boolean!
 
   """The unique identifier for the team."""
-  id: Int!
+  id: ID!
 
   """The members of the team."""
   members: [User!]!
@@ -297,12 +297,12 @@ type Team {
   seed: String!
 
   """The submissions linked to the team"""
-  submissions(problemSlug: String): [Submission!]!
+  submissions(problemSlug: ID): [Submission!]!
 }
 
 type User {
   """The unique identifier for the user."""
-  id: Int!
+  id: ID!
 
   """The name of the user. (Full name or display name)"""
   name: String!
@@ -314,7 +314,7 @@ type User {
   team: Team
 
   """The ID of the team that the user is associated with, if any."""
-  teamId: Int
+  teamId: ID
 
   """The username of the user, used for login."""
   username: String!

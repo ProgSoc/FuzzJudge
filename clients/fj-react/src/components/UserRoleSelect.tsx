@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function UserRoleSelect(props: {
 	role: UserRole;
-	userId: number;
+	userId: string;
 }) {
 	const editUserMutation = useUpdateUserMutation();
 

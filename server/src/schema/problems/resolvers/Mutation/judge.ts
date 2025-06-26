@@ -10,7 +10,7 @@ import type { MutationResolvers } from "./../../../types.generated";
 import { ExpiringTokenBucket } from "@/lib/rate-limit";
 
 // you can submit 5 times every 30 seconds
-const judgingTokenBucket = new ExpiringTokenBucket<number>(5, 30);
+const judgingTokenBucket = new ExpiringTokenBucket<string>(5, 30);
 
 export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	_parent,
@@ -62,7 +62,7 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 
 	if (correct) {
 		const submission = await postSubmission({
-			team: teamId,
+			teamId: teamId,
 			prob: slug,
 			time: time.toString(),
 			out: output,
@@ -93,7 +93,7 @@ export const judge: NonNullable<MutationResolvers["judge"]> = async (
 	const { errors } = judgedProblem;
 
 	const submission = await postSubmission({
-		team: teamId,
+		teamId: teamId,
 		prob: slug,
 		time: time.toString(),
 		out: output,

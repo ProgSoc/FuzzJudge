@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 
 export default function TeamProblemFuzzTextArea(props: {
-	teamId: number;
+	teamId: string;
 	problemSlug: string;
 }) {
 	const { teamId, problemSlug } = props;

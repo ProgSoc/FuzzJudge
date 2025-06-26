@@ -24,7 +24,7 @@ type TeamRow = TeamsQueryQuery["teams"][number];
 const columnHelper = createColumnHelper<TeamRow>();
 
 interface TeamEditMenuProps {
-	teamId: number;
+	teamId: string;
 }
 
 function TeamEditMenu(props: TeamEditMenuProps) {

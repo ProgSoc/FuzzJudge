@@ -146,31 +146,31 @@ export type MutationCreateUserArgs = {
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: UserRole;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   username: Scalars['String']['input'];
 };
 
 
 export type MutationDeleteTeamArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationGetAdminFuzzArgs = {
-  slug: Scalars['String']['input'];
-  teamId: Scalars['Int']['input'];
+  slug: Scalars['ID']['input'];
+  teamId: Scalars['ID']['input'];
 };
 
 
 export type MutationJudgeArgs = {
   code: Scalars['String']['input'];
   output: Scalars['String']['input'];
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
 };
 
 
@@ -182,7 +182,7 @@ export type MutationLoginArgs = {
 
 export type MutationOverrideJudgeArgs = {
   solved: Scalars['Boolean']['input'];
-  submissionId: Scalars['Int']['input'];
+  submissionId: Scalars['ID']['input'];
 };
 
 
@@ -200,17 +200,17 @@ export type MutationReleaseClockArgs = {
 
 export type MutationUpdateTeamArgs = {
   hidden?: InputMaybe<Scalars['Boolean']['input']>;
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationUpdateUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -235,14 +235,14 @@ export type Problem = {
   /** The number of points awarded for solving the problem. */
   points: Scalars['Int']['output'];
   /** The unique identifier for the problem, suitable for use in urls. */
-  slug: Scalars['String']['output'];
+  slug: Scalars['ID']['output'];
   /** The status of whether the problem has been solved by the team. */
   solved?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
 export type ProblemFuzzArgs = {
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type ProblemScore = {
@@ -254,7 +254,7 @@ export type ProblemScore = {
   /** The problem that the score is linked to. */
   problem: Problem;
   /** The slug of the problem, suitable for use in URLs. */
-  slug: Scalars['String']['output'];
+  slug: Scalars['ID']['output'];
   /** Whether the problem has been solved by the team. */
   solved: Scalars['Boolean']['output'];
   /** The number of attempts made by the team to solve the problem. */
@@ -291,28 +291,28 @@ export type Query = {
 
 
 export type QueryProblemArgs = {
-  slug: Scalars['String']['input'];
+  slug: Scalars['ID']['input'];
 };
 
 
 export type QuerySubmissionArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QuerySubmissionsArgs = {
-  problemSlug?: InputMaybe<Scalars['String']['input']>;
-  teamId?: InputMaybe<Scalars['Int']['input']>;
+  problemSlug?: InputMaybe<Scalars['ID']['input']>;
+  teamId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
 export type QueryTeamArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryUserArgs = {
-  id: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 export type ScoreboardRow = {
@@ -328,7 +328,7 @@ export type ScoreboardRow = {
   /** The team that this row is linked to */
   team: Team;
   /** The Id of the team */
-  teamId: Scalars['Int']['output'];
+  teamId: Scalars['ID']['output'];
 };
 
 export type Submission = {
@@ -336,7 +336,7 @@ export type Submission = {
   /** The source code submitted with the solution. */
   code?: Maybe<Scalars['String']['output']>;
   /** The unique identifier for the submission. */
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   /** The result of the submission, indicating whether it was successful or not. */
   ok?: Maybe<Scalars['Boolean']['output']>;
   /** The output of the submission, if any. */
@@ -344,11 +344,11 @@ export type Submission = {
   /** The problem that was attempted in the submission. */
   problem: Problem;
   /** The slug of the problem that the submission is for. */
-  problemSlug: Scalars['String']['output'];
+  problemSlug: Scalars['ID']['output'];
   /** The team that made the submission. */
   team: Team;
   /** The ID of the team that made the submission. */
-  teamId: Scalars['Int']['output'];
+  teamId: Scalars['ID']['output'];
   /** The time that the submission was made. */
   time: Scalars['DateTime']['output'];
   /** The error output of the submission */
@@ -372,7 +372,7 @@ export type Team = {
   /** Whether the team is hidden from the scoreboard. */
   hidden: Scalars['Boolean']['output'];
   /** The unique identifier for the team. */
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   /** The members of the team. */
   members: Array<User>;
   /** The name of the team. */
@@ -385,13 +385,13 @@ export type Team = {
 
 
 export type TeamSubmissionsArgs = {
-  problemSlug?: InputMaybe<Scalars['String']['input']>;
+  problemSlug?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type User = {
   __typename?: 'User';
   /** The unique identifier for the user. */
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   /** The name of the user. (Full name or display name) */
   name: Scalars['String']['output'];
   /** The role of the user */
@@ -399,7 +399,7 @@ export type User = {
   /** The team that the user is associated with, if any. */
   team?: Maybe<Team>;
   /** The ID of the team that the user is associated with, if any. */
-  teamId?: Maybe<Scalars['Int']['output']>;
+  teamId?: Maybe<Scalars['ID']['output']>;
   /** The username of the user, used for login. */
   username: Scalars['String']['output'];
 };
@@ -497,8 +497,8 @@ export type ResolversTypes = {
   JudgeSuccessOutput: ResolverTypeWrapper<JudgeSuccessOutput>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Problem: ResolverTypeWrapper<ProblemMapper>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ProblemScore: ResolverTypeWrapper<ProblemScoreMapper>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Query: ResolverTypeWrapper<{}>;
@@ -524,8 +524,8 @@ export type ResolversParentTypes = {
   JudgeSuccessOutput: JudgeSuccessOutput;
   Mutation: {};
   Boolean: Scalars['Boolean']['output'];
-  Int: Scalars['Int']['output'];
   Problem: ProblemMapper;
+  Int: Scalars['Int']['output'];
   ProblemScore: ProblemScoreMapper;
   Float: Scalars['Float']['output'];
   Query: {};
@@ -617,7 +617,7 @@ export type ProblemResolvers<ContextType = GraphQLContext, ParentType extends Re
   instructions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   solved?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -626,7 +626,7 @@ export type ProblemScoreResolvers<ContextType = GraphQLContext, ParentType exten
   penalty?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   problem?: Resolver<ResolversTypes['Problem'], ParentType, ContextType>;
-  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   solved?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   tries?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -653,19 +653,19 @@ export type ScoreboardRowResolvers<ContextType = GraphQLContext, ParentType exte
   problems?: Resolver<Array<ResolversTypes['ProblemScore']>, ParentType, ContextType>;
   rank?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   team?: Resolver<ResolversTypes['Team'], ParentType, ContextType>;
-  teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  teamId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SubmissionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Submission'] = ResolversParentTypes['Submission']> = {
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   out?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   problem?: Resolver<ResolversTypes['Problem'], ParentType, AuthenticatedContext<ContextType>>;
-  problemSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  problemSlug?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   team?: Resolver<ResolversTypes['Team'], ParentType, AuthenticatedContext<ContextType>>;
-  teamId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  teamId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   vler?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   vlms?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -680,7 +680,7 @@ export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType exten
 
 export type TeamResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Team'] = ResolversParentTypes['Team']> = {
   hidden?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   seed?: Resolver<ResolversTypes['String'], ParentType, AuthenticatedContext<ContextType>>;
@@ -689,11 +689,11 @@ export type TeamResolvers<ContextType = GraphQLContext, ParentType extends Resol
 };
 
 export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   team?: Resolver<Maybe<ResolversTypes['Team']>, ParentType, AuthenticatedContext<ContextType>>;
-  teamId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  teamId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

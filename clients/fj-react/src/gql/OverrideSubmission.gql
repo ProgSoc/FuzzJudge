@@ -1,4 +1,4 @@
-mutation OverrideSubmission($submissionId: Int!, $solved: Boolean!) {
+mutation OverrideSubmission($submissionId: ID!, $solved: Boolean!) {
 	overrideJudge(submissionId: $submissionId, solved: $solved) {
 		id
 	}

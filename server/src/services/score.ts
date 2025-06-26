@@ -17,7 +17,7 @@ const problemScoreSpec = z.object({
 type ProblemScore = z.infer<typeof problemScoreSpec>;
 
 const scoreboardRowSpec = z.object({
-	teamId: z.number(),
+	teamId: z.string(),
 	teamHidden: z.boolean(),
 	points: z.number(),
 	penalty: z.number(),
@@ -225,7 +225,7 @@ export const writeScoreboardToFile = async (
  * @returns The score for the team
  */
 async function calculateTeamScore(
-	teamId: number,
+	teamId: string,
 ): Promise<Omit<ScoreboardRow, "rank"> | null> {
 	// Load the problem set
 	const problemsData = await getProblems(competitionRoot);
@@ -256,7 +256,7 @@ async function calculateTeamScore(
 	}));
 
 	const submissions = await db.query.submissionTable.findMany({
-		where: (submission, { eq }) => eq(submission.team, teamId),
+		where: (submission, { eq }) => eq(submission.teamId, teamId),
 		columns: {
 			prob: true,
 			time: true,

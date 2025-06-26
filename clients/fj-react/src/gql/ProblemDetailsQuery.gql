@@ -1,4 +1,4 @@
-query ProblemDetailsQuery($slug: String!) {
+query ProblemDetailsQuery($slug: ID!) {
 	problem(slug: $slug) {
 		slug
 		name

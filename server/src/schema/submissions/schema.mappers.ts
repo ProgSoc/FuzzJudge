@@ -1,6 +1,6 @@
 export interface SubmissionMapper {
-	id: number;
-	teamId: number;
+	id: string;
+	teamId: string;
 	problemSlug: string;
 	time: Date | string;
 	out?: string;

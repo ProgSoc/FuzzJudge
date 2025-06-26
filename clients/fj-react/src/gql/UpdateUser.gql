@@ -1,6 +1,6 @@
 mutation UpdateUser(
-	$userId: Int!
-	$teamId: Int
+	$userId: ID!
+	$teamId: ID
 	$role: UserRole
 	$username: String
 	$name: String

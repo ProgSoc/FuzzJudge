@@ -13,7 +13,7 @@ type ScoreboardRow {
 	"""
 	The Id of the team
 	"""
-	teamId: Int!
+	teamId: ID!
 	"""
 	The team that this row is linked to
 	"""
@@ -36,7 +36,7 @@ type ProblemScore {
 	"""
 	The slug of the problem, suitable for use in URLs.
 	"""
-	slug: String!
+	slug: ID!
 	"""
 	The problem that the score is linked to.
 	"""

@@ -20,7 +20,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/admin/users/edit")({
 	validateSearch: z.object({
-		userId: z.coerce.number(),
+		userId: z.string(),
 	}),
 	pendingComponent: PendingComponent,
 	component: RouteComponent,
@@ -38,7 +38,7 @@ const editUserSchema = z.object({
 	team: z
 		.object({
 			label: z.string(),
-			value: z.number(),
+			value: z.string(),
 		})
 		.optional()
 		.nullable(),

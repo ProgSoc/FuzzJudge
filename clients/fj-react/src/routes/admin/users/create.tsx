@@ -28,7 +28,7 @@ const createUserSchema = z.object({
 	team: z
 		.object({
 			label: z.string(),
-			value: z.number(),
+			value: z.string(),
 		})
 		.optional()
 		.nullable(),

@@ -1,4 +1,4 @@
-query SubmissionQuery($id: Int!) {
+query SubmissionQuery($id: ID!) {
 	submission(id: $id) {
 		ok
 		out

@@ -6,7 +6,7 @@ extend type Query {
 	"""
 	Get a specific user by their ID.
 	"""
-	user(id: Int!): User! @auth(role: admin)
+	user(id: ID!): User! @auth(role: admin)
 	"""
 	Get the currently logged-in user.
 	"""
@@ -22,15 +22,15 @@ extend type Mutation {
 		username: String!
 		password: String!
 		role: UserRole!
-		teamId: Int
+		teamId: ID
 	): User! @auth(role: admin)
 	"""
 	Update an existing user by their ID.
 	"""
 	updateUser(
-		id: Int!
+		id: ID!
 		role: UserRole
-		teamId: Int
+		teamId: ID
 		name: String
 		username: String
 		password: String
@@ -38,7 +38,7 @@ extend type Mutation {
 	"""
 	Delete a user by their ID.
 	"""
-	deleteUser(id: Int!): User! @auth(role: admin)
+	deleteUser(id: ID!): User! @auth(role: admin)
 	"""
 	Login to an account with a username and password.
 	"""
@@ -72,7 +72,7 @@ type User {
 	"""
 	The unique identifier for the user.
 	"""
-	id: Int!
+	id: ID!
 	"""
 	The role of the user
 	"""
@@ -80,7 +80,7 @@ type User {
 	"""
 	The ID of the team that the user is associated with, if any.
 	"""
-	teamId: Int
+	teamId: ID
 	"""
 	The team that the user is associated with, if any.
 	"""

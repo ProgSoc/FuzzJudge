@@ -1,4 +1,4 @@
-query ProblemData($problemSlug: String!) {
+query ProblemData($problemSlug: ID!) {
 	problem(slug: $problemSlug) {
 		solved
 		name

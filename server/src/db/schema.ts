@@ -1,8 +1,11 @@
 import { relations } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { ulid } from "ulid";
 
 export const teamTable = sqliteTable("team", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => ulid()),
 	seed: text("seed").notNull(),
 	name: text("name").notNull(),
 	hidden: integer("hidden", { mode: "boolean" }).notNull().default(false),
@@ -14,8 +17,10 @@ export const teamTableRelations = relations(teamTable, ({ many }) => ({
 }));
 
 export const userTable = sqliteTable("user", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	teamId: integer("team").references(() => teamTable.id),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => ulid()),
+	teamId: text("team").references(() => teamTable.id),
 	username: text("logn").unique().notNull(),
 	password: text("password").notNull(),
 	name: text("name").notNull().default(""),
@@ -32,7 +37,7 @@ export const userTableRelations = relations(userTable, ({ one, many }) => ({
 
 export const sessionTable = sqliteTable("session", {
 	id: text("id").primaryKey(),
-	userId: integer("user_id")
+	userId: text("user_id")
 		.references(() => userTable.id)
 		.notNull(),
 	expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
@@ -46,8 +51,10 @@ export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
 }));
 
 export const submissionTable = sqliteTable("subm", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	team: integer("team")
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => ulid()),
+	teamId: text("team")
 		.references(() => teamTable.id)
 		.notNull(),
 	prob: text("prob").notNull(),
@@ -63,16 +70,11 @@ export const submissionTableRelations = relations(
 	submissionTable,
 	({ one }) => ({
 		team: one(teamTable, {
-			fields: [submissionTable.team],
+			fields: [submissionTable.teamId],
 			references: [teamTable.id],
 		}),
 	}),
 );
-
-export const compTable = sqliteTable("comp", {
-	key: text("key").primaryKey(),
-	val: text("val"),
-});
 
 export type Team = typeof teamTable.$inferSelect;
 
@@ -85,5 +87,3 @@ export type Session = typeof sessionTable.$inferSelect;
 export type UserRoles = User["role"];
 
 export type Submission = typeof submissionTable.$inferSelect;
-
-export type Comp = typeof compTable.$inferSelect;

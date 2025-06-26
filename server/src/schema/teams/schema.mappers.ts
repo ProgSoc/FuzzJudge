@@ -1,5 +1,5 @@
 export interface TeamMapper {
-	id: number;
+	id: string;
 	name: string;
 	hidden: boolean;
 	seed: string;

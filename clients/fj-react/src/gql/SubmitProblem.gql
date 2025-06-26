@@ -1,4 +1,4 @@
-mutation SubmitProblem($code: String!, $slug: String!, $output: String!) {
+mutation SubmitProblem($code: String!, $slug: ID!, $output: String!) {
 	judge(code: $code, slug: $slug, output: $output) {
 		__typename
 		... on JudgeErrorOutput {

@@ -2,19 +2,18 @@ extend type Query {
 	"""
 	List all submissions
 	"""
-	submissions(teamId: Int, problemSlug: String): [Submission!]!
-		@auth(role: admin)
+	submissions(teamId: ID, problemSlug: ID): [Submission!]! @auth(role: admin)
 	"""
 	Get a specific submission by its ID
 	"""
-	submission(id: Int!): Submission @auth(role: admin)
+	submission(id: ID!): Submission @auth(role: admin)
 }
 
 extend type Mutation {
 	"""
 	Override the judgement of a submission
 	"""
-	overrideJudge(submissionId: Int!, solved: Boolean!): Submission!
+	overrideJudge(submissionId: ID!, solved: Boolean!): Submission!
 		@auth(role: admin)
 }
 
@@ -22,15 +21,15 @@ type Submission @auth(role: admin) {
 	"""
 	The unique identifier for the submission.
 	"""
-	id: Int!
+	id: ID!
 	"""
 	The ID of the team that made the submission.
 	"""
-	teamId: Int!
+	teamId: ID!
 	"""
 	The slug of the problem that the submission is for.
 	"""
-	problemSlug: String!
+	problemSlug: ID!
 	"""
 	The time that the submission was made.
 	"""

@@ -6,7 +6,7 @@ extend type Query {
 	"""
 	Get a specific team by it's ID.
 	"""
-	team(id: Int!): Team! @auth(role: admin)
+	team(id: ID!): Team! @auth(role: admin)
 }
 
 extend type Mutation {
@@ -18,18 +18,18 @@ extend type Mutation {
 	Update an existing team by its ID.
 	You can change the name and hidden status of the team.
 	"""
-	updateTeam(id: Int!, name: String, hidden: Boolean): Team! @auth(role: admin)
+	updateTeam(id: ID!, name: String, hidden: Boolean): Team! @auth(role: admin)
 	"""
 	Delete a team by it's ID.
 	"""
-	deleteTeam(id: Int!): Team! @auth(role: admin)
+	deleteTeam(id: ID!): Team! @auth(role: admin)
 }
 
 type Team {
 	"""
 	The unique identifier for the team.
 	"""
-	id: Int!
+	id: ID!
 	"""
 	The name of the team.
 	"""
@@ -37,7 +37,7 @@ type Team {
 	"""
 	The submissions linked to the team
 	"""
-	submissions(problemSlug: String): [Submission!]! @auth(role: admin)
+	submissions(problemSlug: ID): [Submission!]! @auth(role: admin)
 	"""
 	The members of the team.
 	"""
