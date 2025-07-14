@@ -36,6 +36,6 @@
 		"@tanstack/svelte-query": "5.83.0",
 		"@tanstack/svelte-query-devtools": "5.83.0",
 		"graphql": "16.11.0",
-		"graphql-ws": "6.0.5"
+		"graphql-ws": "6.0.6"
 	}
 }
