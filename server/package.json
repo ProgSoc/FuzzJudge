@@ -7,7 +7,7 @@
 		"@graphql-codegen/cli": "5.0.7",
 		"@types/bun": "1.2.18",
 		"drizzle-kit": "0.31.4",
-		"knip": "5.61.3",
+		"knip": "5.62.0",
 		"tsdown": "0.12.9",
 		"typescript": "5.8.3",
 		"graphql-scalars": "1.24.2"
