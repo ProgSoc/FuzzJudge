@@ -42,7 +42,7 @@
 		"graphql-yoga": "5.15.1",
 		"gray-matter": "4.0.3",
 		"hono": "4.9.0",
-		"smol-toml": "1.4.1",
+		"smol-toml": "1.4.2",
 		"ulid": "3.0.1",
 		"yaml": "2.8.1",
 		"zod": "3.25.76"
