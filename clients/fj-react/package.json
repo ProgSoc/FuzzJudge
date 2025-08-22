@@ -48,7 +48,7 @@
 		"@tanstack/react-query-devtools": "5.85.5",
 		"@tanstack/router-plugin": "1.131.27",
 		"@types/luxon": "3.7.1",
-		"@types/react": "19.1.10",
+		"@types/react": "19.1.11",
 		"@types/react-dom": "19.1.7",
 		"@vitejs/plugin-react": "4.7.0",
 		"babel-plugin-react-compiler": "19.1.0-rc.2",
