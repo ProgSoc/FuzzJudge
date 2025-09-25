@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # ...
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - name: Install Deno
         uses: denoland/setup-deno@v2
@@ -24,7 +24,7 @@ jobs:
     name: Test Svelte
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - name: Install Deps
         run: bun install
