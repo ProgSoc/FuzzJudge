@@ -15,7 +15,7 @@
 		"@graphql-codegen/typescript-graphql-request": "6.3.0",
 		"@graphql-codegen/typescript-operations": "4.6.1",
 		"typescript": "5.9.2",
-		"vite": "6.3.6",
+		"vite": "7.2.4",
 		"graphql": "16.11.0",
 		"graphql-request": "7.2.0",
 		"graphql-scalars": "1.24.2"
