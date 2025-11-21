@@ -6,7 +6,7 @@
 		"@eddeee888/gcg-typescript-resolver-files": "0.12.1",
 		"@graphql-codegen/cli": "5.0.7",
 		"@types/bun": "1.2.21",
-		"drizzle-kit": "0.31.4",
+		"drizzle-kit": "0.31.7",
 		"knip": "5.63.1",
 		"tsdown": "0.12.9",
 		"typescript": "5.9.2",
