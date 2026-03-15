@@ -28,7 +28,7 @@
 		"svelte": "5.38.7",
 		"svelte-check": "4.3.1",
 		"svelte-markdown": "0.4.1",
-		"typescript": "5.9.2",
+		"typescript": "5.9.3",
 		"vite": "6.3.6",
 		"vite-tsconfig-paths": "5.1.4"
 	},
