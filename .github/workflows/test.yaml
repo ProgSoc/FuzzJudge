@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # ...
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v4.4.0
+      - uses: oven-sh/setup-bun@v2.2.0
       - name: Install Deno
-        uses: denoland/setup-deno@v2
+        uses: denoland/setup-deno@v2.0.5
         with:
-          deno-version: v2.x
+          deno-version: 2.9.6
       # run any `bun` or `bunx` command
       - run: bun install
       - run: cd server && bun test
@@ -24,8 +24,8 @@ jobs:
     name: Test Svelte
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v4.4.0
+      - uses: oven-sh/setup-bun@v2.2.0
       - name: Install Deps
         run: bun install
       - name: Build Types
