@@ -9,7 +9,7 @@
 		"drizzle-kit": "0.31.4",
 		"knip": "5.63.1",
 		"tsdown": "0.12.9",
-		"typescript": "5.9.2",
+		"typescript": "5.9.3",
 		"graphql-scalars": "1.24.2"
 	},
 	"bin": "dist/index.js",
